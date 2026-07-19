@@ -1,0 +1,24 @@
+---
+description: "Canonical Unity rebuild architecture."
+globs: "Assets/**/*.cs,Assets/**/*.asmdef,Assets/**/*.unity,Assets/**/*.asset,Packages/manifest.json,ProjectSettings/**/*"
+alwaysApply: true
+---
+# Unity rebuild architecture
+
+Read `Docs/UNITY_REQUIREMENTS.md`.
+
+- Use Unity 6 and frozen package versions.
+- UI Toolkit for application scenes and complex/data-heavy gameplay panels.
+- uGUI screen-space Canvas for gameplay HUD/feedback.
+- uGUI world-space Canvas for in-world markers and prompts.
+- One mission scene with three logical open-world areas.
+- No one-scene-per-area architecture.
+- No additive area loading.
+- No separate final-challenge scene/state; Area 3 includes it.
+- Keep static gameplay content local.
+- Keep Quiz Portal server-managed.
+- Use stable IDs and the canonical v5 manifest and per-mission JSON catalog.
+- Use local-first transactional progress plus outbox.
+- Do not edit vendor packages.
+- Avoid cyclic assemblies and runtime object-name searches.
+- Add validation and tests.

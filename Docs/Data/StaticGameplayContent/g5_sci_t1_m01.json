@@ -1,0 +1,561 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_sci_t1_m01",
+  "grade_id": "grade_5",
+  "subject_id": "subject_science",
+  "term_id": "term_1",
+  "title": "The Vanishing Supply Cart",
+  "curriculum_block": "Weeks 1–2",
+  "learning_focus": "Matter has mass and occupies space; solids, liquids, and gases.",
+  "story_premise": "A supply cart appears empty, yet its balloon, bottle, and sealed boxes still contain matter. The player helps Lab Guide Tala prove what is present.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Matter has mass and occupies space; solids, liquids, and gases.",
+  "collectible_type": "Science Evidence Token",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_sci_t1_m01",
+    "scene_name": "SCN_G5_SCI_T1_M01_TheVanishingSupplyCart",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_sci_t1_m01_a01",
+      "area_number": 1,
+      "title": "Solid and Liquid Depot",
+      "phase": "discover_and_connect",
+      "story": "The learner observes solid objects and pours a fixed amount of liquid into differently shaped containers. The guided investigation compares definite shape with changing container shape while showing that both occupy space. Evidence Token 1 is earned.",
+      "opening_dialogue": [
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "The cart is not empty. Start with the solid and liquid supplies."
+        },
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "Predict what will happen when the water changes containers, then observe and record the result."
+        }
+      ],
+      "learning_clues": [
+        "A solid has a definite shape and occupies space.",
+        "A liquid takes the shape of its container and occupies space."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "observe_problem",
+        "record_observations",
+        "make_prediction",
+        "perform_guided_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t1_m01_a01_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "What will happen when the same water is poured into the wide bowl?",
+          "options": [
+            {
+              "id": "a",
+              "text": "It will take the bowl’s shape."
+            },
+            {
+              "id": "b",
+              "text": "It will become a solid."
+            },
+            {
+              "id": "c",
+              "text": "It will disappear."
+            },
+            {
+              "id": "d",
+              "text": "It will no longer occupy space."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "The water changes shape to match its container.",
+          "correct_feedback": "The water changes shape to match its container.",
+          "records_prediction": true
+        },
+        {
+          "id": "g5_sci_t1_m01_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which object keeps its own shape?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The wooden block"
+            },
+            {
+              "id": "b",
+              "text": "The colored water"
+            },
+            {
+              "id": "c",
+              "text": "The empty space above the bowl"
+            },
+            {
+              "id": "d",
+              "text": "The pouring animation"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Compare the solid and liquid.",
+          "second_wrong_explanation": "The wooden block is a solid with a definite shape.",
+          "correct_feedback": "The wooden block is a solid with a definite shape."
+        },
+        {
+          "id": "g5_sci_t1_m01_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The water stops being matter when its shape changes.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "false"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Matter still occupies space even when its shape changes.",
+          "second_wrong_explanation": "The statement is false. The water remains matter.",
+          "correct_feedback": "The statement is false. The water remains matter."
+        },
+        {
+          "id": "g5_sci_t1_m01_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which observation supports that the liquid occupies space?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The liquid fills part of each container."
+            },
+            {
+              "id": "b",
+              "text": "The container has a label."
+            },
+            {
+              "id": "c",
+              "text": "The table is brown."
+            },
+            {
+              "id": "d",
+              "text": "The guide speaks."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use an observation about the liquid’s volume in the container.",
+          "second_wrong_explanation": "Filling part of the container shows that the liquid occupies space.",
+          "correct_feedback": "Filling part of the container shows that the liquid occupies space."
+        }
+      ],
+      "world_action": "Pour the measured liquid, compare the containers, and record the observation.",
+      "world_result": "The solid and liquid inventory lights activate and Evidence Token 1 appears.",
+      "collectible": {
+        "id": "g5_sci_t1_m01_a01_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t1_m01_a01.started",
+        "g5_sci_t1_m01_a01.interaction_state",
+        "g5_sci_t1_m01_a01.question_outcomes",
+        "g5_sci_t1_m01_a01.review_required",
+        "g5_sci_t1_m01_a01.world_action_completed",
+        "g5_sci_t1_m01_a01.collectible_collected",
+        "g5_sci_t1_m01_a01.completed"
+      ],
+      "story_source": "A wooden block keeps its own shape. The same amount of colored water is poured from a tall cylinder into a wide bowl; its shape changes, but it still occupies space."
+    },
+    {
+      "area_id": "g5_sci_t1_m01_a02",
+      "area_number": 2,
+      "title": "Gas and Mass Yard",
+      "phase": "practice_and_apply",
+      "story": "The learner uses a balloon and sealed container to show that gas occupies space, then compares objects and containers with a guided balance. The zone connects visible and invisible matter to evidence of space and mass. Evidence Token 2 is earned.",
+      "opening_dialogue": [
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "Gas can be hard to see, so we need evidence."
+        },
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "Observe the balloon before and after adding air, then compare the guided balance readings."
+        }
+      ],
+      "learning_clues": [
+        "Gas occupies space even when it is invisible.",
+        "Matter has mass; a guided comparison can provide evidence."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "compare_variables_or_evidence",
+        "perform_application_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "form_intermediate_conclusion",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t1_m01_a02_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "What will likely happen when air is pumped into the balloon?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The balloon will expand."
+            },
+            {
+              "id": "b",
+              "text": "The balloon will turn into metal."
+            },
+            {
+              "id": "c",
+              "text": "The air will stop occupying space."
+            },
+            {
+              "id": "d",
+              "text": "The balloon will disappear."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Think about the space taken by the added air.",
+          "second_wrong_explanation": "The balloon expands because the gas occupies space.",
+          "correct_feedback": "The balloon expands because the gas occupies space.",
+          "records_prediction": true
+        },
+        {
+          "id": "g5_sci_t1_m01_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which observation is evidence that gas occupies space?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The balloon becomes larger after air is added."
+            },
+            {
+              "id": "b",
+              "text": "The pump has a handle."
+            },
+            {
+              "id": "c",
+              "text": "The balloon has a color."
+            },
+            {
+              "id": "d",
+              "text": "The scale sits on a table."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look for a change caused by adding air.",
+          "second_wrong_explanation": "The expansion is direct evidence that gas occupies space.",
+          "correct_feedback": "The expansion is direct evidence that gas occupies space."
+        },
+        {
+          "id": "g5_sci_t1_m01_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "Invisible gas can still be matter.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Matter does not have to be visible.",
+          "second_wrong_explanation": "The statement is true: gas has mass and occupies space.",
+          "correct_feedback": "The statement is true: gas has mass and occupies space."
+        },
+        {
+          "id": "g5_sci_t1_m01_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Why is a sealed balloon used for the balance comparison?",
+          "options": [
+            {
+              "id": "a",
+              "text": "To keep the gas contained during the measurement"
+            },
+            {
+              "id": "b",
+              "text": "To make the balloon a solid"
+            },
+            {
+              "id": "c",
+              "text": "To remove all matter from it"
+            },
+            {
+              "id": "d",
+              "text": "To change every part of the setup"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The test needs the gas to remain in the balloon.",
+          "second_wrong_explanation": "Keeping the gas contained makes the comparison meaningful.",
+          "correct_feedback": "Keeping the gas contained makes the comparison meaningful."
+        }
+      ],
+      "world_action": "Inflate and seal the balloon, then use the guided balance to compare the prepared samples.",
+      "world_result": "The gas and mass indicators activate and Evidence Token 2 appears.",
+      "collectible": {
+        "id": "g5_sci_t1_m01_a02_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t1_m01_a02.started",
+        "g5_sci_t1_m01_a02.interaction_state",
+        "g5_sci_t1_m01_a02.question_outcomes",
+        "g5_sci_t1_m01_a02.review_required",
+        "g5_sci_t1_m01_a02.world_action_completed",
+        "g5_sci_t1_m01_a02.collectible_collected",
+        "g5_sci_t1_m01_a02.completed"
+      ],
+      "story_source": "An uninflated balloon is small. Air from a pump inflates it, showing that gas occupies space. A sealed inflated balloon also changes the balance reading compared with the uninflated balloon."
+    },
+    {
+      "area_id": "g5_sci_t1_m01_a03",
+      "area_number": 3,
+      "title": "Classification Gate",
+      "phase": "resolve_and_master",
+      "story": "The learner classifies everyday examples as solid, liquid, or gas and explains one observable reason for each. The integrated final challenge restores the supply-cart inventory by identifying matter that was visible and invisible. Evidence Token 3 completes the mission.",
+      "opening_dialogue": [
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "The final gate needs a complete matter inventory."
+        },
+        {
+          "speaker": "Lab Guide Tala",
+          "text": "Classify the examples and use evidence about mass and occupied space."
+        }
+      ],
+      "learning_clues": [
+        "Solids keep a definite shape; liquids take the shape of their container; gases spread to fill available space.",
+        "Solids, liquids, and gases are matter because they have mass and occupy space."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "apply_scientific_solution",
+        "resolve_integrated_mission_challenge",
+        "form_final_conclusion",
+        "restore_world_state",
+        "collect_evidence_token",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t1_m01_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "How should the wooden block be classified?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Solid"
+            },
+            {
+              "id": "b",
+              "text": "Liquid"
+            },
+            {
+              "id": "c",
+              "text": "Gas"
+            },
+            {
+              "id": "d",
+              "text": "Not matter"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "It keeps its own shape.",
+          "second_wrong_explanation": "The block is a solid.",
+          "correct_feedback": "The block is a solid."
+        },
+        {
+          "id": "g5_sci_t1_m01_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "How should the bottled water be classified?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Liquid"
+            },
+            {
+              "id": "b",
+              "text": "Solid"
+            },
+            {
+              "id": "c",
+              "text": "Gas"
+            },
+            {
+              "id": "d",
+              "text": "Not matter"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "It takes the shape of its container.",
+          "second_wrong_explanation": "The water is a liquid.",
+          "correct_feedback": "The water is a liquid."
+        },
+        {
+          "id": "g5_sci_t1_m01_a03_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What matter is inside the ball?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Gas (air)"
+            },
+            {
+              "id": "b",
+              "text": "Only empty space"
+            },
+            {
+              "id": "c",
+              "text": "A new solid"
+            },
+            {
+              "id": "d",
+              "text": "No matter at all"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The ball expands because something fills it.",
+          "second_wrong_explanation": "Air is a gas and is matter.",
+          "correct_feedback": "Air is a gas and is matter."
+        },
+        {
+          "id": "g5_sci_t1_m01_a03_q04",
+          "type": "multiple_choice_multiple",
+          "is_scored": true,
+          "prompt": "Which two properties support that all three examples are matter?",
+          "options": [
+            {
+              "id": "a",
+              "text": "They have mass."
+            },
+            {
+              "id": "b",
+              "text": "They occupy space."
+            },
+            {
+              "id": "c",
+              "text": "They are all visible."
+            },
+            {
+              "id": "d",
+              "text": "They all keep the same shape."
+            }
+          ],
+          "correct_option_ids": [
+            "a",
+            "b"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the mission’s two defining properties.",
+          "second_wrong_explanation": "Matter has mass and occupies space.",
+          "correct_feedback": "Matter has mass and occupies space."
+        }
+      ],
+      "world_action": "Classify the three supplies and restore them to the correct cart compartments.",
+      "world_result": "The inventory gate opens, the cart is restored, Evidence Token 3 appears, and the mission completes.",
+      "collectible": {
+        "id": "g5_sci_t1_m01_a03_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t1_m01_a03.started",
+        "g5_sci_t1_m01_a03.interaction_state",
+        "g5_sci_t1_m01_a03.question_outcomes",
+        "g5_sci_t1_m01_a03.review_required",
+        "g5_sci_t1_m01_a03.world_action_completed",
+        "g5_sci_t1_m01_a03.collectible_collected",
+        "g5_sci_t1_m01_a03.completed"
+      ],
+      "story_source": "The restored cart contains a wooden block, bottled water, and an air-filled ball. The learner must classify each item and explain how the evidence shows that all three are matter."
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "milestone_authored_exact_content"
+}

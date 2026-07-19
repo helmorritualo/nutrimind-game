@@ -1,0 +1,17 @@
+{
+  "success": false,
+  "error": {
+    "code": "MANIFEST_AREA_COUNT_INVALID",
+    "message": "The mission manifest must define exactly three areas.",
+    "details": {
+      "mission_id": "g5_lq_t1_m01",
+      "expected": 3,
+      "received": 5
+    }
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

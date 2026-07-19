@@ -1,0 +1,562 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_sci_t2_m02",
+  "grade_id": "grade_5",
+  "subject_id": "subject_science",
+  "term_id": "term_2",
+  "title": "The Growing Life Gallery",
+  "curriculum_block": "Weeks 3–4",
+  "learning_focus": "Age-appropriate reproductive-system identification; animals giving birth or laying eggs; beginnings of life-cycle comparison.",
+  "story_premise": "A gallery of growth has misplaced diagrams and labels. The player restores scientifically accurate, respectful displays.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Age-appropriate reproductive-system identification; animals giving birth or laying eggs; beginnings of life-cycle comparison.",
+  "collectible_type": "Science Evidence Token",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_sci_t2_m02",
+    "scene_name": "SCN_G5_SCI_T2_M02_TheGrowingLifeGallery",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_sci_t2_m02_a01",
+      "area_number": 1,
+      "title": "Body Diagram Room",
+      "phase": "discover_and_connect",
+      "story": "Identify the listed male and female reproductive-system parts using age-appropriate diagrams and function labels. Identify common mammal examples.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Body Diagram Room is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Identify the listed male and female reproductive-system parts using age-appropriate diagrams and function labels."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate Age-appropriate reproductive-system identification, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: Age-appropriate reproductive-system identification.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "observe_problem",
+        "record_observations",
+        "make_prediction",
+        "perform_guided_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t2_m02_a01_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g5_sci_t2_m02_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g5_sci_t2_m02_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g5_sci_t2_m02_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for Age-appropriate reproductive-system identification and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for Age-appropriate reproductive-system identification and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for Age-appropriate reproductive-system identification and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for Age-appropriate reproductive-system identification and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Body Diagram Room.",
+      "collectible": {
+        "id": "g5_sci_t2_m02_a01_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t2_m02_a01.started",
+        "g5_sci_t2_m02_a01.interaction_state",
+        "g5_sci_t2_m02_a01.question_outcomes",
+        "g5_sci_t2_m02_a01.review_required",
+        "g5_sci_t2_m02_a01.world_action_completed",
+        "g5_sci_t2_m02_a01.collectible_collected",
+        "g5_sci_t2_m02_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g5_sci_t2_m02_a02",
+      "area_number": 2,
+      "title": "Egg-Laying Hall",
+      "phase": "practice_and_apply",
+      "story": "Identify bird and reptile examples. Arrange birth/egg, young, and adult stages.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Egg-Laying Hall is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Identify bird and reptile examples."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate animals giving birth or laying eggs, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: animals giving birth or laying eggs.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "compare_variables_or_evidence",
+        "perform_application_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "form_intermediate_conclusion",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t2_m02_a02_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g5_sci_t2_m02_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g5_sci_t2_m02_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g5_sci_t2_m02_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for animals giving birth or laying eggs and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for animals giving birth or laying eggs and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for animals giving birth or laying eggs and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for animals giving birth or laying eggs and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Egg-Laying Hall.",
+      "collectible": {
+        "id": "g5_sci_t2_m02_a02_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t2_m02_a02.started",
+        "g5_sci_t2_m02_a02.interaction_state",
+        "g5_sci_t2_m02_a02.question_outcomes",
+        "g5_sci_t2_m02_a02.review_required",
+        "g5_sci_t2_m02_a02.world_action_completed",
+        "g5_sci_t2_m02_a02.collectible_collected",
+        "g5_sci_t2_m02_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g5_sci_t2_m02_a03",
+      "area_number": 3,
+      "title": "Respect Review",
+      "phase": "resolve_and_master",
+      "story": "Check that language is factual, private, and non-stigmatizing. The gallery opens with a clear note that development and reproduction are biological topics treated respectfully.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Respect Review is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Check that language is factual, private, and non-stigmatizing."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate beginnings of life-cycle comparison, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: beginnings of life-cycle comparison.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "apply_scientific_solution",
+        "resolve_integrated_mission_challenge",
+        "form_final_conclusion",
+        "restore_world_state",
+        "collect_evidence_token",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_sci_t2_m02_a03_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g5_sci_t2_m02_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g5_sci_t2_m02_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g5_sci_t2_m02_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for beginnings of life-cycle comparison and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for beginnings of life-cycle comparison and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for beginnings of life-cycle comparison and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for beginnings of life-cycle comparison and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Respect Review.",
+      "collectible": {
+        "id": "g5_sci_t2_m02_a03_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_sci_t2_m02_a03.started",
+        "g5_sci_t2_m02_a03.interaction_state",
+        "g5_sci_t2_m02_a03.question_outcomes",
+        "g5_sci_t2_m02_a03.review_required",
+        "g5_sci_t2_m02_a03.world_action_completed",
+        "g5_sci_t2_m02_a03.collectible_collected",
+        "g5_sci_t2_m02_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

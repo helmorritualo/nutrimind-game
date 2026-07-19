@@ -1,0 +1,558 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_lq_t1_m03",
+  "grade_id": "grade_5",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Hall of Speaking Sounds",
+  "curriculum_block": "Weeks 5–6",
+  "learning_focus": "Onomatopoeia, alliteration, assonance, consonance; simile, metaphor, and personification; adjective order; non-verbal cues; cultural appropriateness; creation of a visual narrative.",
+  "story_premise": "A hall of oral stories has gone silent because the sounds, comparisons, and gestures were separated from their meanings. The Pathfinder helps performers rebuild a respectful community presentation.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Onomatopoeia, alliteration, assonance, consonance; simile, metaphor, and personification; adjective order; non-verbal cues; cultural appropriateness; creation of a visual narrative.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_lq_t1_m03",
+    "scene_name": "SCN_G5_LQ_T1_M03_TheHallOfSpeakingSounds",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_lq_t1_m03_a01",
+      "area_number": 1,
+      "title": "Echo Arcade",
+      "phase": "discover_and_connect",
+      "story": "Match sound words and sound devices to scenes without turning the passage into noise. Repair short lines using alliteration, assonance, and consonance while keeping the meaning clear.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Echo Arcade."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Match sound words and sound devices to scenes without turning the passage into noise."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Onomatopoeia, alliteration, assonance, consonance, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Onomatopoeia, alliteration, assonance, consonance.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "resolve_story_structure_questions",
+        "apply_language_clue",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m03_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Echo Arcade?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Match sound words and sound devices to scenes without turning the passage into noise."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Match sound words and sound devices to scenes without turning the passage into noise.",
+          "correct_feedback": "Match sound words and sound devices to scenes without turning the passage into noise."
+        },
+        {
+          "id": "g5_lq_t1_m03_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Onomatopoeia, alliteration, assonance, consonance"
+            },
+            {
+              "id": "b",
+              "text": "simile, metaphor, and personification"
+            },
+            {
+              "id": "c",
+              "text": "adjective order"
+            },
+            {
+              "id": "d",
+              "text": "non-verbal cues"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Onomatopoeia, alliteration, assonance, consonance.",
+          "correct_feedback": "This area directly practices Onomatopoeia, alliteration, assonance, consonance."
+        },
+        {
+          "id": "g5_lq_t1_m03_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m03_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "inspect the text or visual clues and repair the first story element"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should inspect the text or visual clues and repair the first story element.",
+          "correct_feedback": "The learner should inspect the text or visual clues and repair the first story element."
+        }
+      ],
+      "world_action": "inspect the text or visual clues and repair the first story element",
+      "world_result": "Echo Arcade is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m03_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m03_a01.started",
+        "g5_lq_t1_m03_a01.interaction_state",
+        "g5_lq_t1_m03_a01.question_outcomes",
+        "g5_lq_t1_m03_a01.review_required",
+        "g5_lq_t1_m03_a01.world_action_completed",
+        "g5_lq_t1_m03_a01.collectible_collected",
+        "g5_lq_t1_m03_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m03_a02",
+      "area_number": 2,
+      "title": "Figure Studio",
+      "phase": "practice_and_apply",
+      "story": "Interpret simile, metaphor, and personification, then choose which comparison best fits a scene. Guide performers to use facial expression, gesture, eye contact, posture, and spacing that support the message.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Figure Studio."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Interpret simile, metaphor, and personification, then choose which comparison best fits a scene."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use adjective order, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: adjective order.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "repair_language_or_visual_elements",
+        "compare_evidence",
+        "resolve_application_questions",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m03_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Figure Studio?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Interpret simile, metaphor, and personification, then choose which comparison best fits a scene."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Interpret simile, metaphor, and personification, then choose which comparison best fits a scene.",
+          "correct_feedback": "Interpret simile, metaphor, and personification, then choose which comparison best fits a scene."
+        },
+        {
+          "id": "g5_lq_t1_m03_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "adjective order"
+            },
+            {
+              "id": "b",
+              "text": "Onomatopoeia, alliteration, assonance, consonance"
+            },
+            {
+              "id": "c",
+              "text": "simile, metaphor, and personification"
+            },
+            {
+              "id": "d",
+              "text": "non-verbal cues"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices adjective order.",
+          "correct_feedback": "This area directly practices adjective order."
+        },
+        {
+          "id": "g5_lq_t1_m03_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m03_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "apply the language or visual clue to repair the middle section"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should apply the language or visual clue to repair the middle section.",
+          "correct_feedback": "The learner should apply the language or visual clue to repair the middle section."
+        }
+      ],
+      "world_action": "apply the language or visual clue to repair the middle section",
+      "world_result": "Figure Studio is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m03_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m03_a02.started",
+        "g5_lq_t1_m03_a02.interaction_state",
+        "g5_lq_t1_m03_a02.question_outcomes",
+        "g5_lq_t1_m03_a02.review_required",
+        "g5_lq_t1_m03_a02.world_action_completed",
+        "g5_lq_t1_m03_a02.collectible_collected",
+        "g5_lq_t1_m03_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m03_a03",
+      "area_number": 3,
+      "title": "Cultural Gallery",
+      "phase": "resolve_and_master",
+      "story": "Rearrange adjective series and visual elements, remove an inappropriate stereotype, and assemble a culturally respectful story panel. The troupe performs the restored scene. The player identifies how sound, figure of speech, gesture, and visual design work together.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Cultural Gallery."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Rearrange adjective series and visual elements, remove an inappropriate stereotype, and assemble a culturally respectful story panel."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use cultural appropriateness, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: cultural appropriateness.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "reconstruct_complete_narrative",
+        "resolve_integrated_mission_challenge",
+        "review_when_required",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m03_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Cultural Gallery?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Rearrange adjective series and visual elements, remove an inappropriate stereotype, and assemble a culturally respectful story panel."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Rearrange adjective series and visual elements, remove an inappropriate stereotype, and assemble a culturally respectful story panel.",
+          "correct_feedback": "Rearrange adjective series and visual elements, remove an inappropriate stereotype, and assemble a culturally respectful story panel."
+        },
+        {
+          "id": "g5_lq_t1_m03_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "cultural appropriateness"
+            },
+            {
+              "id": "b",
+              "text": "Onomatopoeia, alliteration, assonance, consonance"
+            },
+            {
+              "id": "c",
+              "text": "simile, metaphor, and personification"
+            },
+            {
+              "id": "d",
+              "text": "adjective order"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices cultural appropriateness.",
+          "correct_feedback": "This area directly practices cultural appropriateness."
+        },
+        {
+          "id": "g5_lq_t1_m03_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m03_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "reconstruct the final text and restore the complete story"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should reconstruct the final text and restore the complete story.",
+          "correct_feedback": "The learner should reconstruct the final text and restore the complete story."
+        }
+      ],
+      "world_action": "reconstruct the final text and restore the complete story",
+      "world_result": "Cultural Gallery is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m03_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m03_a03.started",
+        "g5_lq_t1_m03_a03.interaction_state",
+        "g5_lq_t1_m03_a03.question_outcomes",
+        "g5_lq_t1_m03_a03.review_required",
+        "g5_lq_t1_m03_a03.world_action_completed",
+        "g5_lq_t1_m03_a03.collectible_collected",
+        "g5_lq_t1_m03_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

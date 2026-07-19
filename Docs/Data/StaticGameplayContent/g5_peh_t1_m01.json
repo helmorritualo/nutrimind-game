@@ -1,0 +1,550 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_peh_t1_m01",
+  "grade_id": "grade_5",
+  "subject_id": "subject_pe_health",
+  "term_id": "term_1",
+  "title": "The Storm Inside",
+  "curriculum_block": "Design Weeks 1–2",
+  "learning_focus": "Recognizing stress and applying healthy coping strategies.",
+  "story_premise": "A sudden school-festival delay makes Wellness Park glow red. Nico and Maya react differently to stress, and the player helps them choose and apply healthy coping actions.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Recognizing stress and applying healthy coping strategies.",
+  "collectible_type": "Wellness Symbol",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_peh_t1_m01",
+    "scene_name": "SCN_G5_PEH_T1_M01_TheStormInside",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_peh_t1_m01_a01",
+      "area_number": 1,
+      "title": "Signal Garden",
+      "phase": "discover_and_connect",
+      "story": "The learner observes physical, emotional, and behavioral signs of stress, then practices a short paced-breathing response in the same zone. The goal is recognition and a safe first coping action, not diagnosis. A calm change in the garden reveals Wellness Symbol 1.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide Aya",
+          "text": "These body feelings, thoughts, and behaviors can be signs of stress. They are clues, not a diagnosis."
+        },
+        {
+          "speaker": "Health Guide Aya",
+          "text": "Help Nico notice the signs and practice slow breathing before choosing the next step."
+        }
+      ],
+      "learning_clues": [
+        "Stress can show through body sensations, emotions, thoughts, and behavior.",
+        "Slow breathing is one safe coping strategy; persistent or serious distress should be shared with a trusted adult."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "observe_health_situation",
+        "identify_health_clues",
+        "learn_safe_concept",
+        "resolve_situation_questions",
+        "perform_first_healthy_action",
+        "observe_wellness_result",
+        "collect_wellness_symbol",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t1_m01_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which detail is a physical sign of stress?",
+          "options": [
+            {
+              "id": "a",
+              "text": "His shoulders are tight."
+            },
+            {
+              "id": "b",
+              "text": "The festival has decorations."
+            },
+            {
+              "id": "c",
+              "text": "The program has a stage."
+            },
+            {
+              "id": "d",
+              "text": "A friend carries a banner."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look for a body sensation.",
+          "second_wrong_explanation": "Tight shoulders are a physical sign.",
+          "correct_feedback": "Tight shoulders are a physical sign."
+        },
+        {
+          "id": "g5_peh_t1_m01_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which thought may show stress?",
+          "options": [
+            {
+              "id": "a",
+              "text": "“Everything will go wrong.”"
+            },
+            {
+              "id": "b",
+              "text": "“I will ask what time the program starts.”"
+            },
+            {
+              "id": "c",
+              "text": "“The banner is blue.”"
+            },
+            {
+              "id": "d",
+              "text": "“I brought my water bottle.”"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look for the worried prediction.",
+          "second_wrong_explanation": "The repeated worst-case thought may be a stress sign.",
+          "correct_feedback": "The repeated worst-case thought may be a stress sign."
+        },
+        {
+          "id": "g5_peh_t1_m01_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "One stress sign is enough to diagnose a health condition.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "false"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Signs are clues, not a diagnosis.",
+          "second_wrong_explanation": "The statement is false. A trusted adult or health professional should handle serious concerns.",
+          "correct_feedback": "The statement is false. A trusted adult or health professional should handle serious concerns."
+        },
+        {
+          "id": "g5_peh_t1_m01_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is a safe first coping action for Nico?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Pause and take slow, comfortable breaths."
+            },
+            {
+              "id": "b",
+              "text": "Keep running even if dizzy."
+            },
+            {
+              "id": "c",
+              "text": "Hide the problem from everyone."
+            },
+            {
+              "id": "d",
+              "text": "Blame another student."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose a calm, low-risk action.",
+          "second_wrong_explanation": "Slow breathing can help Nico pause and settle before deciding what to do next.",
+          "correct_feedback": "Slow breathing can help Nico pause and settle before deciding what to do next."
+        }
+      ],
+      "world_action": "Guide Nico through a short paced-breathing interaction.",
+      "world_result": "Nico’s tension meter lowers, the red glow fades in Signal Garden, and Wellness Symbol 1 appears.",
+      "collectible": {
+        "id": "g5_peh_t1_m01_a01_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t1_m01_a01.started",
+        "g5_peh_t1_m01_a01.interaction_state",
+        "g5_peh_t1_m01_a01.question_outcomes",
+        "g5_peh_t1_m01_a01.review_required",
+        "g5_peh_t1_m01_a01.world_action_completed",
+        "g5_peh_t1_m01_a01.collectible_collected",
+        "g5_peh_t1_m01_a01.completed"
+      ],
+      "story_source": "Nico is waiting for the delayed festival program. His shoulders are tight, his stomach feels uncomfortable, and he keeps saying that everything will go wrong."
+    },
+    {
+      "area_id": "g5_peh_t1_m01_a02",
+      "area_number": 2,
+      "title": "Plan Path",
+      "phase": "practice_and_apply",
+      "story": "The learner breaks the delayed festival task into realistic steps and chooses a trusted person and respectful way to ask for help. The player applies the plan through an in-world action and restores the support route, revealing Wellness Symbol 2.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide Aya",
+          "text": "A large task can feel smaller when it is divided into clear steps."
+        },
+        {
+          "speaker": "Health Guide Aya",
+          "text": "Help Maya choose one first step and identify a trusted person who can answer questions."
+        }
+      ],
+      "learning_clues": [
+        "Break a large task into small, realistic steps.",
+        "Asking a trusted adult, teacher, or responsible helper is a healthy coping action."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "compare_healthy_choices",
+        "build_or_practice_action_plan",
+        "resolve_application_questions",
+        "perform_healthy_action",
+        "observe_wellness_result",
+        "collect_wellness_symbol",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t1_m01_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which is the best first step?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Choose one small task, such as finishing the sign title."
+            },
+            {
+              "id": "b",
+              "text": "Try to do all tasks at exactly the same time."
+            },
+            {
+              "id": "c",
+              "text": "Leave without telling anyone."
+            },
+            {
+              "id": "d",
+              "text": "Wait until the problem becomes worse."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Pick one specific and manageable action.",
+          "second_wrong_explanation": "Starting with one small task makes the plan easier to follow.",
+          "correct_feedback": "Starting with one small task makes the plan easier to follow."
+        },
+        {
+          "id": "g5_peh_t1_m01_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Who is an appropriate trusted helper at the festival?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The assigned teacher or event coordinator"
+            },
+            {
+              "id": "b",
+              "text": "A stranger who asks for private information"
+            },
+            {
+              "id": "c",
+              "text": "Anyone online who sends a message"
+            },
+            {
+              "id": "d",
+              "text": "A person who tells Maya to hide the problem"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose someone responsible and known in the setting.",
+          "second_wrong_explanation": "The teacher or coordinator is an appropriate trusted helper.",
+          "correct_feedback": "The teacher or coordinator is an appropriate trusted helper."
+        },
+        {
+          "id": "g5_peh_t1_m01_a02_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which request is assertive and respectful?",
+          "options": [
+            {
+              "id": "a",
+              "text": "“I feel overwhelmed. Can you help me choose what to do first?”"
+            },
+            {
+              "id": "b",
+              "text": "“Do everything for me now!”"
+            },
+            {
+              "id": "c",
+              "text": "“I will not tell anyone what is wrong.”"
+            },
+            {
+              "id": "d",
+              "text": "“This is all your fault.”"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use clear feelings and a specific request.",
+          "second_wrong_explanation": "The statement explains the concern and asks for practical help.",
+          "correct_feedback": "The statement explains the concern and asks for practical help."
+        },
+        {
+          "id": "g5_peh_t1_m01_a02_q04",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "A coping plan can include both small steps and support from a trusted person.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Healthy coping can combine self-management and help-seeking.",
+          "second_wrong_explanation": "The statement is true.",
+          "correct_feedback": "The statement is true."
+        }
+      ],
+      "world_action": "Arrange Maya’s tasks into three steps and walk with her to the event coordinator.",
+      "world_result": "The route signs align, Maya begins calmly, and Wellness Symbol 2 appears.",
+      "collectible": {
+        "id": "g5_peh_t1_m01_a02_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t1_m01_a02.started",
+        "g5_peh_t1_m01_a02.interaction_state",
+        "g5_peh_t1_m01_a02.question_outcomes",
+        "g5_peh_t1_m01_a02.review_required",
+        "g5_peh_t1_m01_a02.world_action_completed",
+        "g5_peh_t1_m01_a02.collectible_collected",
+        "g5_peh_t1_m01_a02.completed"
+      ],
+      "story_source": "Maya is overwhelmed because she must prepare a sign, practice a line, and find the meeting point before the festival begins. She does not know where to start."
+    },
+    {
+      "area_id": "g5_peh_t1_m01_a03",
+      "area_number": 3,
+      "title": "Rest Grove",
+      "phase": "resolve_and_master",
+      "story": "The learner balances sleep, movement, recreation, quiet time, and support in a simple daily coping plan, then applies the complete plan to the original festival problem. Wellness Park shifts from red to calm green, Wellness Symbol 3 appears, and the mission completes.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide Aya",
+          "text": "One coping strategy may help, but a balanced plan gives several safe choices."
+        },
+        {
+          "speaker": "Health Guide Aya",
+          "text": "Build a simple plan the children can use now and later."
+        }
+      ],
+      "learning_clues": [
+        "Healthy coping may include rest, hydration, movement, recreation, quiet time, and support.",
+        "Choose strategies that are safe, available, and appropriate to the situation."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "apply_integrated_wellness_plan",
+        "resolve_integrated_mission_challenge",
+        "observe_final_wellness_result",
+        "collect_wellness_symbol",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t1_m01_a03_q01",
+          "type": "multiple_choice_multiple",
+          "is_scored": true,
+          "prompt": "Select two healthy actions for the waiting period.",
+          "options": [
+            {
+              "id": "a",
+              "text": "Drink water."
+            },
+            {
+              "id": "b",
+              "text": "Take a short quiet break."
+            },
+            {
+              "id": "c",
+              "text": "Skip food and water."
+            },
+            {
+              "id": "d",
+              "text": "Keep worries secret from every trusted adult."
+            }
+          ],
+          "correct_option_ids": [
+            "a",
+            "b"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose actions that safely support body and mind.",
+          "second_wrong_explanation": "Hydration and a quiet break are safe coping actions.",
+          "correct_feedback": "Hydration and a quiet break are safe coping actions."
+        },
+        {
+          "id": "g5_peh_t1_m01_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What should the learner do if strong stress continues or feels unsafe?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Tell a trusted adult and ask for help."
+            },
+            {
+              "id": "b",
+              "text": "Keep it secret."
+            },
+            {
+              "id": "c",
+              "text": "Use someone else’s medicine."
+            },
+            {
+              "id": "d",
+              "text": "Leave the area alone without permission."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Persistent or serious concerns need trusted support.",
+          "second_wrong_explanation": "The learner should seek help from a trusted adult.",
+          "correct_feedback": "The learner should seek help from a trusted adult."
+        },
+        {
+          "id": "g5_peh_t1_m01_a03_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which plan is most balanced?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Water, a short rest, light movement, and checking in with the teacher"
+            },
+            {
+              "id": "b",
+              "text": "Only scrolling on a device for the entire delay"
+            },
+            {
+              "id": "c",
+              "text": "Ignoring body signals and practicing without breaks"
+            },
+            {
+              "id": "d",
+              "text": "Doing every task alone without rest"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A balanced plan uses more than one safe strategy.",
+          "second_wrong_explanation": "The selected plan supports physical, emotional, and social well-being.",
+          "correct_feedback": "The selected plan supports physical, emotional, and social well-being."
+        },
+        {
+          "id": "g5_peh_t1_m01_a03_q04",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "Healthy coping means every person must use exactly the same strategy.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "false"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "People may need different safe strategies.",
+          "second_wrong_explanation": "The statement is false; safe coping choices can differ by person and situation.",
+          "correct_feedback": "The statement is false; safe coping choices can differ by person and situation."
+        }
+      ],
+      "world_action": "Assemble and apply the balanced coping plan at Rest Grove.",
+      "world_result": "The park changes from red to calm green, the festival group regains focus, Wellness Symbol 3 appears, and the mission completes.",
+      "collectible": {
+        "id": "g5_peh_t1_m01_a03_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t1_m01_a03.started",
+        "g5_peh_t1_m01_a03.interaction_state",
+        "g5_peh_t1_m01_a03.question_outcomes",
+        "g5_peh_t1_m01_a03.review_required",
+        "g5_peh_t1_m01_a03.world_action_completed",
+        "g5_peh_t1_m01_a03.collectible_collected",
+        "g5_peh_t1_m01_a03.completed"
+      ],
+      "story_source": "The festival delay continues. Nico and Maya need a balanced plan that includes rest, water, light movement, a quiet activity, and support from a trusted adult if stress remains strong."
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "milestone_authored_exact_content"
+}

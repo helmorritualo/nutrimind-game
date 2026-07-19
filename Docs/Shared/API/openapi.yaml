@@ -1,0 +1,2566 @@
+openapi: 3.1.0
+info:
+  title: NutriMind Student API — Rebuild Contract
+  version: 1.0.0-rebuild
+  description: Canonical Student API for the fresh NutriMind rebuild. Missions use
+    one Unity open-world scene with exactly three logical progression areas. The former
+    separate final-challenge routes are removed; the integrated mission challenge
+    is completed inside Area 3.
+servers:
+- url: https://{host}/api/v1
+  variables:
+    host:
+      default: api.example.test
+paths:
+  /student/ping:
+    get:
+      summary: Check API availability
+      operationId: studentPing
+      tags:
+      - System
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '422': &id001
+          $ref: '#/components/responses/ValidationFailed'
+        '429': &id002
+          $ref: '#/components/responses/RateLimited'
+        '500': &id003
+          $ref: '#/components/responses/InternalError'
+        '503': &id004
+          $ref: '#/components/responses/ServiceUnavailable'
+      parameters:
+      - &id005
+        $ref: '#/components/parameters/ClientVersionHeader'
+      - &id006
+        $ref: '#/components/parameters/OptionalDeviceIdHeader'
+      security: []
+  /student/config:
+    get:
+      summary: Get compatibility and operational limits
+      operationId: studentConfig
+      tags:
+      - System
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id005
+      - *id006
+      - $ref: '#/components/parameters/OptionalManifestVersionHeader'
+      security: []
+  /student/auth/login:
+    post:
+      summary: Authenticate using LRN and PIN
+      operationId: studentLogin
+      tags:
+      - Authentication
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+        '401': &id007
+          $ref: '#/components/responses/Unauthorized'
+        '403': &id008
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - $ref: '#/components/parameters/ClientVersionHeader'
+      - $ref: '#/components/parameters/DeviceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security: []
+  /student/auth/logout:
+    post:
+      summary: Revoke current access token
+      operationId: studentLogout
+      tags:
+      - Authentication
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        '401': *id007
+        '403': *id008
+        '404': &id009
+          $ref: '#/components/responses/NotFound'
+        '409': &id010
+          $ref: '#/components/responses/Conflict'
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: &id013
+      - &id011
+        $ref: '#/components/parameters/ClientVersionHeader'
+      - &id012
+        $ref: '#/components/parameters/DeviceIdHeader'
+      security:
+      - bearerAuth: []
+  /student/bootstrap:
+    get:
+      summary: Get Student bootstrap data
+      operationId: studentBootstrap
+      tags:
+      - Bootstrap
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootstrapResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+        '426':
+          $ref: '#/components/responses/UpgradeRequired'
+      parameters: &id016
+      - *id011
+      - *id012
+      - &id017
+        $ref: '#/components/parameters/ManifestVersionHeader'
+      security:
+      - bearerAuth: []
+  /student/profile:
+    get:
+      summary: Get safe Student profile
+      operationId: studentProfile
+      tags:
+      - Profile
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+  /student/settings:
+    get:
+      summary: Get Student settings
+      operationId: studentSettingsGet
+      tags:
+      - Profile
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+    patch:
+      summary: Update Student settings
+      operationId: studentSettingsUpdate
+      tags:
+      - Profile
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingsRequest'
+      security:
+      - bearerAuth: []
+  /student/subjects:
+    get:
+      summary: List available subjects
+      operationId: studentSubjects
+      tags:
+      - Catalog
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+  /student/subjects/{subjectSlug}/terms:
+    get:
+      summary: List subject terms
+      operationId: studentSubjectTerms
+      tags:
+      - Catalog
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TermsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/SubjectSlugPath'
+      security:
+      - bearerAuth: []
+  /student/quizzes:
+    get:
+      summary: List available Quiz Portal assignments
+      operationId: studentQuizzes
+      tags:
+      - Quiz Portal
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizzesResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - &id014
+        $ref: '#/components/parameters/PageQuery'
+      - &id015
+        $ref: '#/components/parameters/PerPageQuery'
+      - $ref: '#/components/parameters/SubjectIdQuery'
+      - $ref: '#/components/parameters/TermIdQuery'
+      - $ref: '#/components/parameters/StatusQuery'
+      security:
+      - bearerAuth: []
+  /student/quizzes/{quizId}:
+    get:
+      summary: Get Quiz Portal detail
+      operationId: studentQuizDetail
+      tags:
+      - Quiz Portal
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetailResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/QuizIdPath'
+      security:
+      - bearerAuth: []
+  /student/quizzes/{quizId}/attempts:
+    post:
+      summary: Submit Quiz Portal attempt
+      operationId: studentQuizAttemptSubmit
+      tags:
+      - Quiz Portal
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttemptResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/QuizIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizAttemptRequest'
+      security:
+      - bearerAuth: []
+  /student/quiz-results:
+    get:
+      summary: List Quiz Portal results
+      operationId: studentQuizResults
+      tags:
+      - Quiz Portal
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResultsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id014
+      - *id015
+      - $ref: '#/components/parameters/SubjectIdQuery'
+      - $ref: '#/components/parameters/TermIdQuery'
+      security:
+      - bearerAuth: []
+  /student/quiz-results/{attemptId}:
+    get:
+      summary: Get Quiz Portal result
+      operationId: studentQuizResultDetail
+      tags:
+      - Quiz Portal
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttemptResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/AttemptIdPath'
+      security:
+      - bearerAuth: []
+  /student/progress/summary:
+    get:
+      summary: Get aggregate progress summary
+      operationId: studentProgressSummary
+      tags:
+      - Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressSummaryResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+  /student/rewards:
+    get:
+      summary: List rewards
+      operationId: studentRewards
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+  /student/rewards/{rewardCode}/use:
+    post:
+      summary: Use reward idempotently
+      operationId: studentRewardUse
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardUseResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/RewardCodePath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardUseRequest'
+      security:
+      - bearerAuth: []
+  /student/certificates:
+    get:
+      summary: List certificates
+      operationId: studentCertificates
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificatesResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id014
+      - *id015
+      security:
+      - bearerAuth: []
+  /student/certificates/{certificateId}:
+    get:
+      summary: Get certificate detail
+      operationId: studentCertificateDetail
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateDetailResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/CertificateIdPath'
+      security:
+      - bearerAuth: []
+  /student/announcements:
+    get:
+      summary: List visible announcements
+      operationId: studentAnnouncements
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id014
+      - *id015
+      security:
+      - bearerAuth: []
+  /student/leaderboards:
+    get:
+      summary: Get section leaderboard
+      operationId: studentLeaderboards
+      tags:
+      - Engagement
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - $ref: '#/components/parameters/SubjectIdQuery'
+      - $ref: '#/components/parameters/TermIdQuery'
+      - $ref: '#/components/parameters/LeaderboardScopeQuery'
+      security:
+      - bearerAuth: []
+  /student/sync/status:
+    get:
+      summary: Get sync status
+      operationId: studentSyncStatus
+      tags:
+      - Synchronization
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStatusResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters: *id013
+      security:
+      - bearerAuth: []
+  /student/sync/push:
+    post:
+      summary: Push offline event batch
+      operationId: studentSyncPush
+      tags:
+      - Synchronization
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPushResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+      parameters: *id016
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncPushRequest'
+      security:
+      - bearerAuth: []
+  /student/missions:
+    get:
+      summary: List grade-eligible missions
+      operationId: studentMissions
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionsResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - *id014
+      - *id015
+      - $ref: '#/components/parameters/SubjectIdQuery'
+      - $ref: '#/components/parameters/TermIdQuery'
+      - $ref: '#/components/parameters/StatusQuery'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}:
+    get:
+      summary: Get mission availability
+      operationId: studentMissionDetail
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionDetailResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/progress:
+    get:
+      summary: Get mission progress
+      operationId: studentMissionProgress
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionProgressResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/start:
+    post:
+      summary: Start mission
+      operationId: studentMissionStart
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressMutationResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionEventRequest'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/areas/{areaId}/start:
+    post:
+      summary: Start area
+      operationId: studentAreaStart
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressMutationResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      - $ref: '#/components/parameters/AreaIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionEventRequest'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/areas/{areaId}/events:
+    post:
+      summary: Record semantic gameplay event
+      operationId: studentAreaEvent
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressMutationResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      - $ref: '#/components/parameters/AreaIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameplayEventRequest'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/areas/{areaId}/collectibles/{collectibleId}:
+    post:
+      summary: Collect area item
+      operationId: studentCollectibleCollect
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressMutationResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      - $ref: '#/components/parameters/AreaIdPath'
+      - $ref: '#/components/parameters/CollectibleIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionEventRequest'
+      security:
+      - bearerAuth: []
+  /student/missions/{missionId}/areas/{areaId}/complete:
+    post:
+      summary: Complete a logical mission area
+      operationId: studentAreaComplete
+      tags:
+      - Gameplay Progress
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressMutationResponse'
+        '401': *id007
+        '403': *id008
+        '404': *id009
+        '409': *id010
+        '422': *id001
+        '429': *id002
+        '500': *id003
+        '503': *id004
+      parameters:
+      - *id011
+      - *id012
+      - *id017
+      - $ref: '#/components/parameters/MissionIdPath'
+      - $ref: '#/components/parameters/AreaIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionEventRequest'
+      security:
+      - bearerAuth: []
+      description: Completes one of the mission's three logical areas. Completing
+        Area 3 atomically completes the mission when all required learning interactions,
+        review acknowledgement, and collectible requirements are satisfied.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+  parameters:
+    ClientVersionHeader:
+      name: X-Client-Version
+      in: header
+      required: true
+      schema:
+        type: string
+    DeviceIdHeader:
+      name: X-Device-ID
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OptionalDeviceIdHeader:
+      name: X-Device-ID
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+    ManifestVersionHeader:
+      name: X-Manifest-Version
+      in: header
+      required: true
+      schema:
+        type: string
+    OptionalManifestVersionHeader:
+      name: X-Manifest-Version
+      in: header
+      required: false
+      schema:
+        type: string
+    PageQuery:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PerPageQuery:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    SubjectIdQuery:
+      name: subject_id
+      in: query
+      required: false
+      schema:
+        type: string
+    TermIdQuery:
+      name: term_id
+      in: query
+      required: false
+      schema:
+        type: string
+    StatusQuery:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+    LeaderboardScopeQuery:
+      name: scope
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - section
+        default: section
+    SubjectSlugPath:
+      name: subjectSlug
+      in: path
+      required: true
+      schema:
+        type: string
+    QuizIdPath:
+      name: quizId
+      in: path
+      required: true
+      schema:
+        type: string
+    AttemptIdPath:
+      name: attemptId
+      in: path
+      required: true
+      schema:
+        type: string
+    MissionIdPath:
+      name: missionId
+      in: path
+      required: true
+      schema:
+        type: string
+    AreaIdPath:
+      name: areaId
+      in: path
+      required: true
+      schema:
+        type: string
+    CollectibleIdPath:
+      name: collectibleId
+      in: path
+      required: true
+      schema:
+        type: string
+    RewardCodePath:
+      name: rewardCode
+      in: path
+      required: true
+      schema:
+        type: string
+    CertificateIdPath:
+      name: certificateId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Missing, invalid, expired, or revoked access token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Inactive account, wrong role, grade mismatch, or forbidden resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Missing or out-of-scope resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Workflow, availability, revision, manifest, or idempotency conflict.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationFailed:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    RateLimited:
+      description: Named rate limit exceeded.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Retry delay in seconds.
+    PayloadTooLarge:
+      description: Request exceeds configured limits.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UpgradeRequired:
+      description: Client or manifest version is unsupported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServiceUnavailable:
+      description: API is temporarily unavailable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Retry delay in seconds.
+  schemas:
+    Pagination:
+      type: object
+      required:
+      - current_page
+      - per_page
+      - total
+      - last_page
+      - has_more
+      properties:
+        current_page:
+          type: integer
+          minimum: 1
+        per_page:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        last_page:
+          type: integer
+          minimum: 1
+        has_more:
+          type: boolean
+      additionalProperties: false
+    Meta:
+      type: object
+      required:
+      - request_id
+      - server_time
+      - api_version
+      properties:
+        request_id:
+          type: string
+        server_time:
+          type: string
+          format: date-time
+        api_version:
+          type: string
+          const: v1
+        revision:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        pagination:
+          oneOf:
+          - $ref: '#/components/schemas/Pagination'
+          - type: 'null'
+      additionalProperties: false
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      - details
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      required:
+      - success
+      - error
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          $ref: '#/components/schemas/Error'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    SectionSummary:
+      type:
+      - object
+      - 'null'
+      required:
+      - id
+      - name
+      - grade_id
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        grade_id:
+          type: string
+          enum:
+          - grade_5
+          - grade_6
+      additionalProperties: false
+    StudentProfile:
+      type: object
+      required:
+      - id
+      - display_name
+      - lrn_masked
+      - grade_id
+      - section
+      - is_active
+      properties:
+        id:
+          type: string
+        display_name:
+          type: string
+        lrn_masked:
+          type: string
+        grade_id:
+          type: string
+          enum:
+          - grade_5
+          - grade_6
+        section:
+          $ref: '#/components/schemas/SectionSummary'
+        is_active:
+          type: boolean
+      additionalProperties: false
+    Settings:
+      type: object
+      required:
+      - audio_volume
+      - music_volume
+      - language
+      - reduced_motion
+      - notifications_enabled
+      properties:
+        audio_volume:
+          type: number
+          minimum: 0
+          maximum: 1
+        music_volume:
+          type: number
+          minimum: 0
+          maximum: 1
+        language:
+          type: string
+          enum:
+          - en
+          - fil
+        reduced_motion:
+          type: boolean
+        notifications_enabled:
+          type: boolean
+      additionalProperties: false
+    UpdateSettingsRequest:
+      type: object
+      minProperties: 1
+      properties:
+        audio_volume:
+          type: number
+          minimum: 0
+          maximum: 1
+        music_volume:
+          type: number
+          minimum: 0
+          maximum: 1
+        language:
+          type: string
+          enum:
+          - en
+          - fil
+        reduced_motion:
+          type: boolean
+        notifications_enabled:
+          type: boolean
+      additionalProperties: false
+    Subject:
+      type: object
+      required:
+      - id
+      - slug
+      - name
+      - is_active
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        is_active:
+          type: boolean
+      additionalProperties: false
+    Term:
+      type: object
+      required:
+      - id
+      - name
+      - order
+      - is_active
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+          minimum: 1
+        is_active:
+          type: boolean
+      additionalProperties: false
+    MissionProgressSummary:
+      type: object
+      required:
+      - state
+      - active_area_id
+      - completed_area_count
+      - required_area_count
+      - collectible_count
+      - required_collectible_count
+      - completed_at
+      - revision
+      properties:
+        state:
+          type: string
+          enum:
+          - locked
+          - available
+          - started
+          - in_progress
+          - review_required
+          - mission_completed
+        active_area_id:
+          type:
+          - string
+          - 'null'
+        completed_area_count:
+          type: integer
+          minimum: 0
+          maximum: 3
+        required_area_count:
+          type: integer
+          const: 3
+        collectible_count:
+          type: integer
+          minimum: 0
+          maximum: 3
+        required_collectible_count:
+          type: integer
+          const: 3
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        revision:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    MissionSummary:
+      type: object
+      required:
+      - id
+      - grade_id
+      - subject_id
+      - term_id
+      - order
+      - status
+      - locked_reason
+      - availability_source
+      - teacher_policy
+      - progress
+      - area_count
+      properties:
+        id:
+          type: string
+        grade_id:
+          type: string
+          enum:
+          - grade_5
+          - grade_6
+        subject_id:
+          type: string
+          enum:
+          - subject_literaquest
+          - subject_pe_health
+          - subject_science
+        term_id:
+          type: string
+        order:
+          type: integer
+          minimum: 1
+        status:
+          type: string
+          enum:
+          - locked
+          - available
+          - started
+          - in_progress
+          - completed
+        locked_reason:
+          type:
+          - string
+          - 'null'
+        availability_source:
+          type: string
+          enum:
+          - published_default
+          - prerequisite
+          - teacher_override
+          - schedule
+        teacher_policy:
+          type: string
+          enum:
+          - inherit
+          - unlocked
+          - locked
+        progress:
+          $ref: '#/components/schemas/MissionProgressSummary'
+        area_count:
+          type: integer
+          const: 3
+      additionalProperties: false
+    AreaProgress:
+      type: object
+      required:
+      - id
+      - order
+      - phase
+      - state
+      - review_required
+      - collectible_id
+      - collectible_collected
+      - completed_at
+      properties:
+        id:
+          type: string
+        order:
+          type: integer
+          minimum: 1
+          maximum: 3
+        state:
+          type: string
+          enum:
+          - locked
+          - available
+          - started
+          - in_progress
+          - review_required
+          - collectible_unlocked
+          - collectible_collected
+          - completed
+        review_required:
+          type: boolean
+        collectible_id:
+          type:
+          - string
+          - 'null'
+        collectible_collected:
+          type: boolean
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        phase:
+          type: string
+          enum:
+          - discover_and_connect
+          - practice_and_apply
+          - resolve_and_master
+      additionalProperties: false
+    QuizSummary:
+      type: object
+      required:
+      - id
+      - title
+      - subject_id
+      - term_id
+      - status
+      - locked_reason
+      - opens_at
+      - closes_at
+      - max_attempts
+      - attempts_used
+      - result_visibility
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        subject_id:
+          type: string
+        term_id:
+          type: string
+        status:
+          type: string
+          enum:
+          - locked
+          - available
+          - completed
+          - unavailable
+        locked_reason:
+          type:
+          - string
+          - 'null'
+        opens_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        closes_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        max_attempts:
+          type: integer
+          minimum: 1
+        attempts_used:
+          type: integer
+          minimum: 0
+        result_visibility:
+          type: string
+          enum:
+          - immediate
+          - after_close
+          - teacher_release
+          - hidden
+      additionalProperties: false
+    QuizOption:
+      type: object
+      required:
+      - key
+      - text
+      properties:
+        key:
+          type: string
+        text:
+          type: string
+      additionalProperties: false
+    QuizQuestion:
+      type: object
+      required:
+      - id
+      - type
+      - prompt
+      - options
+      - hint
+      - points
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - multiple_choice_single
+          - multiple_choice_multiple
+          - true_false
+        prompt:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizOption'
+          minItems: 2
+        hint:
+          type:
+          - string
+          - 'null'
+        points:
+          type: integer
+          minimum: 1
+      additionalProperties: false
+    QuizAnswerSubmission:
+      type: object
+      required:
+      - question_id
+      - selected_option_keys
+      properties:
+        question_id:
+          type: string
+        selected_option_keys:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+      additionalProperties: false
+    QuizAttemptRequest:
+      type: object
+      required:
+      - client_attempt_uuid
+      - answers
+      properties:
+        client_attempt_uuid:
+          type: string
+          format: uuid
+        started_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        offline_created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizAnswerSubmission'
+          minItems: 1
+          maxItems: 100
+      additionalProperties: false
+    QuizAttemptResult:
+      type: object
+      required:
+      - attempt_id
+      - quiz_id
+      - client_attempt_uuid
+      - status
+      - earned_points
+      - possible_points
+      - percentage
+      - passed
+      - correct_count
+      - incorrect_count
+      - unanswered_count
+      - submitted_at
+      - feedback_visible
+      - answers
+      properties:
+        attempt_id:
+          type: string
+        quiz_id:
+          type: string
+        client_attempt_uuid:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - submitted
+          - scored
+          - pending_visibility
+        earned_points:
+          type: number
+          minimum: 0
+        possible_points:
+          type: number
+          minimum: 0
+        percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        passed:
+          type:
+          - boolean
+          - 'null'
+        correct_count:
+          type: integer
+          minimum: 0
+        incorrect_count:
+          type: integer
+          minimum: 0
+        unanswered_count:
+          type: integer
+          minimum: 0
+        submitted_at:
+          type: string
+          format: date-time
+        feedback_visible:
+          type: boolean
+        answers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: false
+    GameplayEventPayload:
+      type: object
+      properties:
+        selected_option_keys:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        is_correct:
+          type: boolean
+        hint_shown:
+          type: boolean
+        explanation_shown:
+          type: boolean
+        observation_code:
+          type: string
+        prediction_code:
+          type: string
+        material_ids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        investigation_action_id:
+          type: string
+        result_code:
+          type: string
+        conclusion_code:
+          type: string
+        solution_action_id:
+          type: string
+        health_action_id:
+          type: string
+        wellness_result_id:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        review_reason:
+          type: string
+      additionalProperties: false
+    GameplayEventRequest:
+      type: object
+      required:
+      - event_uuid
+      - event_type
+      - local_sequence
+      - client_created_at
+      - payload
+      properties:
+        event_uuid:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+          - mission.started
+          - area.started
+          - encounter.discovered
+          - learning_clue.viewed
+          - question.attempted
+          - question.hint_shown
+          - question.review_marked
+          - area.questions_completed
+          - collectible.unlocked
+          - collectible.collected
+          - area.completed
+          - next_area.unlocked
+          - mission_challenge.completed
+          - mission.completed
+          - health_situation.observed
+          - healthy_action.selected
+          - health_reminder.viewed
+          - healthy_action.applied
+          - wellness_result.observed
+          - wellness_symbol.collected
+          - science_observation.recorded
+          - science_prediction.recorded
+          - science_material.collected
+          - science_investigation.performed
+          - science_result.recorded
+          - science_conclusion.recorded
+          - science_solution.applied
+          - science_evidence.collected
+        local_sequence:
+          type: integer
+          minimum: 1
+        client_created_at:
+          type: string
+          format: date-time
+        encounter_id:
+          type:
+          - string
+          - 'null'
+        question_id:
+          type:
+          - string
+          - 'null'
+        attempt_number:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          maximum: 2
+        outcome:
+          type:
+          - string
+          - 'null'
+        review_required:
+          type: boolean
+          default: false
+        payload:
+          $ref: '#/components/schemas/GameplayEventPayload'
+      additionalProperties: false
+    ActionEventRequest:
+      type: object
+      required:
+      - event_uuid
+      - local_sequence
+      - client_created_at
+      properties:
+        event_uuid:
+          type: string
+          format: uuid
+        local_sequence:
+          type: integer
+          minimum: 1
+        client_created_at:
+          type: string
+          format: date-time
+        review_required:
+          type: boolean
+          default: false
+        summary:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+      additionalProperties: false
+    SyncEvent:
+      type: object
+      required:
+      - event_uuid
+      - event_type
+      - grade_id
+      - subject_id
+      - term_id
+      - mission_id
+      - local_sequence
+      - manifest_version
+      - client_created_at
+      - payload
+      properties:
+        event_uuid:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+          - mission.started
+          - area.started
+          - encounter.discovered
+          - learning_clue.viewed
+          - question.attempted
+          - question.hint_shown
+          - question.review_marked
+          - area.questions_completed
+          - collectible.unlocked
+          - collectible.collected
+          - area.completed
+          - next_area.unlocked
+          - mission_challenge.completed
+          - mission.completed
+          - health_situation.observed
+          - healthy_action.selected
+          - health_reminder.viewed
+          - healthy_action.applied
+          - wellness_result.observed
+          - wellness_symbol.collected
+          - science_observation.recorded
+          - science_prediction.recorded
+          - science_material.collected
+          - science_investigation.performed
+          - science_result.recorded
+          - science_conclusion.recorded
+          - science_solution.applied
+          - science_evidence.collected
+        grade_id:
+          type: string
+          enum:
+          - grade_5
+          - grade_6
+        subject_id:
+          type: string
+          enum:
+          - subject_literaquest
+          - subject_pe_health
+          - subject_science
+        term_id:
+          type: string
+        mission_id:
+          type: string
+        area_id:
+          type:
+          - string
+          - 'null'
+        encounter_id:
+          type:
+          - string
+          - 'null'
+        question_id:
+          type:
+          - string
+          - 'null'
+        collectible_id:
+          type:
+          - string
+          - 'null'
+        attempt_number:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          maximum: 2
+        outcome:
+          type:
+          - string
+          - 'null'
+        review_required:
+          type: boolean
+          default: false
+        local_sequence:
+          type: integer
+          minimum: 1
+        manifest_version:
+          type: string
+        client_created_at:
+          type: string
+          format: date-time
+        payload:
+          $ref: '#/components/schemas/GameplayEventPayload'
+      additionalProperties: false
+    SyncPushRequest:
+      type: object
+      required:
+      - batch_uuid
+      - client_id
+      - last_known_server_revision
+      - events
+      properties:
+        batch_uuid:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+        last_known_server_revision:
+          type: integer
+          minimum: 0
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncEvent'
+          minItems: 1
+          maxItems: 100
+      additionalProperties: false
+    RewardUseRequest:
+      type: object
+      required:
+      - request_uuid
+      properties:
+        request_uuid:
+          type: string
+          format: uuid
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      required:
+      - lrn
+      - pin
+      - device_name
+      properties:
+        lrn:
+          type: string
+          minLength: 6
+          maxLength: 32
+        pin:
+          type: string
+          minLength: 4
+          maxLength: 12
+        device_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+      additionalProperties: false
+    PingResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - status
+          - service
+          properties:
+            status:
+              type: string
+              const: ok
+            service:
+              type: string
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    ConfigResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    LoginResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - token_type
+          - access_token
+          - expires_at
+          - student
+          properties:
+            token_type:
+              type: string
+              const: Bearer
+            access_token:
+              type: string
+            expires_at:
+              type:
+              - string
+              - 'null'
+              format: date-time
+            student:
+              $ref: '#/components/schemas/StudentProfile'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    EmptySuccessResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    ProfileResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/StudentProfile'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    SettingsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Settings'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    SubjectsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Subject'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    TermsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Term'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    MissionsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MissionSummary'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    MissionDetailResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - mission
+          - areas
+          properties:
+            mission:
+              $ref: '#/components/schemas/MissionSummary'
+            areas:
+              type: array
+              items:
+                $ref: '#/components/schemas/AreaProgress'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    MissionProgressResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - mission
+          - areas
+          - newly_unlocked_ids
+          properties:
+            mission:
+              $ref: '#/components/schemas/MissionSummary'
+            areas:
+              type: array
+              items:
+                $ref: '#/components/schemas/AreaProgress'
+            newly_unlocked_ids:
+              type: array
+              items:
+                type: string
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    QuizzesResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuizSummary'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    QuizDetailResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    QuizAttemptResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/QuizAttemptResult'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    QuizResultsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuizAttemptResult'
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    ProgressMutationResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - event_uuid
+          - status
+          - canonical_state
+          properties:
+            event_uuid:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum:
+              - accepted
+              - duplicate
+            canonical_state:
+              type: object
+              additionalProperties: true
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    ProgressSummaryResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+          - missions_started
+          - missions_completed
+          - areas_completed
+          - review_required_count
+          - quiz_attempts
+          properties:
+            missions_started:
+              type: integer
+              minimum: 0
+            missions_completed:
+              type: integer
+              minimum: 0
+            areas_completed:
+              type: integer
+              minimum: 0
+            review_required_count:
+              type: integer
+              minimum: 0
+            quiz_attempts:
+              type: integer
+              minimum: 0
+          additionalProperties: false
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    RewardsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    RewardUseResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    CertificatesResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    CertificateDetailResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    AnnouncementsResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    LeaderboardResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    SyncStatusResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    SyncPushResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    BootstrapResponse:
+      type: object
+      required:
+      - success
+      - data
+      - meta
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false

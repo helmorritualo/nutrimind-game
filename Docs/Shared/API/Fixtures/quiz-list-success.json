@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "quiz_fixture_001",
+        "title": "Story Elements Check",
+        "subject_id": "subject_literaquest",
+        "term_id": "term_1",
+        "status": "available",
+        "locked_reason": null,
+        "opens_at": null,
+        "closes_at": null,
+        "max_attempts": 1,
+        "attempts_used": 0,
+        "result_visibility": "immediate"
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

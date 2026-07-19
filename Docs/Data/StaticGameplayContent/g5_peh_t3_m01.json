@@ -1,0 +1,561 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_peh_t3_m01",
+  "grade_id": "grade_5",
+  "subject_id": "subject_pe_health",
+  "term_id": "term_3",
+  "title": "Safe Home Workshop",
+  "curriculum_block": "Design Weeks 1–2",
+  "learning_focus": "Home hazards and safety guidelines.",
+  "story_premise": "A repair day reveals blocked exits, wet floors, exposed cords, unsafe storage, and hot surfaces.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Home hazards and safety guidelines.",
+  "collectible_type": "Wellness Symbol",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_peh_t3_m01",
+    "scene_name": "SCN_G5_PEH_T3_M01_SafeHomeWorkshop",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_peh_t3_m01_a01",
+      "area_number": 1,
+      "title": "Kitchen Check",
+      "phase": "discover_and_connect",
+      "story": "Identify heat, sharp-object, and chemical hazards. Correct slippery-floor and electrical-device risks.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide",
+          "text": "A health or safety concern is affecting Kitchen Check."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Identify heat, sharp-object, and chemical hazards."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Observe the signs, think about Home hazards and safety guidelines, then apply the safest healthy action."
+        }
+      ],
+      "learning_clues": [
+        "Health focus: Home hazards and safety guidelines.",
+        "Observe signs, context, and available trusted support before acting."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "observe_health_situation",
+        "identify_health_clues",
+        "learn_safe_concept",
+        "resolve_situation_questions",
+        "perform_first_healthy_action",
+        "observe_wellness_result",
+        "collect_wellness_symbol",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t3_m01_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the healthiest first response in Kitchen Check?",
+          "options": [
+            {
+              "id": "a",
+              "text": "pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines"
+            },
+            {
+              "id": "b",
+              "text": "Ignore the signs and continue the unsafe behavior."
+            },
+            {
+              "id": "c",
+              "text": "Copy another person without checking the situation."
+            },
+            {
+              "id": "d",
+              "text": "Hide the problem and avoid trusted help."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the visible health clues before deciding.",
+          "second_wrong_explanation": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines.",
+          "correct_feedback": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines."
+        },
+        {
+          "id": "g5_peh_t3_m01_a01_q02",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "Health clues should be observed before the learner chooses an action.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Think about why the NPC, environment, or body signal is shown.",
+          "second_wrong_explanation": "The statement is true: the clues provide the reason for the healthy or safe choice.",
+          "correct_feedback": "The statement is true: the clues provide the reason for the healthy or safe choice."
+        },
+        {
+          "id": "g5_peh_t3_m01_a01_q03",
+          "type": "multiple_choice_multiple",
+          "is_scored": true,
+          "prompt": "Select the two actions that support a safe and healthy decision.",
+          "options": [
+            {
+              "id": "a",
+              "text": "Use the observed clues."
+            },
+            {
+              "id": "b",
+              "text": "Choose a safe action or ask a trusted person for help."
+            },
+            {
+              "id": "c",
+              "text": "Ignore warning signs."
+            },
+            {
+              "id": "d",
+              "text": "Repeat an unsafe choice to see what happens."
+            }
+          ],
+          "correct_option_ids": [
+            "a",
+            "b"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose actions that reduce risk and use reliable support.",
+          "second_wrong_explanation": "Safe decisions use evidence from the situation and appropriate help when needed.",
+          "correct_feedback": "Safe decisions use evidence from the situation and appropriate help when needed."
+        },
+        {
+          "id": "g5_peh_t3_m01_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What should happen after the learner answers the situation questions?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Apply the healthy action in the game world and observe the result."
+            },
+            {
+              "id": "b",
+              "text": "Collect the symbol without helping the NPC or area."
+            },
+            {
+              "id": "c",
+              "text": "Restart the entire mission after one mistake."
+            },
+            {
+              "id": "d",
+              "text": "Upload the static question text to the server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "PE & Health requires an applied action, not only a quiz answer.",
+          "second_wrong_explanation": "The correct choice must be applied in the world so the learner sees its effect.",
+          "correct_feedback": "The correct choice must be applied in the world so the learner sees its effect."
+        }
+      ],
+      "world_action": "Apply a safe, age-appropriate action demonstrating Home hazards and safety guidelines.",
+      "world_result": "The NPC or environment in Kitchen Check visibly improves after the healthy action.",
+      "collectible": {
+        "id": "g5_peh_t3_m01_a01_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t3_m01_a01.started",
+        "g5_peh_t3_m01_a01.interaction_state",
+        "g5_peh_t3_m01_a01.question_outcomes",
+        "g5_peh_t3_m01_a01.review_required",
+        "g5_peh_t3_m01_a01.world_action_completed",
+        "g5_peh_t3_m01_a01.collectible_collected",
+        "g5_peh_t3_m01_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g5_peh_t3_m01_a02",
+      "area_number": 2,
+      "title": "Bedroom Check",
+      "phase": "practice_and_apply",
+      "story": "Clear exits and secure unstable objects. Separate medicine, cleaning products, tools, and food.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide",
+          "text": "A health or safety concern is affecting Bedroom Check."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Clear exits and secure unstable objects."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Observe the signs, think about Home hazards and safety guidelines, then apply the safest healthy action."
+        }
+      ],
+      "learning_clues": [
+        "Health focus: Home hazards and safety guidelines.",
+        "Observe signs, context, and available trusted support before acting."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "compare_healthy_choices",
+        "build_or_practice_action_plan",
+        "resolve_application_questions",
+        "perform_healthy_action",
+        "observe_wellness_result",
+        "collect_wellness_symbol",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t3_m01_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the healthiest first response in Bedroom Check?",
+          "options": [
+            {
+              "id": "a",
+              "text": "pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines"
+            },
+            {
+              "id": "b",
+              "text": "Ignore the signs and continue the unsafe behavior."
+            },
+            {
+              "id": "c",
+              "text": "Copy another person without checking the situation."
+            },
+            {
+              "id": "d",
+              "text": "Hide the problem and avoid trusted help."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the visible health clues before deciding.",
+          "second_wrong_explanation": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines.",
+          "correct_feedback": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines."
+        },
+        {
+          "id": "g5_peh_t3_m01_a02_q02",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "Health clues should be observed before the learner chooses an action.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Think about why the NPC, environment, or body signal is shown.",
+          "second_wrong_explanation": "The statement is true: the clues provide the reason for the healthy or safe choice.",
+          "correct_feedback": "The statement is true: the clues provide the reason for the healthy or safe choice."
+        },
+        {
+          "id": "g5_peh_t3_m01_a02_q03",
+          "type": "multiple_choice_multiple",
+          "is_scored": true,
+          "prompt": "Select the two actions that support a safe and healthy decision.",
+          "options": [
+            {
+              "id": "a",
+              "text": "Use the observed clues."
+            },
+            {
+              "id": "b",
+              "text": "Choose a safe action or ask a trusted person for help."
+            },
+            {
+              "id": "c",
+              "text": "Ignore warning signs."
+            },
+            {
+              "id": "d",
+              "text": "Repeat an unsafe choice to see what happens."
+            }
+          ],
+          "correct_option_ids": [
+            "a",
+            "b"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose actions that reduce risk and use reliable support.",
+          "second_wrong_explanation": "Safe decisions use evidence from the situation and appropriate help when needed.",
+          "correct_feedback": "Safe decisions use evidence from the situation and appropriate help when needed."
+        },
+        {
+          "id": "g5_peh_t3_m01_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What should happen after the learner answers the situation questions?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Apply the healthy action in the game world and observe the result."
+            },
+            {
+              "id": "b",
+              "text": "Collect the symbol without helping the NPC or area."
+            },
+            {
+              "id": "c",
+              "text": "Restart the entire mission after one mistake."
+            },
+            {
+              "id": "d",
+              "text": "Upload the static question text to the server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "PE & Health requires an applied action, not only a quiz answer.",
+          "second_wrong_explanation": "The correct choice must be applied in the world so the learner sees its effect.",
+          "correct_feedback": "The correct choice must be applied in the world so the learner sees its effect."
+        }
+      ],
+      "world_action": "Apply a safe, age-appropriate action demonstrating Home hazards and safety guidelines.",
+      "world_result": "The NPC or environment in Bedroom Check visibly improves after the healthy action.",
+      "collectible": {
+        "id": "g5_peh_t3_m01_a02_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t3_m01_a02.started",
+        "g5_peh_t3_m01_a02.interaction_state",
+        "g5_peh_t3_m01_a02.question_outcomes",
+        "g5_peh_t3_m01_a02.review_required",
+        "g5_peh_t3_m01_a02.world_action_completed",
+        "g5_peh_t3_m01_a02.collectible_collected",
+        "g5_peh_t3_m01_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g5_peh_t3_m01_a03",
+      "area_number": 3,
+      "title": "Family Plan Board",
+      "phase": "resolve_and_master",
+      "story": "Create emergency contacts, meeting place, and age-appropriate responsibilities. The house earns a safety light after hazards are corrected rather than merely labeled.",
+      "opening_dialogue": [
+        {
+          "speaker": "Health Guide",
+          "text": "A health or safety concern is affecting Family Plan Board."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Create emergency contacts, meeting place, and age-appropriate responsibilities."
+        },
+        {
+          "speaker": "Health Guide",
+          "text": "Observe the signs, think about Home hazards and safety guidelines, then apply the safest healthy action."
+        }
+      ],
+      "learning_clues": [
+        "Health focus: Home hazards and safety guidelines.",
+        "Observe signs, context, and available trusted support before acting."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "apply_integrated_wellness_plan",
+        "resolve_integrated_mission_challenge",
+        "observe_final_wellness_result",
+        "collect_wellness_symbol",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_peh_t3_m01_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the healthiest first response in Family Plan Board?",
+          "options": [
+            {
+              "id": "a",
+              "text": "pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines"
+            },
+            {
+              "id": "b",
+              "text": "Ignore the signs and continue the unsafe behavior."
+            },
+            {
+              "id": "c",
+              "text": "Copy another person without checking the situation."
+            },
+            {
+              "id": "d",
+              "text": "Hide the problem and avoid trusted help."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the visible health clues before deciding.",
+          "second_wrong_explanation": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines.",
+          "correct_feedback": "The safe first step is to pause, observe the situation, and choose a safe action related to Home hazards and safety guidelines."
+        },
+        {
+          "id": "g5_peh_t3_m01_a03_q02",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "Health clues should be observed before the learner chooses an action.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Think about why the NPC, environment, or body signal is shown.",
+          "second_wrong_explanation": "The statement is true: the clues provide the reason for the healthy or safe choice.",
+          "correct_feedback": "The statement is true: the clues provide the reason for the healthy or safe choice."
+        },
+        {
+          "id": "g5_peh_t3_m01_a03_q03",
+          "type": "multiple_choice_multiple",
+          "is_scored": true,
+          "prompt": "Select the two actions that support a safe and healthy decision.",
+          "options": [
+            {
+              "id": "a",
+              "text": "Use the observed clues."
+            },
+            {
+              "id": "b",
+              "text": "Choose a safe action or ask a trusted person for help."
+            },
+            {
+              "id": "c",
+              "text": "Ignore warning signs."
+            },
+            {
+              "id": "d",
+              "text": "Repeat an unsafe choice to see what happens."
+            }
+          ],
+          "correct_option_ids": [
+            "a",
+            "b"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose actions that reduce risk and use reliable support.",
+          "second_wrong_explanation": "Safe decisions use evidence from the situation and appropriate help when needed.",
+          "correct_feedback": "Safe decisions use evidence from the situation and appropriate help when needed."
+        },
+        {
+          "id": "g5_peh_t3_m01_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What should happen after the learner answers the situation questions?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Apply the healthy action in the game world and observe the result."
+            },
+            {
+              "id": "b",
+              "text": "Collect the symbol without helping the NPC or area."
+            },
+            {
+              "id": "c",
+              "text": "Restart the entire mission after one mistake."
+            },
+            {
+              "id": "d",
+              "text": "Upload the static question text to the server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "PE & Health requires an applied action, not only a quiz answer.",
+          "second_wrong_explanation": "The correct choice must be applied in the world so the learner sees its effect.",
+          "correct_feedback": "The correct choice must be applied in the world so the learner sees its effect."
+        }
+      ],
+      "world_action": "Apply a safe, age-appropriate action demonstrating Home hazards and safety guidelines.",
+      "world_result": "The NPC or environment in Family Plan Board visibly improves after the healthy action.",
+      "collectible": {
+        "id": "g5_peh_t3_m01_a03_collectible",
+        "type": "Wellness Symbol",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_peh_t3_m01_a03.started",
+        "g5_peh_t3_m01_a03.interaction_state",
+        "g5_peh_t3_m01_a03.question_outcomes",
+        "g5_peh_t3_m01_a03.review_required",
+        "g5_peh_t3_m01_a03.world_action_completed",
+        "g5_peh_t3_m01_a03.collectible_collected",
+        "g5_peh_t3_m01_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

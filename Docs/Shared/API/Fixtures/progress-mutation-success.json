@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "data": {
+    "event_uuid": "00000000-0000-4000-8000-000000000111",
+    "status": "accepted",
+    "canonical_state": {
+      "mission_id": "g5_lq_t1_m01",
+      "area_id": "g5_lq_t1_m01_a01",
+      "area_state": "completed",
+      "mission_state": "in_progress",
+      "active_area_id": "g5_lq_t1_m01_a02",
+      "revision": 4
+    }
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

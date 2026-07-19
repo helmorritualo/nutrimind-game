@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "data": {
+    "access_token": "fixture-token-not-a-real-secret",
+    "token_type": "Bearer",
+    "expires_at": null,
+    "student": {
+      "id": "student_fixture_001",
+      "display_name": "Pathfinder",
+      "lrn_masked": "********1234",
+      "grade_id": "grade_5",
+      "section": {
+        "id": "section_g5_a",
+        "name": "Grade 5 A",
+        "grade_id": "grade_5"
+      },
+      "is_active": true
+    }
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

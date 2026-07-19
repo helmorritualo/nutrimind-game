@@ -1,0 +1,5 @@
+---
+description: NutriMind gameplay hybrid UI boundary
+alwaysApply: true
+---
+Use UI Toolkit for complex/data-heavy gameplay panels. Use uGUI screen-space Canvas for HUD, feedback, pause, system, and transition UI. Use uGUI world-space Canvas for NPC/object/path markers. Route all blocking UI through one GameplayUiCoordinator that gates player/camera input and focus. Do not put long questions in world space.

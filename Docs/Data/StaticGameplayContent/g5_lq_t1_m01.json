@@ -1,0 +1,670 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_lq_t1_m01",
+  "grade_id": "grade_5",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Festival Storybook Rescue",
+  "curriculum_block": "Weeks 1–2",
+  "learning_focus": "Story grammar; sequential plot; main idea; collective/concrete/abstract nouns; demonstrative and relative pronouns; verb-forming suffixes; helping/linking/transitive verbs; noun complements; narrative text; layout, tone, and mood.",
+  "story_premise": "On the morning of Bayang Haraya’s Freedom and Friendship Festival, the town storybook loses its first chapter. Farmer Lira remembers pieces of the parade story, but the Haze has scattered the events, captions, and illustrations across three connected festival zones. The Pathfinder must restore the chapter in correct order before the opening ceremony.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Story grammar; sequential plot; main idea; collective/concrete/abstract nouns; demonstrative and relative pronouns; verb-forming suffixes; helping/linking/transitive verbs; noun complements; narrative text; layout, tone, and mood.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_lq_t1_m01",
+    "scene_name": "SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_lq_t1_m01_a01",
+      "area_number": 1,
+      "title": "Parade Meadow",
+      "phase": "discover_and_connect",
+      "story": "Farmer Lira asks the Pathfinder to repair the opening section of the festival chapter. The learner observes a short illustrated scene, identifies the character, setting, goal, and first event, then repairs banner captions using clear noun and pronoun references. The repaired banner route opens the path deeper into the festival and reveals Story Fragment 1.",
+      "opening_dialogue": [
+        {
+          "speaker": "Farmer Lira",
+          "text": "Pathfinder, the opening of our festival story is missing."
+        },
+        {
+          "speaker": "Farmer Lira",
+          "text": "Read the picture and the surviving lines. Find who is here, where they are, what they want to do, and what happened first."
+        },
+        {
+          "speaker": "Farmer Lira",
+          "text": "Then repair the banner captions so every noun and pronoun points clearly to the right person or object."
+        }
+      ],
+      "learning_clues": [
+        "Story grammar identifies character, setting, goal, and events.",
+        "A pronoun must clearly refer to a noun already named."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "resolve_story_structure_questions",
+        "apply_language_clue",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Who asks the Pathfinder to restore the opening page?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Farmer Lira"
+            },
+            {
+              "id": "b",
+              "text": "The stage drummer"
+            },
+            {
+              "id": "c",
+              "text": "The lantern painter"
+            },
+            {
+              "id": "d",
+              "text": "The gatekeeper"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look at the first sentence of the story source.",
+          "second_wrong_explanation": "Farmer Lira is standing beside the storybook and asks for help.",
+          "correct_feedback": "Farmer Lira is standing beside the storybook and asks for help."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Where does the opening event happen?",
+          "options": [
+            {
+              "id": "a",
+              "text": "At Parade Meadow near the old acacia tree"
+            },
+            {
+              "id": "b",
+              "text": "Inside the town newsroom"
+            },
+            {
+              "id": "c",
+              "text": "At the science depot"
+            },
+            {
+              "id": "d",
+              "text": "Beside the river harbor"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Find the place named in the opening page.",
+          "second_wrong_explanation": "The setting is Parade Meadow near the old acacia tree.",
+          "correct_feedback": "The setting is Parade Meadow near the old acacia tree."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What do the children plan to do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Carry a friendship banner to Freedom Stage"
+            },
+            {
+              "id": "b",
+              "text": "Cancel the festival"
+            },
+            {
+              "id": "c",
+              "text": "Hide the town storybook"
+            },
+            {
+              "id": "d",
+              "text": "Build a laboratory"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look for the children’s goal.",
+          "second_wrong_explanation": "Their goal is to carry the friendship banner to Freedom Stage.",
+          "correct_feedback": "Their goal is to carry the friendship banner to Freedom Stage."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event happens first?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children gather near the old acacia tree."
+            },
+            {
+              "id": "b",
+              "text": "The stage celebration begins."
+            },
+            {
+              "id": "c",
+              "text": "The completed chapter is placed in the Chronicle."
+            },
+            {
+              "id": "d",
+              "text": "The lantern route opens."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the sequence in the story source.",
+          "second_wrong_explanation": "The children gathering is the first stated event.",
+          "correct_feedback": "The children gathering is the first stated event."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q05",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "In “They plan to carry a friendship banner,” who does “They” refer to?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children"
+            },
+            {
+              "id": "b",
+              "text": "Farmer Lira"
+            },
+            {
+              "id": "c",
+              "text": "The banner"
+            },
+            {
+              "id": "d",
+              "text": "Freedom Stage"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Find the plural noun immediately before the pronoun.",
+          "second_wrong_explanation": "“They” clearly refers to the children.",
+          "correct_feedback": "“They” clearly refers to the children."
+        }
+      ],
+      "world_action": "Place the correct opening caption and pronoun labels on the parade board.",
+      "world_result": "The parade board becomes readable, the banner route repairs itself, and Story Fragment 1 appears.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a01.started",
+        "g5_lq_t1_m01_a01.interaction_state",
+        "g5_lq_t1_m01_a01.question_outcomes",
+        "g5_lq_t1_m01_a01.review_required",
+        "g5_lq_t1_m01_a01.world_action_completed",
+        "g5_lq_t1_m01_a01.collectible_collected",
+        "g5_lq_t1_m01_a01.completed"
+      ],
+      "story_source": "Farmer Lira stands beside the town storybook at Parade Meadow. The opening page shows children gathering near the old acacia tree. They plan to carry a friendship banner to Freedom Stage, but the first caption has vanished."
+    },
+    {
+      "area_id": "g5_lq_t1_m01_a02",
+      "area_number": 2,
+      "title": "Drumbeat Lane",
+      "phase": "practice_and_apply",
+      "story": "The parade has lost its written rhythm and its lantern poster communicates the wrong mood. The learner restores action instructions using appropriate verb forms and complements, compares visual layouts and tone, and chooses evidence that supports the intended meaning. The corrected drum-and-lantern sequence reveals Story Fragment 2.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mina",
+          "text": "The action words are back, but the rhythm instructions and lantern poster still send mixed messages."
+        },
+        {
+          "speaker": "Mina",
+          "text": "Check how each verb works, complete the missing complement, and choose the layout that matches a warm, welcoming festival."
+        }
+      ],
+      "learning_clues": [
+        "Helping verbs work with a main verb; linking verbs connect a subject to a description; transitive verbs act on an object.",
+        "Layout, color, images, and spacing help communicate tone and mood."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "repair_language_or_visual_elements",
+        "compare_evidence",
+        "resolve_application_questions",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which word is the helping verb in “The drummers are practicing”?",
+          "options": [
+            {
+              "id": "a",
+              "text": "are"
+            },
+            {
+              "id": "b",
+              "text": "drummers"
+            },
+            {
+              "id": "c",
+              "text": "practicing"
+            },
+            {
+              "id": "d",
+              "text": "the"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The helping verb comes before the main action verb.",
+          "second_wrong_explanation": "“Are” helps the main verb “practicing.”",
+          "correct_feedback": "“Are” helps the main verb “practicing.”"
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which sentence uses a linking verb?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The lanterns look bright."
+            },
+            {
+              "id": "b",
+              "text": "Mina carries the lead drum."
+            },
+            {
+              "id": "c",
+              "text": "The children wave the banner."
+            },
+            {
+              "id": "d",
+              "text": "Lino beats the drum."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A linking verb connects the subject to a description.",
+          "second_wrong_explanation": "“Look” links “lanterns” to the description “bright.”",
+          "correct_feedback": "“Look” links “lanterns” to the description “bright.”"
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "In “Mina carries the lead drum,” what receives the action?",
+          "options": [
+            {
+              "id": "a",
+              "text": "the lead drum"
+            },
+            {
+              "id": "b",
+              "text": "Mina"
+            },
+            {
+              "id": "c",
+              "text": "carries"
+            },
+            {
+              "id": "d",
+              "text": "Drumbeat Lane"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A transitive verb has an object that receives the action.",
+          "second_wrong_explanation": "The lead drum receives the action of “carries.”",
+          "correct_feedback": "The lead drum receives the action of “carries.”"
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which word completes what Lino became in “The crowd named Lino the parade ___”?",
+          "options": [
+            {
+              "id": "a",
+              "text": "leader"
+            },
+            {
+              "id": "b",
+              "text": "quickly"
+            },
+            {
+              "id": "c",
+              "text": "bright"
+            },
+            {
+              "id": "d",
+              "text": "under"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The missing word names the role given to Lino.",
+          "second_wrong_explanation": "“Leader” completes the meaning of what Lino was named.",
+          "correct_feedback": "“Leader” completes the meaning of what Lino was named."
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q05",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which poster design best matches a friendly festival?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Open spacing, warm colors, smiling people, and a clear title"
+            },
+            {
+              "id": "b",
+              "text": "Dark crowded images and a warning-style title"
+            },
+            {
+              "id": "c",
+              "text": "Tiny text hidden behind decorations"
+            },
+            {
+              "id": "d",
+              "text": "Unrelated pictures with no caption"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose visual elements that support a welcoming tone.",
+          "second_wrong_explanation": "Warm, clear, relevant visuals support the intended friendly mood.",
+          "correct_feedback": "Warm, clear, relevant visuals support the intended friendly mood."
+        }
+      ],
+      "world_action": "Repair the drum instructions and replace the misleading poster with the welcoming layout.",
+      "world_result": "The drums regain their rhythm, the lanterns glow warmly, and Story Fragment 2 appears.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a02.started",
+        "g5_lq_t1_m01_a02.interaction_state",
+        "g5_lq_t1_m01_a02.question_outcomes",
+        "g5_lq_t1_m01_a02.review_required",
+        "g5_lq_t1_m01_a02.world_action_completed",
+        "g5_lq_t1_m01_a02.collectible_collected",
+        "g5_lq_t1_m01_a02.completed"
+      ],
+      "story_source": "At Drumbeat Lane, a sign reads: “The drummers are practicing. Mina carries the lead drum. The lanterns look bright, and the crowd named Lino the parade leader.” A second poster uses dark crowded images that make the friendly celebration look frightening."
+    },
+    {
+      "area_id": "g5_lq_t1_m01_a03",
+      "area_number": 3,
+      "title": "Freedom Stage",
+      "phase": "resolve_and_master",
+      "story": "At the final stage, the learner arranges seven illustrated events into a coherent narrative, selects the best title and main idea, and completes a short ending. The integrated final challenge reuses the strongest story-grammar, language, and visual-literacy concepts from the mission. The restored festival chapter reveals Story Fragment 3 and completes the mission.",
+      "opening_dialogue": [
+        {
+          "speaker": "Festival Keeper",
+          "text": "The final page will appear only when the seven events form one clear narrative."
+        },
+        {
+          "speaker": "Festival Keeper",
+          "text": "Arrange the events, choose the main idea and title, then complete an ending that fits the story’s hopeful mood."
+        }
+      ],
+      "learning_clues": [
+        "A coherent narrative has a logical beginning, middle, and ending.",
+        "The main idea tells what the whole story is mostly about; a title should match it."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "reconstruct_complete_narrative",
+        "resolve_integrated_mission_challenge",
+        "review_when_required",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event belongs first?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children gather at the acacia tree."
+            },
+            {
+              "id": "b",
+              "text": "The community carries the finished chapter to the stage."
+            },
+            {
+              "id": "c",
+              "text": "The lantern poster is corrected."
+            },
+            {
+              "id": "d",
+              "text": "The banner route opens."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Start with the event that introduces the characters and setting.",
+          "second_wrong_explanation": "The gathering at the acacia tree begins the sequence.",
+          "correct_feedback": "The gathering at the acacia tree begins the sequence."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event happens immediately after the parade captions are restored?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The banner route opens."
+            },
+            {
+              "id": "b",
+              "text": "The children gather."
+            },
+            {
+              "id": "c",
+              "text": "The final celebration ends."
+            },
+            {
+              "id": "d",
+              "text": "The storybook is first discovered."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the numbered event evidence.",
+          "second_wrong_explanation": "The repaired captions cause the banner route to open.",
+          "correct_feedback": "The repaired captions cause the banner route to open."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the best main idea?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The community restores a damaged festival story by using reading, language, and visual clues."
+            },
+            {
+              "id": "b",
+              "text": "The festival is canceled because the book is missing."
+            },
+            {
+              "id": "c",
+              "text": "Only the drummers can repair the town."
+            },
+            {
+              "id": "d",
+              "text": "The story is mainly about building a laboratory."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the statement that covers the entire mission.",
+          "second_wrong_explanation": "The mission is about restoring the festival story through evidence-based literacy tasks.",
+          "correct_feedback": "The mission is about restoring the festival story through evidence-based literacy tasks."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which title best matches the completed narrative?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The Festival Storybook Rescue"
+            },
+            {
+              "id": "b",
+              "text": "A Day Without Any Story"
+            },
+            {
+              "id": "c",
+              "text": "The Empty Science Cart"
+            },
+            {
+              "id": "d",
+              "text": "The Locked Medicine Cabinet"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The title should name the central problem and solution.",
+          "second_wrong_explanation": "“The Festival Storybook Rescue” matches the whole narrative.",
+          "correct_feedback": "“The Festival Storybook Rescue” matches the whole narrative."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q05",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which ending best fits the story?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The restored chapter is read at Freedom Stage, and the community begins the festival together."
+            },
+            {
+              "id": "b",
+              "text": "The Pathfinder hides the chapter so no one can read it."
+            },
+            {
+              "id": "c",
+              "text": "The characters forget every repaired event."
+            },
+            {
+              "id": "d",
+              "text": "The festival changes into an unrelated contest."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose an ending that resolves the goal and keeps the hopeful mood.",
+          "second_wrong_explanation": "The public reading resolves the mission and completes the celebration.",
+          "correct_feedback": "The public reading resolves the mission and completes the celebration."
+        }
+      ],
+      "world_action": "Arrange all seven event cards, bind the three Story Fragments, and place the restored chapter in the Festival Chronicle.",
+      "world_result": "Freedom Stage lights up, the Chronicle opens, the restored story is read, and the mission completes.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a03.started",
+        "g5_lq_t1_m01_a03.interaction_state",
+        "g5_lq_t1_m01_a03.question_outcomes",
+        "g5_lq_t1_m01_a03.review_required",
+        "g5_lq_t1_m01_a03.world_action_completed",
+        "g5_lq_t1_m01_a03.collectible_collected",
+        "g5_lq_t1_m01_a03.completed"
+      ],
+      "story_source": "Seven event cards remain: (1) children gather at the acacia tree; (2) Farmer Lira opens the damaged storybook; (3) the Pathfinder restores the parade captions; (4) the banner route opens; (5) the drummers practice the repaired instructions; (6) the lantern poster is corrected; (7) the community carries the finished chapter to Freedom Stage."
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "milestone_authored_exact_content"
+}

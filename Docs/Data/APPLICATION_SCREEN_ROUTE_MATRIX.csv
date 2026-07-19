@@ -1,0 +1,20 @@
+screen,scene,ui_system,required_states
+Bootstrap,SCN_App_Bootstrap,UI Toolkit,splash|version|manifest|connectivity|offline|maintenance|error
+Login,SCN_App_Authentication,UI Toolkit,form|validation|rate_limited|offline_unavailable|error
+Home,SCN_App_Main,UI Toolkit,loading|content|offline_cached|error
+Subjects,SCN_App_Main,UI Toolkit,loading|content|locked|empty|error
+Terms,SCN_App_Main,UI Toolkit,loading|content|locked|empty|error
+MissionList,SCN_App_Main,UI Toolkit,loading|content|locked|offline_cached|error
+MissionDetail,SCN_App_Main,UI Toolkit,loading|content|locked|offline_unavailable|error
+Progress,SCN_App_Main,UI Toolkit,loading|content|empty|offline_cached|error
+Profile,SCN_App_Main,UI Toolkit,loading|content|offline_cached|error
+Settings,SCN_App_Main,UI Toolkit,content|saving|error
+Rewards,SCN_App_Main,UI Toolkit,loading|content|empty|offline_cached|error
+Certificates,SCN_App_Main,UI Toolkit,loading|content|empty|offline_cached|error
+Announcements,SCN_App_Main,UI Toolkit,loading|content|empty|offline_cached|error
+Leaderboard,SCN_App_Main,UI Toolkit,loading|content|empty|offline_unavailable|error
+QuizList,SCN_App_QuizPortal,UI Toolkit,loading|content|empty|offline_unavailable|error
+QuizDetail,SCN_App_QuizPortal,UI Toolkit,loading|content|locked|offline_unavailable|error
+QuizAttempt,SCN_App_QuizPortal,UI Toolkit,content|submitting|uncertain_submission|error
+QuizResult,SCN_App_QuizPortal,UI Toolkit,loading|content|error
+QuizHistory,SCN_App_QuizPortal,UI Toolkit,loading|content|empty|offline_cached|error

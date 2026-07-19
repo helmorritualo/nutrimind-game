@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "data": {
+    "attempt_id": "attempt_fixture_001",
+    "quiz_id": "quiz_fixture_001",
+    "client_attempt_uuid": "00000000-0000-4000-8000-000000000222",
+    "status": "scored",
+    "earned_points": 2,
+    "possible_points": 2,
+    "percentage": 100,
+    "passed": true,
+    "correct_count": 2,
+    "incorrect_count": 0,
+    "unanswered_count": 0,
+    "submitted_at": "2026-07-19T04:30:00Z",
+    "feedback_visible": true,
+    "answers": [
+      {
+        "question_id": "qq_001",
+        "correct": true,
+        "earned_points": 1
+      },
+      {
+        "question_id": "qq_002",
+        "correct": true,
+        "earned_points": 1
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

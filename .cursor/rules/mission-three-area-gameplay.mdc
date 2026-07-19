@@ -1,0 +1,5 @@
+---
+description: NutriMind three-area static gameplay
+alwaysApply: true
+---
+One mission scene contains exactly three areas. Use the optimized loop: explore, observe/read, interact, learn/answer, review only when required, apply the subject action, show world result, collect, checkpoint, unlock. Area 3 integrates the final challenge. Load authored content from per-mission JSON. Persist state and outbox in SQLite. Never send static answer keys to the server.

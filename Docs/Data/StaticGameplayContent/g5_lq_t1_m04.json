@@ -1,0 +1,558 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_lq_t1_m04",
+  "grade_id": "grade_5",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Newsroom of True Pages",
+  "curriculum_block": "Weeks 7–8",
+  "learning_focus": "Informational text; topic, main idea, and supporting details; explanation and news report; author’s purpose; fact, opinion, and fact-based opinion; formal/informal tone; visual and multimedia meaning.",
+  "story_premise": "Festival reports have been mixed with rumors. The town newsroom cannot publish until the Pathfinder separates evidence from opinion and rebuilds the report.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Informational text; topic, main idea, and supporting details; explanation and news report; author’s purpose; fact, opinion, and fact-based opinion; formal/informal tone; visual and multimedia meaning.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_lq_t1_m04",
+    "scene_name": "SCN_G5_LQ_T1_M04_TheNewsroomOfTruePages",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_lq_t1_m04_a01",
+      "area_number": 1,
+      "title": "Headline Dock",
+      "phase": "discover_and_connect",
+      "story": "Choose a headline that matches the report’s main idea rather than exaggerating it. Sort details under the correct topic and identify which facts support the report.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Headline Dock."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Choose a headline that matches the report’s main idea rather than exaggerating it."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Informational text, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Informational text.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "resolve_story_structure_questions",
+        "apply_language_clue",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m04_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Headline Dock?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Choose a headline that matches the report’s main idea rather than exaggerating it."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Choose a headline that matches the report’s main idea rather than exaggerating it.",
+          "correct_feedback": "Choose a headline that matches the report’s main idea rather than exaggerating it."
+        },
+        {
+          "id": "g5_lq_t1_m04_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Informational text"
+            },
+            {
+              "id": "b",
+              "text": "topic, main idea, and supporting details"
+            },
+            {
+              "id": "c",
+              "text": "explanation and news report"
+            },
+            {
+              "id": "d",
+              "text": "author’s purpose"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Informational text.",
+          "correct_feedback": "This area directly practices Informational text."
+        },
+        {
+          "id": "g5_lq_t1_m04_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m04_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "inspect the text or visual clues and repair the first story element"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should inspect the text or visual clues and repair the first story element.",
+          "correct_feedback": "The learner should inspect the text or visual clues and repair the first story element."
+        }
+      ],
+      "world_action": "inspect the text or visual clues and repair the first story element",
+      "world_result": "Headline Dock is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m04_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m04_a01.started",
+        "g5_lq_t1_m04_a01.interaction_state",
+        "g5_lq_t1_m04_a01.question_outcomes",
+        "g5_lq_t1_m04_a01.review_required",
+        "g5_lq_t1_m04_a01.world_action_completed",
+        "g5_lq_t1_m04_a01.collectible_collected",
+        "g5_lq_t1_m04_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m04_a02",
+      "area_number": 2,
+      "title": "Fact–Opinion Court",
+      "phase": "practice_and_apply",
+      "story": "Classify factual statements, opinions, and fact-based opinions, explaining the evidence needed. Build a simple outline and arrange explanation paragraphs in a logical order.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Fact–Opinion Court."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Classify factual statements, opinions, and fact-based opinions, explaining the evidence needed."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use explanation and news report, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: explanation and news report.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "repair_language_or_visual_elements",
+        "compare_evidence",
+        "resolve_application_questions",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m04_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Fact–Opinion Court?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Classify factual statements, opinions, and fact-based opinions, explaining the evidence needed."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Classify factual statements, opinions, and fact-based opinions, explaining the evidence needed.",
+          "correct_feedback": "Classify factual statements, opinions, and fact-based opinions, explaining the evidence needed."
+        },
+        {
+          "id": "g5_lq_t1_m04_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "explanation and news report"
+            },
+            {
+              "id": "b",
+              "text": "Informational text"
+            },
+            {
+              "id": "c",
+              "text": "topic, main idea, and supporting details"
+            },
+            {
+              "id": "d",
+              "text": "author’s purpose"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices explanation and news report.",
+          "correct_feedback": "This area directly practices explanation and news report."
+        },
+        {
+          "id": "g5_lq_t1_m04_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m04_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "apply the language or visual clue to repair the middle section"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should apply the language or visual clue to repair the middle section.",
+          "correct_feedback": "The learner should apply the language or visual clue to repair the middle section."
+        }
+      ],
+      "world_action": "apply the language or visual clue to repair the middle section",
+      "world_result": "Fact–Opinion Court is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m04_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m04_a02.started",
+        "g5_lq_t1_m04_a02.interaction_state",
+        "g5_lq_t1_m04_a02.question_outcomes",
+        "g5_lq_t1_m04_a02.review_required",
+        "g5_lq_t1_m04_a02.world_action_completed",
+        "g5_lq_t1_m04_a02.collectible_collected",
+        "g5_lq_t1_m04_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m04_a03",
+      "area_number": 3,
+      "title": "Broadcast Balcony",
+      "phase": "resolve_and_master",
+      "story": "Match formal or informal tone to audience and evaluate how images, captions, and sound affect the report. The player publishes a short, balanced festival report with a clear beginning, body, and ending.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Broadcast Balcony."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Match formal or informal tone to audience and evaluate how images, captions, and sound affect the report."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use fact, opinion, and fact-based opinion, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: fact, opinion, and fact-based opinion.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "reconstruct_complete_narrative",
+        "resolve_integrated_mission_challenge",
+        "review_when_required",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m04_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Broadcast Balcony?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Match formal or informal tone to audience and evaluate how images, captions, and sound affect the report."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Match formal or informal tone to audience and evaluate how images, captions, and sound affect the report.",
+          "correct_feedback": "Match formal or informal tone to audience and evaluate how images, captions, and sound affect the report."
+        },
+        {
+          "id": "g5_lq_t1_m04_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "fact, opinion, and fact-based opinion"
+            },
+            {
+              "id": "b",
+              "text": "Informational text"
+            },
+            {
+              "id": "c",
+              "text": "topic, main idea, and supporting details"
+            },
+            {
+              "id": "d",
+              "text": "explanation and news report"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices fact, opinion, and fact-based opinion.",
+          "correct_feedback": "This area directly practices fact, opinion, and fact-based opinion."
+        },
+        {
+          "id": "g5_lq_t1_m04_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m04_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "reconstruct the final text and restore the complete story"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should reconstruct the final text and restore the complete story.",
+          "correct_feedback": "The learner should reconstruct the final text and restore the complete story."
+        }
+      ],
+      "world_action": "reconstruct the final text and restore the complete story",
+      "world_result": "Broadcast Balcony is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m04_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m04_a03.started",
+        "g5_lq_t1_m04_a03.interaction_state",
+        "g5_lq_t1_m04_a03.question_outcomes",
+        "g5_lq_t1_m04_a03.review_required",
+        "g5_lq_t1_m04_a03.world_action_completed",
+        "g5_lq_t1_m04_a03.collectible_collected",
+        "g5_lq_t1_m04_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

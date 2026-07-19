@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "data": {
+    "quiz": {
+      "id": "quiz_fixture_001",
+      "title": "Story Elements Check",
+      "instructions": "Choose the best answer.",
+      "question_count": 2,
+      "questions": [
+        {
+          "id": "qq_001",
+          "type": "multiple_choice_single",
+          "prompt": "Who is the main character?",
+          "options": [
+            {
+              "id": "opt_a",
+              "text": "Farmer Lira"
+            },
+            {
+              "id": "opt_b",
+              "text": "The bridge"
+            }
+          ]
+        },
+        {
+          "id": "qq_002",
+          "type": "true_false",
+          "prompt": "The story happens during a festival.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

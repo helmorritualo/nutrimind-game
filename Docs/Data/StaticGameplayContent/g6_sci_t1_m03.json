@@ -1,0 +1,562 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g6_sci_t1_m03",
+  "grade_id": "grade_6",
+  "subject_id": "subject_science",
+  "term_id": "term_1",
+  "title": "The Separation Market",
+  "curriculum_block": "Weeks 5–6",
+  "learning_focus": "Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets; benefits and useful products.",
+  "story_premise": "A market’s rice, sand, water, metal pieces, and dissolved materials are mixed after a storm.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets; benefits and useful products.",
+  "collectible_type": "Science Evidence Token",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g6_sci_t1_m03",
+    "scene_name": "SCN_G6_SCI_T1_M03_TheSeparationMarket",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g6_sci_t1_m03_a01",
+      "area_number": 1,
+      "title": "Hand Separation Stall",
+      "phase": "discover_and_connect",
+      "story": "Use picking, scooping, or winnowing for suitable mixtures. Separate particles by size.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Hand Separation Stall is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Use picking, scooping, or winnowing for suitable mixtures."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "observe_problem",
+        "record_observations",
+        "make_prediction",
+        "perform_guided_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_sci_t1_m03_a01_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g6_sci_t1_m03_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g6_sci_t1_m03_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g6_sci_t1_m03_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for Decantation, winnowing, scooping, picking, evaporation, filtering, sieving, magnets and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Hand Separation Stall.",
+      "collectible": {
+        "id": "g6_sci_t1_m03_a01_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_sci_t1_m03_a01.started",
+        "g6_sci_t1_m03_a01.interaction_state",
+        "g6_sci_t1_m03_a01.question_outcomes",
+        "g6_sci_t1_m03_a01.review_required",
+        "g6_sci_t1_m03_a01.world_action_completed",
+        "g6_sci_t1_m03_a01.collectible_collected",
+        "g6_sci_t1_m03_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g6_sci_t1_m03_a02",
+      "area_number": 2,
+      "title": "Magnet Stall",
+      "phase": "practice_and_apply",
+      "story": "Remove magnetic material. Separate solid–liquid mixtures by suitable methods.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Magnet Stall is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Remove magnetic material."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate benefits and useful products, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: benefits and useful products.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "compare_variables_or_evidence",
+        "perform_application_investigation",
+        "record_result",
+        "resolve_evidence_questions",
+        "form_intermediate_conclusion",
+        "collect_evidence_token",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_sci_t1_m03_a02_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g6_sci_t1_m03_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g6_sci_t1_m03_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g6_sci_t1_m03_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for benefits and useful products and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for benefits and useful products and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for benefits and useful products and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for benefits and useful products and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Magnet Stall.",
+      "collectible": {
+        "id": "g6_sci_t1_m03_a02_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_sci_t1_m03_a02.started",
+        "g6_sci_t1_m03_a02.interaction_state",
+        "g6_sci_t1_m03_a02.question_outcomes",
+        "g6_sci_t1_m03_a02.review_required",
+        "g6_sci_t1_m03_a02.world_action_completed",
+        "g6_sci_t1_m03_a02.collectible_collected",
+        "g6_sci_t1_m03_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g6_sci_t1_m03_a03",
+      "area_number": 3,
+      "title": "Evaporation Stall",
+      "phase": "resolve_and_master",
+      "story": "Recover a dissolved solid in a model and explain the practical benefit. The player designs a separation plan for each mixture and compares limitations.",
+      "opening_dialogue": [
+        {
+          "speaker": "Science Guide",
+          "text": "The station in Evaporation Stall is not working correctly."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Recover a dissolved solid in a model and explain the practical benefit."
+        },
+        {
+          "speaker": "Science Guide",
+          "text": "Observe carefully, investigate benefits and useful products, record the evidence, and use it to restore the station."
+        }
+      ],
+      "learning_clues": [
+        "Science focus: benefits and useful products.",
+        "Record observations and measurements before forming a conclusion."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "apply_scientific_solution",
+        "resolve_integrated_mission_challenge",
+        "form_final_conclusion",
+        "restore_world_state",
+        "collect_evidence_token",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_sci_t1_m03_a03_q01",
+          "type": "prediction_single_unscored",
+          "is_scored": false,
+          "prompt": "Before changing the setup, what should the learner do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Observe the starting condition and record a prediction."
+            },
+            {
+              "id": "b",
+              "text": "Change several things at once."
+            },
+            {
+              "id": "c",
+              "text": "Choose a conclusion before observing."
+            },
+            {
+              "id": "d",
+              "text": "Skip directly to the collectible."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 1,
+          "first_wrong_hint": "Make a prediction from the clues already observed.",
+          "second_wrong_explanation": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "correct_feedback": "A prediction is recorded before the investigation and is not scored as right or wrong.",
+          "records_prediction": true
+        },
+        {
+          "id": "g6_sci_t1_m03_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which record is the strongest scientific evidence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "A direct observation or measurement from the investigation."
+            },
+            {
+              "id": "b",
+              "text": "A guess made after seeing the answer."
+            },
+            {
+              "id": "c",
+              "text": "A detail unrelated to the setup."
+            },
+            {
+              "id": "d",
+              "text": "A reward animation from the game."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Evidence comes from what was observed or measured.",
+          "second_wrong_explanation": "Scientific evidence is a direct observation or measurement from the investigation.",
+          "correct_feedback": "Scientific evidence is a direct observation or measurement from the investigation."
+        },
+        {
+          "id": "g6_sci_t1_m03_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should record the result before choosing a conclusion.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A conclusion must be supported by recorded evidence.",
+          "second_wrong_explanation": "The statement is true: results are recorded first, then used to form a conclusion.",
+          "correct_feedback": "The statement is true: results are recorded first, then used to form a conclusion."
+        },
+        {
+          "id": "g6_sci_t1_m03_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this science area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "perform the guided investigation for benefits and useful products and record what changes or stays the same"
+            },
+            {
+              "id": "b",
+              "text": "Change every variable and do not record the result."
+            },
+            {
+              "id": "c",
+              "text": "Select an answer without examining the setup."
+            },
+            {
+              "id": "d",
+              "text": "Send the answer key to the server for scoring."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that connects observation, investigation, and evidence.",
+          "second_wrong_explanation": "The learner should perform the guided investigation for benefits and useful products and record what changes or stays the same.",
+          "correct_feedback": "The learner should perform the guided investigation for benefits and useful products and record what changes or stays the same."
+        }
+      ],
+      "world_action": "perform the guided investigation for benefits and useful products and record what changes or stays the same",
+      "world_result": "The scientific solution restores the station or environment in Evaporation Stall.",
+      "collectible": {
+        "id": "g6_sci_t1_m03_a03_collectible",
+        "type": "Science Evidence Token",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_sci_t1_m03_a03.started",
+        "g6_sci_t1_m03_a03.interaction_state",
+        "g6_sci_t1_m03_a03.question_outcomes",
+        "g6_sci_t1_m03_a03.review_required",
+        "g6_sci_t1_m03_a03.world_action_completed",
+        "g6_sci_t1_m03_a03.collectible_collected",
+        "g6_sci_t1_m03_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

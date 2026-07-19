@@ -1,0 +1,22 @@
+---
+description: "Current Unity rebuild milestone."
+globs: "Assets/NutriMind/**/*,Docs/CurrentMilestone/**/*,Tests/**/*"
+alwaysApply: false
+---
+# Current milestone
+
+Deliver:
+
+- SCN_App_Bootstrap;
+- SCN_App_Authentication;
+- SCN_App_Main;
+- SCN_App_QuizPortal;
+- complete application screens;
+- Quiz Portal client;
+- reusable static gameplay JSON loader, validator, question engine, and SQLite progress/outbox;
+- complete `g5_lq_t1_m01` in one three-area scene;
+- overview/data foundations for `g5_peh_t1_m01` and `g5_sci_t1_m01`.
+
+Do not build their complete PE & Health or Science scenes.
+Do not implement later missions.
+Do not reintroduce five areas.

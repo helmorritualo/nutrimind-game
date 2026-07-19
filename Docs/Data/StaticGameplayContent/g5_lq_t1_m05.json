@@ -1,0 +1,558 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g5_lq_t1_m05",
+  "grade_id": "grade_5",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Grand Holiday Chronicle",
+  "curriculum_block": "Weeks 9–10",
+  "learning_focus": "Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+  "story_premise": "The restored pages must be bound into the Grand Holiday Chronicle, but each district wants its part placed first. The Pathfinder must create one fair, coherent record for the whole community.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_lq_t1_m05",
+    "scene_name": "SCN_G5_LQ_T1_M05_TheGrandHolidayChronicle",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_lq_t1_m05_a01",
+      "area_number": 1,
+      "title": "Source Library",
+      "phase": "discover_and_connect",
+      "story": "Review story and report sources, identify purpose and audience, and select reliable details. Repair character, setting, problem, event sequence, and resolution in the festival story.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Source Library."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Review story and report sources, identify purpose and audience, and select reliable details."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "resolve_story_structure_questions",
+        "apply_language_clue",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m05_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Source Library?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Review story and report sources, identify purpose and audience, and select reliable details."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Review story and report sources, identify purpose and audience, and select reliable details.",
+          "correct_feedback": "Review story and report sources, identify purpose and audience, and select reliable details."
+        },
+        {
+          "id": "g5_lq_t1_m05_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness"
+            },
+            {
+              "id": "b",
+              "text": "an unrelated topic"
+            },
+            {
+              "id": "c",
+              "text": "a different mission rule"
+            },
+            {
+              "id": "d",
+              "text": "a menu-navigation task"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+          "correct_feedback": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness."
+        },
+        {
+          "id": "g5_lq_t1_m05_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m05_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "inspect the text or visual clues and repair the first story element"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should inspect the text or visual clues and repair the first story element.",
+          "correct_feedback": "The learner should inspect the text or visual clues and repair the first story element."
+        }
+      ],
+      "world_action": "inspect the text or visual clues and repair the first story element",
+      "world_result": "Source Library is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m05_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m05_a01.started",
+        "g5_lq_t1_m05_a01.interaction_state",
+        "g5_lq_t1_m05_a01.question_outcomes",
+        "g5_lq_t1_m05_a01.review_required",
+        "g5_lq_t1_m05_a01.world_action_completed",
+        "g5_lq_t1_m05_a01.collectible_collected",
+        "g5_lq_t1_m05_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m05_a02",
+      "area_number": 2,
+      "title": "Clarity Foundry",
+      "phase": "practice_and_apply",
+      "story": "Edit verbs, pronouns, complements, adjective order, and compound-complex sentences for clarity. Choose layout, colors, captions, and images that support rather than distort the message.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Clarity Foundry."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Edit verbs, pronouns, complements, adjective order, and compound-complex sentences for clarity."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "repair_language_or_visual_elements",
+        "compare_evidence",
+        "resolve_application_questions",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m05_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Clarity Foundry?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Edit verbs, pronouns, complements, adjective order, and compound-complex sentences for clarity."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Edit verbs, pronouns, complements, adjective order, and compound-complex sentences for clarity.",
+          "correct_feedback": "Edit verbs, pronouns, complements, adjective order, and compound-complex sentences for clarity."
+        },
+        {
+          "id": "g5_lq_t1_m05_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness"
+            },
+            {
+              "id": "b",
+              "text": "an unrelated topic"
+            },
+            {
+              "id": "c",
+              "text": "a different mission rule"
+            },
+            {
+              "id": "d",
+              "text": "a menu-navigation task"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+          "correct_feedback": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness."
+        },
+        {
+          "id": "g5_lq_t1_m05_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m05_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "apply the language or visual clue to repair the middle section"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should apply the language or visual clue to repair the middle section.",
+          "correct_feedback": "The learner should apply the language or visual clue to repair the middle section."
+        }
+      ],
+      "world_action": "apply the language or visual clue to repair the middle section",
+      "world_result": "Clarity Foundry is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m05_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m05_a02.started",
+        "g5_lq_t1_m05_a02.interaction_state",
+        "g5_lq_t1_m05_a02.question_outcomes",
+        "g5_lq_t1_m05_a02.review_required",
+        "g5_lq_t1_m05_a02.world_action_completed",
+        "g5_lq_t1_m05_a02.collectible_collected",
+        "g5_lq_t1_m05_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g5_lq_t1_m05_a03",
+      "area_number": 3,
+      "title": "Chronicle Vault",
+      "phase": "resolve_and_master",
+      "story": "Write or assemble an introduction, body, and conclusion that respectfully represents all districts. The completed chronicle is read at the closing ceremony. The player answers a mixed comprehension challenge and places the bound volume in the Living Library.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Chronicle Vault."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Write or assemble an introduction, body, and conclusion that respectfully represents all districts."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "reconstruct_complete_narrative",
+        "resolve_integrated_mission_challenge",
+        "review_when_required",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m05_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Chronicle Vault?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Write or assemble an introduction, body, and conclusion that respectfully represents all districts."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Write or assemble an introduction, body, and conclusion that respectfully represents all districts.",
+          "correct_feedback": "Write or assemble an introduction, body, and conclusion that respectfully represents all districts."
+        },
+        {
+          "id": "g5_lq_t1_m05_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness"
+            },
+            {
+              "id": "b",
+              "text": "an unrelated topic"
+            },
+            {
+              "id": "c",
+              "text": "a different mission rule"
+            },
+            {
+              "id": "d",
+              "text": "a menu-navigation task"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+          "correct_feedback": "This area directly practices Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness."
+        },
+        {
+          "id": "g5_lq_t1_m05_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g5_lq_t1_m05_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "reconstruct the final text and restore the complete story"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should reconstruct the final text and restore the complete story.",
+          "correct_feedback": "The learner should reconstruct the final text and restore the complete story."
+        }
+      ],
+      "world_action": "reconstruct the final text and restore the complete story",
+      "world_result": "Chronicle Vault is restored and the story route updates.",
+      "collectible": {
+        "id": "g5_lq_t1_m05_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m05_a03.started",
+        "g5_lq_t1_m05_a03.interaction_state",
+        "g5_lq_t1_m05_a03.question_outcomes",
+        "g5_lq_t1_m05_a03.review_required",
+        "g5_lq_t1_m05_a03.world_action_completed",
+        "g5_lq_t1_m05_a03.collectible_collected",
+        "g5_lq_t1_m05_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}

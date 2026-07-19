@@ -1,0 +1,32 @@
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "g5_lq_t1_m01",
+        "grade_id": "grade_5",
+        "subject_id": "subject_literaquest",
+        "term_id": "term_1",
+        "order": 1,
+        "status": "in_progress",
+        "locked_reason": null,
+        "area_count": 3,
+        "progress": {
+          "state": "in_progress",
+          "active_area_id": "g5_lq_t1_m01_a02",
+          "completed_area_count": 1,
+          "required_area_count": 3,
+          "collectible_count": 1,
+          "required_collectible_count": 3,
+          "completed_at": null,
+          "revision": 4
+        }
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "server_time": "2026-07-19T05:00:00Z",
+    "api_version": "v1"
+  }
+}

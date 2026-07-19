@@ -1,0 +1,558 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.0.0",
+  "mission_id": "g6_lq_t1_m03",
+  "grade_id": "grade_6",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Poster That Spoke Too Loudly",
+  "curriculum_block": "Weeks 5–6",
+  "learning_focus": "Hyperbole and irony; adjectival phrases; non-verbal cues; visual purpose; creation of a visual text; cultural appropriateness.",
+  "story_premise": "A promotional poster uses wild exaggeration and an ironic slogan that visitors misunderstand. The Pathfinder works with performers and designers to repair the message.",
+  "mission_objective": "Complete the three connected areas and apply the mission learning focus: Hyperbole and irony; adjectival phrases; non-verbal cues; visual purpose; creation of a visual text; cultural appropriateness.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g6_lq_t1_m03",
+    "scene_name": "SCN_G6_LQ_T1_M03_ThePosterThatSpokeTooLoudly",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g6_lq_t1_m03_a01",
+      "area_number": 1,
+      "title": "Slogan Gate",
+      "phase": "discover_and_connect",
+      "story": "Identify hyperbole and explain when exaggeration becomes misleading. Interpret an ironic line using story context.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Slogan Gate."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Identify hyperbole and explain when exaggeration becomes misleading."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use Hyperbole and irony, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: Hyperbole and irony.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "resolve_story_structure_questions",
+        "apply_language_clue",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_lq_t1_m03_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Slogan Gate?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Identify hyperbole and explain when exaggeration becomes misleading."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Identify hyperbole and explain when exaggeration becomes misleading.",
+          "correct_feedback": "Identify hyperbole and explain when exaggeration becomes misleading."
+        },
+        {
+          "id": "g6_lq_t1_m03_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Hyperbole and irony"
+            },
+            {
+              "id": "b",
+              "text": "adjectival phrases"
+            },
+            {
+              "id": "c",
+              "text": "non-verbal cues"
+            },
+            {
+              "id": "d",
+              "text": "visual purpose"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices Hyperbole and irony.",
+          "correct_feedback": "This area directly practices Hyperbole and irony."
+        },
+        {
+          "id": "g6_lq_t1_m03_a01_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g6_lq_t1_m03_a01_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "inspect the text or visual clues and repair the first story element"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should inspect the text or visual clues and repair the first story element.",
+          "correct_feedback": "The learner should inspect the text or visual clues and repair the first story element."
+        }
+      ],
+      "world_action": "inspect the text or visual clues and repair the first story element",
+      "world_result": "Slogan Gate is restored and the story route updates.",
+      "collectible": {
+        "id": "g6_lq_t1_m03_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_lq_t1_m03_a01.started",
+        "g6_lq_t1_m03_a01.interaction_state",
+        "g6_lq_t1_m03_a01.question_outcomes",
+        "g6_lq_t1_m03_a01.review_required",
+        "g6_lq_t1_m03_a01.world_action_completed",
+        "g6_lq_t1_m03_a01.collectible_collected",
+        "g6_lq_t1_m03_a01.completed"
+      ]
+    },
+    {
+      "area_id": "g6_lq_t1_m03_a02",
+      "area_number": 2,
+      "title": "Description Studio",
+      "phase": "practice_and_apply",
+      "story": "Use adjectival phrases to add precise, relevant detail. Adjust facial expression, gesture, eye contact, posture, touch boundaries, and blocking.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Description Studio."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Use adjectival phrases to add precise, relevant detail."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use non-verbal cues, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: non-verbal cues.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "repair_language_or_visual_elements",
+        "compare_evidence",
+        "resolve_application_questions",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_lq_t1_m03_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Description Studio?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Use adjectival phrases to add precise, relevant detail."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Use adjectival phrases to add precise, relevant detail.",
+          "correct_feedback": "Use adjectival phrases to add precise, relevant detail."
+        },
+        {
+          "id": "g6_lq_t1_m03_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "non-verbal cues"
+            },
+            {
+              "id": "b",
+              "text": "Hyperbole and irony"
+            },
+            {
+              "id": "c",
+              "text": "adjectival phrases"
+            },
+            {
+              "id": "d",
+              "text": "visual purpose"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices non-verbal cues.",
+          "correct_feedback": "This area directly practices non-verbal cues."
+        },
+        {
+          "id": "g6_lq_t1_m03_a02_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g6_lq_t1_m03_a02_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "apply the language or visual clue to repair the middle section"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should apply the language or visual clue to repair the middle section.",
+          "correct_feedback": "The learner should apply the language or visual clue to repair the middle section."
+        }
+      ],
+      "world_action": "apply the language or visual clue to repair the middle section",
+      "world_result": "Description Studio is restored and the story route updates.",
+      "collectible": {
+        "id": "g6_lq_t1_m03_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_lq_t1_m03_a02.started",
+        "g6_lq_t1_m03_a02.interaction_state",
+        "g6_lq_t1_m03_a02.question_outcomes",
+        "g6_lq_t1_m03_a02.review_required",
+        "g6_lq_t1_m03_a02.world_action_completed",
+        "g6_lq_t1_m03_a02.collectible_collected",
+        "g6_lq_t1_m03_a02.completed"
+      ]
+    },
+    {
+      "area_id": "g6_lq_t1_m03_a03",
+      "area_number": 3,
+      "title": "Design Press",
+      "phase": "resolve_and_master",
+      "story": "Create a visual text whose lines, colors, layout, and symbols match the intended message. The revised poster is approved because it is engaging without misrepresenting the community.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mission Guide",
+          "text": "The Haze has damaged the work in Design Press."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Create a visual text whose lines, colors, layout, and symbols match the intended message."
+        },
+        {
+          "speaker": "Mission Guide",
+          "text": "Observe the clues, use creation of a visual text, and repair this area before collecting the Story Fragment."
+        }
+      ],
+      "learning_clues": [
+        "Learning focus: creation of a visual text.",
+        "Use details from the text, dialogue, and visual layout as evidence."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "reconstruct_complete_narrative",
+        "resolve_integrated_mission_challenge",
+        "review_when_required",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g6_lq_t1_m03_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What is the Pathfinder’s main task in Design Press?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Create a visual text whose lines, colors, layout, and symbols match the intended message."
+            },
+            {
+              "id": "b",
+              "text": "Ignore the damaged story and leave the area."
+            },
+            {
+              "id": "c",
+              "text": "Collect an item before examining any clue."
+            },
+            {
+              "id": "d",
+              "text": "Open the next mission without completing this area."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look again at the guide’s first explanation.",
+          "second_wrong_explanation": "Create a visual text whose lines, colors, layout, and symbols match the intended message.",
+          "correct_feedback": "Create a visual text whose lines, colors, layout, and symbols match the intended message."
+        },
+        {
+          "id": "g6_lq_t1_m03_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which learning focus most directly supports this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "creation of a visual text"
+            },
+            {
+              "id": "b",
+              "text": "Hyperbole and irony"
+            },
+            {
+              "id": "c",
+              "text": "adjectival phrases"
+            },
+            {
+              "id": "d",
+              "text": "non-verbal cues"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Match the skill to the text, language, or visual task in this area.",
+          "second_wrong_explanation": "This area directly practices creation of a visual text.",
+          "correct_feedback": "This area directly practices creation of a visual text."
+        },
+        {
+          "id": "g6_lq_t1_m03_a03_q03",
+          "type": "true_false",
+          "is_scored": true,
+          "prompt": "The learner should use evidence from the text, dialogue, or visual before changing the story.",
+          "options": [
+            {
+              "id": "true",
+              "text": "True"
+            },
+            {
+              "id": "false",
+              "text": "False"
+            }
+          ],
+          "correct_option_ids": [
+            "true"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "A good repair is based on evidence, not guessing.",
+          "second_wrong_explanation": "The statement is true: the learner must inspect evidence before editing or arranging content.",
+          "correct_feedback": "The statement is true: the learner must inspect evidence before editing or arranging content."
+        },
+        {
+          "id": "g6_lq_t1_m03_a03_q04",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which action best completes this area?",
+          "options": [
+            {
+              "id": "a",
+              "text": "reconstruct the final text and restore the complete story"
+            },
+            {
+              "id": "b",
+              "text": "Skip the learning task and collect the reward immediately."
+            },
+            {
+              "id": "c",
+              "text": "Repeat the mission introduction as a separate activity."
+            },
+            {
+              "id": "d",
+              "text": "Send the static answer key to the classroom server."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that applies the learned skill in the game world.",
+          "second_wrong_explanation": "The learner should reconstruct the final text and restore the complete story.",
+          "correct_feedback": "The learner should reconstruct the final text and restore the complete story."
+        }
+      ],
+      "world_action": "reconstruct the final text and restore the complete story",
+      "world_result": "Design Press is restored and the story route updates.",
+      "collectible": {
+        "id": "g6_lq_t1_m03_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g6_lq_t1_m03_a03.started",
+        "g6_lq_t1_m03_a03.interaction_state",
+        "g6_lq_t1_m03_a03.question_outcomes",
+        "g6_lq_t1_m03_a03.review_required",
+        "g6_lq_t1_m03_a03.world_action_completed",
+        "g6_lq_t1_m03_a03.collectible_collected",
+        "g6_lq_t1_m03_a03.completed"
+      ]
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "future_mission_structured_curriculum_draft"
+}
