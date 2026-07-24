@@ -599,6 +599,13 @@ A task is complete only when:
 * Relevant validation or tests pass.
 * Required manual Unity Editor steps are documented.
 
+## 20. Unity MCP Tool Guardrails
+- **Max Tool Iteration Limit**: You are strictly forbidden from calling the same Unity MCP tool (e.g., `Unity_ManageGameObject`) more than 2 consecutive times with the same or slightly altered arguments.
+- **Fail-Fast Loop Detection**: If a tool call does not yield a visible "SUCCESS" state or state change in the context window, DO NOT retry it. Stop immediately.
+- **Error Transparency**: If a tool fails, throws an error, or hangs, halt execution. Output the exact payload parameters you tried to send, and explicitly ask the user to check the Unity Editor Console.
+- **Prefab Safety**: Before using `Unity_ManageGameObject` on any object, verify if it is part of a Prefab. If it is, alert the user to unpack it manually, or request explicit confirmation before modifying component properties to avoid breaking prefab instances.
+
+
 ## Learned User Preferences
 
 - Treat design-only, presentation-only, and Penpot-only UI work as visual/layout tasks: UXML/USS, Penpot boards, and shared UI assets only—do not add Unity application or gameplay logic unless explicitly asked.
@@ -609,8 +616,10 @@ A task is complete only when:
 - When creating a requested folder tree, create the full deep nested structure in one pass—not only shallow top-level folders.
 - After a temporary design/layout test is approved, delete the test files and folders when asked rather than leaving them in the project.
 - For large UI refinement passes, inspect references and existing UXML/USS first, plan highest-impact fixes, and wait for approval before rewriting broadly when Plan Mode is requested.
-- Prefer readable, accessible panel scale in Game view / device sims when matching a reference—do not leave the primary form visually undersized.
+- Prefer readable, accessible App UITK scale in Game view / device sims—enlarge undersized text/controls, keep dropdown/popup menus legible, and use generous padding/margins so sections are not visually compact.
 - Prefer medium or bold font weights for App UITK labels, input text, and placeholders—avoid thin weights that hurt readability at Full HD.
+- For App UITK visual QA, prefer user-provided Game view screenshots over Unity MCP capture, SceneView, or PlayMode screenshot tools when those MCP tools are unreliable.
+- On Profile, show LRN as plain unmasked digits with no decorative dashes; style Sign Out as a clear red/destructive action.
 
 ## Learned Workspace Facts
 
@@ -620,4 +629,6 @@ A task is complete only when:
 - Application UI is designed in Penpot via the `user-penpot` MCP as the layout source of truth; keep that work separate from Unity App UXML/USS/C#/scene implementation unless explicitly requested.
 - The Unity Design System package is at `Packages/com.sinanata.designsystem`.
 - The project targets Unity 6 (`6000.3.x` per `ProjectSettings/ProjectVersion.txt`).
-- Temporary App UITK screen previews are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
+- Temporary App UITK screen previews (including Profile and Settings) are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
+- Local-only App Settings options should work without the server; server-backed settings stay deferred.
+- App UITK iteration commonly uses the Singularity Group Hot Reload package.

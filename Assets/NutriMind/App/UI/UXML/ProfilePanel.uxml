@@ -1,0 +1,272 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/ProfilePanel.uss" />
+
+    <ui:VisualElement name="profile-root" class="ds-root theme-nutrimind profile-panel">
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <ui:VisualElement name="profile-content" class="profile-panel__content">
+            <ui:VisualElement class="profile-panel__grid">
+
+                <!-- LEFT: Profile summary -->
+                <ui:VisualElement name="card-profile" class="profile-panel__card profile-panel__card--profile">
+                    <ui:VisualElement class="profile-panel__avatar-wrap">
+                        <!-- ILL_ProfileAvatar — circular portrait when art is ready -->
+                        <ui:VisualElement name="profile-avatar" class="profile-panel__avatar">
+                            <ui:Label text="ILL_Avatar&#10;180×180" class="profile-panel__avatar-label" />
+                        </ui:VisualElement>
+                        <ui:Button name="avatar-edit-button" text="" class="profile-panel__avatar-edit" tooltip="Edit avatar">
+                            <ui:VisualElement class="ds-icon ds-icon--edit profile-panel__avatar-edit-icon" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:Label text="Ariana Dela Cruz" class="profile-panel__name" />
+                    <ui:Label text="Grade 6 • Section: Rizal" class="profile-panel__meta" />
+                    <ui:Label text="LRN: 123456789" class="profile-panel__meta" />
+                    <ui:Label text="School Year: 2025–2026" class="profile-panel__meta profile-panel__meta--school" />
+
+                    <ui:VisualElement class="profile-panel__title-pill">
+                        <ui:VisualElement class="ds-icon ds-icon--medal profile-panel__title-pill-icon" />
+                        <ui:Label text="Knowledge Seeker" class="profile-panel__title-pill-label" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="profile-panel__stats">
+                        <ui:VisualElement class="profile-panel__stat">
+                            <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold profile-panel__stat-icon" />
+                            <ui:Label text="87" class="profile-panel__stat-value" />
+                            <ui:Label text="Stars Earned" class="profile-panel__stat-caption" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="profile-panel__stat">
+                            <ui:VisualElement class="ds-icon ds-icon--shield profile-panel__stat-icon profile-panel__stat-icon--badge" />
+                            <ui:Label text="6" class="profile-panel__stat-value" />
+                            <ui:Label text="Badges" class="profile-panel__stat-caption" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="profile-panel__stat">
+                            <ui:VisualElement class="ds-icon ds-icon--calendar profile-panel__stat-icon profile-panel__stat-icon--days" />
+                            <ui:Label text="12" class="profile-panel__stat-value" />
+                            <ui:Label text="Days Active" class="profile-panel__stat-caption" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:Button name="sign-out-button" text="Sign out" class="profile-panel__sign-out" />
+                </ui:VisualElement>
+
+                <!-- CENTER: Progress column -->
+                <ui:VisualElement class="profile-panel__col profile-panel__col--center">
+
+                    <ui:VisualElement name="card-overall" class="profile-panel__card profile-panel__card--overall">
+                        <ui:Label text="Overall Learning Progress" class="profile-panel__card-title" />
+                        <ui:VisualElement class="profile-panel__overall-body">
+                            <!-- Donut progress — static ~72% ring (border-side approximation) -->
+                            <ui:VisualElement class="profile-panel__ring">
+                                <ui:VisualElement class="profile-panel__ring-hole">
+                                    <ui:Label text="72%" class="profile-panel__ring-pct" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__overall-copy">
+                                <ui:Label text="Great job! Keep up the healthy learning!" class="profile-panel__overall-message" />
+                                <ui:VisualElement class="profile-panel__milestone">
+                                    <ui:VisualElement class="profile-panel__milestone-icon-wrap">
+                                        <ui:VisualElement class="ds-icon ds-icon--shield profile-panel__milestone-icon" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="profile-panel__milestone-copy">
+                                        <ui:Label text="Next Milestone" class="profile-panel__milestone-label" />
+                                        <ui:Label text="Level 8 Explorer" class="profile-panel__milestone-value" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="card-subjects" class="profile-panel__card profile-panel__card--subjects">
+                        <ui:Label text="Subject Progress" class="profile-panel__card-title" />
+                        <ui:VisualElement class="profile-panel__subject-list">
+
+                            <ui:VisualElement class="profile-panel__subject">
+                                <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--science">
+                                    <ui:Label text="ICO&#10;Sci" class="profile-panel__ph-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-main">
+                                    <ui:Label text="Science" class="profile-panel__subject-name" />
+                                    <ui:VisualElement class="profile-panel__bar-track">
+                                        <ui:VisualElement class="profile-panel__bar-fill profile-panel__bar-fill--science" style="width: 72%;" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-stats">
+                                    <ui:Label text="72%" class="profile-panel__subject-pct" />
+                                    <ui:Label text="18 / 25" class="profile-panel__subject-frac" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__subject">
+                                <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--pe">
+                                    <ui:Label text="ICO&#10;PE" class="profile-panel__ph-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-main">
+                                    <ui:Label text="PE and Health" class="profile-panel__subject-name" />
+                                    <ui:VisualElement class="profile-panel__bar-track">
+                                        <ui:VisualElement class="profile-panel__bar-fill profile-panel__bar-fill--pe" style="width: 64%;" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-stats">
+                                    <ui:Label text="64%" class="profile-panel__subject-pct" />
+                                    <ui:Label text="16 / 25" class="profile-panel__subject-frac" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__subject">
+                                <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--lq">
+                                    <ui:VisualElement class="ds-icon ds-icon--book profile-panel__subject-glyph" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-main">
+                                    <ui:Label text="LiteraQuest" class="profile-panel__subject-name" />
+                                    <ui:VisualElement class="profile-panel__bar-track">
+                                        <ui:VisualElement class="profile-panel__bar-fill profile-panel__bar-fill--lq" style="width: 60%;" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-stats">
+                                    <ui:Label text="60%" class="profile-panel__subject-pct" />
+                                    <ui:Label text="15 / 25" class="profile-panel__subject-frac" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__subject profile-panel__subject--last">
+                                <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--hh">
+                                    <ui:Label text="ICO&#10;HH" class="profile-panel__ph-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-main">
+                                    <ui:Label text="Healthy Habits" class="profile-panel__subject-name" />
+                                    <ui:VisualElement class="profile-panel__bar-track">
+                                        <ui:VisualElement class="profile-panel__bar-fill profile-panel__bar-fill--hh" style="width: 85%;" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:VisualElement class="profile-panel__subject-stats">
+                                    <ui:Label text="85%" class="profile-panel__subject-pct" />
+                                    <ui:Label text="17 / 20" class="profile-panel__subject-frac" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- RIGHT: Achievements + Activity -->
+                <ui:VisualElement class="profile-panel__col profile-panel__col--right">
+
+                    <ui:VisualElement name="card-achievements" class="profile-panel__card profile-panel__card--achievements">
+                        <ui:VisualElement class="profile-panel__card-head">
+                            <ui:Label text="Achievements" class="profile-panel__card-title" />
+                            <ui:Button name="achievements-view-all" text="View All" class="profile-panel__view-all" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="profile-panel__badge-row">
+                            <ui:VisualElement class="profile-panel__badge">
+                                <ui:VisualElement class="profile-panel__badge-disc profile-panel__badge-disc--purple">
+                                    <ui:VisualElement class="ds-icon ds-icon--book profile-panel__badge-glyph profile-panel__badge-glyph--on-dark" />
+                                </ui:VisualElement>
+                                <ui:Label text="Knowledge&#10;Seeker" class="profile-panel__badge-caption" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="profile-panel__badge">
+                                <ui:VisualElement class="profile-panel__badge-disc profile-panel__badge-disc--green">
+                                    <ui:Label text="ICO&#10;Apple" class="profile-panel__ph-label profile-panel__ph-label--on-dark" />
+                                </ui:VisualElement>
+                                <ui:Label text="Healthy&#10;Choice" class="profile-panel__badge-caption" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="profile-panel__badge">
+                                <ui:VisualElement class="profile-panel__badge-disc profile-panel__badge-disc--blue">
+                                    <ui:VisualElement class="ds-icon ds-icon--target profile-panel__badge-glyph profile-panel__badge-glyph--on-dark" />
+                                </ui:VisualElement>
+                                <ui:Label text="Quiz&#10;Whiz" class="profile-panel__badge-caption" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="profile-panel__badge profile-panel__badge--locked">
+                                <ui:VisualElement class="profile-panel__badge-disc profile-panel__badge-disc--locked">
+                                    <ui:VisualElement class="ds-icon ds-icon--star profile-panel__badge-glyph profile-panel__badge-glyph--locked" />
+                                </ui:VisualElement>
+                                <ui:Label text="Explorer&#10;Locked" class="profile-panel__badge-caption" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="card-activity" class="profile-panel__card profile-panel__card--activity">
+                        <ui:VisualElement class="profile-panel__card-head">
+                            <ui:Label text="Recent Activity" class="profile-panel__card-title" />
+                            <ui:Button name="activity-view-all" text="View All" class="profile-panel__view-all" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="profile-panel__activity-list">
+
+                            <ui:VisualElement class="profile-panel__activity">
+                                <ui:VisualElement class="profile-panel__activity-icon profile-panel__activity-icon--science">
+                                    <ui:Label text="ICO" class="profile-panel__ph-label profile-panel__ph-label--sm" />
+                                </ui:VisualElement>
+                                <ui:Label text="Completed Science Mission 3" class="profile-panel__activity-text profile-panel__activity-text--science" />
+                                <ui:Label text="Today, 3:45 PM" class="profile-panel__activity-time" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__activity">
+                                <ui:VisualElement class="profile-panel__activity-icon profile-panel__activity-icon--badge">
+                                    <ui:VisualElement class="ds-icon ds-icon--shield profile-panel__activity-glyph" />
+                                </ui:VisualElement>
+                                <ui:Label text="Earned the Healthy Choice badge" class="profile-panel__activity-text profile-panel__activity-text--badge" />
+                                <ui:Label text="Today, 2:30 PM" class="profile-panel__activity-time" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__activity">
+                                <ui:VisualElement class="profile-panel__activity-icon profile-panel__activity-icon--quiz">
+                                    <ui:VisualElement class="ds-icon ds-icon--target profile-panel__activity-glyph" />
+                                </ui:VisualElement>
+                                <ui:Label text="Finished Quiz: Food Detectives" class="profile-panel__activity-text profile-panel__activity-text--quiz" />
+                                <ui:Label text="Today, 1:15 PM" class="profile-panel__activity-time" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="profile-panel__activity profile-panel__activity--last">
+                                <ui:VisualElement class="profile-panel__activity-icon profile-panel__activity-icon--login">
+                                    <ui:VisualElement class="ds-icon ds-icon--user profile-panel__activity-glyph profile-panel__activity-glyph--muted" />
+                                </ui:VisualElement>
+                                <ui:Label text="Logged in" class="profile-panel__activity-text profile-panel__activity-text--login" />
+                                <ui:Label text="Today, 8:02 AM" class="profile-panel__activity-time" />
+                            </ui:VisualElement>
+
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== BOTTOM NAV (7 items, matching Home / reference) ===== -->
+        <ui:VisualElement name="profile-nav" class="profile-panel__nav">
+            <ui:Button name="nav-home" class="profile-panel__nav-item is-active">
+                <ui:VisualElement class="ds-icon ds-icon--home profile-panel__nav-icon" />
+                <ui:Label text="Home" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-map" class="profile-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--map profile-panel__nav-icon" />
+                <ui:Label text="Map" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-missions" class="profile-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--bag profile-panel__nav-icon" />
+                <ui:Label text="Missions" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-achievements" class="profile-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--trophy profile-panel__nav-icon" />
+                <ui:Label text="Achievements" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-rewards" class="profile-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--treasure profile-panel__nav-icon" />
+                <ui:Label text="Rewards" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-friends" class="profile-panel__nav-item">
+                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
+                <ui:VisualElement class="profile-panel__nav-icon-ph">
+                    <ui:Label text="ICO&#10;32" class="profile-panel__nav-icon-ph-label" />
+                </ui:VisualElement>
+                <ui:Label text="Friends" class="profile-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-more" class="profile-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--more-horizontal profile-panel__nav-icon" />
+                <ui:Label text="More" class="profile-panel__nav-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

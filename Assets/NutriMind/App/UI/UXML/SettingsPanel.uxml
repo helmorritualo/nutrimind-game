@@ -1,0 +1,390 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/SettingsPanel.uss" />
+
+    <ui:VisualElement name="settings-root" class="ds-root theme-nutrimind settings-panel">
+
+        <ui:VisualElement name="settings-body" class="settings-panel__body">
+
+            <!-- ===== LEFT SIDEBAR ===== -->
+            <ui:VisualElement name="settings-sidebar" class="settings-panel__sidebar">
+                <ui:Button name="nav-audio-display" class="settings-panel__nav-item is-active">
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--sound settings-panel__nav-icon" />
+                    <ui:Label text="Audio &amp; Display" class="settings-panel__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-accessibility" class="settings-panel__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--user settings-panel__nav-icon" />
+                    <ui:Label text="Accessibility" class="settings-panel__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-language" class="settings-panel__nav-item">
+                    <!-- ICO_Globe — not in design system yet -->
+                    <ui:VisualElement class="settings-panel__nav-icon-ph">
+                        <ui:Label text="ICO&#10;Globe" class="settings-panel__nav-icon-ph-label" />
+                    </ui:VisualElement>
+                    <ui:Label text="Language" class="settings-panel__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-account" class="settings-panel__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--shield settings-panel__nav-icon" />
+                    <ui:Label text="Account &amp; Support" class="settings-panel__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-help" class="settings-panel__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--help settings-panel__nav-icon" />
+                    <ui:Label text="Help &amp; Tutorial" class="settings-panel__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-about" class="settings-panel__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--info settings-panel__nav-icon" />
+                    <ui:Label text="About NutriMind" class="settings-panel__nav-label" />
+                </ui:Button>
+            </ui:VisualElement>
+
+            <!-- ===== MAIN COLUMN ===== -->
+            <ui:VisualElement class="settings-panel__main">
+                <ui:ScrollView name="settings-scroll" class="settings-panel__scroll" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto">
+
+                    <!-- PAGE: Audio & Display (matches design reference overview) -->
+                    <ui:VisualElement name="page-audio-display" class="settings-panel__page">
+                        <ui:VisualElement class="settings-panel__grid">
+
+                            <ui:VisualElement class="settings-panel__col settings-panel__col--left">
+
+                                <!-- Audio card -->
+                                <ui:VisualElement name="card-audio" class="settings-panel__card settings-panel__card--audio">
+                                    <ui:Label text="Audio" class="settings-panel__card-title" />
+
+                                    <ui:VisualElement class="settings-panel__slider-row">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--master">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--sound settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Master Volume" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-master" class="settings-panel__slider-fill settings-panel__slider-fill--master" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-master" low-value="0" high-value="100" value="80" class="ds-slider settings-panel__slider settings-panel__slider--master" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-master" text="80%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__slider-row">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--music">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--music settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Music Volume" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-music" class="settings-panel__slider-fill settings-panel__slider-fill--music" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-music" low-value="0" high-value="100" value="70" class="ds-slider settings-panel__slider settings-panel__slider--music" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-music" text="70%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__slider-row">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--sfx">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--sparkle settings-panel__slider-glyph settings-panel__slider-glyph--on-accent" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Sound Effects" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-sfx" class="settings-panel__slider-fill settings-panel__slider-fill--sfx" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-sfx" low-value="0" high-value="100" value="80" class="ds-slider settings-panel__slider settings-panel__slider--sfx" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-sfx" text="80%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__slider-row settings-panel__slider-row--last">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--voice">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--mic settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Voice / Dialogue" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-voice" class="settings-panel__slider-fill settings-panel__slider-fill--voice" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-voice" low-value="0" high-value="100" value="85" class="ds-slider settings-panel__slider settings-panel__slider--voice" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-voice" text="85%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+
+                                <!-- Language card (on overview) -->
+                                <ui:VisualElement name="card-language-overview" class="settings-panel__card settings-panel__card--language">
+                                    <ui:Label text="Language" class="settings-panel__card-title" />
+                                    <ui:VisualElement class="settings-panel__field-row">
+                                        <ui:Label text="App Language" class="settings-panel__field-label settings-panel__field-label--inline" />
+                                        <ui:DropdownField name="dropdown-language-overview" choices="English,Filipino" index="0" class="ds-dropdown settings-panel__dropdown settings-panel__dropdown--inline" />
+                                    </ui:VisualElement>
+                                    <ui:Label text="(More languages coming soon)" class="settings-panel__hint" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="settings-panel__col settings-panel__col--right">
+
+                                <!-- Display card -->
+                                <ui:VisualElement name="card-display" class="settings-panel__card settings-panel__card--display">
+                                    <ui:Label text="Display" class="settings-panel__card-title" />
+                                    <ui:Label text="Graphics Quality" class="settings-panel__field-label" />
+                                    <ui:DropdownField name="dropdown-graphics" choices="Low,Medium,High,Ultra" index="2" class="ds-dropdown settings-panel__dropdown" />
+
+                                    <ui:VisualElement class="settings-panel__slider-row settings-panel__slider-row--brightness">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--brightness">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--sun settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Screen Brightness" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-brightness" class="settings-panel__slider-fill settings-panel__slider-fill--brightness" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-brightness" low-value="0" high-value="100" value="75" class="ds-slider settings-panel__slider settings-panel__slider--brightness" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-brightness" text="75%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+
+                                <!-- Accessibility card (on overview) -->
+                                <ui:VisualElement name="card-accessibility-overview" class="settings-panel__card settings-panel__card--accessibility">
+                                    <ui:Label text="Accessibility" class="settings-panel__card-title" />
+                                    <ui:Label text="Text Size" class="settings-panel__field-label" />
+                                    <ui:DropdownField name="dropdown-text-size-overview" choices="Small,Medium,Large,Extra Large" index="2" class="ds-dropdown settings-panel__dropdown" />
+
+                                    <ui:VisualElement class="settings-panel__toggle-row">
+                                        <ui:VisualElement class="settings-panel__toggle-copy">
+                                            <ui:Label text="Reduce Motion" class="settings-panel__toggle-title" />
+                                            <ui:Label text="Minimize animations and effects" class="settings-panel__toggle-sub" />
+                                        </ui:VisualElement>
+                                        <ui:Toggle name="toggle-reduce-motion-overview" value="true" class="ds-toggle settings-panel__switch">
+                                            <ui:VisualElement class="ds-toggle__knob" />
+                                            <ui:Label name="label-reduce-motion-overview" text="On" class="settings-panel__switch-text" />
+                                        </ui:Toggle>
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__toggle-row settings-panel__toggle-row--last">
+                                        <ui:VisualElement class="settings-panel__toggle-copy">
+                                            <ui:Label text="High Contrast Mode" class="settings-panel__toggle-title" />
+                                        </ui:VisualElement>
+                                        <ui:Toggle name="toggle-high-contrast-overview" value="false" class="ds-toggle settings-panel__switch">
+                                            <ui:VisualElement class="ds-toggle__knob" />
+                                            <ui:Label name="label-high-contrast-overview" text="Off" class="settings-panel__switch-text" />
+                                        </ui:Toggle>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+
+                                <!-- Account & Support card (on overview) -->
+                                <ui:VisualElement name="card-account-overview" class="settings-panel__card settings-panel__card--account">
+                                    <ui:Label text="Account &amp; Support" class="settings-panel__card-title" />
+
+                                    <ui:Button name="btn-privacy-overview" class="settings-panel__list-btn">
+                                        <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--privacy">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--shield settings-panel__list-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:Label text="Privacy &amp; Account Information" class="settings-panel__list-label" />
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                    </ui:Button>
+
+                                    <ui:Button name="btn-reset-tutorial-overview" class="settings-panel__list-btn settings-panel__list-btn--last">
+                                        <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--reset">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--refresh settings-panel__list-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__list-copy">
+                                            <ui:Label text="Reset Tutorial" class="settings-panel__list-label" />
+                                            <ui:Label text="Replay the getting started guide" class="settings-panel__list-sub" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                    </ui:Button>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PAGE: Accessibility -->
+                    <ui:VisualElement name="page-accessibility" class="settings-panel__page settings-panel__page--hidden">
+                        <ui:VisualElement class="settings-panel__page-stack">
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Accessibility" class="settings-panel__card-title" />
+                                <ui:Label text="Text Size" class="settings-panel__field-label" />
+                                <ui:DropdownField name="dropdown-text-size" choices="Small,Medium,Large,Extra Large" index="2" class="ds-dropdown settings-panel__dropdown" />
+
+                                <ui:VisualElement class="settings-panel__toggle-row">
+                                    <ui:VisualElement class="settings-panel__toggle-copy">
+                                        <ui:Label text="Reduce Motion" class="settings-panel__toggle-title" />
+                                        <ui:Label text="Minimize animations and effects" class="settings-panel__toggle-sub" />
+                                    </ui:VisualElement>
+                                    <ui:Toggle name="toggle-reduce-motion" value="true" class="ds-toggle settings-panel__switch">
+                                        <ui:VisualElement class="ds-toggle__knob" />
+                                        <ui:Label name="label-reduce-motion" text="On" class="settings-panel__switch-text" />
+                                    </ui:Toggle>
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="settings-panel__toggle-row">
+                                    <ui:VisualElement class="settings-panel__toggle-copy">
+                                        <ui:Label text="High Contrast Mode" class="settings-panel__toggle-title" />
+                                        <ui:Label text="Increase contrast for readability" class="settings-panel__toggle-sub" />
+                                    </ui:VisualElement>
+                                    <ui:Toggle name="toggle-high-contrast" value="false" class="ds-toggle settings-panel__switch">
+                                        <ui:VisualElement class="ds-toggle__knob" />
+                                        <ui:Label name="label-high-contrast" text="Off" class="settings-panel__switch-text" />
+                                    </ui:Toggle>
+                                </ui:VisualElement>
+
+                                <ui:Label text="Input Sensitivity" class="settings-panel__field-label settings-panel__field-label--spaced" />
+                                <ui:VisualElement class="settings-panel__slider-row settings-panel__slider-row--last">
+                                    <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--input">
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--target settings-panel__slider-glyph" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="settings-panel__slider-main">
+                                        <ui:Label text="Camera / Look Sensitivity" class="settings-panel__slider-label" />
+                                        <ui:VisualElement class="settings-panel__slider-field">
+                                            <ui:VisualElement class="settings-panel__slider-track">
+                                                <ui:VisualElement name="fill-sensitivity" class="settings-panel__slider-fill settings-panel__slider-fill--master" />
+                                            </ui:VisualElement>
+                                            <ui:Slider name="slider-sensitivity" low-value="0" high-value="100" value="50" class="ds-slider settings-panel__slider settings-panel__slider--master" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                    <ui:Label name="pct-sensitivity" text="50%" class="settings-panel__slider-pct" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PAGE: Language -->
+                    <ui:VisualElement name="page-language" class="settings-panel__page settings-panel__page--hidden">
+                        <ui:VisualElement class="settings-panel__page-stack">
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Language" class="settings-panel__card-title" />
+                                <ui:Label text="App Language" class="settings-panel__field-label" />
+                                <ui:DropdownField name="dropdown-language" choices="English,Filipino" index="0" class="ds-dropdown settings-panel__dropdown" />
+                                <ui:Label text="(More languages coming soon)" class="settings-panel__hint" />
+                                <ui:Label text="Language preference is stored on this device. Full localization content will arrive in a later update." class="settings-panel__body-copy" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PAGE: Account & Support -->
+                    <ui:VisualElement name="page-account" class="settings-panel__page settings-panel__page--hidden">
+                        <ui:VisualElement class="settings-panel__page-stack">
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Account &amp; Support" class="settings-panel__card-title" />
+
+                                <ui:Button name="btn-privacy" class="settings-panel__list-btn">
+                                    <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--privacy">
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--shield settings-panel__list-glyph" />
+                                    </ui:VisualElement>
+                                    <ui:Label text="Privacy &amp; Account Information" class="settings-panel__list-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                </ui:Button>
+
+                                <ui:Button name="btn-reset-tutorial" class="settings-panel__list-btn">
+                                    <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--reset">
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--refresh settings-panel__list-glyph" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="settings-panel__list-copy">
+                                        <ui:Label text="Reset Tutorial" class="settings-panel__list-label" />
+                                        <ui:Label text="Replay the getting started guide" class="settings-panel__list-sub" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                </ui:Button>
+
+                                <ui:Button name="btn-support" class="settings-panel__list-btn settings-panel__list-btn--last">
+                                    <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--support">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--help settings-panel__list-glyph" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="settings-panel__list-copy">
+                                        <ui:Label text="Contact Support" class="settings-panel__list-label" />
+                                        <ui:Label text="Ask a teacher or classroom admin for help" class="settings-panel__list-sub" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="privacy-detail" class="settings-panel__card settings-panel__card--detail settings-panel__page--hidden">
+                                <ui:Label text="Privacy &amp; Account Information" class="settings-panel__card-title" />
+                                <ui:Label text="Your profile, progress, and classroom assignment are managed by your school. Local device settings (audio, display, accessibility) stay on this device and are not sent to the gameplay server unless they are part of the synced settings contract." class="settings-panel__body-copy" />
+                                <ui:Label text="Static mission content, questions, and answer keys remain local and are never uploaded." class="settings-panel__body-copy" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PAGE: Help & Tutorial -->
+                    <ui:VisualElement name="page-help" class="settings-panel__page settings-panel__page--hidden">
+                        <ui:VisualElement class="settings-panel__page-stack">
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Help &amp; Tutorial" class="settings-panel__card-title" />
+                                <ui:Label text="Getting Started" class="settings-panel__section-title" />
+                                <ui:Label text="1. Sign in with your classroom account." class="settings-panel__body-copy settings-panel__body-copy--step" />
+                                <ui:Label text="2. Choose a subject, term, and mission from Home." class="settings-panel__body-copy settings-panel__body-copy--step" />
+                                <ui:Label text="3. Explore each of the three areas, answer questions, and collect story fragments." class="settings-panel__body-copy settings-panel__body-copy--step" />
+                                <ui:Label text="4. Complete Area 3 to finish the mission challenge." class="settings-panel__body-copy settings-panel__body-copy--step" />
+
+                                <ui:Button name="btn-replay-tutorial" class="settings-panel__action-row">
+                                    <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--play settings-panel__action-icon" />
+                                    <ui:Label text="Replay Getting Started Guide" class="settings-panel__action-label" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Tips" class="settings-panel__card-title" />
+                                <ui:Label text="Use Reduce Motion if animations feel distracting." class="settings-panel__body-copy" />
+                                <ui:Label text="Increase Text Size under Accessibility for easier reading." class="settings-panel__body-copy" />
+                                <ui:Label text="Your teacher can unlock missions and view progress from the classroom portal." class="settings-panel__body-copy" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PAGE: About NutriMind -->
+                    <ui:VisualElement name="page-about" class="settings-panel__page settings-panel__page--hidden">
+                        <ui:VisualElement class="settings-panel__page-stack">
+                            <ui:VisualElement class="settings-panel__card settings-panel__card--about">
+                                <ui:VisualElement class="settings-panel__about-logo">
+                                    <ui:Label text="ILL&#10;Logo" class="settings-panel__about-logo-label" />
+                                </ui:VisualElement>
+                                <ui:Label text="NutriMind" class="settings-panel__about-name" />
+                                <ui:Label name="label-app-version" text="Version 0.1.0 (Milestone Preview)" class="settings-panel__about-version" />
+                                <ui:Label text="A classroom learning adventure for LiteraQuest, PE &amp; Health, and Science." class="settings-panel__body-copy settings-panel__body-copy--center" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="settings-panel__card">
+                                <ui:Label text="Credits &amp; Privacy" class="settings-panel__card-title" />
+                                <ui:Label text="Curriculum content is authored locally per mission. Quiz Portal remains a separate server-managed system." class="settings-panel__body-copy" />
+                                <ui:Label text="Learner progress is stored locally first and synchronized through the classroom outbox when online." class="settings-panel__body-copy" />
+                                <ui:Button name="btn-about-privacy" class="settings-panel__list-btn settings-panel__list-btn--last">
+                                    <ui:VisualElement class="settings-panel__list-icon settings-panel__list-icon--privacy">
+                                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--shield settings-panel__list-glyph" />
+                                    </ui:VisualElement>
+                                    <ui:Label text="View Privacy Summary" class="settings-panel__list-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-right settings-panel__list-chevron" />
+                                </ui:Button>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                </ui:ScrollView>
+
+                <!-- ===== FOOTER ACTIONS ===== -->
+                <ui:VisualElement name="settings-footer" class="settings-panel__footer">
+                    <ui:Button name="btn-restore-defaults" class="ds-btn ds-btn--lg ds-btn--ghost settings-panel__btn settings-panel__btn--restore">
+                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--refresh settings-panel__btn-icon settings-panel__btn-icon--dark" />
+                        <ui:Label text="Restore Defaults" class="settings-panel__btn-label settings-panel__btn-label--dark" />
+                    </ui:Button>
+                    <ui:Button name="btn-save-changes" class="ds-btn ds-btn--lg ds-btn--primary settings-panel__btn settings-panel__btn--save">
+                        <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--check settings-panel__btn-icon settings-panel__btn-icon--light" />
+                        <ui:Label text="Save Changes" class="settings-panel__btn-label settings-panel__btn-label--light" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <ui:Label name="settings-status" text="" class="settings-panel__status" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,1097 @@
+/* Settings screen — 1920×1080 landscape, kid-friendly scale */
+
+.settings-panel {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    background-color: var(--color-bg);
+    padding: 0;
+    margin: 0;
+}
+
+.settings-panel Label {
+    margin: 0;
+    padding: 0;
+}
+
+.settings-panel__body {
+    flex-grow: 1;
+    flex-direction: row;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ========== SIDEBAR ========== */
+.settings-panel__sidebar {
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 320px;
+    min-width: 280px;
+    padding: 40px 0 32px 0;
+    background-color: var(--color-bg);
+    border-right-width: 0;
+}
+
+.settings-panel__nav-item {
+    flex-direction: row;
+    align-items: center;
+    height: 68px;
+    min-height: 68px;
+    margin: 0 0 10px 0;
+    padding: 0 28px 0 32px;
+    border-width: 0;
+    border-radius: 0 34px 34px 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: #2D5A27;
+}
+
+.settings-panel__nav-item:hover {
+    background-color: rgba(76, 175, 80, 0.10);
+}
+
+.settings-panel__nav-item.is-active {
+    background-color: #E8F5E9;
+}
+
+.settings-panel__nav-item.is-active .settings-panel__nav-icon {
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.settings-panel__nav-item.is-active .settings-panel__nav-label {
+    color: #2D5A27;
+}
+
+.settings-panel__nav-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.settings-panel__nav-label {
+    font-size: 22px;
+    color: #2D5A27;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+}
+
+.settings-panel__nav-icon-ph {
+    width: 30px;
+    height: 30px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background-color: #E8F5E9;
+    border-width: 1px;
+    border-color: #C8E6C9;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel__nav-icon-ph-label {
+    font-size: 8px;
+    color: #7CB342;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+/* ========== MAIN ========== */
+.settings-panel__main {
+    flex-grow: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 32px 40px 24px 32px;
+}
+
+.settings-panel__scroll {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.settings-panel__scroll > .unity-scroll-view__content-container {
+    flex-grow: 1;
+    width: 100%;
+    padding-right: 12px;
+    padding-bottom: 12px;
+}
+
+.settings-panel__page {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    width: 100%;
+}
+
+.settings-panel__page--hidden {
+    display: none;
+}
+
+.settings-panel__grid {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 0;
+    width: 100%;
+}
+
+.settings-panel__col {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.settings-panel__col--left {
+    margin-right: 28px;
+}
+
+/* Centered single-column stack for dedicated settings pages */
+.settings-panel__page-stack {
+    flex-direction: column;
+    width: 100%;
+    max-width: 1040px;
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 16px;
+    padding-bottom: 8px;
+}
+
+/* ========== CARDS ========== */
+.settings-panel__card {
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 28px;
+    padding: 40px 44px;
+    margin-bottom: 32px;
+    flex-shrink: 0;
+}
+
+.settings-panel__card-title {
+    font-size: 32px;
+    color: #2D5A27;
+    -unity-font-style: bold;
+    letter-spacing: -0.5px;
+    margin-bottom: 28px;
+    white-space: nowrap;
+}
+
+.settings-panel__section-title {
+    font-size: 22px;
+    color: #2D5A27;
+    -unity-font-style: bold;
+    margin-bottom: 18px;
+    margin-top: 8px;
+}
+
+.settings-panel__field-label {
+    font-size: 20px;
+    color: #2A2A2A;
+    -unity-font-style: bold;
+    margin-bottom: 16px;
+    margin-top: 4px;
+}
+
+.settings-panel__field-label--spaced {
+    margin-top: 32px;
+}
+
+.settings-panel__field-label--inline {
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-right: 24px;
+    flex-shrink: 0;
+    -unity-text-align: middle-left;
+}
+
+.settings-panel__field-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    margin-top: 4px;
+    min-height: 68px;
+}
+
+.settings-panel__hint {
+    font-size: 17px;
+    color: var(--color-text-disabled);
+    margin-top: 18px;
+    margin-bottom: 4px;
+    -unity-font-style: bold;
+}
+
+.settings-panel__body-copy {
+    font-size: 19px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    white-space: normal;
+    margin-bottom: 18px;
+    margin-top: 4px;
+    padding-right: 8px;
+}
+
+.settings-panel__body-copy--center {
+    -unity-text-align: middle-center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.settings-panel__body-copy--step {
+    font-size: 20px;
+    margin-bottom: 18px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+/* ========== DROPDOWNS (ds-dropdown overrides) ========== */
+.settings-panel .settings-panel__dropdown.ds-dropdown,
+.settings-panel__dropdown {
+    height: 64px;
+    min-height: 64px;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
+.settings-panel__dropdown--inline {
+    flex-grow: 1;
+    min-width: 240px;
+    max-width: 480px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.settings-panel .settings-panel__dropdown .unity-popup-field__input,
+.settings-panel .settings-panel__dropdown .unity-base-popup-field__input,
+.settings-panel .settings-panel__dropdown .unity-base-field__input,
+.settings-panel__dropdown .unity-popup-field__input,
+.settings-panel__dropdown .unity-base-popup-field__input,
+.settings-panel__dropdown .unity-base-field__input {
+    height: 64px;
+    min-height: 64px;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    border-width: 2px;
+    border-color: #D5D2CB;
+    padding-left: 24px;
+    padding-right: 18px;
+    align-items: center;
+}
+
+.settings-panel .settings-panel__dropdown .unity-popup-field__input:hover,
+.settings-panel .settings-panel__dropdown .unity-base-popup-field__input:hover,
+.settings-panel__dropdown .unity-popup-field__input:hover,
+.settings-panel__dropdown .unity-base-popup-field__input:hover {
+    border-color: #A5D6A7;
+    background-color: #FAFFF8;
+}
+
+.settings-panel .settings-panel__dropdown .unity-popup-field__input:focus,
+.settings-panel .settings-panel__dropdown .unity-base-popup-field__input:focus,
+.settings-panel__dropdown .unity-popup-field__input:focus,
+.settings-panel__dropdown .unity-base-popup-field__input:focus {
+    border-color: #4CAF50;
+    background-color: #FFFFFF;
+}
+
+.settings-panel .settings-panel__dropdown .unity-popup-field__text,
+.settings-panel .settings-panel__dropdown .unity-base-popup-field__text,
+.settings-panel .settings-panel__dropdown .unity-text-element,
+.settings-panel__dropdown .unity-popup-field__text,
+.settings-panel__dropdown .unity-base-popup-field__text,
+.settings-panel__dropdown .unity-text-element {
+    font-size: 22px;
+    color: #1A1A1A;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+    flex-shrink: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.settings-panel .settings-panel__dropdown .unity-base-popup-field__arrow,
+.settings-panel__dropdown .unity-base-popup-field__arrow {
+    width: 22px;
+    height: 22px;
+    margin-left: 14px;
+    margin-right: 6px;
+    flex-shrink: 0;
+    background-image: resource("Textures/Icons/chevron_down");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+/* ========== SLIDER ROWS ========== */
+.settings-panel__slider-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 28px;
+    min-height: 64px;
+}
+
+.settings-panel__slider-row--last {
+    margin-bottom: 0;
+}
+
+.settings-panel__slider-row--brightness {
+    margin-top: 28px;
+}
+
+.settings-panel__slider-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel__slider-icon--master {
+    background-color: #E8F5E9;
+}
+
+.settings-panel__slider-icon--music {
+    background-color: #E3F2FD;
+}
+
+.settings-panel__slider-icon--sfx {
+    background-color: #FB8C00;
+}
+
+.settings-panel__slider-icon--voice {
+    background-color: #F3E5F5;
+}
+
+.settings-panel__slider-icon--brightness {
+    background-color: #FFF8E1;
+}
+
+.settings-panel__slider-icon--input {
+    background-color: #E8F5E9;
+}
+
+.settings-panel__slider-glyph {
+    width: 24px;
+    height: 24px;
+}
+
+.settings-panel__slider-icon--master .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #43A047;
+}
+
+.settings-panel__slider-icon--music .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #1E88E5;
+}
+
+.settings-panel__slider-icon--sfx .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+.settings-panel__slider-icon--voice .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #8E24AA;
+}
+
+.settings-panel__slider-icon--brightness .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #F9A825;
+}
+
+.settings-panel__slider-icon--input .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #43A047;
+}
+
+.settings-panel__slider-main {
+    flex-grow: 1;
+    flex-direction: column;
+    min-width: 0;
+    margin-right: 16px;
+}
+
+.settings-panel__slider-label {
+    font-size: 19px;
+    color: #2A2A2A;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+.settings-panel__slider-field {
+    position: relative;
+    height: 28px;
+    justify-content: center;
+}
+
+.settings-panel__slider-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 10px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #E8E6E1;
+    overflow: hidden;
+}
+
+.settings-panel__slider-fill {
+    height: 100%;
+    border-radius: 4px;
+    width: 80%;
+}
+
+.settings-panel__slider-fill--master {
+    background-color: #4CAF50;
+}
+
+.settings-panel__slider-fill--music {
+    background-color: #1E88E5;
+}
+
+.settings-panel__slider-fill--sfx {
+    background-color: #F9A825;
+}
+
+.settings-panel__slider-fill--voice {
+    background-color: #8E24AA;
+}
+
+.settings-panel__slider-fill--brightness {
+    background-color: #F9A825;
+}
+
+.settings-panel__slider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 28px;
+    margin: 0;
+}
+
+.settings-panel__slider .unity-base-slider__tracker {
+    background-color: rgba(0, 0, 0, 0);
+    height: 8px;
+}
+
+.settings-panel__slider .unity-base-slider__dragger {
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    border-width: 3px;
+    margin-top: -12px;
+}
+
+.settings-panel__slider--master .unity-base-slider__dragger {
+    border-color: #4CAF50;
+}
+
+.settings-panel__slider--music .unity-base-slider__dragger {
+    border-color: #1E88E5;
+}
+
+.settings-panel__slider--sfx .unity-base-slider__dragger {
+    border-color: #F9A825;
+}
+
+.settings-panel__slider--voice .unity-base-slider__dragger {
+    border-color: #8E24AA;
+}
+
+.settings-panel__slider--brightness .unity-base-slider__dragger {
+    border-color: #F9A825;
+}
+
+.settings-panel__slider-pct {
+    width: 64px;
+    flex-shrink: 0;
+    font-size: 19px;
+    color: #2A2A2A;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+/* ========== TOGGLES ========== */
+.settings-panel__toggle-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    min-height: 64px;
+}
+
+.settings-panel__toggle-row--last {
+    margin-bottom: 0;
+}
+
+.settings-panel__toggle-copy {
+    flex-grow: 1;
+    flex-direction: column;
+    min-width: 0;
+    margin-right: 24px;
+    padding-right: 8px;
+}
+
+.settings-panel__toggle-title {
+    font-size: 20px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.settings-panel__toggle-sub {
+    font-size: 16px;
+    color: var(--color-text-disabled);
+    -unity-font-style: bold;
+    margin-top: 6px;
+    white-space: normal;
+}
+
+.settings-panel__switch {
+    flex-shrink: 0;
+    width: 88px;
+    height: 44px;
+    margin: 0;
+}
+
+.settings-panel__switch .unity-toggle__input {
+    width: 88px;
+    height: 44px;
+}
+
+.settings-panel__switch .unity-toggle__checkmark {
+    width: 88px;
+    height: 44px;
+    border-radius: 22px;
+    background-color: #BDBDBD;
+    border-width: 0;
+}
+
+.settings-panel__switch:checked .unity-toggle__checkmark {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.settings-panel__switch .ds-toggle__knob {
+    width: 34px;
+    height: 34px;
+    border-radius: 17px;
+    top: 5px;
+    left: 5px;
+    background-color: #FFFFFF;
+}
+
+.settings-panel__switch:checked .ds-toggle__knob {
+    translate: 44px 0;
+}
+
+.settings-panel__switch-text {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    font-size: 15px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+.settings-panel__switch:checked .settings-panel__switch-text {
+    -unity-text-align: middle-left;
+}
+
+/* ========== LIST BUTTONS ========== */
+.settings-panel__list-btn {
+    flex-direction: row;
+    align-items: center;
+    height: auto;
+    min-height: 80px;
+    margin: 0 0 16px 0;
+    padding: 18px 22px;
+    border-width: 2px;
+    border-color: var(--color-border);
+    border-radius: 22px;
+    background-color: #FAFAF8;
+}
+
+.settings-panel__list-btn:hover {
+    background-color: #F0F6E8;
+    border-color: #C8E6C9;
+}
+
+.settings-panel__list-btn--last {
+    margin-bottom: 0;
+}
+
+.settings-panel__list-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel__list-icon--privacy {
+    background-color: #E8F5E9;
+}
+
+.settings-panel__list-icon--reset {
+    background-color: #E3F2FD;
+}
+
+.settings-panel__list-icon--support {
+    background-color: #FFF3E0;
+}
+
+.settings-panel__list-glyph {
+    width: 24px;
+    height: 24px;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.settings-panel__list-icon--reset .settings-panel__list-glyph {
+    -unity-background-image-tint-color: #1E88E5;
+}
+
+.settings-panel__list-icon--support .settings-panel__list-glyph {
+    -unity-background-image-tint-color: #FB8C00;
+}
+
+.settings-panel__list-copy {
+    flex-grow: 1;
+    flex-direction: column;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.settings-panel__list-label {
+    font-size: 20px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    white-space: normal;
+    flex-grow: 1;
+}
+
+.settings-panel__list-sub {
+    font-size: 16px;
+    color: var(--color-text-disabled);
+    -unity-font-style: bold;
+    margin-top: 6px;
+    white-space: normal;
+}
+
+.settings-panel__list-chevron {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-left: 12px;
+    -unity-background-image-tint-color: #9E9E9E;
+}
+
+.settings-panel__action-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    min-height: 64px;
+    margin-top: 28px;
+    margin-bottom: 4px;
+    padding: 0 28px;
+    border-width: 0;
+    border-radius: 32px;
+    background-color: #E8F5E9;
+}
+
+.settings-panel__action-row:hover {
+    background-color: #C8E6C9;
+}
+
+.settings-panel__action-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 14px;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.settings-panel__action-label {
+    font-size: 19px;
+    color: #2D5A27;
+    -unity-font-style: bold;
+}
+
+/* ========== ABOUT ========== */
+.settings-panel__card--about {
+    align-items: center;
+    padding: 48px 44px;
+}
+
+.settings-panel__about-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 28px;
+    background-color: #E8F5E9;
+    border-width: 2px;
+    border-color: #C8E6C9;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.settings-panel__about-logo-label {
+    font-size: 16px;
+    color: #7CB342;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+.settings-panel__about-name {
+    font-size: 40px;
+    color: #2D5A27;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+.settings-panel__about-version {
+    font-size: 18px;
+    color: var(--color-text-disabled);
+    -unity-font-style: bold;
+    margin-bottom: 16px;
+}
+
+/* ========== FOOTER ========== */
+.settings-panel__footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding-top: 20px;
+    min-height: 84px;
+}
+
+.settings-panel__btn {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    min-height: 64px;
+    border-radius: 32px;
+    padding: 0 32px;
+    margin: 0;
+}
+
+/* Beat ds-btn / ds-btn--lg defaults from the design system */
+.settings-panel .settings-panel__btn.ds-btn,
+.settings-panel .settings-panel__btn.ds-btn--lg {
+    height: 64px;
+    min-height: 64px;
+    border-radius: 32px;
+    font-size: 22px;
+}
+
+.settings-panel__btn--restore {
+    flex-grow: 0;
+    min-width: 280px;
+    background-color: var(--color-bg);
+    border-width: 2px;
+    border-color: #1A1A1A;
+}
+
+.settings-panel__btn--restore:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.settings-panel__btn--save {
+    flex-grow: 0;
+    min-width: 320px;
+    background-color: var(--color-primary);
+    border-width: 0;
+}
+
+.settings-panel__btn--save:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.settings-panel__btn-icon {
+    width: 26px;
+    height: 26px;
+    margin-right: 14px;
+    flex-shrink: 0;
+}
+
+.settings-panel__btn-icon--dark {
+    -unity-background-image-tint-color: #1A1A1A;
+}
+
+.settings-panel__btn-icon--light {
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+.settings-panel__btn-label {
+    font-size: 22px;
+    -unity-font-style: bold;
+}
+
+.settings-panel__btn-label--dark {
+    color: #1A1A1A;
+}
+
+.settings-panel__btn-label--light {
+    color: #FFFFFF;
+}
+
+.settings-panel__status {
+    flex-shrink: 0;
+    height: 26px;
+    margin-top: 8px;
+    font-size: 16px;
+    color: var(--color-primary);
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+/* ========== TEXT SIZE / HIGH CONTRAST ========== */
+.settings-panel--text-small .settings-panel__card-title {
+    font-size: 28px;
+}
+
+.settings-panel--text-small .settings-panel__slider-label,
+.settings-panel--text-small .settings-panel__toggle-title,
+.settings-panel--text-small .settings-panel__list-label,
+.settings-panel--text-small .settings-panel__nav-label,
+.settings-panel--text-small .settings-panel__field-label,
+.settings-panel--text-small .settings-panel__body-copy {
+    font-size: 16px;
+}
+
+.settings-panel--text-large .settings-panel__card-title {
+    font-size: 34px;
+}
+
+.settings-panel--text-large .settings-panel__slider-label,
+.settings-panel--text-large .settings-panel__toggle-title,
+.settings-panel--text-large .settings-panel__list-label,
+.settings-panel--text-large .settings-panel__nav-label,
+.settings-panel--text-large .settings-panel__field-label {
+    font-size: 22px;
+}
+
+.settings-panel--text-xlarge .settings-panel__card-title {
+    font-size: 36px;
+}
+
+.settings-panel--text-xlarge .settings-panel__slider-label,
+.settings-panel--text-xlarge .settings-panel__toggle-title,
+.settings-panel--text-xlarge .settings-panel__list-label,
+.settings-panel--text-xlarge .settings-panel__nav-label,
+.settings-panel--text-xlarge .settings-panel__field-label,
+.settings-panel--text-xlarge .settings-panel__body-copy {
+    font-size: 23px;
+}
+
+.settings-panel--high-contrast {
+    background-color: #FFFFFF;
+}
+
+.settings-panel--high-contrast .settings-panel__card {
+    border-width: 2px;
+    border-color: #1A1A1A;
+}
+
+.settings-panel--high-contrast .settings-panel__card-title,
+.settings-panel--high-contrast .settings-panel__nav-label,
+.settings-panel--high-contrast .settings-panel__slider-label,
+.settings-panel--high-contrast .settings-panel__toggle-title {
+    color: #000000;
+}
+
+.settings-panel--high-contrast .settings-panel__nav-item.is-active {
+    background-color: #C8E6C9;
+    border-width: 2px;
+    border-color: #1B5E20;
+}
+
+/* ========== RESPONSIVE: compact < 1100 ========== */
+.settings-panel--compact .settings-panel__sidebar {
+    width: 240px;
+    min-width: 220px;
+    padding-top: 28px;
+}
+
+.settings-panel--compact .settings-panel__nav-item {
+    height: 56px;
+    min-height: 56px;
+    padding-left: 18px;
+    padding-right: 14px;
+}
+
+.settings-panel--compact .settings-panel__nav-label {
+    font-size: 17px;
+}
+
+.settings-panel--compact .settings-panel__nav-icon,
+.settings-panel--compact .settings-panel__nav-icon-ph {
+    width: 24px;
+    height: 24px;
+}
+
+.settings-panel--compact .settings-panel__main {
+    padding: 22px 22px 16px 18px;
+}
+
+.settings-panel--compact .settings-panel__col--left {
+    margin-right: 18px;
+}
+
+.settings-panel--compact .settings-panel__page-stack {
+    max-width: 100%;
+}
+
+.settings-panel--compact .settings-panel__card {
+    padding: 24px 24px;
+    margin-bottom: 18px;
+    border-radius: 22px;
+}
+
+.settings-panel--compact .settings-panel__card-title {
+    font-size: 26px;
+    margin-bottom: 16px;
+}
+
+.settings-panel--compact .settings-panel__dropdown {
+    height: 56px;
+    min-height: 56px;
+}
+
+.settings-panel--compact .settings-panel__dropdown .unity-popup-field__input,
+.settings-panel--compact .settings-panel__dropdown .unity-base-popup-field__input,
+.settings-panel--compact .settings-panel__dropdown .unity-base-field__input {
+    height: 56px;
+    min-height: 56px;
+    border-radius: 18px;
+}
+
+.settings-panel--compact .settings-panel__dropdown .unity-popup-field__text,
+.settings-panel--compact .settings-panel__dropdown .unity-base-popup-field__text,
+.settings-panel--compact .settings-panel__dropdown .unity-text-element {
+    font-size: 18px;
+}
+
+.settings-panel--compact .settings-panel__btn {
+    height: 56px;
+    min-height: 56px;
+}
+
+.settings-panel--compact .settings-panel__btn--restore {
+    min-width: 200px;
+}
+
+.settings-panel--compact .settings-panel__btn--save {
+    min-width: 220px;
+}
+
+.settings-panel--compact .settings-panel__btn-label {
+    font-size: 18px;
+}
+
+/* ========== RESPONSIVE: narrow < 820 ========== */
+.settings-panel--narrow .settings-panel__body {
+    flex-direction: column;
+}
+
+.settings-panel--narrow .settings-panel__sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+    padding: 14px 14px 6px 14px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+.settings-panel--narrow .settings-panel__nav-item {
+    flex-grow: 1;
+    flex-basis: 30%;
+    height: 48px;
+    min-height: 48px;
+    margin: 0 4px 8px 4px;
+    padding: 0 12px;
+    border-radius: 24px;
+    justify-content: center;
+}
+
+.settings-panel--narrow .settings-panel__nav-label {
+    font-size: 14px;
+}
+
+.settings-panel--narrow .settings-panel__nav-icon,
+.settings-panel--narrow .settings-panel__nav-icon-ph {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.settings-panel--narrow .settings-panel__main {
+    padding: 16px 16px 12px 16px;
+}
+
+.settings-panel--narrow .settings-panel__grid {
+    flex-direction: column;
+}
+
+.settings-panel--narrow .settings-panel__col--left {
+    margin-right: 0;
+}
+
+.settings-panel--narrow .settings-panel__footer {
+    flex-wrap: wrap;
+    justify-content: stretch;
+}
+
+.settings-panel--narrow .settings-panel__btn--restore,
+.settings-panel--narrow .settings-panel__btn--save {
+    flex-grow: 1;
+    min-width: 0;
+    margin-bottom: 8px;
+}
+
+.settings-panel--narrow .settings-panel__btn--restore {
+    margin-right: 8px;
+}
+
+/* Mobile helper from design system */
+.mobile .settings-panel__nav-item {
+    min-height: 48px;
+}
+
+.mobile .settings-panel__btn {
+    min-height: 52px;
+}
+
+.mobile .settings-panel__dropdown {
+    height: 56px;
+    min-height: 56px;
+}
+
+.mobile .settings-panel__list-btn {
+    min-height: 68px;
+}

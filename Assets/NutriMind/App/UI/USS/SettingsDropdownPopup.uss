@@ -1,0 +1,130 @@
+/* ============================================================================
+   Settings dropdown popup — attach at PANEL scope (not via UXML <Style>).
+   Unity parents GenericDropdownMenu as a sibling of .ds-root, so screen USS
+   cannot reach these selectors. SettingsPanelController adds this sheet.
+   ============================================================================ */
+
+/* Fullscreen click-capture overlay — keep transparent. */
+.unity-base-dropdown {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Visible menu chrome — kid-friendly NutriMind light surface */
+.unity-base-dropdown__container-outer {
+    background-color: #FFFFFF;
+    border-color: #D5D2CB;
+    border-width: 2px;
+    border-radius: 22px;
+    padding: 12px;
+}
+
+/* Hide until Design System tuner places the menu */
+.ds-dropdown-tuner .unity-base-dropdown__container-outer {
+    opacity: 0;
+}
+
+.ds-dropdown-tuner .ds-popup--tuned .unity-base-dropdown__container-outer {
+    opacity: 1;
+}
+
+.unity-base-dropdown__container-inner {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+/* Option rows — large touch targets + readable type */
+.unity-base-dropdown__item {
+    background-color: rgba(0, 0, 0, 0);
+    color: #1A1A1A;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-radius: 16px;
+    min-height: 56px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+}
+
+.unity-base-dropdown__item:hover {
+    background-color: #E8F5E9;
+}
+
+.unity-base-dropdown__item:checked {
+    background-color: #C8E6C9;
+}
+
+.unity-base-dropdown__label,
+.unity-base-dropdown__item .unity-text-element {
+    color: #1A1A1A;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+}
+
+.unity-base-dropdown__checkmark {
+    width: 22px;
+    height: 22px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    background-image: resource("Textures/Icons/check");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.unity-base-dropdown__separator {
+    background-color: #E8E6E1;
+    height: 1px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
+.unity-base-dropdown .unity-scroller--horizontal {
+    display: none;
+}
+
+.unity-base-dropdown .unity-scroller__low-button,
+.unity-base-dropdown .unity-scroller__high-button {
+    display: none;
+}
+
+.unity-base-dropdown .unity-scroll-view__content-container {
+    width: 100%;
+}
+
+.unity-base-dropdown .unity-scroll-view__vertical-scroller {
+    width: 10px;
+    margin-left: 4px;
+}
+
+.unity-base-dropdown .unity-scroll-view__vertical-scroller .unity-base-slider {
+    width: 10px;
+    margin: 0;
+}
+
+.unity-base-dropdown .unity-scroll-view__vertical-scroller .unity-base-slider__tracker {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.unity-base-dropdown .unity-scroll-view__vertical-scroller .unity-base-slider__dragger {
+    width: 10px;
+    left: 0;
+    margin: 0;
+    border-width: 0;
+    border-radius: 5px;
+    background-color: #C8C8C8;
+}
+
+.unity-base-dropdown .unity-scroll-view__vertical-scroller .unity-base-slider__dragger:hover {
+    background-color: #8A8A8A;
+}
