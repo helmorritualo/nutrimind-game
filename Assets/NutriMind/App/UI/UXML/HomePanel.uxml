@@ -1,0 +1,187 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/HomePanel.uss" />
+
+    <ui:VisualElement name="home-root" class="ds-root theme-nutrimind home-panel">
+
+        <!-- ===== HEADER ===== -->
+        <ui:VisualElement name="home-header" class="home-panel__header">
+            <ui:VisualElement class="home-panel__brand">
+                <ui:Label text="Nutri" class="home-panel__brand-nutri" />
+                <ui:VisualElement class="home-panel__brand-mind-wrap">
+                    <ui:Label text="Mind" class="home-panel__brand-mind" />
+                    <ui:VisualElement class="ds-icon ds-icon--leaf home-panel__brand-leaf" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="home-panel__greeting">
+                <ui:Label text="Good morning, Ariana!" class="home-panel__greeting-title" />
+                <ui:Label text="Ready for today's adventure?" class="home-panel__greeting-sub" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="home-panel__stats">
+                <ui:VisualElement class="home-panel__stat">
+                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold home-panel__stat-icon" />
+                    <ui:Label text="87 Stars" class="home-panel__stat-label" />
+                </ui:VisualElement>
+                <ui:VisualElement class="home-panel__stat">
+                    <ui:VisualElement class="ds-icon ds-icon--shield home-panel__stat-icon home-panel__stat-icon--level" />
+                    <ui:Label text="Level 7 Explorer" class="home-panel__stat-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- ICO_HomeAvatar — 80×80 circle when art is ready -->
+            <ui:VisualElement name="home-avatar" class="home-panel__avatar" tooltip="Profile">
+                <ui:Label text="ICO_Avatar&#10;80×80" class="home-panel__avatar-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <ui:VisualElement name="home-content" class="home-panel__content">
+            <ui:VisualElement class="home-panel__grid">
+
+                <!-- Row 1: Play + Quiz -->
+                <ui:VisualElement class="home-panel__row home-panel__row--top">
+
+                    <!-- Play Adventure: icon | title+desc+CTA -->
+                    <ui:VisualElement name="card-play" class="home-panel__card home-panel__card--play">
+                        <ui:VisualElement class="home-panel__card-deco home-panel__card-deco--play" picking-mode="Ignore" />
+                        <ui:VisualElement class="home-panel__card-body">
+                            <ui:VisualElement class="home-panel__feature-icon home-panel__feature-icon--play">
+                                <ui:VisualElement class="ds-icon ds-icon--gamepad home-panel__feature-glyph" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="home-panel__feature-copy">
+                                <ui:Label text="Play Adventure" class="home-panel__feature-title home-panel__feature-title--play" />
+                                <ui:Label text="Continue your story mission and earn stars!" class="home-panel__feature-desc" />
+                                <ui:Button name="play-continue-button" text="" class="home-panel__pill home-panel__pill--green">
+                                    <ui:Label text="Continue" class="home-panel__pill-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--chevron-right home-panel__pill-chevron" />
+                                </ui:Button>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- Quiz Portal: icon | title+desc+CTA -->
+                    <ui:VisualElement name="card-quiz" class="home-panel__card home-panel__card--quiz">
+                        <ui:VisualElement class="home-panel__card-deco home-panel__card-deco--quiz" picking-mode="Ignore" />
+                        <ui:VisualElement class="home-panel__card-body">
+                            <ui:VisualElement class="home-panel__feature-icon home-panel__feature-icon--quiz">
+                                <ui:VisualElement class="ds-icon ds-icon--book home-panel__feature-glyph home-panel__feature-glyph--on-purple" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="home-panel__feature-copy">
+                                <ui:Label text="Quiz Portal" class="home-panel__feature-title home-panel__feature-title--quiz" />
+                                <ui:Label text="Practice lessons and challenge your knowledge." class="home-panel__feature-desc" />
+                                <ui:Button name="quiz-go-button" text="" class="home-panel__pill home-panel__pill--purple">
+                                    <ui:Label text="Go to Quizzes" class="home-panel__pill-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--chevron-right home-panel__pill-chevron" />
+                                </ui:Button>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Row 2: Journey (wide) + Goal -->
+                <ui:VisualElement class="home-panel__row home-panel__row--bottom">
+
+                    <ui:VisualElement name="card-journey" class="home-panel__card home-panel__card--journey">
+                        <ui:VisualElement class="home-panel__section-head">
+                            <ui:VisualElement class="ds-icon ds-icon--flag home-panel__section-icon home-panel__section-icon--journey" />
+                            <ui:Label text="Current Journey" class="home-panel__section-title home-panel__section-title--journey" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="home-panel__journey-body">
+                            <ui:VisualElement class="home-panel__mission-box">
+                                <ui:VisualElement class="home-panel__mission-copy">
+                                    <ui:Label text="Mission 3" class="home-panel__mission-badge" />
+                                    <ui:Label text="Food Detectives" class="home-panel__mission-title" />
+                                </ui:VisualElement>
+                                <!-- ICO_MissionSprout — 56×56 -->
+                                <ui:VisualElement class="home-panel__mission-sprout">
+                                    <ui:VisualElement class="ds-icon ds-icon--leaf home-panel__mission-sprout-icon" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="home-panel__progress">
+                                <ui:VisualElement class="home-panel__progress-head">
+                                    <ui:Label text="Overall Progress" class="home-panel__progress-label" />
+                                    <ui:Label text="72%" class="home-panel__progress-pct" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="home-panel__progress-track">
+                                    <ui:VisualElement class="home-panel__progress-fill" />
+                                </ui:VisualElement>
+                                <ui:Label text="3 of 5 tasks complete" class="home-panel__progress-caption" />
+                                <ui:VisualElement class="home-panel__steps">
+                                    <ui:VisualElement class="home-panel__step home-panel__step--done">
+                                        <ui:VisualElement class="ds-icon ds-icon--check home-panel__step-check" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="home-panel__step-line home-panel__step-line--done" />
+                                    <ui:VisualElement class="home-panel__step home-panel__step--done">
+                                        <ui:VisualElement class="ds-icon ds-icon--check home-panel__step-check" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="home-panel__step-line home-panel__step-line--done" />
+                                    <ui:VisualElement class="home-panel__step home-panel__step--done">
+                                        <ui:VisualElement class="ds-icon ds-icon--check home-panel__step-check" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="home-panel__step-line" />
+                                    <ui:VisualElement class="home-panel__step" />
+                                    <ui:VisualElement class="home-panel__step-line" />
+                                    <ui:VisualElement class="home-panel__step" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="card-goal" class="home-panel__card home-panel__card--goal">
+                        <ui:VisualElement class="home-panel__section-head">
+                            <ui:VisualElement class="ds-icon ds-icon--target home-panel__section-icon home-panel__section-icon--goal" />
+                            <ui:Label text="Today's Goal" class="home-panel__section-title home-panel__section-title--goal" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="home-panel__goal-body">
+                            <ui:Label text="Finish one science quest and answer a quiz to earn a star!" class="home-panel__goal-text" />
+                            <!-- ILL_GoalStar — 128×128 -->
+                            <ui:VisualElement class="home-panel__goal-star">
+                                <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold home-panel__goal-star-icon" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== BOTTOM NAV (7 items, matching reference) ===== -->
+        <ui:VisualElement name="home-nav" class="home-panel__nav">
+            <ui:Button name="nav-home" class="home-panel__nav-item is-active">
+                <ui:VisualElement class="ds-icon ds-icon--home home-panel__nav-icon" />
+                <ui:Label text="Home" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-map" class="home-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--map home-panel__nav-icon" />
+                <ui:Label text="Map" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-missions" class="home-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--bag home-panel__nav-icon" />
+                <ui:Label text="Missions" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-achievements" class="home-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--trophy home-panel__nav-icon" />
+                <ui:Label text="Achievements" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-rewards" class="home-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--treasure home-panel__nav-icon" />
+                <ui:Label text="Rewards" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-friends" class="home-panel__nav-item">
+                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
+                <ui:VisualElement class="home-panel__nav-icon-ph">
+                    <ui:Label text="ICO&#10;32" class="home-panel__nav-icon-ph-label" />
+                </ui:VisualElement>
+                <ui:Label text="Friends" class="home-panel__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-more" class="home-panel__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--more-horizontal home-panel__nav-icon" />
+                <ui:Label text="More" class="home-panel__nav-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

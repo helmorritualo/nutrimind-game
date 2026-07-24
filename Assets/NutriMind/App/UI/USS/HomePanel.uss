@@ -1,0 +1,1016 @@
+/* Home screen — 1920×1080 landscape, matched to HomeScreen design reference */
+
+.home-panel {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    background-color: var(--color-bg);
+    padding: 0;
+    margin: 0;
+}
+
+/* Kill Unity Label default margins that shift / soft-overlap text */
+.home-panel Label {
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== HEADER ========== */
+.home-panel__header {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 120px;
+    min-height: 120px;
+    padding: 0 48px;
+    background-color: var(--color-surface);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+.home-panel__brand {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-shrink: 0;
+    margin-right: 40px;
+}
+
+.home-panel__brand-nutri {
+    margin: 0;
+    padding: 0;
+    font-size: 44px;
+    color: var(--nm-brand-green);
+    -unity-font-style: bold;
+    letter-spacing: -1px;
+}
+
+.home-panel__brand-mind-wrap {
+    position: relative;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.home-panel__brand-mind {
+    margin: 0;
+    padding: 0;
+    font-size: 44px;
+    color: var(--nm-brand-blue);
+    -unity-font-style: bold;
+    letter-spacing: -1px;
+}
+
+.home-panel__brand-leaf {
+    position: absolute;
+    right: -4px;
+    top: -6px;
+    width: 20px;
+    height: 20px;
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+.home-panel__greeting {
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-right: 28px;
+    min-width: 240px;
+}
+
+.home-panel__greeting-title {
+    margin: 0 0 6px 0;
+    padding: 0;
+    font-size: 34px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    letter-spacing: -1px;
+}
+
+.home-panel__greeting-sub {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.home-panel__stats {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 28px;
+}
+
+.home-panel__stat {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 32px;
+}
+
+.home-panel__stat-icon {
+    width: 34px;
+    height: 34px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.home-panel__stat-icon--level {
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+.home-panel__stat-label {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+/* Avatar placeholder — 80×80 */
+.home-panel__avatar {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    border-radius: 40px;
+    background-color: #E8F5E9;
+    border-width: 3px;
+    border-color: #C8E6C9;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.home-panel__avatar-label {
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    color: #7CB342;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+/* ========== CONTENT ========== */
+.home-panel__content {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 32px 48px 24px 48px;
+    min-height: 0;
+}
+
+.home-panel__grid {
+    flex-grow: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.home-panel__row {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.home-panel__row--top {
+    margin-bottom: 24px;
+    flex-basis: 44%;
+}
+
+.home-panel__row--bottom {
+    flex-basis: 56%;
+}
+
+.home-panel__card {
+    position: relative;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 28px;
+    padding: 28px 32px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.home-panel__card--play,
+.home-panel__card--quiz {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 36px;
+}
+
+.home-panel__card--play {
+    margin-right: 24px;
+    background-color: #EAF6E8;
+    border-color: #D7EBD2;
+}
+
+.home-panel__card--quiz {
+    background-color: #F3ECFB;
+    border-color: #E4D6F5;
+}
+
+.home-panel__card--journey {
+    flex-grow: 1.75;
+    flex-basis: 0;
+    margin-right: 24px;
+    flex-direction: column;
+    padding: 24px 28px;
+}
+
+.home-panel__card--goal {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: column;
+    padding: 24px 28px;
+}
+
+/* Soft foliage wash — bottom-right only, no text (ghost labels caused blur).
+   picking-mode is a UXML attribute only — never put it in USS or the whole sheet can fail to apply. */
+.home-panel__card-deco {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 220px;
+    height: 140px;
+    border-top-left-radius: 120px;
+    border-bottom-right-radius: 28px;
+    opacity: 0.22;
+}
+
+.home-panel__card-deco--play {
+    background-color: rgba(76, 175, 80, 0.35);
+}
+
+.home-panel__card-deco--quiz {
+    background-color: rgba(139, 92, 246, 0.30);
+}
+
+/* Feature cards: icon left, copy+CTA stacked right — matched to HomeScreen ref */
+.home-panel__card-body {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Play: rounded square badge. Quiz: circular badge. Glyph ~64×64 */
+.home-panel__feature-icon {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    min-height: 120px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 28px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.home-panel__feature-icon--play {
+    border-radius: 28px;
+    background-color: #F7F3EA;
+    border-width: 0;
+}
+
+.home-panel__feature-icon--quiz {
+    border-radius: 60px;
+    background-color: var(--color-tertiary);
+}
+
+.home-panel__feature-glyph {
+    width: 64px;
+    height: 64px;
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+.home-panel__feature-glyph--on-purple {
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+/* Copy column hugs content — do not stretch across empty foliage area */
+.home-panel__feature-copy {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 520px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.home-panel__feature-title {
+    margin: 0;
+    padding: 0 0 6px 0;
+    font-size: 34px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+    letter-spacing: -1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.home-panel Label.home-panel__feature-title {
+    margin: 0;
+    padding: 0 0 6px 0;
+}
+
+.home-panel__feature-title--play {
+    color: #1B5E20;
+}
+
+.home-panel__feature-title--quiz {
+    color: #5B21B6;
+}
+
+.home-panel__feature-desc {
+    margin: 0;
+    padding: 0 0 20px 0;
+    font-size: 18px;
+    color: #3D3D3D;
+    -unity-font-style: bold;
+    white-space: normal;
+    max-width: 420px;
+    overflow: hidden;
+}
+
+.home-panel Label.home-panel__feature-desc {
+    margin: 0;
+    padding: 0 0 20px 0;
+}
+
+/* Pill CTAs — sized to HomeScreen reference under copy */
+.home-panel__pill {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    width: auto;
+    height: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    padding: 0 28px;
+    border-width: 0;
+    border-radius: 28px;
+    margin: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.home-panel__pill--green {
+    background-color: var(--color-primary);
+}
+
+.home-panel__pill--green:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.home-panel__pill--purple {
+    background-color: var(--color-tertiary);
+}
+
+.home-panel__pill--purple:hover {
+    background-color: var(--color-tertiary-hover);
+}
+
+.home-panel__pill-label {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    color: var(--color-text-on-accent);
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+}
+
+.home-panel Label.home-panel__pill-label {
+    margin: 0 8px 0 0;
+    padding: 0;
+}
+
+.home-panel__pill-chevron {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-text-on-accent);
+}
+
+/* Hide Unity Button's built-in text element when we use child Labels.
+   Do not use :not() here — Unity USS rejects it as "Recursive pseudo classes"
+   and fails the entire stylesheet import. */
+.home-panel__pill > .unity-button__text {
+    display: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    color: rgba(0, 0, 0, 0);
+}
+
+/* Section heads — Journey / Goal */
+.home-panel__section-head {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+    height: auto;
+    min-height: 28px;
+}
+
+.home-panel__section-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.home-panel__section-icon--journey {
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+.home-panel__section-icon--goal {
+    -unity-background-image-tint-color: #E67E22;
+}
+
+.home-panel__section-title {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.home-panel Label.home-panel__section-title {
+    margin: 0;
+    padding: 0;
+}
+
+.home-panel__section-title--journey {
+    color: #1B5E20;
+}
+
+.home-panel__section-title--goal {
+    color: #B45309;
+}
+
+/* Journey + Goal cards use padding from .home-panel__card--journey / --goal above */
+
+/* Journey body — mission card + progress side by side */
+.home-panel__journey-body {
+    flex-direction: row;
+    flex-grow: 1;
+    align-items: center;
+    min-height: 0;
+}
+
+.home-panel__mission-box {
+    flex-direction: row;
+    align-items: center;
+    width: 300px;
+    min-width: 240px;
+    max-width: 340px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: #F7F3EA;
+    border-radius: 20px;
+    padding: 20px 22px;
+    margin-right: 28px;
+}
+
+.home-panel__mission-copy {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-width: 0;
+    margin-right: 14px;
+}
+
+/* Green pill badge — must beat .home-panel Label { padding: 0 } */
+.home-panel__mission-badge {
+    align-self: flex-start;
+    font-size: 13px;
+    color: #FFFFFF;
+    background-color: var(--color-primary);
+    border-radius: 12px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+    -unity-text-align: middle-center;
+}
+
+.home-panel Label.home-panel__mission-badge {
+    margin: 0 0 10px 0;
+    padding: 6px 14px;
+}
+
+.home-panel__mission-title {
+    font-size: 24px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.home-panel Label.home-panel__mission-title {
+    margin: 0;
+    padding: 0;
+}
+
+/* Sprout badge beside mission title */
+.home-panel__mission-sprout {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    border-radius: 26px;
+    background-color: #FFFFFF;
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+    border-color: #E5E5E5;
+    flex-shrink: 0;
+}
+
+.home-panel__mission-sprout-icon {
+    width: 26px;
+    height: 26px;
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+.home-panel__progress {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 4px 4px 4px 0;
+}
+
+.home-panel__progress-head {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.home-panel__progress-label {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+}
+
+.home-panel Label.home-panel__progress-label {
+    margin: 0;
+    padding: 0;
+}
+
+.home-panel__progress-pct {
+    font-size: 20px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+}
+
+.home-panel Label.home-panel__progress-pct {
+    margin: 0;
+    padding: 0;
+}
+
+.home-panel__progress-track {
+    height: 12px;
+    border-radius: 6px;
+    background-color: #E8E8E8;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.home-panel__progress-fill {
+    width: 72%;
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 6px;
+}
+
+.home-panel__progress-caption {
+    font-size: 15px;
+    color: #3D3D3D;
+    -unity-font-style: bold;
+}
+
+.home-panel Label.home-panel__progress-caption {
+    margin: 0;
+    padding: 0 0 14px 0;
+}
+
+.home-panel__steps {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    max-width: 420px;
+}
+
+.home-panel__step {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+    border-width: 2px;
+    border-color: #C8C8C8;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.home-panel__step--done {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.home-panel__step-check {
+    width: 14px;
+    height: 14px;
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+.home-panel__step-line {
+    flex-grow: 1;
+    height: 3px;
+    background-color: #D0D0D0;
+    margin: 0 5px;
+}
+
+.home-panel__step-line--done {
+    background-color: var(--color-primary);
+}
+
+/* Goal card — text left, star badge right */
+.home-panel__goal-body {
+    flex-direction: row;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 0;
+    padding: 4px 0;
+}
+
+.home-panel__goal-text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    font-size: 18px;
+    color: #3D3D3D;
+    -unity-font-style: bold;
+    white-space: normal;
+    max-width: 360px;
+}
+
+.home-panel Label.home-panel__goal-text {
+    margin: 0 20px 0 0;
+    padding: 0;
+}
+
+/* Goal star — warm rounded square */
+.home-panel__goal-star {
+    width: 112px;
+    height: 112px;
+    min-width: 112px;
+    min-height: 112px;
+    border-radius: 22px;
+    background-color: #F7F3EA;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.home-panel__goal-star-icon {
+    width: 72px;
+    height: 72px;
+}
+
+/* ========== BOTTOM NAV ========== */
+.home-panel__nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    height: 104px;
+    min-height: 104px;
+    padding: 10px 40px 14px 40px;
+    background-color: var(--color-surface);
+    border-top-width: 1px;
+    border-top-color: var(--color-border);
+}
+
+.home-panel__nav-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 80px;
+    margin: 0 6px;
+    padding: 10px 8px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 18px;
+}
+
+.home-panel__nav-item:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.home-panel__nav-item.is-active {
+    background-color: var(--color-primary-soft);
+    border-width: 1px;
+    border-color: rgba(76, 175, 80, 0.35);
+}
+
+.home-panel__nav-item.is-active .home-panel__nav-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.home-panel__nav-item.is-active .home-panel__nav-label {
+    color: var(--color-primary);
+}
+
+.home-panel__nav-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    -unity-background-image-tint-color: #757575;
+}
+
+.home-panel__nav-label {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: #5C5C5C;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+/* Friends nav icon placeholder — 32×32 */
+.home-panel__nav-icon-ph {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: #EEEEEE;
+    border-width: 1px;
+    border-color: #D0D0D0;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-panel__nav-icon-ph-label {
+    margin: 0;
+    padding: 0;
+    font-size: 9px;
+    color: #9E9E9E;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+/* ========== RESPONSIVE ========== */
+.home-panel--compact .home-panel__header {
+    height: auto;
+    min-height: 88px;
+    padding: 14px 24px;
+    flex-wrap: wrap;
+}
+
+.home-panel--compact .home-panel__brand-nutri,
+.home-panel--compact .home-panel__brand-mind {
+    font-size: 32px;
+}
+
+.home-panel--compact .home-panel__greeting {
+    /* Unity USS in this project rejects `order`; wrap + full width reflows greeting under brand/stats. */
+    width: 100%;
+    margin: 10px 0 0 0;
+}
+
+.home-panel--compact .home-panel__greeting-title {
+    font-size: 26px;
+}
+
+.home-panel--compact .home-panel__content {
+    padding: 18px 24px 14px 24px;
+}
+
+.home-panel--compact .home-panel__row--top,
+.home-panel--compact .home-panel__row--bottom {
+    flex-direction: column;
+    flex-basis: auto;
+}
+
+.home-panel--compact .home-panel__card--play,
+.home-panel--compact .home-panel__card--journey {
+    margin-right: 0;
+    margin-bottom: 16px;
+}
+
+.home-panel--compact .home-panel__card--play,
+.home-panel--compact .home-panel__card--quiz {
+    min-height: 200px;
+}
+
+.home-panel--compact .home-panel__feature-title {
+    font-size: 28px;
+}
+
+.home-panel--compact Label.home-panel__feature-title {
+    padding-bottom: 4px;
+}
+
+.home-panel--compact .home-panel__feature-desc {
+    font-size: 16px;
+    max-width: 100%;
+}
+
+.home-panel--compact Label.home-panel__feature-desc {
+    padding-bottom: 14px;
+}
+
+.home-panel--compact .home-panel__feature-icon {
+    width: 96px;
+    height: 96px;
+    min-width: 96px;
+    max-width: 96px;
+    min-height: 96px;
+    margin-right: 20px;
+}
+
+.home-panel--compact .home-panel__feature-icon--play {
+    border-radius: 24px;
+}
+
+.home-panel--compact .home-panel__feature-icon--quiz {
+    border-radius: 48px;
+}
+
+.home-panel--compact .home-panel__feature-glyph {
+    width: 52px;
+    height: 52px;
+}
+
+.home-panel--compact .home-panel__pill {
+    height: 50px;
+    min-height: 50px;
+    max-height: 50px;
+    padding: 0 22px;
+    border-radius: 25px;
+}
+
+.home-panel--compact .home-panel__pill-label {
+    font-size: 16px;
+}
+
+.home-panel--compact .home-panel__journey-body {
+    flex-direction: column;
+}
+
+.home-panel--compact .home-panel__mission-box {
+    width: auto;
+    max-width: none;
+    margin-right: 0;
+    margin-bottom: 14px;
+    padding: 16px 18px;
+}
+
+.home-panel--compact .home-panel__section-head {
+    margin-bottom: 12px;
+}
+
+.home-panel--compact .home-panel__goal-star {
+    width: 88px;
+    height: 88px;
+    min-width: 88px;
+    min-height: 88px;
+    border-radius: 18px;
+}
+
+.home-panel--compact .home-panel__goal-star-icon {
+    width: 56px;
+    height: 56px;
+}
+
+.home-panel--compact Label.home-panel__goal-text {
+    font-size: 16px;
+    margin-right: 14px;
+}
+
+.home-panel--compact .home-panel__nav {
+    height: auto;
+    min-height: 80px;
+    padding: 8px 12px 12px 12px;
+    flex-wrap: wrap;
+}
+
+.home-panel--compact .home-panel__nav-item {
+    flex-grow: 0;
+    width: 84px;
+    height: 72px;
+}
+
+.home-panel--narrow .home-panel__brand-nutri,
+.home-panel--narrow .home-panel__brand-mind {
+    font-size: 28px;
+}
+
+.home-panel--narrow .home-panel__greeting-title {
+    font-size: 22px;
+    white-space: normal;
+}
+
+.home-panel--narrow .home-panel__feature-title {
+    font-size: 24px;
+}
+
+.home-panel--narrow Label.home-panel__feature-title {
+    padding-bottom: 4px;
+}
+
+.home-panel--narrow .home-panel__feature-desc {
+    font-size: 15px;
+}
+
+.home-panel--narrow Label.home-panel__feature-desc {
+    padding-bottom: 12px;
+}
+
+.home-panel--narrow .home-panel__feature-icon {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    min-height: 80px;
+    margin-right: 16px;
+}
+
+.home-panel--narrow .home-panel__feature-icon--play {
+    border-radius: 20px;
+}
+
+.home-panel--narrow .home-panel__feature-icon--quiz {
+    border-radius: 40px;
+}
+
+.home-panel--narrow .home-panel__feature-glyph {
+    width: 42px;
+    height: 42px;
+}
+
+.home-panel--narrow .home-panel__pill {
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0 20px;
+    border-radius: 24px;
+}
+
+.home-panel--narrow .home-panel__pill-label {
+    font-size: 15px;
+}
+
+.home-panel--narrow .home-panel__goal-star {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    border-radius: 16px;
+}
+
+.home-panel--narrow .home-panel__goal-star-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.home-panel--narrow Label.home-panel__goal-text {
+    font-size: 15px;
+    margin-right: 12px;
+}
+
+.home-panel--narrow .home-panel__nav-label {
+    font-size: 11px;
+}

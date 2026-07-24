@@ -1,0 +1,53 @@
+/* NutriMind light theme — LoginScreen reference */
+
+.theme-nutrimind {
+    --color-primary: #4CAF50;
+    --color-primary-hover: #43A047;
+    --color-primary-press: #388E3C;
+    --color-primary-soft: rgba(76, 175, 80, 0.12);
+
+    --color-secondary: #1E88E5;
+    --color-secondary-hover: #1976D2;
+    --color-secondary-press: #1565C0;
+    --color-secondary-soft: rgba(30, 136, 229, 0.14);
+
+    --color-tertiary: #8B5CF6;
+    --color-tertiary-hover: #7C3AED;
+    --color-tertiary-press: #6D28D9;
+    --color-tertiary-soft: rgba(139, 92, 246, 0.14);
+
+    --color-warning: #F59E0B;
+    --color-warning-hover: #D97706;
+    --color-warning-soft: rgba(245, 158, 11, 0.16);
+
+    --color-danger: #D32F2F;
+    --color-danger-hover: #C62828;
+    --color-danger-press: #B71C1C;
+    --color-danger-soft: rgba(211, 47, 47, 0.10);
+
+    --color-text-primary: #1A1A1A;
+    --color-text-secondary: #4A4A4A;
+    --color-text-disabled: #8A8A8A;
+    --color-text-on-accent: #FFFFFF;
+
+    --color-bg: #FAF9F6;
+    --color-surface: #FFFFFF;
+    --color-surface-elev: #F7F6F2;
+    --color-surface-hover: #F0EFEA;
+    --color-border: #E5E5E5;
+    --color-border-strong: #C8C8C8;
+    --color-overlay: rgba(33, 33, 33, 0.40);
+
+    --nm-science: #3B82F6;
+    --nm-pe-health: #F97316;
+    --nm-literaquest: #8B5CF6;
+    --nm-healthy-habits: #4CAF50;
+
+    --nm-brand-green: #4CAF50;
+    --nm-brand-blue: #1E88E5;
+    --nm-error-bg: #FFF2F2;
+    --nm-error-border: #F5B7B7;
+    --nm-tip-bg: #FFFFFF;
+    --nm-tip-border: #E5E5E5;
+    --nm-illustration-glow: #F0F6E8;
+}

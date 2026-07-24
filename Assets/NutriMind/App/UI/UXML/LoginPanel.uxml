@@ -1,0 +1,88 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/LoginPanel.uss" />
+
+    <ui:VisualElement name="login-root" class="ds-root theme-nutrimind login-panel">
+        <ui:VisualElement name="login-card" class="login-panel__card">
+
+            <!-- LEFT: form (vertically centered stack, scaled for accessibility) -->
+            <ui:VisualElement name="login-form" class="login-panel__form">
+                <ui:VisualElement name="login-form-stack" class="login-panel__form-stack">
+                    <ui:VisualElement class="login-panel__brand">
+                        <ui:Label text="Nutri" class="login-panel__brand-nutri" />
+                        <ui:VisualElement class="login-panel__brand-mind-wrap">
+                            <ui:Label text="Mind" class="login-panel__brand-mind" />
+                            <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__brand-leaf" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:Label text="Welcome back, Explorer!" class="login-panel__title" />
+                    <ui:Label text="Let's continue your learning adventure." class="login-panel__subtitle" />
+
+                    <ui:VisualElement class="login-panel__field">
+                        <ui:Label text="Learner Reference Number (LRN)" class="login-panel__label" />
+                        <ui:VisualElement name="lrn-shell" class="login-panel__input-shell">
+                            <ui:VisualElement class="ds-icon ds-icon--user login-panel__input-icon" picking-mode="Ignore" />
+                            <ui:TextField name="lrn-field" class="login-panel__input" label="" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="login-panel__field">
+                        <ui:Label text="PIN" class="login-panel__label" />
+                        <ui:VisualElement name="pin-shell" class="login-panel__input-shell">
+                            <ui:VisualElement class="ds-icon ds-icon--lock login-panel__input-icon" picking-mode="Ignore" />
+                            <ui:TextField name="pin-field" class="login-panel__input" label="" password="true" />
+                            <ui:Button name="pin-toggle" class="login-panel__pin-toggle" tooltip="Show or hide PIN">
+                                <ui:VisualElement name="pin-toggle-icon" class="ds-icon ds-icon--eye login-panel__input-icon login-panel__input-icon--trail" />
+                            </ui:Button>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="login-error" class="login-panel__error">
+                        <ui:VisualElement class="ds-icon ds-icon--warning login-panel__error-icon" picking-mode="Ignore" />
+                        <ui:Label text="We could not verify those details. Please try again." class="login-panel__error-text" />
+                    </ui:VisualElement>
+
+                    <ui:Button name="login-button" class="login-panel__login-btn">
+                        <ui:VisualElement class="login-panel__login-btn-main">
+                            <ui:VisualElement class="ds-icon ds-icon--user login-panel__login-btn-icon" />
+                            <ui:Label text="Log In" class="login-panel__login-btn-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="ds-icon ds-icon--chevron-right login-panel__login-btn-chevron" />
+                    </ui:Button>
+
+                    <ui:VisualElement class="login-panel__form-footer">
+                        <ui:Button name="forgot-pin-button" text="Forgot PIN?" class="login-panel__forgot" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="login-panel__divider" picking-mode="Ignore" />
+
+            <!-- RIGHT: illustration -->
+            <ui:VisualElement name="login-visual" class="login-panel__visual">
+                <ui:VisualElement class="login-panel__visual-main">
+                    <ui:VisualElement class="login-panel__illustration-glow">
+                        <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__leaf login-panel__leaf--1" picking-mode="Ignore" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__leaf login-panel__leaf--2" picking-mode="Ignore" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__leaf login-panel__leaf--3" picking-mode="Ignore" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__leaf login-panel__leaf--4" picking-mode="Ignore" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf login-panel__leaf login-panel__leaf--5" picking-mode="Ignore" />
+                        <ui:VisualElement class="login-panel__illustration-placeholder">
+                            <ui:Label text="ILL_LoginExplorer&#10;(placeholder)" class="login-panel__illustration-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="login-panel__tip">
+                    <ui:VisualElement class="login-panel__tip-icon-wrap">
+                        <ui:VisualElement class="ds-icon ds-icon--info login-panel__tip-icon" />
+                    </ui:VisualElement>
+                    <ui:Label text="Learning is best when you have fun and stay curious!" class="login-panel__tip-text" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
