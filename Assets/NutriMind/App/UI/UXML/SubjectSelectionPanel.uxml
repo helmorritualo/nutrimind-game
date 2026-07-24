@@ -1,0 +1,175 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/SubjectSelectionPanel.uss" />
+
+    <ui:VisualElement name="subject-selection-root" class="ds-root theme-nutrimind subject-selection">
+
+        <!-- ===== HEADER ===== -->
+        <ui:VisualElement name="subject-header" class="subject-selection__header">
+            <ui:VisualElement class="subject-selection__header-left">
+                <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost subject-selection__back" tooltip="Back">
+                    <ui:VisualElement class="ds-icon ds-icon--arrow-left subject-selection__back-icon" />
+                </ui:Button>
+
+                <ui:VisualElement class="subject-selection__brand">
+                    <ui:Label text="Nutri" class="subject-selection__brand-nutri" />
+                    <ui:VisualElement class="subject-selection__brand-mind-wrap">
+                        <ui:Label text="Mind" class="subject-selection__brand-mind" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf subject-selection__brand-leaf" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== SUBJECT CARDS (horizontal scroll) ===== -->
+        <ui:VisualElement name="subject-content" class="subject-selection__content">
+            <ui:ScrollView name="subject-scroll" mode="Horizontal" class="subject-selection__scroll"
+                           horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
+                <ui:VisualElement name="subject-cards" class="subject-selection__cards">
+
+                    <!-- LiteraQuest -->
+                    <ui:VisualElement name="card-literaquest" class="ds-card subject-selection__card subject-selection__card--lq">
+                        <ui:VisualElement class="subject-selection__card-stack">
+                            <ui:VisualElement class="subject-selection__hex subject-selection__hex--lq">
+                                <ui:VisualElement class="ds-icon ds-icon--book subject-selection__hex-icon" />
+                            </ui:VisualElement>
+                            <ui:Label text="LiteraQuest" class="subject-selection__card-title" />
+                            <ui:Label text="Sharpen reading skills and explore stories." class="subject-selection__card-desc" />
+
+                            <ui:VisualElement class="subject-selection__progress-row">
+                                <ui:VisualElement class="subject-selection__progress-track">
+                                    <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--lq" />
+                                </ui:VisualElement>
+                                <ui:Label text="60%" class="subject-selection__progress-pct" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="subject-selection__stats">
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
+                                    <ui:Label text="72 / 120" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <!-- ICO_Clipboard — list glyph until clipboard art exists -->
+                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label text="18" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:Button name="continue-lq-button" text="" class="ds-btn ds-btn--primary subject-selection__cta">
+                                <ui:Label text="Continue" class="subject-selection__cta-label" />
+                                <ui:VisualElement class="ds-icon ds-icon--chevron-right subject-selection__cta-chevron" />
+                            </ui:Button>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- PE & Health -->
+                    <ui:VisualElement name="card-pe-health" class="ds-card subject-selection__card subject-selection__card--peh">
+                        <ui:VisualElement class="subject-selection__card-stack">
+                            <ui:VisualElement class="subject-selection__hex subject-selection__hex--peh">
+                                <!-- ICO_Run — bolt glyph until running-person art exists -->
+                                <ui:VisualElement class="ds-icon ds-icon--bolt subject-selection__hex-icon" />
+                            </ui:VisualElement>
+                            <ui:Label text="PE &amp; Health" class="subject-selection__card-title" />
+                            <ui:Label text="Build healthy habits and active minds." class="subject-selection__card-desc" />
+
+                            <ui:VisualElement class="subject-selection__progress-row">
+                                <ui:VisualElement class="subject-selection__progress-track">
+                                    <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--peh" />
+                                </ui:VisualElement>
+                                <ui:Label text="70%" class="subject-selection__progress-pct" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="subject-selection__stats">
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
+                                    <ui:Label text="84 / 120" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label text="21" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:Button name="continue-peh-button" text="" class="ds-btn ds-btn--primary subject-selection__cta">
+                                <ui:Label text="Continue" class="subject-selection__cta-label" />
+                                <ui:VisualElement class="ds-icon ds-icon--chevron-right subject-selection__cta-chevron" />
+                            </ui:Button>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- Science -->
+                    <ui:VisualElement name="card-science" class="ds-card subject-selection__card subject-selection__card--sci">
+                        <ui:VisualElement class="subject-selection__card-stack">
+                            <ui:VisualElement class="subject-selection__hex subject-selection__hex--sci">
+                                <!-- ICO_Flask — potion glyph until flask art exists -->
+                                <ui:VisualElement class="ds-icon ds-icon--potion subject-selection__hex-icon" />
+                            </ui:VisualElement>
+                            <ui:Label text="Science" class="subject-selection__card-title" />
+                            <ui:Label text="Explore the world through discovery." class="subject-selection__card-desc" />
+
+                            <ui:VisualElement class="subject-selection__progress-row">
+                                <ui:VisualElement class="subject-selection__progress-track">
+                                    <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--sci" />
+                                </ui:VisualElement>
+                                <ui:Label text="72%" class="subject-selection__progress-pct" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="subject-selection__stats">
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
+                                    <ui:Label text="87 / 120" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="subject-selection__stat">
+                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label text="24" class="subject-selection__stat-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:Button name="continue-sci-button" text="" class="ds-btn ds-btn--primary subject-selection__cta">
+                                <ui:Label text="Continue" class="subject-selection__cta-label" />
+                                <ui:VisualElement class="ds-icon ds-icon--chevron-right subject-selection__cta-chevron" />
+                            </ui:Button>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <ui:VisualElement name="subject-nav" class="subject-selection__nav">
+            <ui:Button name="nav-home" class="subject-selection__nav-item is-active">
+                <ui:VisualElement class="ds-icon ds-icon--home subject-selection__nav-icon" />
+                <ui:Label text="Home" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-map" class="subject-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--map subject-selection__nav-icon" />
+                <ui:Label text="Map" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-missions" class="subject-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__nav-icon" />
+                <ui:Label text="Missions" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-achievements" class="subject-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--trophy subject-selection__nav-icon" />
+                <ui:Label text="Achievements" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-rewards" class="subject-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--gift subject-selection__nav-icon" />
+                <ui:Label text="Rewards" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-friends" class="subject-selection__nav-item">
+                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
+                <ui:VisualElement class="subject-selection__nav-icon-ph">
+                    <ui:Label text="ICO&#10;32" class="subject-selection__nav-icon-ph-label" />
+                </ui:VisualElement>
+                <ui:Label text="Friends" class="subject-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-more" class="subject-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--more-horizontal subject-selection__nav-icon" />
+                <ui:Label text="More" class="subject-selection__nav-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

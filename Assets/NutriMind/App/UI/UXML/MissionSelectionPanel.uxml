@@ -1,0 +1,187 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/MissionSelectionPanel.uss" />
+
+    <ui:VisualElement name="mission-selection-root" class="ds-root theme-nutrimind mission-selection">
+
+        <!-- ===== HEADER ===== -->
+        <ui:VisualElement name="mission-header" class="mission-selection__header">
+            <ui:VisualElement class="mission-selection__header-left">
+                <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost mission-selection__back" tooltip="Back">
+                    <ui:VisualElement class="ds-icon ds-icon--arrow-left mission-selection__back-icon" />
+                </ui:Button>
+
+                <ui:VisualElement class="mission-selection__brand">
+                    <ui:Label text="Nutri" class="mission-selection__brand-nutri" />
+                    <ui:VisualElement class="mission-selection__brand-mind-wrap">
+                        <ui:Label text="Mind" class="mission-selection__brand-mind" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf mission-selection__brand-leaf" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== MAIN BODY (list + detail) ===== -->
+        <ui:VisualElement name="mission-body" class="mission-selection__body">
+            <!-- Left: mission list -->
+            <ui:VisualElement name="mission-list-panel" class="mission-selection__list-panel">
+                <ui:Label name="term-heading" text="Term 2: Life and Living Things" class="mission-selection__term-heading" />
+
+                <ui:ScrollView name="mission-scroll" class="mission-selection__scroll"
+                               horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
+                    <ui:VisualElement name="mission-list" class="mission-selection__list">
+
+                        <!-- Mission 1 — Completed -->
+                        <ui:Button name="mission-item-1" class="ds-card mission-selection__item mission-selection__item--completed">
+                            <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--completed">
+                                <ui:Label text="1" class="mission-selection__item-badge-label" />
+                            </ui:VisualElement>
+                            <ui:Label name="mission-1-title" text="What Is a Living Thing?" class="mission-selection__item-title" />
+                            <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--completed">
+                                <ui:VisualElement class="ds-icon ds-icon--check mission-selection__item-status-icon" />
+                                <ui:Label text="Completed" class="mission-selection__item-status-label" />
+                            </ui:VisualElement>
+                        </ui:Button>
+
+                        <!-- Mission 2 — In Progress (selected) -->
+                        <ui:Button name="mission-item-2" class="ds-card mission-selection__item mission-selection__item--progress is-selected">
+                            <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--progress">
+                                <ui:Label text="2" class="mission-selection__item-badge-label" />
+                            </ui:VisualElement>
+                            <ui:Label name="mission-2-title" text="Needs of Living Things" class="mission-selection__item-title mission-selection__item-title--active" />
+                            <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--progress">
+                                <ui:VisualElement class="mission-selection__mini-ring">
+                                    <ui:VisualElement class="mission-selection__mini-ring-track" />
+                                    <ui:VisualElement class="mission-selection__mini-ring-fill" />
+                                </ui:VisualElement>
+                                <ui:Label text="In Progress" class="mission-selection__item-status-label" />
+                            </ui:VisualElement>
+                        </ui:Button>
+
+                        <!-- Mission 3 — Available -->
+                        <ui:Button name="mission-item-3" class="ds-card mission-selection__item mission-selection__item--available">
+                            <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--available">
+                                <ui:Label text="3" class="mission-selection__item-badge-label" />
+                            </ui:VisualElement>
+                            <ui:Label name="mission-3-title" text="Habitats Around Us" class="mission-selection__item-title" />
+                            <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--available">
+                                <ui:VisualElement class="mission-selection__available-ring" />
+                                <ui:Label text="Available" class="mission-selection__item-status-label" />
+                            </ui:VisualElement>
+                        </ui:Button>
+
+                        <!-- Mission 4 — Locked -->
+                        <ui:Button name="mission-item-4" class="ds-card mission-selection__item mission-selection__item--locked">
+                            <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--locked">
+                                <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-badge-lock" />
+                            </ui:VisualElement>
+                            <ui:Label name="mission-4-title" text="Life Cycles" class="mission-selection__item-title mission-selection__item-title--locked" />
+                            <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--locked">
+                                <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-status-icon mission-selection__item-status-icon--locked" />
+                                <ui:Label text="Locked" class="mission-selection__item-status-label" />
+                            </ui:VisualElement>
+                        </ui:Button>
+
+                    </ui:VisualElement>
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <!-- Right: mission detail -->
+            <ui:VisualElement name="mission-detail-panel" class="mission-selection__detail-panel ds-card ds-card--flush">
+                <ui:VisualElement name="mission-detail" class="mission-selection__detail">
+
+                    <ui:VisualElement class="mission-selection__detail-header">
+                        <ui:Label name="detail-title" text="Needs of Living Things" class="mission-selection__detail-title" />
+                        <ui:Label name="detail-description" text="Discover what living things need to survive and how they get what they need." class="mission-selection__detail-desc" />
+                    </ui:VisualElement>
+
+                    <!-- Learning Goal card -->
+                    <ui:VisualElement name="learning-goal" class="mission-selection__info-card mission-selection__goal">
+                        <ui:VisualElement class="mission-selection__goal-header">
+                            <ui:VisualElement class="ds-icon ds-icon--target mission-selection__goal-icon" />
+                            <ui:Label text="Learning Goal" class="mission-selection__goal-heading" />
+                        </ui:VisualElement>
+                        <ui:Label name="detail-learning-goal" text="I can identify the basic needs of living things and explain why they are important." class="mission-selection__goal-text" />
+                    </ui:VisualElement>
+
+                    <!-- Your Progress card -->
+                    <ui:VisualElement name="progress-section" class="mission-selection__info-card mission-selection__progress-section">
+                        <ui:Label text="Your Progress" class="mission-selection__section-heading" />
+                        <ui:VisualElement class="mission-selection__progress-row">
+                            <ui:VisualElement name="progress-stars" class="mission-selection__stars">
+                                <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold mission-selection__star mission-selection__star--filled" />
+                                <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold mission-selection__star mission-selection__star--filled" />
+                                <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold mission-selection__star mission-selection__star--filled" />
+                                <ui:VisualElement class="ds-icon ds-icon--star mission-selection__star mission-selection__star--empty" />
+                                <ui:VisualElement class="ds-icon ds-icon--star mission-selection__star mission-selection__star--empty" />
+                            </ui:VisualElement>
+                            <ui:Label name="detail-progress" text="3 / 5" class="mission-selection__progress-count" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- Mission Rewards card -->
+                    <ui:VisualElement name="rewards-section" class="mission-selection__info-card mission-selection__rewards-section">
+                        <ui:Label text="Mission Rewards" class="mission-selection__section-heading" />
+                        <ui:VisualElement class="mission-selection__rewards">
+                            <ui:VisualElement class="mission-selection__reward-card">
+                                <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold mission-selection__reward-icon mission-selection__reward-icon--star" />
+                                <ui:VisualElement class="mission-selection__reward-copy">
+                                    <ui:Label name="detail-reward-stars" text="50" class="mission-selection__reward-value" />
+                                    <ui:Label text="Stars" class="mission-selection__reward-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="mission-selection__reward-card">
+                                <!-- ICO_ExplorerXp — placeholder until custom XP art exists -->
+                                <ui:VisualElement class="mission-selection__reward-xp-badge">
+                                    <ui:Label text="XP" class="mission-selection__reward-xp-label" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="mission-selection__reward-copy">
+                                    <ui:Label name="detail-reward-xp" text="100" class="mission-selection__reward-value" />
+                                    <ui:Label text="Explorer XP" class="mission-selection__reward-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <ui:VisualElement name="mission-nav" class="mission-selection__nav">
+            <ui:Button name="nav-home" class="mission-selection__nav-item is-active">
+                <ui:VisualElement class="ds-icon ds-icon--home mission-selection__nav-icon" />
+                <ui:Label text="Home" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-map" class="mission-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--map mission-selection__nav-icon" />
+                <ui:Label text="Map" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-missions" class="mission-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--bag mission-selection__nav-icon" />
+                <ui:Label text="Missions" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-achievements" class="mission-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--trophy mission-selection__nav-icon" />
+                <ui:Label text="Achievements" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-rewards" class="mission-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--gift mission-selection__nav-icon" />
+                <ui:Label text="Rewards" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-friends" class="mission-selection__nav-item">
+                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
+                <ui:VisualElement class="mission-selection__nav-icon-ph">
+                    <ui:Label text="ICO&#10;32" class="mission-selection__nav-icon-ph-label" />
+                </ui:VisualElement>
+                <ui:Label text="Friends" class="mission-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-more" class="mission-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--more-horizontal mission-selection__nav-icon" />
+                <ui:Label text="More" class="mission-selection__nav-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

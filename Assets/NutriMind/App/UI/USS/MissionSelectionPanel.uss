@@ -1,0 +1,1032 @@
+/* Mission Selection — 1920×1080 landscape, matched to MissionSelectionScreen design reference */
+
+.mission-selection {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    background-color: var(--color-bg);
+    padding: 0;
+    margin: 0;
+}
+
+.mission-selection Label {
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== HEADER ========== */
+.mission-selection__header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 100px;
+    min-height: 100px;
+    padding: 0 40px;
+    background-color: var(--color-surface);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+.mission-selection__header-left {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.mission-selection__back {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+    padding: 0;
+    margin: 0 20px 0 0;
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 16px;
+    background-color: var(--color-surface);
+    align-items: center;
+    justify-content: center;
+}
+
+.mission-selection__back:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.mission-selection__back > .unity-button__text {
+    display: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    color: rgba(0, 0, 0, 0);
+}
+
+.mission-selection__back-icon {
+    width: 24px;
+    height: 24px;
+    -unity-background-image-tint-color: var(--color-text-primary);
+}
+
+.mission-selection__brand {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.mission-selection__brand-nutri {
+    margin: 0;
+    padding: 0;
+    font-size: 40px;
+    color: var(--nm-brand-green);
+    -unity-font-style: bold;
+    letter-spacing: -1px;
+}
+
+.mission-selection__brand-mind-wrap {
+    position: relative;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.mission-selection__brand-mind {
+    margin: 0;
+    padding: 0;
+    font-size: 40px;
+    color: var(--nm-brand-blue);
+    -unity-font-style: bold;
+    letter-spacing: -1px;
+}
+
+.mission-selection__brand-leaf {
+    position: absolute;
+    right: -4px;
+    top: -6px;
+    width: 18px;
+    height: 18px;
+    -unity-background-image-tint-color: var(--nm-brand-green);
+}
+
+/* ========== BODY (list + detail) ========== */
+.mission-selection__body {
+    flex-direction: row;
+    align-items: stretch;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    padding: 24px 36px 20px 36px;
+}
+
+/* ----- Left list panel (~45%) ----- */
+.mission-selection__list-panel {
+    flex-direction: column;
+    align-items: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 45%;
+    width: 45%;
+    min-width: 0;
+    min-height: 0;
+    margin-right: 32px;
+}
+
+.mission-selection__term-heading {
+    flex-shrink: 0;
+    margin: 0 0 20px 4px;
+    padding: 0;
+    font-size: 34px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    letter-spacing: -0.4px;
+    white-space: normal;
+}
+
+.mission-selection__scroll {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.mission-selection__scroll .unity-scroll-view__content-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px 2px 8px 2px;
+}
+
+.mission-selection__list {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.mission-selection__list > * {
+    margin-bottom: 14px;
+}
+
+/* ----- Mission list items ----- */
+.mission-selection__item {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 88px;
+    height: auto;
+    padding: 18px 22px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.mission-selection__item:hover {
+    border-color: var(--color-border-strong);
+}
+
+.mission-selection__item.is-selected {
+    border-width: 2px;
+    border-color: var(--nm-science);
+    background-color: rgba(59, 130, 246, 0.06);
+}
+
+.mission-selection__item--locked {
+    opacity: 0.72;
+}
+
+.mission-selection__item > .unity-button__text {
+    display: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    color: rgba(0, 0, 0, 0);
+}
+
+.mission-selection__item-badge {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+    margin-right: 18px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 26px;
+}
+
+.mission-selection__item-badge--completed {
+    background-color: var(--color-primary);
+}
+
+.mission-selection__item-badge--progress {
+    background-color: var(--nm-science);
+}
+
+.mission-selection__item-badge--available {
+    background-color: #9CA3AF;
+}
+
+.mission-selection__item-badge--locked {
+    background-color: #B0B5BD;
+}
+
+.mission-selection__item-badge-label {
+    font-size: 22px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+.mission-selection__item-badge-lock {
+    width: 22px;
+    height: 22px;
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+.mission-selection__item-title {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    margin: 0 16px 0 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mission-selection__item-title--active {
+    color: #1565C0;
+}
+
+.mission-selection__item.is-selected .mission-selection__item-title {
+    color: #1565C0;
+}
+
+.mission-selection__item-title--locked {
+    color: #9CA3AF;
+}
+
+.mission-selection__item-status {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.mission-selection__item-status-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.mission-selection__item-status--completed .mission-selection__item-status-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.mission-selection__item-status--progress .mission-selection__item-status-icon {
+    -unity-background-image-tint-color: var(--nm-science);
+}
+
+.mission-selection__item-status--available .mission-selection__item-status-icon {
+    -unity-background-image-tint-color: #9CA3AF;
+}
+
+.mission-selection__item-status-icon--locked {
+    width: 18px;
+    height: 18px;
+    -unity-background-image-tint-color: #9CA3AF;
+}
+
+.mission-selection__item-status-label {
+    font-size: 16px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.mission-selection__item-status--completed .mission-selection__item-status-label {
+    color: var(--color-primary);
+}
+
+.mission-selection__item-status--progress .mission-selection__item-status-label {
+    color: var(--nm-science);
+}
+
+.mission-selection__item-status--available .mission-selection__item-status-label {
+    color: #9CA3AF;
+}
+
+.mission-selection__item-status--locked .mission-selection__item-status-label {
+    color: #9CA3AF;
+}
+
+/* Mini progress ring for list item */
+.mission-selection__mini-ring {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.mission-selection__mini-ring-track {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 11px;
+    border-width: 3px;
+    border-color: #E5E7EB;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mission-selection__mini-ring-fill {
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 14px;
+    border-width: 3px;
+    border-top-color: var(--nm-science);
+    border-right-color: var(--nm-science);
+    border-bottom-color: var(--nm-science);
+    border-left-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Dashed available ring placeholder */
+.mission-selection__available-ring {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    margin-right: 8px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #C4C9D0;
+    background-color: rgba(0, 0, 0, 0);
+    flex-shrink: 0;
+}
+
+.mission-selection Label.mission-selection__detail-title,
+.mission-selection Label.mission-selection__detail-desc,
+.mission-selection Label.mission-selection__goal-heading,
+.mission-selection Label.mission-selection__goal-text,
+.mission-selection Label.mission-selection__section-heading,
+.mission-selection Label.mission-selection__progress-count,
+.mission-selection Label.mission-selection__reward-value,
+.mission-selection Label.mission-selection__reward-label {
+    -unity-font-style: bold;
+}
+
+/* ----- Right detail panel (~55%) ----- */
+.mission-selection__detail-panel {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 55%;
+    min-width: 0;
+    min-height: 0;
+    padding: 40px 44px 36px 44px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.mission-selection__detail {
+    flex-direction: column;
+    align-items: stretch;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.mission-selection__detail > * {
+    margin-bottom: 22px;
+}
+
+.mission-selection__detail-header {
+    flex-direction: column;
+    align-items: stretch;
+    flex-shrink: 0;
+    margin-bottom: 28px;
+}
+
+.mission-selection__detail-title {
+    margin: 0 0 14px 0;
+    padding: 0;
+    font-size: 42px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    letter-spacing: -0.5px;
+    white-space: normal;
+}
+
+.mission-selection__detail-desc {
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    color: #5C6370;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+/* Shared bordered info cards (Learning Goal / Progress / Rewards) */
+.mission-selection__info-card {
+    flex-direction: column;
+    align-items: stretch;
+    flex-shrink: 0;
+    width: 100%;
+    padding: 24px 28px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 18px;
+}
+
+/* Learning goal */
+.mission-selection__goal {
+    background-color: #F7F8FA;
+}
+
+.mission-selection__goal-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.mission-selection__goal-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.mission-selection__goal-heading {
+    font-size: 22px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.mission-selection__goal-text {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    color: #374151;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+/* Progress section */
+.mission-selection__progress-section {
+    background-color: #F7F8FA;
+}
+
+.mission-selection__section-heading {
+    margin: 0 0 18px 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.mission-selection__progress-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+}
+
+.mission-selection__stars {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.mission-selection__star {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.mission-selection__star--filled {
+    -unity-background-image-tint-color: #F5A623;
+}
+
+.mission-selection__star--empty {
+    -unity-background-image-tint-color: #D1D5DB;
+}
+
+.mission-selection__progress-count {
+    margin: 0;
+    padding: 0 0 0 20px;
+    font-size: 26px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+    flex-grow: 0;
+    -unity-text-align: middle-right;
+}
+
+/* Rewards section */
+.mission-selection__rewards-section {
+    background-color: #F7F8FA;
+}
+
+.mission-selection__rewards {
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+}
+
+.mission-selection__rewards > * {
+    margin-right: 18px;
+}
+
+.mission-selection__reward-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+    height: 104px;
+    min-height: 104px;
+    max-height: 104px;
+    padding: 0 24px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 16px;
+}
+
+.mission-selection__reward-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    margin-right: 18px;
+    flex-shrink: 0;
+}
+
+.mission-selection__reward-icon--star {
+    -unity-background-image-tint-color: #F5A623;
+}
+
+.mission-selection__reward-xp-badge {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    margin-right: 18px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: var(--color-primary);
+    border-radius: 14px;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.mission-selection__reward-xp-label {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+.mission-selection__reward-copy {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex-grow: 0;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.mission-selection__reward-value {
+    margin: 0 0 4px 0;
+    padding: 0;
+    font-size: 32px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.mission-selection__reward-label {
+    margin: 0;
+    padding: 0;
+    font-size: 17px;
+    color: #5C6370;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+/* ========== BOTTOM NAV ========== */
+.mission-selection__nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    height: 104px;
+    min-height: 104px;
+    padding: 10px 40px 14px 40px;
+    background-color: var(--color-surface);
+    border-top-width: 1px;
+    border-top-color: var(--color-border);
+}
+
+.mission-selection__nav-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 80px;
+    margin: 0 6px;
+    padding: 10px 8px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 18px;
+}
+
+.mission-selection__nav-item:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.mission-selection__nav-item.is-active .mission-selection__nav-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.mission-selection__nav-item.is-active .mission-selection__nav-label {
+    color: var(--color-primary);
+}
+
+.mission-selection__nav-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    -unity-background-image-tint-color: #757575;
+}
+
+.mission-selection__nav-label {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: #5C5C5C;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+.mission-selection__nav-icon-ph {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: #EEEEEE;
+    border-width: 1px;
+    border-color: #D0D0D0;
+    align-items: center;
+    justify-content: center;
+}
+
+.mission-selection__nav-icon-ph-label {
+    margin: 0;
+    padding: 0;
+    font-size: 9px;
+    color: #9E9E9E;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+/* ========== RESPONSIVE ========== */
+.mission-selection--compact .mission-selection__header {
+    height: auto;
+    min-height: 84px;
+    padding: 14px 24px;
+}
+
+.mission-selection--compact .mission-selection__brand-nutri,
+.mission-selection--compact .mission-selection__brand-mind {
+    font-size: 32px;
+}
+
+.mission-selection--compact .mission-selection__body {
+    padding: 18px 24px 16px 24px;
+}
+
+.mission-selection--compact .mission-selection__list-panel {
+    margin-right: 20px;
+}
+
+.mission-selection--compact .mission-selection__term-heading {
+    font-size: 28px;
+    margin-bottom: 14px;
+}
+
+.mission-selection--compact .mission-selection__item {
+    min-height: 76px;
+    padding: 14px 16px;
+    border-radius: 16px;
+}
+
+.mission-selection--compact .mission-selection__item-badge {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    margin-right: 14px;
+    border-radius: 22px;
+}
+
+.mission-selection--compact .mission-selection__item-badge-label {
+    font-size: 18px;
+}
+
+.mission-selection--compact .mission-selection__item-title {
+    font-size: 18px;
+}
+
+.mission-selection--compact .mission-selection__item-status-label {
+    font-size: 14px;
+}
+
+.mission-selection--compact .mission-selection__detail-panel {
+    padding: 28px 28px 24px 28px;
+}
+
+.mission-selection--compact .mission-selection__detail > * {
+    margin-bottom: 18px;
+}
+
+.mission-selection--compact .mission-selection__detail-header {
+    margin-bottom: 24px;
+}
+
+.mission-selection--compact .mission-selection__detail-title {
+    font-size: 34px;
+}
+
+.mission-selection--compact .mission-selection__detail-desc {
+    font-size: 17px;
+}
+
+.mission-selection--compact .mission-selection__info-card {
+    padding: 20px 22px;
+}
+
+.mission-selection--compact .mission-selection__goal-heading,
+.mission-selection--compact .mission-selection__section-heading {
+    font-size: 19px;
+}
+
+.mission-selection--compact .mission-selection__goal-text {
+    font-size: 16px;
+}
+
+.mission-selection--compact .mission-selection__goal-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.mission-selection--compact .mission-selection__star {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+.mission-selection--compact .mission-selection__progress-count {
+    font-size: 22px;
+}
+
+.mission-selection--compact .mission-selection__reward-card {
+    height: 88px;
+    min-height: 88px;
+    max-height: 88px;
+    padding: 0 18px;
+}
+
+.mission-selection--compact .mission-selection__reward-icon,
+.mission-selection--compact .mission-selection__reward-xp-badge {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.mission-selection--compact .mission-selection__reward-xp-label {
+    font-size: 14px;
+}
+
+.mission-selection--compact .mission-selection__reward-value {
+    font-size: 28px;
+}
+
+.mission-selection--compact .mission-selection__reward-label {
+    font-size: 15px;
+}
+
+.mission-selection--compact .mission-selection__nav {
+    height: auto;
+    min-height: 80px;
+    padding: 8px 12px 12px 12px;
+    flex-wrap: wrap;
+}
+
+.mission-selection--compact .mission-selection__nav-item {
+    flex-grow: 0;
+    width: 84px;
+    height: 72px;
+}
+
+/* Narrow / mobile landscape — stack list above detail */
+.mission-selection--narrow .mission-selection__brand-nutri,
+.mission-selection--narrow .mission-selection__brand-mind {
+    font-size: 28px;
+}
+
+.mission-selection--narrow .mission-selection__back {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    margin-right: 12px;
+    border-radius: 12px;
+}
+
+.mission-selection--narrow .mission-selection__body {
+    flex-direction: column;
+    padding: 14px 16px 12px 16px;
+}
+
+.mission-selection--narrow .mission-selection__list-panel {
+    flex-basis: auto;
+    width: 100%;
+    max-height: 42%;
+    margin-right: 0;
+    margin-bottom: 16px;
+}
+
+.mission-selection--narrow .mission-selection__term-heading {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.mission-selection--narrow .mission-selection__item {
+    min-height: 68px;
+    padding: 12px 14px;
+}
+
+.mission-selection--narrow .mission-selection__item-badge {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    margin-right: 12px;
+    border-radius: 20px;
+}
+
+.mission-selection--narrow .mission-selection__item-title {
+    font-size: 16px;
+}
+
+.mission-selection--narrow .mission-selection__item-status-label {
+    font-size: 12px;
+}
+
+.mission-selection--narrow .mission-selection__detail-panel {
+    flex-basis: auto;
+    flex-grow: 1;
+    min-height: 0;
+    padding: 20px 18px 16px 18px;
+}
+
+.mission-selection--narrow .mission-selection__detail > * {
+    margin-bottom: 14px;
+}
+
+.mission-selection--narrow .mission-selection__detail-header {
+    margin-bottom: 18px;
+}
+
+.mission-selection--narrow .mission-selection__detail-title {
+    font-size: 28px;
+}
+
+.mission-selection--narrow .mission-selection__detail-desc {
+    font-size: 15px;
+}
+
+.mission-selection--narrow .mission-selection__info-card {
+    padding: 16px 16px;
+}
+
+.mission-selection--narrow .mission-selection__goal-heading,
+.mission-selection--narrow .mission-selection__section-heading {
+    font-size: 17px;
+}
+
+.mission-selection--narrow .mission-selection__goal-text {
+    font-size: 14px;
+}
+
+.mission-selection--narrow .mission-selection__star {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    margin-right: 8px;
+}
+
+.mission-selection--narrow .mission-selection__progress-count {
+    font-size: 18px;
+}
+
+.mission-selection--narrow .mission-selection__rewards {
+    flex-direction: column;
+}
+
+.mission-selection--narrow .mission-selection__rewards > * {
+    margin-right: 0;
+    margin-bottom: 12px;
+}
+
+.mission-selection--narrow .mission-selection__reward-card {
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+    padding: 0 16px;
+}
+
+.mission-selection--narrow .mission-selection__reward-icon,
+.mission-selection--narrow .mission-selection__reward-xp-badge {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.mission-selection--narrow .mission-selection__reward-value {
+    font-size: 24px;
+}
+
+.mission-selection--narrow .mission-selection__reward-label {
+    font-size: 14px;
+}
+
+.mission-selection--narrow .mission-selection__nav-label {
+    font-size: 11px;
+}
+
+.mission-selection--narrow .mission-selection__nav-item {
+    width: 72px;
+    height: 64px;
+    padding: 8px 4px;
+}
+
+.mission-selection--narrow .mission-selection__nav-icon,
+.mission-selection--narrow .mission-selection__nav-icon-ph {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 6px;
+}

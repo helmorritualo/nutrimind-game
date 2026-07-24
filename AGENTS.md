@@ -608,16 +608,15 @@ A task is complete only when:
 
 ## Learned User Preferences
 
-- Treat design-only, presentation-only, and Penpot-only UI work as visual/layout tasks: UXML/USS, Penpot boards, and shared UI assets only—do not add Unity application or gameplay logic unless explicitly asked.
+- Treat design-only, presentation-only, and Penpot-only UI work as visual/layout tasks: UXML/USS, Penpot boards, and shared UI assets only—do not add Unity application or gameplay logic unless explicitly asked; wire App panels together only after the screen set is designed.
 - Match supplied design references closely—exact padding, margins, type sizes, logo/text placement, and panel centering; when asked for layout-only, copy structure and spacing first and ignore reference artwork until imagery is requested.
 - Prefer Full HD (1920×1080) landscape framing for static UI layout tests and Penpot boards, while keeping App UITK layouts responsive across Android screen sizes.
 - Prefer building UITK layouts with the installed DesignSystem package (`com.sinanata.designsystem`) reusable components when available; use placeholders for custom images that are not ready yet.
-- Omit Demo Login and other non-reference chrome unless explicitly requested.
+- Omit Demo Login and other non-reference chrome unless explicitly requested; on Subject Selection and Term Selection screens, omit Profile/Settings/Logout chrome and the Quiz Portal card (Quiz Portal belongs on Home).
 - When creating a requested folder tree, create the full deep nested structure in one pass—not only shallow top-level folders.
 - After a temporary design/layout test is approved, delete the test files and folders when asked rather than leaving them in the project.
 - For large UI refinement passes, inspect references and existing UXML/USS first, plan highest-impact fixes, and wait for approval before rewriting broadly when Plan Mode is requested.
-- Prefer readable, accessible App UITK scale in Game view / device sims—enlarge undersized text/controls, keep dropdown/popup menus legible, and use generous padding/margins so sections are not visually compact.
-- Prefer medium or bold font weights for App UITK labels, input text, and placeholders—avoid thin weights that hurt readability at Full HD.
+- Prefer readable, accessible App UITK scale in Game view / device sims—enlarge undersized text/controls, keep dropdown/popup menus legible, use generous padding/margins, prefer medium or bold font weights over thin ones, and design selection cards so layouts stay valid with dynamic/variable text lengths.
 - For App UITK visual QA, prefer user-provided Game view screenshots over Unity MCP capture, SceneView, or PlayMode screenshot tools when those MCP tools are unreliable.
 - On Profile, show LRN as plain unmasked digits with no decorative dashes; style Sign Out as a clear red/destructive action.
 
@@ -629,6 +628,6 @@ A task is complete only when:
 - Application UI is designed in Penpot via the `user-penpot` MCP as the layout source of truth; keep that work separate from Unity App UXML/USS/C#/scene implementation unless explicitly requested.
 - The Unity Design System package is at `Packages/com.sinanata.designsystem`.
 - The project targets Unity 6 (`6000.3.x` per `ProjectSettings/ProjectVersion.txt`).
-- Temporary App UITK screen previews (including Profile and Settings) are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
+- Temporary App UITK screen previews (including Profile, Settings, Subject Selection, and Term Selection) are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
 - Local-only App Settings options should work without the server; server-backed settings stay deferred.
-- App UITK iteration commonly uses the Singularity Group Hot Reload package.
+- App UITK iteration commonly uses the Singularity Group Hot Reload package; pause Hot Reload and free RAM before Unity MCP `ManageGameObject`/scene wiring to avoid import/domain-reload hangs.

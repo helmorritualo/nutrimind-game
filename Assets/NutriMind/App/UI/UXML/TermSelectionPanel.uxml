@@ -1,0 +1,200 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/TermSelectionPanel.uss" />
+
+    <ui:VisualElement name="term-selection-root" class="ds-root theme-nutrimind term-selection">
+
+        <!-- ===== HEADER ===== -->
+        <ui:VisualElement name="term-header" class="term-selection__header">
+            <ui:VisualElement class="term-selection__header-left">
+                <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost term-selection__back" tooltip="Back">
+                    <ui:VisualElement class="ds-icon ds-icon--arrow-left term-selection__back-icon" />
+                </ui:Button>
+
+                <ui:VisualElement class="term-selection__brand">
+                    <ui:Label text="Nutri" class="term-selection__brand-nutri" />
+                    <ui:VisualElement class="term-selection__brand-mind-wrap">
+                        <ui:Label text="Mind" class="term-selection__brand-mind" />
+                        <ui:VisualElement class="ds-icon ds-icon--leaf term-selection__brand-leaf" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== SUBJECT INTRO ===== -->
+        <ui:VisualElement name="term-subject" class="term-selection__subject">
+            <ui:VisualElement class="term-selection__subject-hex">
+                <!-- ICO_Flask — potion glyph until flask art exists -->
+                <ui:VisualElement class="ds-icon ds-icon--potion term-selection__subject-hex-icon" />
+            </ui:VisualElement>
+            <ui:VisualElement class="term-selection__subject-text">
+                <ui:Label text="Science" class="term-selection__subject-title" />
+                <ui:Label text="Choose a term to continue your adventure." class="term-selection__subject-subtitle" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== TERM CARDS ===== -->
+        <ui:VisualElement name="term-content" class="term-selection__content">
+            <ui:ScrollView name="term-scroll" mode="Horizontal" class="term-selection__scroll"
+                           horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
+                <ui:VisualElement name="term-cards" class="term-selection__cards">
+
+                    <!-- Term 1 — Completed -->
+                    <ui:Button name="card-term-1" class="ds-card term-selection__card term-selection__card--completed">
+                        <ui:VisualElement class="term-selection__card-tab term-selection__card-tab--active">
+                            <ui:Label name="term-1-tab-label" text="Term 1" class="term-selection__card-tab-label" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="term-selection__card-body">
+                            <ui:VisualElement class="term-selection__card-top">
+                                <ui:VisualElement class="term-selection__status-icon term-selection__status-icon--completed">
+                                    <ui:VisualElement class="ds-icon ds-icon--check term-selection__status-glyph" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__card-copy">
+                                    <ui:Label name="term-1-title" text="Exploring Our World" class="term-selection__card-title" />
+                                    <ui:Label name="term-1-desc" text="Discover matter, energy, and simple machines." class="term-selection__card-desc" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__status-pill term-selection__status-pill--completed">
+                                    <ui:Label name="term-1-status" text="Completed" class="term-selection__status-pill-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="term-selection__card-footer">
+                                <ui:VisualElement class="term-selection__divider" />
+                                <ui:VisualElement class="term-selection__stats">
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold term-selection__stat-icon" />
+                                        <ui:Label name="term-1-stars" text="30 / 30" class="term-selection__stat-label" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <!-- ICO_Clipboard — list glyph until clipboard art exists -->
+                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--tasks" />
+                                        <ui:Label name="term-1-tasks" text="10 / 10" class="term-selection__stat-label" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:Button>
+
+                    <!-- Term 2 — In Progress -->
+                    <ui:Button name="card-term-2" class="ds-card term-selection__card term-selection__card--progress">
+                        <ui:VisualElement class="term-selection__card-tab term-selection__card-tab--active">
+                            <ui:Label name="term-2-tab-label" text="Term 2" class="term-selection__card-tab-label" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="term-selection__card-body">
+                            <ui:VisualElement class="term-selection__card-top">
+                                <ui:VisualElement class="term-selection__status-icon term-selection__status-icon--progress">
+                                    <ui:VisualElement class="term-selection__ring-track">
+                                        <ui:VisualElement class="term-selection__ring-fill" />
+                                    </ui:VisualElement>
+                                    <ui:Label name="term-2-pct" text="72%" class="term-selection__ring-pct" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__card-copy">
+                                    <ui:Label name="term-2-title" text="Life and Living Things" class="term-selection__card-title" />
+                                    <ui:Label name="term-2-desc" text="Learn about ecosystems, habitats, and life cycles." class="term-selection__card-desc" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__status-pill term-selection__status-pill--progress">
+                                    <ui:Label name="term-2-status" text="In Progress" class="term-selection__status-pill-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="term-selection__card-footer">
+                                <ui:VisualElement class="term-selection__divider" />
+                                <ui:VisualElement class="term-selection__stats">
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold term-selection__stat-icon" />
+                                        <ui:Label name="term-2-stars" text="21 / 30" class="term-selection__stat-label" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--tasks" />
+                                        <ui:Label name="term-2-tasks" text="7 / 10" class="term-selection__stat-label" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:Button>
+
+                    <!-- Term 3 — Locked -->
+                    <ui:Button name="card-term-3" class="ds-card term-selection__card term-selection__card--locked">
+                        <ui:VisualElement class="term-selection__card-tab term-selection__card-tab--locked">
+                            <ui:Label name="term-3-tab-label" text="Term 3" class="term-selection__card-tab-label" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="term-selection__card-body">
+                            <ui:VisualElement class="term-selection__card-top">
+                                <ui:VisualElement class="term-selection__status-icon term-selection__status-icon--locked">
+                                    <ui:VisualElement class="ds-icon ds-icon--lock term-selection__status-glyph term-selection__status-glyph--locked" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__card-copy">
+                                    <ui:Label name="term-3-title" text="Earth and Space" class="term-selection__card-title" />
+                                    <ui:Label name="term-3-desc" text="Explore Earth, weather, and our solar system." class="term-selection__card-desc" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="term-selection__status-pill term-selection__status-pill--locked">
+                                    <ui:Label name="term-3-status" text="Coming Soon" class="term-selection__status-pill-label" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="term-selection__card-footer">
+                                <ui:VisualElement class="term-selection__divider" />
+                                <ui:VisualElement class="term-selection__stats">
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <ui:VisualElement class="ds-icon ds-icon--star term-selection__stat-icon term-selection__stat-icon--muted" />
+                                        <ui:Label name="term-3-stars" text="0 / 30" class="term-selection__stat-label term-selection__stat-label--muted" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="term-selection__stat">
+                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--muted" />
+                                        <ui:Label name="term-3-tasks" text="0 / 10" class="term-selection__stat-label term-selection__stat-label--muted" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:Button>
+
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <ui:VisualElement name="term-nav" class="term-selection__nav">
+            <ui:Button name="nav-home" class="term-selection__nav-item is-active">
+                <ui:VisualElement class="ds-icon ds-icon--home term-selection__nav-icon" />
+                <ui:Label text="Home" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-map" class="term-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--map term-selection__nav-icon" />
+                <ui:Label text="Map" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-missions" class="term-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--bag term-selection__nav-icon" />
+                <ui:Label text="Missions" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-achievements" class="term-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--trophy term-selection__nav-icon" />
+                <ui:Label text="Achievements" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-rewards" class="term-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--gift term-selection__nav-icon" />
+                <ui:Label text="Rewards" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-friends" class="term-selection__nav-item">
+                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
+                <ui:VisualElement class="term-selection__nav-icon-ph">
+                    <ui:Label text="ICO&#10;32" class="term-selection__nav-icon-ph-label" />
+                </ui:VisualElement>
+                <ui:Label text="Friends" class="term-selection__nav-label" />
+            </ui:Button>
+            <ui:Button name="nav-more" class="term-selection__nav-item">
+                <ui:VisualElement class="ds-icon ds-icon--more-horizontal term-selection__nav-icon" />
+                <ui:Label text="More" class="term-selection__nav-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
