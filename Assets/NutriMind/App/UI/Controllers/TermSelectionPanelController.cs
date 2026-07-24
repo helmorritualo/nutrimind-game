@@ -4,9 +4,11 @@ using UnityEngine.UIElements;
 namespace NutriMind.App.UI
 {
     /// <summary>
-    /// Layout-only term selection panel wiring for UI Toolkit preview.
-    /// Handles responsive classes and static nav active state.
-    /// Does not perform routing, progress loading, or networking.
+    /// Layout-only term selection panel wiring for UI Toolkit static preview.
+    /// Handles responsive classes, term card selection styling, and a
+    /// placeholder Continue/View Missions action (logged via Debug.Log only).
+    /// Locked term cards are not selectable. Does not perform routing,
+    /// progress loading, or networking.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
@@ -15,12 +17,16 @@ namespace NutriMind.App.UI
         private const string CompactClass = "term-selection--compact";
         private const string NarrowClass = "term-selection--narrow";
         private const string MobileClass = "mobile";
+        private const string CardClass = "term-selection__card";
+        private const string LockedCardClass = "term-selection__card--locked";
+        private const string NavItemClass = "term-selection__nav-item";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
 
         private UIDocument _uiDocument;
         private VisualElement _root;
         private VisualElement _nav;
+        private Button _backButton;
         private float _lastWidth = -1f;
 
         private void OnEnable()
@@ -79,10 +85,21 @@ namespace NutriMind.App.UI
             _nav = _root.Q<VisualElement>("term-nav");
             if (_nav != null)
             {
-                foreach (var button in _nav.Query<Button>(className: "term-selection__nav-item").ToList())
+                foreach (var button in _nav.Query<Button>(className: NavItemClass).ToList())
                 {
                     button.RegisterCallback<ClickEvent>(OnNavClickEvent);
                 }
+            }
+
+            foreach (var card in _root.Query<Button>(className: CardClass).ToList())
+            {
+                card.RegisterCallback<ClickEvent>(OnCardClickEvent);
+            }
+
+            _backButton = _root.Q<Button>("back-button");
+            if (_backButton != null)
+            {
+                _backButton.RegisterCallback<ClickEvent>(OnBackClicked);
             }
 
             _root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -93,7 +110,7 @@ namespace NutriMind.App.UI
         {
             if (_nav != null)
             {
-                foreach (var button in _nav.Query<Button>(className: "term-selection__nav-item").ToList())
+                foreach (var button in _nav.Query<Button>(className: NavItemClass).ToList())
                 {
                     button.UnregisterCallback<ClickEvent>(OnNavClickEvent);
                 }
@@ -101,12 +118,66 @@ namespace NutriMind.App.UI
 
             if (_root != null)
             {
+                foreach (var card in _root.Query<Button>(className: CardClass).ToList())
+                {
+                    card.UnregisterCallback<ClickEvent>(OnCardClickEvent);
+                }
+
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
+
+            if (_backButton != null)
+            {
+                _backButton.UnregisterCallback<ClickEvent>(OnBackClicked);
             }
 
             _root = null;
             _nav = null;
+            _backButton = null;
             _lastWidth = -1f;
+        }
+
+        private void OnCardClickEvent(ClickEvent evt)
+        {
+            if (!(evt.currentTarget is Button card))
+            {
+                return;
+            }
+
+            string termLabel = GetTermLabel(card);
+
+            if (card.ClassListContains(LockedCardClass))
+            {
+                Debug.Log($"[Static Preview] {termLabel} is locked and cannot be opened.");
+                return;
+            }
+
+            SetActiveCard(card);
+            Debug.Log($"[Static Preview] View Missions: {termLabel}");
+        }
+
+        private static string GetTermLabel(VisualElement card)
+        {
+            var tabLabel = card.Q<Label>(className: "term-selection__card-tab-label");
+            return tabLabel != null ? tabLabel.text : card.name;
+        }
+
+        private void SetActiveCard(VisualElement selected)
+        {
+            if (_root == null || selected == null)
+            {
+                return;
+            }
+
+            _root.Query<Button>(className: CardClass).ForEach(card =>
+            {
+                card.EnableInClassList("is-selected", card == selected);
+            });
+        }
+
+        private void OnBackClicked(ClickEvent evt)
+        {
+            Debug.Log("[Static Preview] Back button clicked.");
         }
 
         private void OnNavClickEvent(ClickEvent evt)
@@ -144,7 +215,7 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            _nav.Query<Button>(className: "term-selection__nav-item").ForEach(button =>
+            _nav.Query<Button>(className: NavItemClass).ForEach(button =>
             {
                 button.EnableInClassList("is-active", button == selected);
             });

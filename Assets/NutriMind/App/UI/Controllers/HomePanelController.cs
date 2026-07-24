@@ -5,8 +5,10 @@ namespace NutriMind.App.UI
 {
     /// <summary>
     /// Layout-only home panel wiring for UI Toolkit preview.
-    /// Handles responsive classes and static nav active state.
-    /// Does not perform routing, progress loading, or networking.
+    /// Handles responsive classes, bottom nav selection, and static click
+    /// feedback (Debug.Log plus a small toast) for Play Adventure, Quiz
+    /// Portal, the avatar, and every nav item.
+    /// Does not perform routing, progress loading, sync, or networking.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
@@ -17,10 +19,17 @@ namespace NutriMind.App.UI
         private const string MobileClass = "mobile";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
+        private const float ToastDurationSeconds = 2.5f;
 
         private UIDocument _uiDocument;
         private VisualElement _root;
         private VisualElement _nav;
+        private VisualElement _toast;
+        private Label _toastLabel;
+        private Button _playContinueButton;
+        private Button _quizGoButton;
+        private VisualElement _avatar;
+        private Clickable _avatarClickable;
         private float _lastWidth = -1f;
 
         private void OnEnable()
@@ -33,6 +42,7 @@ namespace NutriMind.App.UI
         {
             Unbind();
             CancelInvoke(nameof(BindWhenReady));
+            CancelInvoke(nameof(HideToast));
         }
 
         private void Update()
@@ -76,6 +86,9 @@ namespace NutriMind.App.UI
             panelRoot.style.width = Length.Percent(100);
             panelRoot.style.height = Length.Percent(100);
 
+            _toast = _root.Q<VisualElement>("home-toast");
+            _toastLabel = _root.Q<Label>("home-toast-label");
+
             _nav = _root.Q<VisualElement>("home-nav");
             if (_nav != null)
             {
@@ -83,6 +96,19 @@ namespace NutriMind.App.UI
                 {
                     button.RegisterCallback<ClickEvent>(OnNavClickEvent);
                 }
+            }
+
+            _playContinueButton = _root.Q<Button>("play-continue-button");
+            _playContinueButton?.RegisterCallback<ClickEvent>(OnPlayContinueClicked);
+
+            _quizGoButton = _root.Q<Button>("quiz-go-button");
+            _quizGoButton?.RegisterCallback<ClickEvent>(OnQuizGoClicked);
+
+            _avatar = _root.Q<VisualElement>("home-avatar");
+            if (_avatar != null)
+            {
+                _avatarClickable = new Clickable(OnAvatarClicked);
+                _avatar.AddManipulator(_avatarClickable);
             }
 
             _root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -99,6 +125,14 @@ namespace NutriMind.App.UI
                 }
             }
 
+            _playContinueButton?.UnregisterCallback<ClickEvent>(OnPlayContinueClicked);
+            _quizGoButton?.UnregisterCallback<ClickEvent>(OnQuizGoClicked);
+
+            if (_avatar != null && _avatarClickable != null)
+            {
+                _avatar.RemoveManipulator(_avatarClickable);
+            }
+
             if (_root != null)
             {
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -106,6 +140,12 @@ namespace NutriMind.App.UI
 
             _root = null;
             _nav = null;
+            _toast = null;
+            _toastLabel = null;
+            _playContinueButton = null;
+            _quizGoButton = null;
+            _avatar = null;
+            _avatarClickable = null;
             _lastWidth = -1f;
         }
 
@@ -148,6 +188,46 @@ namespace NutriMind.App.UI
             {
                 button.EnableInClassList("is-active", button == selected);
             });
+
+            string navLabel = selected.Q<Label>(className: "home-panel__nav-label")?.text ?? selected.name;
+            Debug.Log($"[HomePanel] Nav item selected: {selected.name} ({navLabel}).");
+            ShowToast($"{navLabel} selected — preview only.");
+        }
+
+        private void OnPlayContinueClicked(ClickEvent evt)
+        {
+            Debug.Log("[HomePanel] Play Adventure > Continue tapped.");
+            ShowToast("Preview only — Play Adventure will launch the mission scene.");
+        }
+
+        private void OnQuizGoClicked(ClickEvent evt)
+        {
+            Debug.Log("[HomePanel] Quiz Portal > Go to Quizzes tapped.");
+            ShowToast("Preview only — this will open the Quiz Portal.");
+        }
+
+        private void OnAvatarClicked()
+        {
+            Debug.Log("[HomePanel] Avatar tapped.");
+            ShowToast("Preview only — this will open your Profile.");
+        }
+
+        private void ShowToast(string message)
+        {
+            if (_toast == null || _toastLabel == null)
+            {
+                return;
+            }
+
+            _toastLabel.text = message ?? string.Empty;
+            _toast.EnableInClassList("is-visible", true);
+            CancelInvoke(nameof(HideToast));
+            Invoke(nameof(HideToast), ToastDurationSeconds);
+        }
+
+        private void HideToast()
+        {
+            _toast?.EnableInClassList("is-visible", false);
         }
     }
 }

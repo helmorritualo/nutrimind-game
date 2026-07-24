@@ -34,7 +34,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- ===== TERM CARDS ===== -->
+        <!-- ===== TERM CARDS (exactly 3) ===== -->
         <ui:VisualElement name="term-content" class="term-selection__content">
             <ui:ScrollView name="term-scroll" mode="Horizontal" class="term-selection__scroll"
                            horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
@@ -66,13 +66,8 @@
                                 <ui:VisualElement class="term-selection__divider" />
                                 <ui:VisualElement class="term-selection__stats">
                                     <ui:VisualElement class="term-selection__stat">
-                                        <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold term-selection__stat-icon" />
-                                        <ui:Label name="term-1-stars" text="30 / 30" class="term-selection__stat-label" />
-                                    </ui:VisualElement>
-                                    <ui:VisualElement class="term-selection__stat">
-                                        <!-- ICO_Clipboard — list glyph until clipboard art exists -->
-                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--tasks" />
-                                        <ui:Label name="term-1-tasks" text="10 / 10" class="term-selection__stat-label" />
+                                        <ui:VisualElement class="ds-icon ds-icon--bag term-selection__stat-icon term-selection__stat-icon--tasks" />
+                                        <ui:Label name="term-1-missions" text="5 / 5 Missions" class="term-selection__stat-label" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
                             </ui:VisualElement>
@@ -91,7 +86,7 @@
                                     <ui:VisualElement class="term-selection__ring-track">
                                         <ui:VisualElement class="term-selection__ring-fill" />
                                     </ui:VisualElement>
-                                    <ui:Label name="term-2-pct" text="72%" class="term-selection__ring-pct" />
+                                    <ui:Label name="term-2-pct" text="60%" class="term-selection__ring-pct" />
                                 </ui:VisualElement>
 
                                 <ui:VisualElement class="term-selection__card-copy">
@@ -108,19 +103,17 @@
                                 <ui:VisualElement class="term-selection__divider" />
                                 <ui:VisualElement class="term-selection__stats">
                                     <ui:VisualElement class="term-selection__stat">
-                                        <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold term-selection__stat-icon" />
-                                        <ui:Label name="term-2-stars" text="21 / 30" class="term-selection__stat-label" />
-                                    </ui:VisualElement>
-                                    <ui:VisualElement class="term-selection__stat">
-                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--tasks" />
-                                        <ui:Label name="term-2-tasks" text="7 / 10" class="term-selection__stat-label" />
+                                        <ui:VisualElement class="ds-icon ds-icon--bag term-selection__stat-icon term-selection__stat-icon--tasks" />
+                                        <ui:Label name="term-2-missions" text="3 / 5 Missions" class="term-selection__stat-label" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
+                                <!-- Optional areas summary for the currently active mission -->
+                                <ui:Label name="term-2-areas" text="Mission 4 · Area 2 of 3" class="term-selection__areas-summary" />
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:Button>
 
-                    <!-- Term 3 — Locked -->
+                    <!-- Term 3 — Locked (server/teacher managed; NOT a learner-level lock) -->
                     <ui:Button name="card-term-3" class="ds-card term-selection__card term-selection__card--locked">
                         <ui:VisualElement class="term-selection__card-tab term-selection__card-tab--locked">
                             <ui:Label name="term-3-tab-label" text="Term 3" class="term-selection__card-tab-label" />
@@ -138,7 +131,7 @@
                                 </ui:VisualElement>
 
                                 <ui:VisualElement class="term-selection__status-pill term-selection__status-pill--locked">
-                                    <ui:Label name="term-3-status" text="Coming Soon" class="term-selection__status-pill-label" />
+                                    <ui:Label name="term-3-status" text="Previous Term Incomplete" class="term-selection__status-pill-label" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
@@ -146,12 +139,8 @@
                                 <ui:VisualElement class="term-selection__divider" />
                                 <ui:VisualElement class="term-selection__stats">
                                     <ui:VisualElement class="term-selection__stat">
-                                        <ui:VisualElement class="ds-icon ds-icon--star term-selection__stat-icon term-selection__stat-icon--muted" />
-                                        <ui:Label name="term-3-stars" text="0 / 30" class="term-selection__stat-label term-selection__stat-label--muted" />
-                                    </ui:VisualElement>
-                                    <ui:VisualElement class="term-selection__stat">
-                                        <ui:VisualElement class="ds-icon ds-icon--list term-selection__stat-icon term-selection__stat-icon--muted" />
-                                        <ui:Label name="term-3-tasks" text="0 / 10" class="term-selection__stat-label term-selection__stat-label--muted" />
+                                        <ui:VisualElement class="ds-icon ds-icon--bag term-selection__stat-icon term-selection__stat-icon--muted" />
+                                        <ui:Label name="term-3-missions" text="0 / 5 Missions" class="term-selection__stat-label term-selection__stat-label--muted" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
                             </ui:VisualElement>
@@ -162,34 +151,28 @@
             </ui:ScrollView>
         </ui:VisualElement>
 
-        <!-- ===== BOTTOM NAV ===== -->
+        <!-- ===== BOTTOM NAV =====
+             TODO: duplicated navigation will later be replaced by AppShell.uxml -->
         <ui:VisualElement name="term-nav" class="term-selection__nav">
-            <ui:Button name="nav-home" class="term-selection__nav-item is-active">
+            <ui:Button name="nav-home" class="term-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--home term-selection__nav-icon" />
                 <ui:Label text="Home" class="term-selection__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-map" class="term-selection__nav-item">
+            <ui:Button name="nav-subjects" class="term-selection__nav-item is-active">
                 <ui:VisualElement class="ds-icon ds-icon--map term-selection__nav-icon" />
-                <ui:Label text="Map" class="term-selection__nav-label" />
+                <ui:Label text="Subjects" class="term-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-missions" class="term-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--bag term-selection__nav-icon" />
                 <ui:Label text="Missions" class="term-selection__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-achievements" class="term-selection__nav-item">
+            <ui:Button name="nav-progress" class="term-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--trophy term-selection__nav-icon" />
-                <ui:Label text="Achievements" class="term-selection__nav-label" />
+                <ui:Label text="Progress" class="term-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-rewards" class="term-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--gift term-selection__nav-icon" />
+                <ui:VisualElement class="ds-icon ds-icon--treasure term-selection__nav-icon" />
                 <ui:Label text="Rewards" class="term-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-friends" class="term-selection__nav-item">
-                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
-                <ui:VisualElement class="term-selection__nav-icon-ph">
-                    <ui:Label text="ICO&#10;32" class="term-selection__nav-icon-ph-label" />
-                </ui:VisualElement>
-                <ui:Label text="Friends" class="term-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-more" class="term-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--more-horizontal term-selection__nav-icon" />

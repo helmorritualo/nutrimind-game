@@ -445,10 +445,6 @@
     background-color: #EDE9FE;
 }
 
-.profile-panel__subject-icon--hh {
-    background-color: #E8F5E9;
-}
-
 .profile-panel__subject-glyph {
     width: 28px;
     height: 28px;
@@ -495,10 +491,6 @@
 
 .profile-panel__bar-fill--lq {
     background-color: var(--nm-literaquest);
-}
-
-.profile-panel__bar-fill--hh {
-    background-color: var(--nm-healthy-habits);
 }
 
 .profile-panel__subject-stats {
@@ -996,4 +988,39 @@
 .profile-panel--narrow .profile-panel__nav-icon,
 .profile-panel--narrow .profile-panel__nav-icon-ph {
     margin-bottom: 0;
+}
+
+/* ========== SIGN OUT CONFIRMATION (static preview) ========== */
+.profile-panel__confirm-backdrop {
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-panel__confirm-backdrop--hidden {
+    display: none;
+}
+
+.profile-panel__confirm-dialog {
+    width: 440px;
+    padding: 40px 36px 32px 36px;
+    border-radius: 28px;
+}
+
+.profile-panel__confirm-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+    -unity-background-image-tint-color: var(--color-danger);
+}
+
+.profile-panel__confirm-dialog .ds-dialog__title {
+    font-size: 26px;
+}
+
+.profile-panel__confirm-dialog .ds-dialog__message {
+    font-size: 17px;
+}
+
+.profile-panel__confirm-dialog .ds-dialog__actions .ds-btn {
+    height: 52px;
 }

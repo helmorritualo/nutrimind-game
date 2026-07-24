@@ -1,11 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NutriMind.App.UI
 {
     /// <summary>
-    /// Layout-only subject selection panel wiring for UI Toolkit preview.
-    /// Handles responsive classes and static nav active state.
+    /// Layout-only subject selection panel wiring for UI Toolkit static preview.
+    /// Handles responsive classes, card selection styling, and placeholder
+    /// back/nav/Continue actions (logged via Debug.Log only).
     /// Does not perform routing, progress loading, or networking.
     /// </summary>
     [DisallowMultipleComponent]
@@ -15,12 +17,25 @@ namespace NutriMind.App.UI
         private const string CompactClass = "subject-selection--compact";
         private const string NarrowClass = "subject-selection--narrow";
         private const string MobileClass = "mobile";
+        private const string CardClass = "subject-selection__card";
+        private const string UnavailableCardClass = "subject-selection__card--unavailable";
+        private const string NavItemClass = "subject-selection__nav-item";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
+
+        private static readonly string[] ContinueButtonNames =
+        {
+            "continue-lq-button",
+            "continue-peh-button",
+            "continue-sci-button",
+        };
+
+        private readonly List<Button> _continueButtons = new List<Button>();
 
         private UIDocument _uiDocument;
         private VisualElement _root;
         private VisualElement _nav;
+        private Button _backButton;
         private float _lastWidth = -1f;
 
         private void OnEnable()
@@ -79,10 +94,36 @@ namespace NutriMind.App.UI
             _nav = _root.Q<VisualElement>("subject-nav");
             if (_nav != null)
             {
-                foreach (var button in _nav.Query<Button>(className: "subject-selection__nav-item").ToList())
+                foreach (var button in _nav.Query<Button>(className: NavItemClass).ToList())
                 {
                     button.RegisterCallback<ClickEvent>(OnNavClickEvent);
                 }
+            }
+
+            foreach (var card in _root.Query<VisualElement>(className: CardClass).ToList())
+            {
+                if (!card.ClassListContains(UnavailableCardClass))
+                {
+                    card.RegisterCallback<ClickEvent>(OnCardClickEvent);
+                }
+            }
+
+            foreach (var buttonName in ContinueButtonNames)
+            {
+                var button = _root.Q<Button>(buttonName);
+                if (button == null)
+                {
+                    continue;
+                }
+
+                button.RegisterCallback<ClickEvent>(OnContinueClickEvent);
+                _continueButtons.Add(button);
+            }
+
+            _backButton = _root.Q<Button>("back-button");
+            if (_backButton != null)
+            {
+                _backButton.RegisterCallback<ClickEvent>(OnBackClicked);
             }
 
             _root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -93,7 +134,7 @@ namespace NutriMind.App.UI
         {
             if (_nav != null)
             {
-                foreach (var button in _nav.Query<Button>(className: "subject-selection__nav-item").ToList())
+                foreach (var button in _nav.Query<Button>(className: NavItemClass).ToList())
                 {
                     button.UnregisterCallback<ClickEvent>(OnNavClickEvent);
                 }
@@ -101,12 +142,106 @@ namespace NutriMind.App.UI
 
             if (_root != null)
             {
+                foreach (var card in _root.Query<VisualElement>(className: CardClass).ToList())
+                {
+                    card.UnregisterCallback<ClickEvent>(OnCardClickEvent);
+                }
+
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
+
+            foreach (var button in _continueButtons)
+            {
+                button.UnregisterCallback<ClickEvent>(OnContinueClickEvent);
+            }
+
+            _continueButtons.Clear();
+
+            if (_backButton != null)
+            {
+                _backButton.UnregisterCallback<ClickEvent>(OnBackClicked);
             }
 
             _root = null;
             _nav = null;
+            _backButton = null;
             _lastWidth = -1f;
+        }
+
+        private void OnCardClickEvent(ClickEvent evt)
+        {
+            if (evt.currentTarget is VisualElement card)
+            {
+                SetActiveCard(card);
+            }
+        }
+
+        private void SetActiveCard(VisualElement selected)
+        {
+            if (_root == null || selected == null)
+            {
+                return;
+            }
+
+            _root.Query<VisualElement>(className: CardClass).ForEach(card =>
+            {
+                card.EnableInClassList("is-selected", card == selected);
+            });
+        }
+
+        private void OnContinueClickEvent(ClickEvent evt)
+        {
+            evt.StopPropagation();
+
+            if (!(evt.currentTarget is Button button))
+            {
+                return;
+            }
+
+            string subjectLabel = GetSubjectLabel(button.name);
+            if (IsInUnavailableCard(button))
+            {
+                Debug.Log($"[Static Preview] {subjectLabel} is unavailable in this classroom.");
+                return;
+            }
+
+            Debug.Log($"[Static Preview] View Terms: {subjectLabel}");
+        }
+
+        private static string GetSubjectLabel(string continueButtonName)
+        {
+            switch (continueButtonName)
+            {
+                case "continue-lq-button":
+                    return "LiteraQuest";
+                case "continue-peh-button":
+                    return "PE & Health";
+                case "continue-sci-button":
+                    return "Science";
+                default:
+                    return continueButtonName;
+            }
+        }
+
+        private static bool IsInUnavailableCard(VisualElement element)
+        {
+            var current = element;
+            while (current != null)
+            {
+                if (current.ClassListContains(UnavailableCardClass))
+                {
+                    return true;
+                }
+
+                current = current.parent;
+            }
+
+            return false;
+        }
+
+        private void OnBackClicked(ClickEvent evt)
+        {
+            Debug.Log("[Static Preview] Back button clicked.");
         }
 
         private void OnNavClickEvent(ClickEvent evt)
@@ -144,7 +279,7 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            _nav.Query<Button>(className: "subject-selection__nav-item").ForEach(button =>
+            _nav.Query<Button>(className: NavItemClass).ForEach(button =>
             {
                 button.EnableInClassList("is-active", button == selected);
             });

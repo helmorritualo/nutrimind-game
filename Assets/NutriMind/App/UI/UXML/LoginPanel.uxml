@@ -24,7 +24,7 @@
                         <ui:Label text="Learner Reference Number (LRN)" class="login-panel__label" />
                         <ui:VisualElement name="lrn-shell" class="login-panel__input-shell">
                             <ui:VisualElement class="ds-icon ds-icon--user login-panel__input-icon" picking-mode="Ignore" />
-                            <ui:TextField name="lrn-field" class="login-panel__input" label="" />
+                            <ui:TextField name="lrn-field" class="login-panel__input" label="" tooltip="Enter your 12-digit Learner Reference Number" />
                         </ui:VisualElement>
                     </ui:VisualElement>
 
@@ -32,28 +32,42 @@
                         <ui:Label text="PIN" class="login-panel__label" />
                         <ui:VisualElement name="pin-shell" class="login-panel__input-shell">
                             <ui:VisualElement class="ds-icon ds-icon--lock login-panel__input-icon" picking-mode="Ignore" />
-                            <ui:TextField name="pin-field" class="login-panel__input" label="" password="true" />
+                            <ui:TextField name="pin-field" class="login-panel__input" label="" password="true" tooltip="Enter your PIN" />
                             <ui:Button name="pin-toggle" class="login-panel__pin-toggle" tooltip="Show or hide PIN">
-                                <ui:VisualElement name="pin-toggle-icon" class="ds-icon ds-icon--eye login-panel__input-icon login-panel__input-icon--trail" />
+                                <ui:VisualElement name="pin-toggle-icon" class="ds-icon ds-icon--eye login-panel__input-icon login-panel__input-icon--trail" picking-mode="Ignore" />
                             </ui:Button>
                         </ui:VisualElement>
                     </ui:VisualElement>
 
-                    <ui:VisualElement name="login-error" class="login-panel__error">
-                        <ui:VisualElement class="ds-icon ds-icon--warning login-panel__error-icon" picking-mode="Ignore" />
-                        <ui:Label text="We could not verify those details. Please try again." class="login-panel__error-text" />
+                    <ui:VisualElement name="login-status" class="login-panel__status">
+                        <ui:VisualElement name="login-status-icon" class="ds-icon ds-icon--warning login-panel__status-icon" picking-mode="Ignore" />
+                        <ui:Label name="login-status-text" text="We could not verify those details. Please try again." class="login-panel__status-text" />
                     </ui:VisualElement>
 
-                    <ui:Button name="login-button" class="login-panel__login-btn">
-                        <ui:VisualElement class="login-panel__login-btn-main">
-                            <ui:VisualElement class="ds-icon ds-icon--user login-panel__login-btn-icon" />
+                    <ui:Button name="login-button" class="login-panel__login-btn" tooltip="Log in with your LRN and PIN">
+                        <ui:VisualElement name="login-button-main" class="login-panel__login-btn-main">
+                            <ui:VisualElement class="ds-icon ds-icon--user login-panel__login-btn-icon" picking-mode="Ignore" />
                             <ui:Label text="Log In" class="login-panel__login-btn-label" />
                         </ui:VisualElement>
-                        <ui:VisualElement class="ds-icon ds-icon--chevron-right login-panel__login-btn-chevron" />
+                        <ui:VisualElement name="login-checking" class="login-panel__login-btn-loading">
+                            <ui:VisualElement class="ds-spinner login-panel__login-spinner is-spinning" picking-mode="Ignore" />
+                            <ui:Label text="Checking..." class="login-panel__login-btn-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="login-button-chevron" class="ds-icon ds-icon--chevron-right login-panel__login-btn-chevron" picking-mode="Ignore" />
                     </ui:Button>
 
                     <ui:VisualElement class="login-panel__form-footer">
-                        <ui:Button name="forgot-pin-button" text="Forgot PIN?" class="login-panel__forgot" />
+                        <ui:Button name="forgot-pin-button" text="Forgot PIN?" class="login-panel__forgot" tooltip="Recover access to your account" />
+                        <ui:VisualElement class="login-panel__meta-links">
+                            <ui:Button name="help-button" class="login-panel__meta-link" tooltip="Open help for signing in">
+                                <ui:VisualElement class="ds-icon ds-icon--help login-panel__meta-link-icon" picking-mode="Ignore" />
+                                <ui:Label text="Help" class="login-panel__meta-link-label" />
+                            </ui:Button>
+                            <ui:Button name="privacy-button" class="login-panel__meta-link" tooltip="Open privacy information">
+                                <ui:VisualElement class="ds-icon ds-icon--info login-panel__meta-link-icon" picking-mode="Ignore" />
+                                <ui:Label text="Privacy" class="login-panel__meta-link-label" />
+                            </ui:Button>
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -83,6 +97,42 @@
                 </ui:VisualElement>
             </ui:VisualElement>
 
+        </ui:VisualElement>
+
+        <!-- HELP MODAL -->
+        <ui:VisualElement name="help-modal-backdrop" class="ds-backdrop login-panel__modal-backdrop">
+            <ui:VisualElement name="help-modal" class="ds-modal login-panel__modal">
+                <ui:VisualElement class="ds-modal__header">
+                    <ui:Label text="Need Help?" class="ds-modal__title" />
+                    <ui:Button name="help-modal-close" class="ds-modal__close" tooltip="Close help">
+                        <ui:VisualElement class="ds-icon ds-icon--close" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="ds-modal__body">
+                    <ui:Label text="Forgot your LRN or PIN? Ask your teacher or guardian for help. You can also visit the Help Desk kiosk in your classroom to reset your sign-in details." class="ds-modal__body-text" />
+                </ui:VisualElement>
+                <ui:VisualElement class="ds-modal__actions">
+                    <ui:Button name="help-modal-ok" text="Got it" class="ds-btn ds-btn--primary" tooltip="Close this dialog" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- PRIVACY MODAL -->
+        <ui:VisualElement name="privacy-modal-backdrop" class="ds-backdrop login-panel__modal-backdrop">
+            <ui:VisualElement name="privacy-modal" class="ds-modal login-panel__modal">
+                <ui:VisualElement class="ds-modal__header">
+                    <ui:Label text="Your Privacy" class="ds-modal__title" />
+                    <ui:Button name="privacy-modal-close" class="ds-modal__close" tooltip="Close privacy information">
+                        <ui:VisualElement class="ds-icon ds-icon--close" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="ds-modal__body">
+                    <ui:Label text="NutriMind keeps your learning data private and secure. Your progress is used only to support your lessons and is never shared outside your school." class="ds-modal__body-text" />
+                </ui:VisualElement>
+                <ui:VisualElement class="ds-modal__actions">
+                    <ui:Button name="privacy-modal-ok" text="Got it" class="ds-btn ds-btn--primary" tooltip="Close this dialog" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

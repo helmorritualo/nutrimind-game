@@ -18,10 +18,7 @@
                     <ui:Label text="Accessibility" class="settings-panel__nav-label" />
                 </ui:Button>
                 <ui:Button name="nav-language" class="settings-panel__nav-item">
-                    <!-- ICO_Globe — not in design system yet -->
-                    <ui:VisualElement class="settings-panel__nav-icon-ph">
-                        <ui:Label text="ICO&#10;Globe" class="settings-panel__nav-icon-ph-label" />
-                    </ui:VisualElement>
+                    <ui:VisualElement class="ds-icon ds-icon--xl ds-icon--flag settings-panel__nav-icon" />
                     <ui:Label text="Language" class="settings-panel__nav-label" />
                 </ui:Button>
                 <ui:Button name="nav-account" class="settings-panel__nav-item">
@@ -85,6 +82,22 @@
                                     </ui:VisualElement>
 
                                     <ui:VisualElement class="settings-panel__slider-row">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--ambient">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--leaf settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Ambient Volume" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-ambient" class="settings-panel__slider-fill settings-panel__slider-fill--ambient" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-ambient" low-value="0" high-value="100" value="55" class="ds-slider settings-panel__slider settings-panel__slider--ambient" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-ambient" text="55%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__slider-row">
                                         <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--sfx">
                                             <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--sparkle settings-panel__slider-glyph settings-panel__slider-glyph--on-accent" />
                                         </ui:VisualElement>
@@ -122,9 +135,9 @@
                                     <ui:Label text="Language" class="settings-panel__card-title" />
                                     <ui:VisualElement class="settings-panel__field-row">
                                         <ui:Label text="App Language" class="settings-panel__field-label settings-panel__field-label--inline" />
-                                        <ui:DropdownField name="dropdown-language-overview" choices="English,Filipino" index="0" class="ds-dropdown settings-panel__dropdown settings-panel__dropdown--inline" />
+                                        <ui:DropdownField name="dropdown-language-overview" choices="English,Filipino (Coming Soon)" index="0" class="ds-dropdown settings-panel__dropdown settings-panel__dropdown--inline" />
                                     </ui:VisualElement>
-                                    <ui:Label text="(More languages coming soon)" class="settings-panel__hint" />
+                                    <ui:Label text="English is fully supported. Other languages are coming in a future update." class="settings-panel__hint" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
@@ -150,6 +163,22 @@
                                             </ui:VisualElement>
                                         </ui:VisualElement>
                                         <ui:Label name="pct-brightness" text="75%" class="settings-panel__slider-pct" />
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement class="settings-panel__slider-row settings-panel__slider-row--last">
+                                        <ui:VisualElement class="settings-panel__slider-icon settings-panel__slider-icon--input">
+                                            <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--target settings-panel__slider-glyph" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="settings-panel__slider-main">
+                                            <ui:Label text="Input Sensitivity" class="settings-panel__slider-label" />
+                                            <ui:VisualElement class="settings-panel__slider-field">
+                                                <ui:VisualElement class="settings-panel__slider-track">
+                                                    <ui:VisualElement name="fill-sensitivity-overview" class="settings-panel__slider-fill settings-panel__slider-fill--master" />
+                                                </ui:VisualElement>
+                                                <ui:Slider name="slider-sensitivity-overview" low-value="0" high-value="100" value="50" class="ds-slider settings-panel__slider settings-panel__slider--master" />
+                                            </ui:VisualElement>
+                                        </ui:VisualElement>
+                                        <ui:Label name="pct-sensitivity-overview" text="50%" class="settings-panel__slider-pct" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
 
@@ -264,9 +293,9 @@
                             <ui:VisualElement class="settings-panel__card">
                                 <ui:Label text="Language" class="settings-panel__card-title" />
                                 <ui:Label text="App Language" class="settings-panel__field-label" />
-                                <ui:DropdownField name="dropdown-language" choices="English,Filipino" index="0" class="ds-dropdown settings-panel__dropdown" />
-                                <ui:Label text="(More languages coming soon)" class="settings-panel__hint" />
-                                <ui:Label text="Language preference is stored on this device. Full localization content will arrive in a later update." class="settings-panel__body-copy" />
+                                <ui:DropdownField name="dropdown-language" choices="English,Filipino (Coming Soon)" index="0" class="ds-dropdown settings-panel__dropdown" />
+                                <ui:Label text="English is fully supported. Other languages are coming in a future update." class="settings-panel__hint" />
+                                <ui:Label text="Language preference is stored on this device only. Full localization content will arrive in a later update." class="settings-panel__body-copy" />
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -384,6 +413,19 @@
                 </ui:VisualElement>
 
                 <ui:Label name="settings-status" text="" class="settings-panel__status" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== CONFIRMATION DIALOG (Restore Defaults / Reset Tutorial — static preview) ===== -->
+        <ui:VisualElement name="settings-confirm-backdrop" class="ds-backdrop settings-panel__confirm-backdrop settings-panel__confirm-backdrop--hidden">
+            <ui:VisualElement class="ds-dialog settings-panel__confirm-dialog">
+                <ui:VisualElement name="settings-confirm-icon" class="ds-icon ds-icon--xxl ds-icon--refresh settings-panel__confirm-icon" />
+                <ui:Label name="settings-confirm-title" text="Restore Defaults?" class="ds-dialog__title" />
+                <ui:Label name="settings-confirm-message" text="This resets Audio, Display, and Accessibility settings on this device back to their defaults." class="ds-dialog__message" />
+                <ui:VisualElement class="ds-dialog__actions">
+                    <ui:Button name="settings-confirm-cancel" text="Cancel" class="ds-btn ds-btn--secondary" />
+                    <ui:Button name="settings-confirm-accept" text="Restore" class="ds-btn ds-btn--primary" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

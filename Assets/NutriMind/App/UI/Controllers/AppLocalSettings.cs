@@ -13,12 +13,18 @@ namespace NutriMind.App.UI
 
         public float MasterVolume = 0.80f;
         public float MusicVolume = 0.70f;
+        public float AmbientVolume = 0.55f;
         public float SfxVolume = 0.80f;
         public float VoiceVolume = 0.85f;
         public float Brightness = 0.75f;
         public float InputSensitivity = 0.50f;
         public int GraphicsQualityIndex = 2;
         public int TextSizeIndex = 2;
+
+        /// <summary>
+        /// Only English ships in this milestone. Other languages are shown in the
+        /// dropdown as "Coming Soon" but are not selectable — always forced to 0.
+        /// </summary>
         public int LanguageIndex = 0;
         public bool ReduceMotion = true;
         public bool HighContrast;
@@ -34,13 +40,16 @@ namespace NutriMind.App.UI
             var settings = CreateDefaults();
             settings.MasterVolume = PlayerPrefs.GetFloat(PrefsPrefix + "MasterVolume", settings.MasterVolume);
             settings.MusicVolume = PlayerPrefs.GetFloat(PrefsPrefix + "MusicVolume", settings.MusicVolume);
+            settings.AmbientVolume = PlayerPrefs.GetFloat(PrefsPrefix + "AmbientVolume", settings.AmbientVolume);
             settings.SfxVolume = PlayerPrefs.GetFloat(PrefsPrefix + "SfxVolume", settings.SfxVolume);
             settings.VoiceVolume = PlayerPrefs.GetFloat(PrefsPrefix + "VoiceVolume", settings.VoiceVolume);
             settings.Brightness = PlayerPrefs.GetFloat(PrefsPrefix + "Brightness", settings.Brightness);
             settings.InputSensitivity = PlayerPrefs.GetFloat(PrefsPrefix + "InputSensitivity", settings.InputSensitivity);
             settings.GraphicsQualityIndex = PlayerPrefs.GetInt(PrefsPrefix + "GraphicsQualityIndex", settings.GraphicsQualityIndex);
             settings.TextSizeIndex = PlayerPrefs.GetInt(PrefsPrefix + "TextSizeIndex", settings.TextSizeIndex);
-            settings.LanguageIndex = PlayerPrefs.GetInt(PrefsPrefix + "LanguageIndex", settings.LanguageIndex);
+            // Forced to English (0) regardless of any stored value — other languages
+            // are not selectable until localization content actually ships.
+            settings.LanguageIndex = 0;
             settings.ReduceMotion = PlayerPrefs.GetInt(PrefsPrefix + "ReduceMotion", settings.ReduceMotion ? 1 : 0) == 1;
             settings.HighContrast = PlayerPrefs.GetInt(PrefsPrefix + "HighContrast", settings.HighContrast ? 1 : 0) == 1;
             settings.TutorialCompleted = PlayerPrefs.GetInt(PrefsPrefix + "TutorialCompleted", settings.TutorialCompleted ? 1 : 0) == 1;
@@ -51,13 +60,14 @@ namespace NutriMind.App.UI
         {
             PlayerPrefs.SetFloat(PrefsPrefix + "MasterVolume", MasterVolume);
             PlayerPrefs.SetFloat(PrefsPrefix + "MusicVolume", MusicVolume);
+            PlayerPrefs.SetFloat(PrefsPrefix + "AmbientVolume", AmbientVolume);
             PlayerPrefs.SetFloat(PrefsPrefix + "SfxVolume", SfxVolume);
             PlayerPrefs.SetFloat(PrefsPrefix + "VoiceVolume", VoiceVolume);
             PlayerPrefs.SetFloat(PrefsPrefix + "Brightness", Brightness);
             PlayerPrefs.SetFloat(PrefsPrefix + "InputSensitivity", InputSensitivity);
             PlayerPrefs.SetInt(PrefsPrefix + "GraphicsQualityIndex", GraphicsQualityIndex);
             PlayerPrefs.SetInt(PrefsPrefix + "TextSizeIndex", TextSizeIndex);
-            PlayerPrefs.SetInt(PrefsPrefix + "LanguageIndex", LanguageIndex);
+            // LanguageIndex is intentionally not persisted while only English ships.
             PlayerPrefs.SetInt(PrefsPrefix + "ReduceMotion", ReduceMotion ? 1 : 0);
             PlayerPrefs.SetInt(PrefsPrefix + "HighContrast", HighContrast ? 1 : 0);
             PlayerPrefs.SetInt(PrefsPrefix + "TutorialCompleted", TutorialCompleted ? 1 : 0);
@@ -96,6 +106,7 @@ namespace NutriMind.App.UI
             {
                 MasterVolume = MasterVolume,
                 MusicVolume = MusicVolume,
+                AmbientVolume = AmbientVolume,
                 SfxVolume = SfxVolume,
                 VoiceVolume = VoiceVolume,
                 Brightness = Brightness,

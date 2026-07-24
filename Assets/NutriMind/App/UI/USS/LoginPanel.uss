@@ -203,7 +203,11 @@
     border-radius: 12px;
 }
 
-.login-panel__error {
+/* ---- Status banner (validation / error / offline / lockout) ----
+   Default appearance mirrors the old danger-only error banner;
+   modifier classes recolor it per LoginPreviewState. Hidden by
+   default and toggled from the controller. */
+.login-panel__status {
     flex-direction: row;
     align-items: center;
     background-color: var(--nm-error-bg);
@@ -214,16 +218,18 @@
     margin-top: 4px;
     margin-bottom: 22px;
     min-height: 60px;
+    display: none;
 }
 
-.login-panel__error-icon {
+.login-panel__status-icon {
     width: 24px;
     height: 24px;
     margin-right: 14px;
+    flex-shrink: 0;
     -unity-background-image-tint-color: var(--color-danger);
 }
 
-.login-panel__error-text {
+.login-panel__status-text {
     flex-grow: 1;
     font-size: 17px;
     color: var(--color-danger);
@@ -231,6 +237,41 @@
     white-space: normal;
     margin: 0;
     padding: 0;
+}
+
+/* Danger (invalid credentials, lockout) — same palette as the base state. */
+.login-panel__status--danger {
+    background-color: var(--nm-error-bg);
+    border-color: var(--nm-error-border);
+}
+.login-panel__status--danger .login-panel__status-icon,
+.login-panel__status--danger .login-panel__status-text {
+    color: var(--color-danger);
+    -unity-background-image-tint-color: var(--color-danger);
+}
+
+/* Warning (validation errors) — amber palette. */
+.login-panel__status--warning {
+    background-color: var(--color-warning-soft);
+    border-color: var(--color-warning);
+}
+.login-panel__status--warning .login-panel__status-icon {
+    -unity-background-image-tint-color: var(--color-warning-hover);
+}
+.login-panel__status--warning .login-panel__status-text {
+    color: var(--color-warning-hover);
+}
+
+/* Info (offline / first sign-in requires connectivity) — blue palette. */
+.login-panel__status--info {
+    background-color: var(--color-secondary-soft);
+    border-color: var(--nm-brand-blue);
+}
+.login-panel__status--info .login-panel__status-icon {
+    -unity-background-image-tint-color: var(--nm-brand-blue);
+}
+.login-panel__status--info .login-panel__status-text {
+    color: var(--nm-brand-blue);
 }
 
 /* Centered icon + "Log In"; chevron pinned to the right */
@@ -288,9 +329,36 @@
     -unity-background-image-tint-color: var(--color-text-on-accent);
 }
 
+.login-panel__login-btn:disabled {
+    background-color: var(--color-primary);
+    opacity: 0.85;
+}
+
+/* Loading content swapped in for LoginPreviewState.Checking; hidden by default. */
+.login-panel__login-btn-loading {
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-panel__login-spinner {
+    width: 26px;
+    height: 26px;
+    border-width: 3px;
+    margin-right: 12px;
+    border-top-color: var(--color-text-on-accent);
+    border-right-color: rgba(255, 255, 255, 0.35);
+    border-bottom-color: rgba(255, 255, 255, 0.35);
+    border-left-color: rgba(255, 255, 255, 0.35);
+}
+
 .login-panel__form-footer {
     margin-top: 4px;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     flex-shrink: 0;
 }
 
@@ -311,6 +379,51 @@
 .login-panel__forgot:hover {
     color: var(--color-secondary-hover);
     background-color: rgba(0, 0, 0, 0);
+}
+
+/* ---- Help / Privacy links ---- */
+.login-panel__meta-links {
+    flex-direction: row;
+    align-items: center;
+}
+
+.login-panel__meta-link {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 0 20px;
+    padding: 10px 6px;
+    height: auto;
+    min-height: 44px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.login-panel__meta-link:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.login-panel__meta-link:hover .login-panel__meta-link-label {
+    color: var(--color-text-primary);
+}
+
+.login-panel__meta-link:hover .login-panel__meta-link-icon {
+    -unity-background-image-tint-color: var(--color-text-primary);
+}
+
+.login-panel__meta-link-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    -unity-background-image-tint-color: var(--color-text-secondary);
+}
+
+.login-panel__meta-link-label {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
 }
 
 .login-panel__divider {
@@ -429,6 +542,21 @@
     padding: 0;
 }
 
+/* ---- Help / Privacy modals ----
+   Built on the shared .ds-backdrop / .ds-modal primitives; hidden by
+   default and toggled open via a modifier class from the controller. */
+.login-panel__modal-backdrop {
+    display: none;
+}
+
+.login-panel__modal-backdrop--open {
+    display: flex;
+}
+
+.login-panel__modal {
+    width: 480px;
+}
+
 /* ---- Compact ---- */
 .login-panel--compact .login-panel__card {
     flex-direction: column;
@@ -468,6 +596,24 @@
 .login-panel--compact .login-panel__brand-nutri,
 .login-panel--compact .login-panel__brand-mind {
     font-size: 36px;
+}
+
+.login-panel--compact .login-panel__form-footer {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.login-panel--compact .login-panel__meta-links {
+    margin-top: 4px;
+}
+
+.login-panel--compact .login-panel__meta-link {
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+.login-panel--compact .login-panel__modal {
+    width: 400px;
 }
 
 /* ---- Narrow ---- */
@@ -527,4 +673,22 @@
 
 .login-panel--narrow .login-panel__tip-text {
     font-size: 14px;
+}
+
+.login-panel--narrow .login-panel__status {
+    padding: 12px 14px;
+    min-height: 48px;
+}
+
+.login-panel--narrow .login-panel__status-text {
+    font-size: 15px;
+}
+
+.login-panel--narrow .login-panel__meta-link-label {
+    font-size: 14px;
+}
+
+.login-panel--narrow .login-panel__modal {
+    width: 92%;
+    max-width: 360px;
 }

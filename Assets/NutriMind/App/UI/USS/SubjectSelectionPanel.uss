@@ -140,8 +140,6 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    /* UITK has no :last-child — use gap instead of trailing card margins */
-    column-gap: 32px;
 }
 
 /* ========== SUBJECT CARDS ========== */
@@ -157,13 +155,39 @@
     max-width: none;
     height: 100%;
     min-height: 0;
-    margin-right: 0;
+    /* UITK has no gap/:last-child — space cards via symmetric horizontal margins */
+    margin-left: 16px;
+    margin-right: 16px;
     padding: 48px 44px 44px 44px;
     background-color: var(--color-surface);
     border-width: 1px;
     border-color: var(--color-border);
     border-radius: 28px;
     overflow: hidden;
+    transition-property: border-color;
+    transition-duration: 0.15s;
+}
+
+/* ----- Card states: available (default), selected, hover, focused, unavailable ----- */
+.subject-selection__card:hover {
+    border-color: var(--color-border-strong);
+}
+
+.subject-selection__card:focus {
+    border-color: var(--color-secondary);
+}
+
+.subject-selection__card.is-selected {
+    border-width: 3px;
+    border-color: var(--color-primary);
+}
+
+.subject-selection__card--unavailable {
+    opacity: 0.62;
+}
+
+.subject-selection__card--unavailable:hover {
+    border-color: var(--color-border);
 }
 
 /* Vertically centers the full content block inside tall cards */
@@ -180,6 +204,7 @@
 
 /* Hexagon stand-in badge — replace with ILL_SubjectHex art when ready */
 .subject-selection__hex {
+    position: relative;
     width: 148px;
     height: 136px;
     min-width: 148px;
@@ -197,6 +222,23 @@
     border-top-width: 0;
     border-bottom-width: 0;
     border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Lock badge overlay for the unavailable-card demo */
+.subject-selection__hex-lock-badge {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
+    background-color: #6B7280;
+    border-radius: 20px;
+    border-width: 3px;
+    border-color: var(--color-surface);
+    -unity-background-image-tint-color: #FFFFFF;
 }
 
 .subject-selection__hex--lq {
@@ -277,12 +319,12 @@
 }
 
 .subject-selection__progress-fill--peh {
-    width: 70%;
+    width: 67%;
     background-color: var(--nm-pe-health);
 }
 
 .subject-selection__progress-fill--sci {
-    width: 72%;
+    width: 73%;
     background-color: var(--nm-science);
 }
 
@@ -339,6 +381,21 @@
     padding: 0;
 }
 
+.subject-selection__unavailable-note {
+    width: 100%;
+    font-size: 15px;
+    color: var(--color-text-disabled);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    margin-bottom: 20px;
+}
+
+.subject-selection Label.subject-selection__unavailable-note {
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
 /* ========== CTA BUTTONS ========== */
 .subject-selection__cta {
     flex-direction: row;
@@ -355,17 +412,27 @@
     border-radius: 20px;
     flex-shrink: 0;
     background-color: var(--color-primary);
-    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.34);
 }
 
 .subject-selection__cta:hover {
     background-color: var(--color-primary-hover);
-    box-shadow: 0 10px 24px rgba(76, 175, 80, 0.42);
 }
 
 .subject-selection__cta:active {
     background-color: var(--color-primary-press);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.28);
+}
+
+/* Unavailable CTA — classroom/server preview only, not a level lock */
+.subject-selection__cta--unavailable {
+    background-color: #9CA3AF;
+}
+
+.subject-selection__cta--unavailable:hover {
+    background-color: #9CA3AF;
+}
+
+.subject-selection__cta--unavailable:active {
+    background-color: #9CA3AF;
 }
 
 .subject-selection__cta > .unity-button__text {
@@ -456,28 +523,6 @@
     white-space: nowrap;
 }
 
-.subject-selection__nav-icon-ph {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background-color: #EEEEEE;
-    border-width: 1px;
-    border-color: #D0D0D0;
-    align-items: center;
-    justify-content: center;
-}
-
-.subject-selection__nav-icon-ph-label {
-    margin: 0;
-    padding: 0;
-    font-size: 9px;
-    color: #9E9E9E;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: normal;
-}
-
 /* ========== RESPONSIVE ========== */
 .subject-selection--compact .subject-selection__header {
     height: auto;
@@ -494,13 +539,11 @@
     padding: 24px 24px 18px 24px;
 }
 
-.subject-selection--compact .subject-selection__cards {
-    column-gap: 22px;
-}
-
 .subject-selection--compact .subject-selection__card {
     flex-grow: 0;
     flex-shrink: 0;
+    margin-left: 11px;
+    margin-right: 11px;
     flex-basis: auto;
     width: 360px;
     min-width: 360px;
@@ -588,13 +631,11 @@
     margin-right: 12px;
 }
 
-.subject-selection--narrow .subject-selection__cards {
-    column-gap: 16px;
-}
-
 .subject-selection--narrow .subject-selection__card {
     flex-grow: 0;
     flex-shrink: 0;
+    margin-left: 8px;
+    margin-right: 8px;
     flex-basis: auto;
     width: 300px;
     min-width: 300px;

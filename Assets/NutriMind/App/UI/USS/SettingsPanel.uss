@@ -376,6 +376,10 @@
     background-color: #F3E5F5;
 }
 
+.settings-panel__slider-icon--ambient {
+    background-color: #E0F2F1;
+}
+
 .settings-panel__slider-icon--brightness {
     background-color: #FFF8E1;
 }
@@ -403,6 +407,10 @@
 
 .settings-panel__slider-icon--voice .settings-panel__slider-glyph {
     -unity-background-image-tint-color: #8E24AA;
+}
+
+.settings-panel__slider-icon--ambient .settings-panel__slider-glyph {
+    -unity-background-image-tint-color: #00897B;
 }
 
 .settings-panel__slider-icon--brightness .settings-panel__slider-glyph {
@@ -466,6 +474,10 @@
     background-color: #8E24AA;
 }
 
+.settings-panel__slider-fill--ambient {
+    background-color: #00897B;
+}
+
 .settings-panel__slider-fill--brightness {
     background-color: #F9A825;
 }
@@ -508,6 +520,10 @@
 
 .settings-panel__slider--voice .unity-base-slider__dragger {
     border-color: #8E24AA;
+}
+
+.settings-panel__slider--ambient .unity-base-slider__dragger {
+    border-color: #00897B;
 }
 
 .settings-panel__slider--brightness .unity-base-slider__dragger {
@@ -864,9 +880,57 @@
     height: 26px;
     margin-top: 8px;
     font-size: 16px;
-    color: var(--color-primary);
+    color: var(--color-text-disabled);
     -unity-font-style: bold;
     -unity-text-align: middle-right;
+}
+
+/* ========== SAVE STATUS STATES (current / saving / saved / error) ========== */
+.settings-panel__status--saving {
+    color: var(--color-warning);
+}
+
+.settings-panel__status--saved {
+    color: var(--color-primary);
+}
+
+.settings-panel__status--error {
+    color: var(--color-danger);
+}
+
+/* ========== CONFIRMATION DIALOG (Restore Defaults / Reset Tutorial) ========== */
+.settings-panel__confirm-backdrop {
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel__confirm-backdrop--hidden {
+    display: none;
+}
+
+.settings-panel__confirm-dialog {
+    width: 440px;
+    padding: 40px 36px 32px 36px;
+    border-radius: 28px;
+}
+
+.settings-panel__confirm-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.settings-panel__confirm-dialog .ds-dialog__title {
+    font-size: 26px;
+}
+
+.settings-panel__confirm-dialog .ds-dialog__message {
+    font-size: 17px;
+}
+
+.settings-panel__confirm-dialog .ds-dialog__actions .ds-btn {
+    height: 52px;
 }
 
 /* ========== TEXT SIZE / HIGH CONTRAST ========== */
@@ -1064,7 +1128,7 @@
 
 .settings-panel--narrow .settings-panel__footer {
     flex-wrap: wrap;
-    justify-content: stretch;
+    justify-content: space-between;
 }
 
 .settings-panel--narrow .settings-panel__btn--restore,

@@ -117,7 +117,7 @@
     flex-shrink: 0;
 }
 
-.home-panel__stat-icon--level {
+.home-panel__stat-icon--grade {
     -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
@@ -154,6 +154,73 @@
     -unity-font-style: bold;
     -unity-text-align: middle-center;
     white-space: normal;
+}
+
+/* ========== ANNOUNCEMENT + SYNC STATUS ========== */
+.home-panel__announce-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 14px 48px;
+    background-color: var(--color-surface-elev);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+.home-panel__announce {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: 24px;
+}
+
+.home-panel__announce-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--nm-brand-blue);
+}
+
+.home-panel__announce-text {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-panel__sync {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.home-panel__sync-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #43A047;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.home-panel__sync-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-text-secondary);
+}
+
+.home-panel__sync-label {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    white-space: nowrap;
 }
 
 /* ========== CONTENT ========== */
@@ -602,63 +669,56 @@
 }
 
 .home-panel__progress-fill {
-    width: 72%;
+    width: 67%;
     height: 100%;
     background-color: var(--color-primary);
     border-radius: 6px;
 }
 
-.home-panel__progress-caption {
-    font-size: 15px;
-    color: #3D3D3D;
-    -unity-font-style: bold;
+.home-panel__journey-metrics {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 4px;
 }
 
-.home-panel Label.home-panel__progress-caption {
-    margin: 0;
-    padding: 0 0 14px 0;
-}
-
-.home-panel__steps {
+.home-panel__journey-metric {
     flex-direction: row;
     align-items: center;
-    width: 100%;
-    max-width: 420px;
+    justify-content: space-between;
+    min-width: 200px;
+    background-color: #F7F3EA;
+    border-radius: 14px;
+    padding: 12px 18px;
+    margin-right: 16px;
+    margin-bottom: 8px;
 }
 
-.home-panel__step {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    border-radius: 15px;
-    background-color: #FFFFFF;
-    border-width: 2px;
-    border-color: #C8C8C8;
+.home-panel__journey-metric-head {
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    margin-right: 14px;
+}
+
+.home-panel__journey-metric-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
     flex-shrink: 0;
+    -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
-.home-panel__step--done {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
+.home-panel__journey-metric-label {
+    font-size: 14px;
+    color: #3D3D3D;
+    -unity-font-style: bold;
+    white-space: nowrap;
 }
 
-.home-panel__step-check {
-    width: 14px;
-    height: 14px;
-    -unity-background-image-tint-color: #FFFFFF;
-}
-
-.home-panel__step-line {
-    flex-grow: 1;
-    height: 3px;
-    background-color: #D0D0D0;
-    margin: 0 5px;
-}
-
-.home-panel__step-line--done {
-    background-color: var(--color-primary);
+.home-panel__journey-metric-value {
+    font-size: 18px;
+    color: #1B5E20;
+    -unity-font-style: bold;
+    white-space: nowrap;
 }
 
 /* Goal card — text left, star badge right */
@@ -703,6 +763,7 @@
 .home-panel__goal-star-icon {
     width: 72px;
     height: 72px;
+    -unity-background-image-tint-color: #E67E22;
 }
 
 /* ========== BOTTOM NAV ========== */
@@ -768,27 +829,42 @@
     white-space: nowrap;
 }
 
-/* Friends nav icon placeholder — 32×32 */
-.home-panel__nav-icon-ph {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background-color: #EEEEEE;
-    border-width: 1px;
-    border-color: #D0D0D0;
-    align-items: center;
+/* ========== CLICK-FEEDBACK TOAST ========== */
+.home-panel__toast-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 128px;
+    flex-direction: row;
     justify-content: center;
 }
 
-.home-panel__nav-icon-ph-label {
-    margin: 0;
-    padding: 0;
-    font-size: 9px;
-    color: #9E9E9E;
+.home-panel__toast {
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(30, 30, 30, 0.92);
+    border-radius: 24px;
+    padding: 14px 24px;
+}
+
+.home-panel__toast.is-visible {
+    display: flex;
+}
+
+.home-panel__toast-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: #FFFFFF;
+}
+
+.home-panel__toast-label {
+    font-size: 15px;
+    color: #FFFFFF;
     -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -816,6 +892,19 @@
 
 .home-panel--compact .home-panel__content {
     padding: 18px 24px 14px 24px;
+}
+
+.home-panel--compact .home-panel__announce-bar {
+    padding: 10px 24px;
+    flex-wrap: wrap;
+}
+
+.home-panel--compact .home-panel__announce {
+    margin-bottom: 6px;
+}
+
+.home-panel--compact .home-panel__announce-text {
+    white-space: normal;
 }
 
 .home-panel--compact .home-panel__row--top,

@@ -28,8 +28,9 @@
                            horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
                 <ui:VisualElement name="subject-cards" class="subject-selection__cards">
 
-                    <!-- LiteraQuest -->
-                    <ui:VisualElement name="card-literaquest" class="ds-card subject-selection__card subject-selection__card--lq">
+                    <!-- LiteraQuest — available, selected by default for static preview -->
+                    <ui:VisualElement name="card-literaquest" focusable="true" tabindex="0"
+                                       class="ds-card subject-selection__card subject-selection__card--lq subject-selection__card--available is-selected">
                         <ui:VisualElement class="subject-selection__card-stack">
                             <ui:VisualElement class="subject-selection__hex subject-selection__hex--lq">
                                 <ui:VisualElement class="ds-icon ds-icon--book subject-selection__hex-icon" />
@@ -41,18 +42,13 @@
                                 <ui:VisualElement class="subject-selection__progress-track">
                                     <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--lq" />
                                 </ui:VisualElement>
-                                <ui:Label text="60%" class="subject-selection__progress-pct" />
+                                <ui:Label name="lq-progress-pct" text="60%" class="subject-selection__progress-pct" />
                             </ui:VisualElement>
 
                             <ui:VisualElement class="subject-selection__stats">
                                 <ui:VisualElement class="subject-selection__stat">
-                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
-                                    <ui:Label text="72 / 120" class="subject-selection__stat-label" />
-                                </ui:VisualElement>
-                                <ui:VisualElement class="subject-selection__stat">
-                                    <!-- ICO_Clipboard — list glyph until clipboard art exists -->
-                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
-                                    <ui:Label text="18" class="subject-selection__stat-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label name="lq-missions" text="9 / 15 Missions" class="subject-selection__stat-label" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
@@ -63,12 +59,14 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
 
-                    <!-- PE & Health -->
-                    <ui:VisualElement name="card-pe-health" class="ds-card subject-selection__card subject-selection__card--peh">
+                    <!-- PE & Health — unavailable for classroom/server preview only (NOT a level lock) -->
+                    <ui:VisualElement name="card-pe-health"
+                                       class="ds-card subject-selection__card subject-selection__card--peh subject-selection__card--unavailable">
                         <ui:VisualElement class="subject-selection__card-stack">
                             <ui:VisualElement class="subject-selection__hex subject-selection__hex--peh">
                                 <!-- ICO_Run — bolt glyph until running-person art exists -->
                                 <ui:VisualElement class="ds-icon ds-icon--bolt subject-selection__hex-icon" />
+                                <ui:VisualElement class="ds-icon ds-icon--lock subject-selection__hex-lock-badge" />
                             </ui:VisualElement>
                             <ui:Label text="PE &amp; Health" class="subject-selection__card-title" />
                             <ui:Label text="Build healthy habits and active minds." class="subject-selection__card-desc" />
@@ -77,29 +75,28 @@
                                 <ui:VisualElement class="subject-selection__progress-track">
                                     <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--peh" />
                                 </ui:VisualElement>
-                                <ui:Label text="70%" class="subject-selection__progress-pct" />
+                                <ui:Label name="peh-progress-pct" text="67%" class="subject-selection__progress-pct" />
                             </ui:VisualElement>
 
                             <ui:VisualElement class="subject-selection__stats">
                                 <ui:VisualElement class="subject-selection__stat">
-                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
-                                    <ui:Label text="84 / 120" class="subject-selection__stat-label" />
-                                </ui:VisualElement>
-                                <ui:VisualElement class="subject-selection__stat">
-                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
-                                    <ui:Label text="21" class="subject-selection__stat-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label name="peh-missions" text="10 / 15 Missions" class="subject-selection__stat-label" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
-                            <ui:Button name="continue-peh-button" text="" class="ds-btn ds-btn--primary subject-selection__cta">
-                                <ui:Label text="Continue" class="subject-selection__cta-label" />
-                                <ui:VisualElement class="ds-icon ds-icon--chevron-right subject-selection__cta-chevron" />
+                            <ui:Label text="Not available in your classroom yet." class="subject-selection__unavailable-note" />
+
+                            <ui:Button name="continue-peh-button" text="" class="ds-btn subject-selection__cta subject-selection__cta--unavailable">
+                                <ui:Label text="Unavailable" class="subject-selection__cta-label" />
+                                <ui:VisualElement class="ds-icon ds-icon--lock subject-selection__cta-chevron" />
                             </ui:Button>
                         </ui:VisualElement>
                     </ui:VisualElement>
 
-                    <!-- Science -->
-                    <ui:VisualElement name="card-science" class="ds-card subject-selection__card subject-selection__card--sci">
+                    <!-- Science — available, NOT locked by learner level -->
+                    <ui:VisualElement name="card-science" focusable="true" tabindex="0"
+                                       class="ds-card subject-selection__card subject-selection__card--sci subject-selection__card--available">
                         <ui:VisualElement class="subject-selection__card-stack">
                             <ui:VisualElement class="subject-selection__hex subject-selection__hex--sci">
                                 <!-- ICO_Flask — potion glyph until flask art exists -->
@@ -112,17 +109,13 @@
                                 <ui:VisualElement class="subject-selection__progress-track">
                                     <ui:VisualElement class="subject-selection__progress-fill subject-selection__progress-fill--sci" />
                                 </ui:VisualElement>
-                                <ui:Label text="72%" class="subject-selection__progress-pct" />
+                                <ui:Label name="sci-progress-pct" text="73%" class="subject-selection__progress-pct" />
                             </ui:VisualElement>
 
                             <ui:VisualElement class="subject-selection__stats">
                                 <ui:VisualElement class="subject-selection__stat">
-                                    <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold subject-selection__stat-icon" />
-                                    <ui:Label text="87 / 120" class="subject-selection__stat-label" />
-                                </ui:VisualElement>
-                                <ui:VisualElement class="subject-selection__stat">
-                                    <ui:VisualElement class="ds-icon ds-icon--list subject-selection__stat-icon subject-selection__stat-icon--tasks" />
-                                    <ui:Label text="24" class="subject-selection__stat-label" />
+                                    <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__stat-icon subject-selection__stat-icon--tasks" />
+                                    <ui:Label name="sci-missions" text="11 / 15 Missions" class="subject-selection__stat-label" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
@@ -137,34 +130,28 @@
             </ui:ScrollView>
         </ui:VisualElement>
 
-        <!-- ===== BOTTOM NAV ===== -->
+        <!-- ===== BOTTOM NAV =====
+             TODO: duplicated navigation will later be replaced by AppShell.uxml -->
         <ui:VisualElement name="subject-nav" class="subject-selection__nav">
-            <ui:Button name="nav-home" class="subject-selection__nav-item is-active">
+            <ui:Button name="nav-home" class="subject-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--home subject-selection__nav-icon" />
                 <ui:Label text="Home" class="subject-selection__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-map" class="subject-selection__nav-item">
+            <ui:Button name="nav-subjects" class="subject-selection__nav-item is-active">
                 <ui:VisualElement class="ds-icon ds-icon--map subject-selection__nav-icon" />
-                <ui:Label text="Map" class="subject-selection__nav-label" />
+                <ui:Label text="Subjects" class="subject-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-missions" class="subject-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__nav-icon" />
                 <ui:Label text="Missions" class="subject-selection__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-achievements" class="subject-selection__nav-item">
+            <ui:Button name="nav-progress" class="subject-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--trophy subject-selection__nav-icon" />
-                <ui:Label text="Achievements" class="subject-selection__nav-label" />
+                <ui:Label text="Progress" class="subject-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-rewards" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--gift subject-selection__nav-icon" />
+                <ui:VisualElement class="ds-icon ds-icon--treasure subject-selection__nav-icon" />
                 <ui:Label text="Rewards" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-friends" class="subject-selection__nav-item">
-                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
-                <ui:VisualElement class="subject-selection__nav-icon-ph">
-                    <ui:Label text="ICO&#10;32" class="subject-selection__nav-icon-ph-label" />
-                </ui:VisualElement>
-                <ui:Label text="Friends" class="subject-selection__nav-label" />
             </ui:Button>
             <ui:Button name="nav-more" class="subject-selection__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--more-horizontal subject-selection__nav-icon" />

@@ -3,6 +3,12 @@
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/ProfilePanel.uss" />
 
+    <!--
+        TODO(AppShell): The bottom nav below is duplicated per-screen (Home, Subjects,
+        Term, Mission, Locked Mission, Profile). Once a shared Assets/NutriMind/App/UI/UXML/AppShell.uxml
+        exists, extract this nav bar (and any other persistent chrome) into that shell
+        and have per-screen UXML only provide screen content.
+    -->
     <ui:VisualElement name="profile-root" class="ds-root theme-nutrimind profile-panel">
 
         <!-- ===== MAIN CONTENT ===== -->
@@ -23,7 +29,7 @@
 
                     <ui:Label text="Ariana Dela Cruz" class="profile-panel__name" />
                     <ui:Label text="Grade 6 • Section: Rizal" class="profile-panel__meta" />
-                    <ui:Label text="LRN: 123456789" class="profile-panel__meta" />
+                    <ui:Label name="profile-lrn" text="LRN: 1234-****-89" class="profile-panel__meta" />
                     <ui:Label text="School Year: 2025–2026" class="profile-panel__meta profile-panel__meta--school" />
 
                     <ui:VisualElement class="profile-panel__title-pill">
@@ -35,7 +41,7 @@
                         <ui:VisualElement class="profile-panel__stat">
                             <ui:VisualElement class="ds-icon ds-icon--star ds-icon--gold profile-panel__stat-icon" />
                             <ui:Label text="87" class="profile-panel__stat-value" />
-                            <ui:Label text="Stars Earned" class="profile-panel__stat-caption" />
+                            <ui:Label text="Stars Collected" class="profile-panel__stat-caption" />
                         </ui:VisualElement>
                         <ui:VisualElement class="profile-panel__stat">
                             <ui:VisualElement class="ds-icon ds-icon--shield profile-panel__stat-icon profile-panel__stat-icon--badge" />
@@ -72,8 +78,8 @@
                                         <ui:VisualElement class="ds-icon ds-icon--shield profile-panel__milestone-icon" />
                                     </ui:VisualElement>
                                     <ui:VisualElement class="profile-panel__milestone-copy">
-                                        <ui:Label text="Next Milestone" class="profile-panel__milestone-label" />
-                                        <ui:Label text="Level 8 Explorer" class="profile-panel__milestone-value" />
+                                        <ui:Label text="Current Title" class="profile-panel__milestone-label" />
+                                        <ui:Label text="Explorer" class="profile-panel__milestone-value" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
                             </ui:VisualElement>
@@ -116,7 +122,7 @@
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
-                            <ui:VisualElement class="profile-panel__subject">
+                            <ui:VisualElement class="profile-panel__subject profile-panel__subject--last">
                                 <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--lq">
                                     <ui:VisualElement class="ds-icon ds-icon--book profile-panel__subject-glyph" />
                                 </ui:VisualElement>
@@ -129,22 +135,6 @@
                                 <ui:VisualElement class="profile-panel__subject-stats">
                                     <ui:Label text="60%" class="profile-panel__subject-pct" />
                                     <ui:Label text="15 / 25" class="profile-panel__subject-frac" />
-                                </ui:VisualElement>
-                            </ui:VisualElement>
-
-                            <ui:VisualElement class="profile-panel__subject profile-panel__subject--last">
-                                <ui:VisualElement class="profile-panel__subject-icon profile-panel__subject-icon--hh">
-                                    <ui:Label text="ICO&#10;HH" class="profile-panel__ph-label" />
-                                </ui:VisualElement>
-                                <ui:VisualElement class="profile-panel__subject-main">
-                                    <ui:Label text="Healthy Habits" class="profile-panel__subject-name" />
-                                    <ui:VisualElement class="profile-panel__bar-track">
-                                        <ui:VisualElement class="profile-panel__bar-fill profile-panel__bar-fill--hh" style="width: 85%;" />
-                                    </ui:VisualElement>
-                                </ui:VisualElement>
-                                <ui:VisualElement class="profile-panel__subject-stats">
-                                    <ui:Label text="85%" class="profile-panel__subject-pct" />
-                                    <ui:Label text="17 / 20" class="profile-panel__subject-frac" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
 
@@ -234,39 +224,45 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- ===== BOTTOM NAV (7 items, matching Home / reference) ===== -->
+        <!-- ===== BOTTOM NAV (6 items — Friends removed; see AppShell TODO above) ===== -->
         <ui:VisualElement name="profile-nav" class="profile-panel__nav">
-            <ui:Button name="nav-home" class="profile-panel__nav-item is-active">
+            <ui:Button name="nav-home" class="profile-panel__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--home profile-panel__nav-icon" />
                 <ui:Label text="Home" class="profile-panel__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-map" class="profile-panel__nav-item">
+            <ui:Button name="nav-subjects" class="profile-panel__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--map profile-panel__nav-icon" />
-                <ui:Label text="Map" class="profile-panel__nav-label" />
+                <ui:Label text="Subjects" class="profile-panel__nav-label" />
             </ui:Button>
             <ui:Button name="nav-missions" class="profile-panel__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--bag profile-panel__nav-icon" />
                 <ui:Label text="Missions" class="profile-panel__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-achievements" class="profile-panel__nav-item">
+            <ui:Button name="nav-progress" class="profile-panel__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--trophy profile-panel__nav-icon" />
-                <ui:Label text="Achievements" class="profile-panel__nav-label" />
+                <ui:Label text="Progress" class="profile-panel__nav-label" />
             </ui:Button>
             <ui:Button name="nav-rewards" class="profile-panel__nav-item">
                 <ui:VisualElement class="ds-icon ds-icon--treasure profile-panel__nav-icon" />
                 <ui:Label text="Rewards" class="profile-panel__nav-label" />
             </ui:Button>
-            <ui:Button name="nav-friends" class="profile-panel__nav-item">
-                <!-- ICO_NavFriends — 32×32 (no group icon in DS) -->
-                <ui:VisualElement class="profile-panel__nav-icon-ph">
-                    <ui:Label text="ICO&#10;32" class="profile-panel__nav-icon-ph-label" />
-                </ui:VisualElement>
-                <ui:Label text="Friends" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-more" class="profile-panel__nav-item">
+            <ui:Button name="nav-more" class="profile-panel__nav-item is-active">
                 <ui:VisualElement class="ds-icon ds-icon--more-horizontal profile-panel__nav-icon" />
                 <ui:Label text="More" class="profile-panel__nav-label" />
             </ui:Button>
+        </ui:VisualElement>
+
+        <!-- ===== SIGN OUT CONFIRMATION (static preview — does not sign out) ===== -->
+        <ui:VisualElement name="sign-out-confirm-backdrop" class="ds-backdrop profile-panel__confirm-backdrop profile-panel__confirm-backdrop--hidden">
+            <ui:VisualElement class="ds-dialog profile-panel__confirm-dialog">
+                <ui:VisualElement class="ds-icon ds-icon--xxl ds-icon--shield profile-panel__confirm-icon" />
+                <ui:Label text="Sign Out?" class="ds-dialog__title" />
+                <ui:Label text="You'll need to sign back in to continue your learning adventure. This is a preview — no account action happens yet." class="ds-dialog__message" />
+                <ui:VisualElement class="ds-dialog__actions">
+                    <ui:Button name="sign-out-cancel" text="Cancel" class="ds-btn ds-btn--secondary" />
+                    <ui:Button name="sign-out-confirm" text="Sign Out" class="ds-btn ds-btn--danger" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

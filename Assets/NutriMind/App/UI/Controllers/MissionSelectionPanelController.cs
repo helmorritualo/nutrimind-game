@@ -5,9 +5,10 @@ using UnityEngine.UIElements;
 namespace NutriMind.App.UI
 {
     /// <summary>
-    /// Layout-only mission selection panel wiring for UI Toolkit preview.
-    /// Handles responsive classes, list selection, and static nav active state.
-    /// Does not perform routing, progress loading, or networking.
+    /// Layout-only mission selection panel wiring for UI Toolkit static preview.
+    /// Handles responsive classes, list selection, and detail-region field updates
+    /// from local preview data only. Does not perform routing, JSON/SQLite loading,
+    /// progress tracking, or networking.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
@@ -17,8 +18,12 @@ namespace NutriMind.App.UI
         private const string NarrowClass = "mission-selection--narrow";
         private const string MobileClass = "mobile";
         private const string SelectedClass = "is-selected";
+        private const string StatusModifierPrefix = "mission-selection__detail-status--";
+        private const string PrimaryActionLockedClass = "mission-selection__primary-action--locked";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
+
+        private static readonly string[] StatusStates = { "completed", "progress", "available", "locked" };
 
         private UIDocument _uiDocument;
         private VisualElement _root;
@@ -27,46 +32,96 @@ namespace NutriMind.App.UI
         private Label _detailTitle;
         private Label _detailDescription;
         private Label _detailLearningGoal;
-        private Label _detailProgress;
-        private Label _detailRewardStars;
-        private Label _detailRewardXp;
-        private VisualElement _progressStars;
+        private VisualElement _detailStatus;
+        private Label _detailStatusLabel;
+        private Label _detailAreasProgress;
+        private VisualElement _detailAreasFill;
+        private Label _detailCollectiblesProgress;
+        private VisualElement _detailCollectiblesFill;
+        private Label _detailPrerequisite;
+        private Label _detailClassroom;
+        private Label _detailDownloaded;
+        private Button _primaryActionButton;
+        private Label _primaryActionLabel;
         private float _lastWidth = -1f;
 
         private readonly Dictionary<string, MissionPreviewData> _missionData = new()
         {
             ["mission-item-1"] = new MissionPreviewData(
-                "What Is a Living Thing?",
-                "Learn how to tell living things apart from non-living things.",
-                "I can describe characteristics of living things.",
-                5,
-                5,
-                "50",
-                "100"),
+                title: "What Is a Living Thing?",
+                description: "Learn how to tell living things apart from non-living things.",
+                learningGoal: "I can describe characteristics of living things.",
+                areasCompleted: 3,
+                areasTotal: 3,
+                collectiblesCompleted: 3,
+                collectiblesTotal: 3,
+                statusLabel: "Completed",
+                statusState: "completed",
+                prerequisiteText: "No prerequisite",
+                classroomText: "Published to your classroom",
+                downloadedText: "Downloaded • Available offline",
+                primaryActionLabel: "Review Mission",
+                isLocked: false),
             ["mission-item-2"] = new MissionPreviewData(
-                "Needs of Living Things",
-                "Discover what living things need to survive and how they get what they need.",
-                "I can identify the basic needs of living things and explain why they are important.",
-                3,
-                5,
-                "50",
-                "100"),
+                title: "Needs of Living Things",
+                description: "Discover what living things need to survive and how they get what they need.",
+                learningGoal: "I can identify the basic needs of living things and explain why they are important.",
+                areasCompleted: 2,
+                areasTotal: 3,
+                collectiblesCompleted: 2,
+                collectiblesTotal: 3,
+                statusLabel: "In Progress",
+                statusState: "progress",
+                prerequisiteText: "No prerequisite",
+                classroomText: "Published to your classroom",
+                downloadedText: "Downloaded • Available offline",
+                primaryActionLabel: "Continue Mission",
+                isLocked: false),
             ["mission-item-3"] = new MissionPreviewData(
-                "Habitats Around Us",
-                "Explore different habitats and how living things adapt to them.",
-                "I can name common habitats and describe how organisms survive in each one.",
-                0,
-                5,
-                "50",
-                "100"),
+                title: "Habitats Around Us",
+                description: "Explore different habitats and how living things adapt to them.",
+                learningGoal: "I can name common habitats and describe how organisms survive in each one.",
+                areasCompleted: 0,
+                areasTotal: 3,
+                collectiblesCompleted: 0,
+                collectiblesTotal: 3,
+                statusLabel: "Available",
+                statusState: "available",
+                prerequisiteText: "No prerequisite",
+                classroomText: "Published to your classroom",
+                downloadedText: "Downloaded • Available offline",
+                primaryActionLabel: "Start Mission",
+                isLocked: false),
             ["mission-item-4"] = new MissionPreviewData(
-                "Life Cycles",
-                "Follow the stages of life for plants and animals in your community.",
-                "I can explain basic life-cycle stages for familiar living things.",
-                0,
-                5,
-                "50",
-                "100")
+                title: "Life Cycles",
+                description: "Follow the stages of life for plants and animals in your community.",
+                learningGoal: "I can explain basic life-cycle stages for familiar living things.",
+                areasCompleted: 0,
+                areasTotal: 3,
+                collectiblesCompleted: 0,
+                collectiblesTotal: 3,
+                statusLabel: "Prerequisite Locked",
+                statusState: "locked",
+                prerequisiteText: "Requires: Habitats Around Us (Mission 3)",
+                classroomText: "Published to your classroom",
+                downloadedText: "Downloaded • Available offline",
+                primaryActionLabel: "Back to Missions",
+                isLocked: true),
+            ["mission-item-5"] = new MissionPreviewData(
+                title: "Ecosystems and Balance",
+                description: "Discover how living things depend on each other within an ecosystem.",
+                learningGoal: "I can describe how organisms interact within an ecosystem to survive.",
+                areasCompleted: 0,
+                areasTotal: 3,
+                collectiblesCompleted: 0,
+                collectiblesTotal: 3,
+                statusLabel: "Teacher Locked",
+                statusState: "locked",
+                prerequisiteText: "Prerequisite complete — no additional missions required.",
+                classroomText: "Waiting for classroom release",
+                downloadedText: "Not downloaded on this device",
+                primaryActionLabel: "Back to Missions",
+                isLocked: true)
         };
 
         private void OnEnable()
@@ -127,10 +182,17 @@ namespace NutriMind.App.UI
             _detailTitle = _root.Q<Label>("detail-title");
             _detailDescription = _root.Q<Label>("detail-description");
             _detailLearningGoal = _root.Q<Label>("detail-learning-goal");
-            _detailProgress = _root.Q<Label>("detail-progress");
-            _detailRewardStars = _root.Q<Label>("detail-reward-stars");
-            _detailRewardXp = _root.Q<Label>("detail-reward-xp");
-            _progressStars = _root.Q<VisualElement>("progress-stars");
+            _detailStatus = _root.Q<VisualElement>("detail-status");
+            _detailStatusLabel = _root.Q<Label>("detail-status-label");
+            _detailAreasProgress = _root.Q<Label>("detail-areas-progress");
+            _detailAreasFill = _root.Q<VisualElement>("detail-areas-fill");
+            _detailCollectiblesProgress = _root.Q<Label>("detail-collectibles-progress");
+            _detailCollectiblesFill = _root.Q<VisualElement>("detail-collectibles-fill");
+            _detailPrerequisite = _root.Q<Label>("detail-prerequisite");
+            _detailClassroom = _root.Q<Label>("detail-classroom");
+            _detailDownloaded = _root.Q<Label>("detail-downloaded");
+            _primaryActionButton = _root.Q<Button>("primary-action-button");
+            _primaryActionLabel = _root.Q<Label>("primary-action-label");
 
             if (_nav != null)
             {
@@ -187,10 +249,17 @@ namespace NutriMind.App.UI
             _detailTitle = null;
             _detailDescription = null;
             _detailLearningGoal = null;
-            _detailProgress = null;
-            _detailRewardStars = null;
-            _detailRewardXp = null;
-            _progressStars = null;
+            _detailStatus = null;
+            _detailStatusLabel = null;
+            _detailAreasProgress = null;
+            _detailAreasFill = null;
+            _detailCollectiblesProgress = null;
+            _detailCollectiblesFill = null;
+            _detailPrerequisite = null;
+            _detailClassroom = null;
+            _detailDownloaded = null;
+            _primaryActionButton = null;
+            _primaryActionLabel = null;
             _lastWidth = -1f;
         }
 
@@ -260,6 +329,11 @@ namespace NutriMind.App.UI
                 return;
             }
 
+            ApplyMissionData(data);
+        }
+
+        private void ApplyMissionData(MissionPreviewData data)
+        {
             if (_detailTitle != null)
             {
                 _detailTitle.text = data.Title;
@@ -275,39 +349,68 @@ namespace NutriMind.App.UI
                 _detailLearningGoal.text = data.LearningGoal;
             }
 
-            if (_detailProgress != null)
+            if (_detailStatusLabel != null)
             {
-                _detailProgress.text = $"{data.ProgressFilled} / {data.ProgressTotal}";
+                _detailStatusLabel.text = data.StatusLabel;
             }
 
-            if (_detailRewardStars != null)
+            if (_detailStatus != null)
             {
-                _detailRewardStars.text = data.RewardStars;
+                foreach (string state in StatusStates)
+                {
+                    _detailStatus.EnableInClassList(StatusModifierPrefix + state, state == data.StatusState);
+                }
             }
 
-            if (_detailRewardXp != null)
+            if (_detailAreasProgress != null)
             {
-                _detailRewardXp.text = data.RewardXp;
+                _detailAreasProgress.text = $"{data.AreasCompleted} / {data.AreasTotal}";
             }
 
-            UpdateProgressStars(data.ProgressFilled, data.ProgressTotal);
+            UpdateStatFill(_detailAreasFill, data.AreasCompleted, data.AreasTotal);
+
+            if (_detailCollectiblesProgress != null)
+            {
+                _detailCollectiblesProgress.text = $"{data.CollectiblesCompleted} / {data.CollectiblesTotal}";
+            }
+
+            UpdateStatFill(_detailCollectiblesFill, data.CollectiblesCompleted, data.CollectiblesTotal);
+
+            if (_detailPrerequisite != null)
+            {
+                _detailPrerequisite.text = data.PrerequisiteText;
+            }
+
+            if (_detailClassroom != null)
+            {
+                _detailClassroom.text = data.ClassroomText;
+            }
+
+            if (_detailDownloaded != null)
+            {
+                _detailDownloaded.text = data.DownloadedText;
+            }
+
+            if (_primaryActionLabel != null)
+            {
+                _primaryActionLabel.text = data.PrimaryActionLabel;
+            }
+
+            if (_primaryActionButton != null)
+            {
+                _primaryActionButton.EnableInClassList(PrimaryActionLockedClass, data.IsLocked);
+            }
         }
 
-        private void UpdateProgressStars(int filled, int total)
+        private static void UpdateStatFill(VisualElement fill, int completed, int total)
         {
-            if (_progressStars == null)
+            if (fill == null)
             {
                 return;
             }
 
-            var stars = _progressStars.Query(className: "mission-selection__star").ToList();
-            for (int i = 0; i < stars.Count; i++)
-            {
-                bool isFilled = i < filled;
-                stars[i].EnableInClassList("mission-selection__star--filled", isFilled);
-                stars[i].EnableInClassList("mission-selection__star--empty", !isFilled);
-                stars[i].EnableInClassList("ds-icon--gold", isFilled);
-            }
+            float percent = total > 0 ? Mathf.Clamp01((float)completed / total) * 100f : 0f;
+            fill.style.width = Length.Percent(percent);
         }
 
         private readonly struct MissionPreviewData
@@ -316,27 +419,48 @@ namespace NutriMind.App.UI
                 string title,
                 string description,
                 string learningGoal,
-                int progressFilled,
-                int progressTotal,
-                string rewardStars,
-                string rewardXp)
+                int areasCompleted,
+                int areasTotal,
+                int collectiblesCompleted,
+                int collectiblesTotal,
+                string statusLabel,
+                string statusState,
+                string prerequisiteText,
+                string classroomText,
+                string downloadedText,
+                string primaryActionLabel,
+                bool isLocked)
             {
                 Title = title;
                 Description = description;
                 LearningGoal = learningGoal;
-                ProgressFilled = progressFilled;
-                ProgressTotal = progressTotal;
-                RewardStars = rewardStars;
-                RewardXp = rewardXp;
+                AreasCompleted = areasCompleted;
+                AreasTotal = areasTotal;
+                CollectiblesCompleted = collectiblesCompleted;
+                CollectiblesTotal = collectiblesTotal;
+                StatusLabel = statusLabel;
+                StatusState = statusState;
+                PrerequisiteText = prerequisiteText;
+                ClassroomText = classroomText;
+                DownloadedText = downloadedText;
+                PrimaryActionLabel = primaryActionLabel;
+                IsLocked = isLocked;
             }
 
             public string Title { get; }
             public string Description { get; }
             public string LearningGoal { get; }
-            public int ProgressFilled { get; }
-            public int ProgressTotal { get; }
-            public string RewardStars { get; }
-            public string RewardXp { get; }
+            public int AreasCompleted { get; }
+            public int AreasTotal { get; }
+            public int CollectiblesCompleted { get; }
+            public int CollectiblesTotal { get; }
+            public string StatusLabel { get; }
+            public string StatusState { get; }
+            public string PrerequisiteText { get; }
+            public string ClassroomText { get; }
+            public string DownloadedText { get; }
+            public string PrimaryActionLabel { get; }
+            public bool IsLocked { get; }
         }
     }
 }

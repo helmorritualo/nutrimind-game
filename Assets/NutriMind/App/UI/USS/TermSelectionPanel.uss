@@ -212,8 +212,6 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    /* UITK has no :last-child — use gap instead of trailing card margins */
-    column-gap: 28px;
 }
 
 /* ========== TERM CARDS ==========
@@ -235,7 +233,9 @@
     max-width: 480px;
     height: 100%;
     min-height: 0;
-    margin-right: 0;
+    /* UITK has no gap/:last-child — space cards via symmetric horizontal margins */
+    margin-left: 14px;
+    margin-right: 14px;
     padding: 0;
     background-color: var(--color-surface);
     border-width: 1px;
@@ -246,6 +246,41 @@
 
 .term-selection__card:hover {
     border-color: var(--color-border-strong);
+}
+
+.term-selection__card:focus {
+    border-color: var(--nm-science);
+}
+
+.term-selection__card.is-selected {
+    border-width: 3px;
+    border-color: var(--nm-science);
+}
+
+.term-selection__card--locked:hover,
+.term-selection__card--locked:focus {
+    border-color: var(--color-border);
+}
+
+/* Available state — unlocked term not yet started. Not used by the current
+   3-term static data set (Term 1 completed / Term 2 in progress / Term 3
+   locked), but supported here for future data-driven term counts. */
+.term-selection__card--available:hover {
+    border-color: var(--color-border-strong);
+}
+
+.term-selection__status-icon--available {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 4px;
+    border-color: #9CA3AF;
+}
+
+.term-selection__status-pill--available {
+    background-color: #EEF0F3;
+}
+
+.term-selection__status-pill--available .term-selection__status-pill-label {
+    color: #6B7280;
 }
 
 .term-selection__card > .unity-button__text {
@@ -560,6 +595,24 @@
     padding: 0;
 }
 
+/* Optional areas summary — shown only for the in-progress term card */
+.term-selection__areas-summary {
+    width: 100%;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.term-selection Label.term-selection__areas-summary {
+    margin: 12px 0 0 0;
+    padding: 0;
+}
+
 /* ========== BOTTOM NAV ========== */
 .term-selection__nav {
     flex-direction: row;
@@ -617,28 +670,6 @@
     white-space: nowrap;
 }
 
-.term-selection__nav-icon-ph {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background-color: #EEEEEE;
-    border-width: 1px;
-    border-color: #D0D0D0;
-    align-items: center;
-    justify-content: center;
-}
-
-.term-selection__nav-icon-ph-label {
-    margin: 0;
-    padding: 0;
-    font-size: 9px;
-    color: #9E9E9E;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: normal;
-}
-
 /* ========== RESPONSIVE ========== */
 .term-selection--compact .term-selection__header {
     height: auto;
@@ -680,13 +711,11 @@
     padding: 12px 24px 18px 24px;
 }
 
-.term-selection--compact .term-selection__cards {
-    column-gap: 20px;
-}
-
 .term-selection--compact .term-selection__card {
     flex-grow: 0;
     flex-shrink: 0;
+    margin-left: 10px;
+    margin-right: 10px;
     flex-basis: auto;
     width: 340px;
     min-width: 340px;
@@ -806,13 +835,11 @@
     height: 28px;
 }
 
-.term-selection--narrow .term-selection__cards {
-    column-gap: 16px;
-}
-
 .term-selection--narrow .term-selection__card {
     flex-grow: 0;
     flex-shrink: 0;
+    margin-left: 8px;
+    margin-right: 8px;
     flex-basis: auto;
     width: 300px;
     min-width: 300px;
