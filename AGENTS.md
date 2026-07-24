@@ -598,3 +598,26 @@ A task is complete only when:
 * Stable IDs and Unity GUIDs are preserved.
 * Relevant validation or tests pass.
 * Required manual Unity Editor steps are documented.
+
+## Learned User Preferences
+
+- Treat design-only, presentation-only, and Penpot-only UI work as visual/layout tasks: UXML/USS, Penpot boards, and shared UI assets only—do not add Unity application or gameplay logic unless explicitly asked.
+- Match supplied design references closely—exact padding, margins, type sizes, logo/text placement, and panel centering; when asked for layout-only, copy structure and spacing first and ignore reference artwork until imagery is requested.
+- Prefer Full HD (1920×1080) landscape framing for static UI layout tests and Penpot boards, while keeping App UITK layouts responsive across Android screen sizes.
+- Prefer building UITK layouts with the installed DesignSystem package (`com.sinanata.designsystem`) reusable components when available; use placeholders for custom images that are not ready yet.
+- Omit Demo Login and other non-reference chrome unless explicitly requested.
+- When creating a requested folder tree, create the full deep nested structure in one pass—not only shallow top-level folders.
+- After a temporary design/layout test is approved, delete the test files and folders when asked rather than leaving them in the project.
+- For large UI refinement passes, inspect references and existing UXML/USS first, plan highest-impact fixes, and wait for approval before rewriting broadly when Plan Mode is requested.
+- Prefer readable, accessible panel scale in Game view / device sims when matching a reference—do not leave the primary form visually undersized.
+- Prefer medium or bold font weights for App UITK labels, input text, and placeholders—avoid thin weights that hurt readability at Full HD.
+
+## Learned Workspace Facts
+
+- Canonical first-party content lives under `Assets/NutriMind/` using Core, App, Gameplay, Content, Missions, Shared, Settings, Editor, and Tests (not a nested `NutriMindUnity/` wrapper).
+- Application UI design references are under `Assets/NutriMind/Shared/UI/DesignRefs/` (PNG and JPG variants).
+- Application UI Toolkit screens belong under `Assets/NutriMind/App/UI/` (UXML, USS, Controllers); App panel settings belong under `Assets/NutriMind/Settings/UI/`.
+- Application UI is designed in Penpot via the `user-penpot` MCP as the layout source of truth; keep that work separate from Unity App UXML/USS/C#/scene implementation unless explicitly requested.
+- The Unity Design System package is at `Packages/com.sinanata.designsystem`.
+- The project targets Unity 6 (`6000.3.x` per `ProjectSettings/ProjectVersion.txt`).
+- Temporary App UITK screen previews are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.

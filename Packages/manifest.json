@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.sinanata.designsystem": "https://github.com/sinanata/unity-ui-toolkit-design-system.git?path=/Assets/DesignSystem",
+    "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.23",
     "com.unity.ai.assistant": "2.15.0-pre.2",
     "com.unity.ai.inference": "2.6.1",
     "com.unity.ai.navigation": "2.0.13",

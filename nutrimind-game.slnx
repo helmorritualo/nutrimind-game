@@ -13,6 +13,7 @@
   <Project Path="Unity.RenderPipelines.Core.Editor.csproj" />
   <Project Path="Unity.Collections.csproj" />
   <Project Path="UnityEngine.UI.csproj" />
+  <Project Path="SingularityGroup.HotReload.Editor.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.2D.Runtime.csproj" />
   <Project Path="Unity.InferenceEngine.Microsoft.Msagl.csproj" />
   <Project Path="Unity.VisualScripting.Core.Editor.csproj" />
@@ -52,6 +53,7 @@
   <Project Path="Unity.AI.ModelSelector.csproj" />
   <Project Path="Unity.AI.Animate.csproj" />
   <Project Path="Unity.AI.Assistant.Tools.Editor.csproj" />
+  <Project Path="SingularityGroup.HotReload.Runtime.csproj" />
   <Project Path="Unity.TextMeshPro.csproj" />
   <Project Path="Unity.TextMeshPro.Editor.csproj" />
   <Project Path="Unity.AppUI.Navigation.Editor.csproj" />
@@ -78,11 +80,12 @@
   <Project Path="Unity.AI.Generators.UI.AIDropdownIntegrations.csproj" />
   <Project Path="Unity.AppUI.Navigation.csproj" />
   <Project Path="Unity.InputSystem.ForUI.csproj" />
-  <Project Path="Unity.AI.Generators.Asset.csproj" />
   <Project Path="DesignSystem.Runtime.csproj" />
+  <Project Path="Unity.AI.Generators.Asset.csproj" />
   <Project Path="Unity.AI.Navigation.csproj" />
   <Project Path="Unity.Collections.CodeGen.csproj" />
   <Project Path="Unity.AI.Assistant.AssetGenerators.Editor.csproj" />
+  <Project Path="SingularityGroup.HotReload.Runtime.Public.csproj" />
   <Project Path="Unity.Mathematics.Editor.csproj" />
   <Project Path="Unity.VisualScripting.SettingsProvider.Editor.csproj" />
   <Project Path="DesignSystem.Editor.csproj" />
