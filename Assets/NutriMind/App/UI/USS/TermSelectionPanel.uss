@@ -4,6 +4,8 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     flex-direction: column;
     background-color: var(--color-bg);
     padding: 0;
@@ -15,24 +17,13 @@
     padding: 0;
 }
 
-/* ========== HEADER ========== */
-.term-selection__header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    flex-shrink: 0;
-    height: 100px;
-    min-height: 100px;
-    padding: 0 40px;
-    background-color: var(--color-surface);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
-}
-
-.term-selection__header-left {
+/* ========== ROUTE INTRO ========== */
+.term-selection__intro {
     flex-direction: row;
     align-items: center;
     flex-shrink: 0;
+    min-width: 0;
+    padding: 20px 36px 14px 36px;
 }
 
 .term-selection__back {
@@ -72,72 +63,88 @@
     -unity-background-image-tint-color: var(--color-text-primary);
 }
 
-.term-selection__brand {
+.term-selection__count {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 0;
     flex-shrink: 0;
+    align-self: center;
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    margin-left: 20px;
+    padding: 0 18px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 22px;
 }
 
-.term-selection__brand-nutri {
+.term-selection__count-icon {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.term-selection__count-label {
+    font-size: 17px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    -unity-text-align: middle-left;
+}
+
+.term-selection Label.term-selection__count-label {
     margin: 0;
     padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-green);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
 }
 
-.term-selection__brand-mind-wrap {
-    position: relative;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.term-selection__brand-mind {
-    margin: 0;
-    padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-blue);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.term-selection__brand-leaf {
-    position: absolute;
-    right: -4px;
-    top: -6px;
-    width: 18px;
-    height: 18px;
-    -unity-background-image-tint-color: var(--nm-brand-green);
-}
-
-/* ========== SUBJECT INTRO ========== */
+/* ========== SUBJECT IDENTITY ========== */
 .term-selection__subject {
     flex-direction: row;
     align-items: center;
-    flex-shrink: 0;
-    padding: 28px 56px 8px 56px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    padding: 0;
 }
 
 .term-selection__subject-hex {
-    width: 88px;
-    height: 80px;
-    min-width: 88px;
-    min-height: 80px;
-    margin-right: 22px;
+    width: 72px;
+    height: 66px;
+    min-width: 72px;
+    min-height: 66px;
+    margin-right: 18px;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     background-color: var(--nm-science);
-    border-top-left-radius: 22px;
-    border-top-right-radius: 22px;
-    border-bottom-left-radius: 22px;
-    border-bottom-right-radius: 22px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
     border-left-width: 8px;
     border-right-width: 8px;
     border-top-width: 0;
     border-bottom-width: 0;
     border-color: rgba(255, 255, 255, 0.18);
+}
+
+.term-selection__subject-hex--literaquest {
+    background-color: var(--nm-literaquest);
+}
+
+.term-selection__subject-hex--pe-health {
+    background-color: var(--nm-pe-health);
+}
+
+.term-selection__subject-hex--science {
+    background-color: var(--nm-science);
 }
 
 .term-selection__subject-hex-icon {
@@ -156,12 +163,12 @@
 }
 
 .term-selection__subject-title {
-    font-size: 42px;
+    font-size: 28px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.4px;
     white-space: nowrap;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .term-selection Label.term-selection__subject-title {
@@ -170,7 +177,7 @@
 }
 
 .term-selection__subject-subtitle {
-    font-size: 20px;
+    font-size: 16px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
     white-space: normal;
@@ -194,13 +201,33 @@
     flex-shrink: 1;
     min-height: 0;
     width: 100%;
+    height: 100%;
+}
+
+.term-selection__scroll > .unity-scroll-view__content-and-vertical-scroll-container,
+.term-selection__scroll > .unity-scroll-view__content-and-horizontal-scroll-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+.term-selection__scroll .unity-scroll-view__content-viewport {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    height: 100%;
 }
 
 .term-selection__scroll .unity-scroll-view__content-container {
     flex-grow: 1;
+    flex-shrink: 1;
     flex-direction: row;
     align-items: stretch;
     justify-content: center;
+    /* Fill the scaled panel height from PS_AppPanels (1920×1080 reference). */
+    height: 100%;
+    min-height: 0;
     padding: 8px 4px 12px 4px;
 }
 
@@ -215,11 +242,10 @@
 }
 
 /* ========== TERM CARDS ==========
-   Stable template for dynamic text:
-   - Fixed icon zone
-   - Reserved title (2 lines) + description (3 lines)
-   - Status pill stays in place
-   - Footer pinned to bottom
+   Stable two-block template for every term state:
+   - card-main: icon + copy (top)
+   - card-bottom: status pill + footer (never overlaps main)
+   space-between keeps them apart when the card is tall; neither block shrinks.
 */
 .term-selection__card {
     flex-direction: column;
@@ -337,16 +363,26 @@
     flex-shrink: 1;
     min-height: 0;
     width: 100%;
-    padding: 32px 28px 24px 28px;
+    padding: 28px 28px 24px 28px;
 }
 
-.term-selection__card-top {
+/* Top block: icon + title/description */
+.term-selection__card-main {
     flex-direction: column;
     align-items: center;
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-height: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
     width: 100%;
+}
+
+/* Bottom block: status pill + missions footer — never shares space with main */
+.term-selection__card-bottom {
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: 24px;
 }
 
 .term-selection__card-footer {
@@ -355,7 +391,6 @@
     flex-grow: 0;
     flex-shrink: 0;
     width: 100%;
-    margin-top: 24px;
 }
 
 /* Status icons — fixed footprint */
@@ -447,13 +482,12 @@
     flex-grow: 0;
     flex-shrink: 0;
     width: 100%;
-    margin-bottom: 20px;
 }
 
 .term-selection__card-title {
     width: 100%;
-    min-height: 72px;
-    max-height: 72px;
+    min-height: 64px;
+    max-height: 64px;
     font-size: 26px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
@@ -471,8 +505,8 @@
 
 .term-selection__card-desc {
     width: 100%;
-    min-height: 66px;
-    max-height: 66px;
+    min-height: 54px;
+    max-height: 54px;
     font-size: 16px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
@@ -487,17 +521,19 @@
     padding: 0;
 }
 
-/* Status pills */
+/* Status pills — fixed slot above the footer, never overlapping missions */
 .term-selection__status-pill {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    align-self: center;
     height: 48px;
     min-height: 48px;
     max-height: 48px;
     padding: 0 28px;
     border-radius: 24px;
-    margin-top: auto;
+    margin-top: 0;
+    margin-bottom: 20px;
     flex-grow: 0;
     flex-shrink: 0;
 }
@@ -550,7 +586,7 @@
 .term-selection__stats {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     flex-shrink: 0;
 }
@@ -595,9 +631,12 @@
     padding: 0;
 }
 
-/* Optional areas summary — shown only for the in-progress term card */
+/* Areas summary — always reserved so in-progress footers match other states */
 .term-selection__areas-summary {
     width: 100%;
+    height: 20px;
+    min-height: 20px;
+    max-height: 20px;
     margin-top: 12px;
     font-size: 14px;
     color: var(--color-text-secondary);
@@ -608,103 +647,43 @@
     text-overflow: ellipsis;
 }
 
+.term-selection__areas-summary--empty {
+    color: rgba(0, 0, 0, 0);
+}
+
 .term-selection Label.term-selection__areas-summary {
     margin: 12px 0 0 0;
     padding: 0;
 }
 
-/* ========== BOTTOM NAV ========== */
-.term-selection__nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    flex-shrink: 0;
-    height: 104px;
-    min-height: 104px;
-    padding: 10px 40px 14px 40px;
-    background-color: var(--color-surface);
-    border-top-width: 1px;
-    border-top-color: var(--color-border);
-}
-
-.term-selection__nav-item {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    height: 80px;
-    margin: 0 6px;
-    padding: 10px 8px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    border-radius: 18px;
-}
-
-.term-selection__nav-item:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.term-selection__nav-item.is-active .term-selection__nav-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.term-selection__nav-item.is-active .term-selection__nav-label {
-    color: var(--color-primary);
-}
-
-.term-selection__nav-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    -unity-background-image-tint-color: #757575;
-}
-
-.term-selection__nav-label {
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: #5C5C5C;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-}
-
 /* ========== RESPONSIVE ========== */
-.term-selection--compact .term-selection__header {
-    height: auto;
-    min-height: 84px;
-    padding: 14px 24px;
-}
-
-.term-selection--compact .term-selection__brand-nutri,
-.term-selection--compact .term-selection__brand-mind {
-    font-size: 32px;
+.term-selection--compact .term-selection__intro {
+    padding: 16px 24px 10px 24px;
 }
 
 .term-selection--compact .term-selection__subject {
-    padding: 18px 24px 4px 24px;
+    padding: 0;
 }
 
 .term-selection--compact .term-selection__subject-hex {
-    width: 72px;
-    height: 66px;
-    min-width: 72px;
-    min-height: 66px;
-    margin-right: 16px;
+    width: 64px;
+    height: 58px;
+    min-width: 64px;
+    min-height: 58px;
+    margin-right: 14px;
 }
 
 .term-selection--compact .term-selection__subject-hex-icon {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
 }
 
 .term-selection--compact .term-selection__subject-title {
-    font-size: 32px;
+    font-size: 24px;
 }
 
 .term-selection--compact .term-selection__subject-subtitle {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .term-selection--compact .term-selection__content {
@@ -763,14 +742,14 @@
 }
 
 .term-selection--compact .term-selection__card-title {
-    min-height: 60px;
-    max-height: 60px;
+    min-height: 52px;
+    max-height: 52px;
     font-size: 22px;
 }
 
 .term-selection--compact .term-selection__card-desc {
-    min-height: 54px;
-    max-height: 54px;
+    min-height: 44px;
+    max-height: 44px;
     font-size: 14px;
 }
 
@@ -785,22 +764,9 @@
     font-size: 16px;
 }
 
-.term-selection--compact .term-selection__nav {
-    height: auto;
-    min-height: 80px;
-    padding: 8px 12px 12px 12px;
+.term-selection--narrow .term-selection__intro {
     flex-wrap: wrap;
-}
-
-.term-selection--compact .term-selection__nav-item {
-    flex-grow: 0;
-    width: 84px;
-    height: 72px;
-}
-
-.term-selection--narrow .term-selection__brand-nutri,
-.term-selection--narrow .term-selection__brand-mind {
-    font-size: 28px;
+    padding: 14px 18px 8px 18px;
 }
 
 .term-selection--narrow .term-selection__back {
@@ -815,24 +781,47 @@
 }
 
 .term-selection--narrow .term-selection__subject-title {
-    font-size: 26px;
+    font-size: 20px;
+    white-space: normal;
 }
 
 .term-selection--narrow .term-selection__subject-subtitle {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .term-selection--narrow .term-selection__subject-hex {
-    width: 60px;
-    height: 56px;
-    min-width: 60px;
-    min-height: 56px;
+    width: 52px;
+    height: 48px;
+    min-width: 52px;
+    min-height: 48px;
     margin-right: 12px;
 }
 
 .term-selection--narrow .term-selection__subject-hex-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
+}
+
+.term-selection--narrow .term-selection__count {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    margin-left: 0;
+    margin-top: 8px;
+    padding: 0 14px;
+    align-self: flex-start;
+}
+
+.term-selection--narrow .term-selection__count-icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    margin-right: 8px;
+}
+
+.term-selection--narrow .term-selection__count-label {
+    font-size: 15px;
 }
 
 .term-selection--narrow .term-selection__card {
@@ -876,14 +865,14 @@
 }
 
 .term-selection--narrow .term-selection__card-title {
-    min-height: 52px;
-    max-height: 52px;
+    min-height: 48px;
+    max-height: 48px;
     font-size: 20px;
 }
 
 .term-selection--narrow .term-selection__card-desc {
-    min-height: 48px;
-    max-height: 48px;
+    min-height: 40px;
+    max-height: 40px;
     font-size: 13px;
 }
 
@@ -900,8 +889,4 @@
 
 .term-selection--narrow .term-selection__stat-label {
     font-size: 15px;
-}
-
-.term-selection--narrow .term-selection__nav-label {
-    font-size: 11px;
 }

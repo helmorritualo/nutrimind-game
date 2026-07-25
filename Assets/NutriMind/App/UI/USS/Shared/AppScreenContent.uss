@@ -17,8 +17,35 @@
 
 .app-screen-content__scroll {
     flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
     min-width: 0;
     min-height: 0;
+    /* Bound the ScrollView so it scrolls instead of growing with its children. */
+    overflow: hidden;
+}
+
+.app-screen-content__scroll > .unity-scroll-view__content-and-vertical-scroll-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.app-screen-content__scroll .unity-scroll-view__content-viewport {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+/* Scroll content must size to its children — never stretch/shrink to the
+   viewport, or overflow is clipped and the ScrollView never engages. */
+.app-screen-content__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    width: 100%;
+    min-width: 0;
+    height: auto;
 }
 
 .app-screen-content__body {

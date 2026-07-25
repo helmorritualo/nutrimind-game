@@ -304,8 +304,9 @@
     flex-shrink: 1;
     min-width: 0;
     min-height: 0;
-    padding: 28px 40px 20px 40px;
+    padding: 18px 28px 14px 28px;
     position: relative;
+    overflow: hidden;
 }
 
 .app-shell__content-instance {
@@ -315,6 +316,7 @@
     height: 100%;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
 /* ========== BOTTOM NAV ========== */

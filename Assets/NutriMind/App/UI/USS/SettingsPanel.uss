@@ -4,10 +4,12 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    min-height: 0;
     flex-direction: column;
     background-color: var(--color-bg);
     padding: 0;
     margin: 0;
+    overflow: hidden;
 }
 
 .settings-panel Label {
@@ -17,10 +19,20 @@
 
 .settings-panel__body {
     flex-grow: 1;
+    flex-shrink: 1;
     flex-direction: row;
     min-height: 0;
     width: 100%;
-    height: 100%;
+    overflow: hidden;
+}
+
+/* ========== ROUTE INTRO ========== */
+.settings-panel__route-intro {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 76px;
+    padding: 18px 40px 6px 40px;
 }
 
 /* ========== SIDEBAR ========== */
@@ -29,9 +41,42 @@
     flex-shrink: 0;
     width: 320px;
     min-width: 280px;
-    padding: 40px 0 32px 0;
+    padding: 8px 0 32px 0;
     background-color: var(--color-bg);
     border-right-width: 0;
+}
+
+.settings-panel__back {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+    margin: 0 20px 0 0;
+    padding: 0;
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 16px;
+    background-color: var(--color-surface);
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel__back:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.settings-panel__back-icon {
+    width: 24px;
+    height: 24px;
+    -unity-background-image-tint-color: #2D5A27;
+}
+
+.settings-panel__route-label {
+    font-size: 20px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
 }
 
 .settings-panel__nav-item {
@@ -106,26 +151,47 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
-    padding: 32px 40px 24px 32px;
+    padding: 8px 40px 24px 32px;
+    overflow: hidden;
 }
 
 .settings-panel__scroll {
     flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.settings-panel__scroll > .unity-scroll-view__content-and-vertical-scroll-container {
+    flex-grow: 1;
+    flex-shrink: 1;
     min-height: 0;
 }
 
-.settings-panel__scroll > .unity-scroll-view__content-container {
+.settings-panel__scroll .unity-scroll-view__content-viewport {
     flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+/* Scroll content must size to its children, otherwise the flex pass shrinks the
+   pages to the viewport and the cards are clipped instead of scrolled. */
+.settings-panel__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
     width: 100%;
+    height: auto;
     padding-right: 12px;
-    padding-bottom: 12px;
+    padding-bottom: 24px;
 }
 
 .settings-panel__page {
-    flex-grow: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
     flex-direction: column;
     align-items: stretch;
-    min-height: 0;
     width: 100%;
 }
 
@@ -134,19 +200,19 @@
 }
 
 .settings-panel__grid {
-    flex-grow: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
     flex-direction: row;
-    align-items: stretch;
-    min-height: 0;
+    align-items: flex-start;
     width: 100%;
 }
 
 .settings-panel__col {
     flex-direction: column;
     flex-grow: 1;
+    flex-shrink: 0;
     flex-basis: 0;
     min-width: 0;
-    min-height: 0;
 }
 
 .settings-panel__col--left {
@@ -156,6 +222,8 @@
 /* Centered single-column stack for dedicated settings pages */
 .settings-panel__page-stack {
     flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
     width: 100%;
     max-width: 1040px;
     align-self: center;
@@ -898,41 +966,6 @@
     color: var(--color-danger);
 }
 
-/* ========== CONFIRMATION DIALOG (Restore Defaults / Reset Tutorial) ========== */
-.settings-panel__confirm-backdrop {
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-panel__confirm-backdrop--hidden {
-    display: none;
-}
-
-.settings-panel__confirm-dialog {
-    width: 440px;
-    padding: 40px 36px 32px 36px;
-    border-radius: 28px;
-}
-
-.settings-panel__confirm-icon {
-    width: 56px;
-    height: 56px;
-    margin-bottom: 18px;
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.settings-panel__confirm-dialog .ds-dialog__title {
-    font-size: 26px;
-}
-
-.settings-panel__confirm-dialog .ds-dialog__message {
-    font-size: 17px;
-}
-
-.settings-panel__confirm-dialog .ds-dialog__actions .ds-btn {
-    height: 52px;
-}
-
 /* ========== TEXT SIZE / HIGH CONTRAST ========== */
 .settings-panel--text-small .settings-panel__card-title {
     font-size: 28px;
@@ -998,7 +1031,16 @@
 .settings-panel--compact .settings-panel__sidebar {
     width: 240px;
     min-width: 220px;
-    padding-top: 28px;
+    padding-top: 16px;
+}
+
+.settings-panel--compact .settings-panel__route-intro {
+    min-height: 64px;
+    padding: 14px 24px 4px 24px;
+}
+
+.settings-panel--compact .settings-panel__route-label {
+    font-size: 16px;
 }
 
 .settings-panel--compact .settings-panel__nav-item {
@@ -1092,6 +1134,23 @@
     border-bottom-color: var(--color-border);
 }
 
+.settings-panel--narrow .settings-panel__route-intro {
+    width: 100%;
+    min-height: 52px;
+    padding: 10px 16px 2px 16px;
+}
+
+.settings-panel--narrow .settings-panel__back {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    margin-right: 12px;
+    border-radius: 12px;
+}
+
 .settings-panel--narrow .settings-panel__nav-item {
     flex-grow: 1;
     flex-basis: 30%;
@@ -1120,6 +1179,13 @@
 
 .settings-panel--narrow .settings-panel__grid {
     flex-direction: column;
+}
+
+/* Stacked columns must size to content instead of sharing the row basis. */
+.settings-panel--narrow .settings-panel__col {
+    flex-grow: 0;
+    flex-basis: auto;
+    width: 100%;
 }
 
 .settings-panel--narrow .settings-panel__col--left {

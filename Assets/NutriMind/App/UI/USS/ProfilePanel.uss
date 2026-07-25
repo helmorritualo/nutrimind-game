@@ -4,10 +4,12 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    min-height: 0;
     flex-direction: column;
     background-color: var(--color-bg);
     padding: 0;
     margin: 0;
+    overflow: hidden;
 }
 
 .profile-panel Label {
@@ -15,23 +17,113 @@
     padding: 0;
 }
 
-/* ========== CONTENT ========== */
-.profile-panel__content {
+/* ========== ROUTE INTRO ========== */
+.profile-panel__intro {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 84px;
+    padding: 20px 48px 8px 48px;
+}
+
+.profile-panel__back {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+    margin: 0;
+    padding: 0;
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: 16px;
+    background-color: var(--color-surface);
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-panel__back:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.profile-panel__back > .unity-button__text {
+    display: none;
+}
+
+.profile-panel__back-icon {
+    width: 22px;
+    height: 22px;
+    -unity-background-image-tint-color: var(--color-text-primary);
+}
+
+.profile-panel__intro-title {
     flex-grow: 1;
     flex-shrink: 1;
-    padding: 32px 48px 24px 48px;
+    margin-left: 20px;
+    font-size: 26px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}
+
+.profile-panel__settings-button {
+    flex-shrink: 0;
+    height: 52px;
+    min-height: 52px;
+    padding: 0 26px;
+    border-radius: 16px;
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.profile-panel__scroll {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.profile-panel__scroll > .unity-scroll-view__content-and-vertical-scroll-container {
+    flex-grow: 1;
+    flex-shrink: 1;
     min-height: 0;
 }
 
-.profile-panel__grid {
+.profile-panel__scroll .unity-scroll-view__content-viewport {
     flex-grow: 1;
-    flex-direction: row;
+    flex-shrink: 1;
     min-height: 0;
+}
+
+.profile-panel__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    width: 100%;
+    height: auto;
+}
+
+/* ========== CONTENT ========== */
+.profile-panel__content {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%;
+    height: auto;
+    padding: 12px 48px 28px 48px;
+}
+
+.profile-panel__grid {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
 .profile-panel__col {
     flex-direction: column;
-    min-height: 0;
+    flex-shrink: 0;
     min-width: 0;
 }
 
@@ -53,7 +145,8 @@
     border-color: var(--color-border);
     border-radius: 28px;
     padding: 28px 32px;
-    min-height: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
     overflow: hidden;
 }
 
@@ -261,7 +354,7 @@
 }
 
 .profile-panel__sign-out {
-    margin-top: auto;
+    margin-top: 8px;
     width: 100%;
     height: 52px;
     border-radius: 14px;
@@ -287,8 +380,8 @@
 
 /* ========== OVERALL PROGRESS ========== */
 .profile-panel__card--overall {
-    flex-grow: 0.72;
-    flex-basis: 0;
+    flex-grow: 0;
+    flex-basis: auto;
     margin-bottom: 24px;
     flex-direction: column;
 }
@@ -296,8 +389,8 @@
 .profile-panel__overall-body {
     flex-direction: row;
     align-items: center;
-    flex-grow: 1;
-    min-height: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 /* ~72% ring via three green sides + one grey (border-side approximation) */
@@ -398,16 +491,15 @@
 
 /* ========== SUBJECT PROGRESS ========== */
 .profile-panel__card--subjects {
-    flex-grow: 1.28;
-    flex-basis: 0;
+    flex-grow: 0;
+    flex-basis: auto;
     flex-direction: column;
 }
 
 .profile-panel__subject-list {
-    flex-grow: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 0;
 }
 
 .profile-panel__subject {
@@ -515,8 +607,8 @@
 
 /* ========== ACHIEVEMENTS ========== */
 .profile-panel__card--achievements {
-    flex-grow: 0.85;
-    flex-basis: 0;
+    flex-grow: 0;
+    flex-basis: auto;
     margin-bottom: 24px;
     flex-direction: column;
 }
@@ -594,16 +686,15 @@
 
 /* ========== RECENT ACTIVITY ========== */
 .profile-panel__card--activity {
-    flex-grow: 1.15;
-    flex-basis: 0;
+    flex-grow: 0;
+    flex-basis: auto;
     flex-direction: column;
 }
 
 .profile-panel__activity-list {
-    flex-grow: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 0;
 }
 
 .profile-panel__activity {
@@ -712,86 +803,6 @@
     font-size: 11px;
 }
 
-/* ========== BOTTOM NAV ========== */
-.profile-panel__nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    flex-shrink: 0;
-    height: 112px;
-    min-height: 112px;
-    padding: 12px 48px 16px 48px;
-    background-color: var(--color-surface);
-    border-top-width: 1px;
-    border-top-color: var(--color-border);
-}
-
-.profile-panel__nav-item {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    height: 88px;
-    margin: 0 6px;
-    padding: 12px 8px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    border-radius: 20px;
-}
-
-.profile-panel__nav-item:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.profile-panel__nav-item.is-active {
-    background-color: var(--color-primary-soft);
-    border-width: 1px;
-    border-color: rgba(76, 175, 80, 0.35);
-}
-
-.profile-panel__nav-item.is-active .profile-panel__nav-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.profile-panel__nav-item.is-active .profile-panel__nav-label {
-    color: var(--color-primary);
-}
-
-.profile-panel__nav-icon {
-    width: 36px;
-    height: 36px;
-    margin-bottom: 8px;
-    -unity-background-image-tint-color: #757575;
-}
-
-.profile-panel__nav-label {
-    font-size: 16px;
-    color: #5C5C5C;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-}
-
-.profile-panel__nav-icon-ph {
-    width: 36px;
-    height: 36px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background-color: #EEEEEE;
-    border-width: 1px;
-    border-color: #D0D0D0;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-panel__nav-icon-ph-label {
-    font-size: 10px;
-    color: #9E9E9E;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: normal;
-}
 
 /* ========== RESPONSIVE: compact < 1100 ========== */
 .profile-panel--compact .profile-panel__content {
@@ -909,28 +920,6 @@
     font-size: 15px;
 }
 
-.profile-panel--compact .profile-panel__nav {
-    height: 96px;
-    min-height: 96px;
-    padding: 8px 20px 12px 20px;
-}
-
-.profile-panel--compact .profile-panel__nav-item {
-    height: 76px;
-    margin: 0 2px;
-    padding: 8px 4px;
-}
-
-.profile-panel--compact .profile-panel__nav-icon,
-.profile-panel--compact .profile-panel__nav-icon-ph {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 6px;
-}
-
-.profile-panel--compact .profile-panel__nav-label {
-    font-size: 13px;
-}
 
 /* ========== RESPONSIVE: narrow < 820 ========== */
 .profile-panel--narrow .profile-panel__grid {
@@ -981,37 +970,10 @@
     margin-top: 8px;
 }
 
-.profile-panel--narrow .profile-panel__nav-label {
-    display: none;
-}
-
-.profile-panel--narrow .profile-panel__nav-icon,
-.profile-panel--narrow .profile-panel__nav-icon-ph {
-    margin-bottom: 0;
-}
 
 /* ========== SIGN OUT CONFIRMATION (static preview) ========== */
-.profile-panel__confirm-backdrop {
-    align-items: center;
-    justify-content: center;
-}
 
-.profile-panel__confirm-backdrop--hidden {
-    display: none;
-}
 
-.profile-panel__confirm-dialog {
-    width: 440px;
-    padding: 40px 36px 32px 36px;
-    border-radius: 28px;
-}
-
-.profile-panel__confirm-icon {
-    width: 56px;
-    height: 56px;
-    margin-bottom: 18px;
-    -unity-background-image-tint-color: var(--color-danger);
-}
 
 .profile-panel__confirm-dialog .ds-dialog__title {
     font-size: 26px;

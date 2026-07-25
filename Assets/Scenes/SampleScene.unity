@@ -532,9 +532,42 @@ MonoBehaviour:
     _pageTitle: Subjects
     _pageContext: Grade 5
     _selectFromBottomNavigation: 1
+  - _screen: 3
+    _contentAsset: {fileID: 9197481963319205126, guid: 5685e0fa28a7c6344affac5ac5b4369e, type: 3}
+    _activeNavigation: 1
+    _pageTitle: Terms
+    _pageContext: LiteraQuest
+    _selectFromBottomNavigation: 0
+  - _screen: 4
+    _contentAsset: {fileID: 9197481963319205126, guid: e3f8a1b42c6d7890a1b2c3d4e5f67890, type: 3}
+    _activeNavigation: 2
+    _pageTitle: Missions
+    _pageContext: "LiteraQuest \u2022 Term 1"
+    _selectFromBottomNavigation: 1
+  - _screen: 5
+    _contentAsset: {fileID: 9197481963319205126, guid: a4f8e2a1b9c3d5e7f0a2b4c6d8e0f1a3, type: 3}
+    _activeNavigation: 2
+    _pageTitle: Mission Availability
+    _pageContext: "LiteraQuest \u2022 Term 1 \u2022 Mission 5"
+    _selectFromBottomNavigation: 0
+  - _screen: 6
+    _contentAsset: {fileID: 9197481963319205126, guid: 9e0c7e030ec7eaf408721884437ceb64, type: 3}
+    _activeNavigation: 5
+    _pageTitle: Profile
+    _pageContext: "Grade 5 \u2022 Section Emerald"
+    _selectFromBottomNavigation: 1
+  - _screen: 7
+    _contentAsset: {fileID: 9197481963319205126, guid: 21602a34e19806342aa0e119fc6b5331, type: 3}
+    _activeNavigation: 5
+    _pageTitle: Settings
+    _pageContext: Profile & application
+    _selectFromBottomNavigation: 0
   _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
+  _confirmDialogAsset: {fileID: 9197481963319205126, guid: 91243026619ce4249aca4c3ea55ea743, type: 3}
   _respondToShellNavigation: 1
   _respondToProfileRequest: 1
+  _selectedSubject: 0
+  _selectedTerm: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

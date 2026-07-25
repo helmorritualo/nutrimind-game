@@ -52,7 +52,11 @@
         <!-- ===== SUBJECT CARDS (horizontal scroll) ===== -->
         <ui:VisualElement name="subject-content" class="subject-selection__content">
             <ui:ScrollView name="subject-scroll" mode="Horizontal" class="subject-selection__scroll"
-                           horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden">
+                           horizontal-scroller-visibility="Auto"
+                           vertical-scroller-visibility="Hidden"
+                           mouse-wheel-scroll-size="72"
+                           touch-scroll-type="Clamped"
+                           focusable="true">
                 <ui:VisualElement name="subject-cards" class="subject-selection__cards">
 
                     <!-- LiteraQuest — available, selected by default for static preview -->

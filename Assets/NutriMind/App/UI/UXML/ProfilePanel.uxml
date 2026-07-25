@@ -1,17 +1,29 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/ProfilePanel.uss" />
 
-    <!--
-        TODO(AppShell): The bottom nav below is duplicated per-screen (Home, Subjects,
-        Term, Mission, Locked Mission, Profile). Once a shared Assets/NutriMind/App/UI/UXML/AppShell.uxml
-        exists, extract this nav bar (and any other persistent chrome) into that shell
-        and have per-screen UXML only provide screen content.
-    -->
-    <ui:VisualElement name="profile-root" class="ds-root theme-nutrimind profile-panel">
+    <ui:VisualElement name="profile-root" class="ds-root theme-nutrimind app-screen-content profile-panel">
+        <ui:VisualElement class="profile-panel__intro">
+            <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost profile-panel__back" tooltip="Back">
+                <ui:VisualElement class="ds-icon ds-icon--arrow-left profile-panel__back-icon" />
+            </ui:Button>
+            <ui:Label text="Your learner profile" class="profile-panel__intro-title" />
+            <ui:Button name="settings-button" text="Settings" class="ds-btn ds-btn--secondary profile-panel__settings-button" />
+        </ui:VisualElement>
 
         <!-- ===== MAIN CONTENT ===== -->
+        <ui:ScrollView
+            name="profile-scroll"
+            class="app-screen-content__scroll profile-panel__scroll"
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="AlwaysVisible"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
         <ui:VisualElement name="profile-content" class="profile-panel__content">
             <ui:VisualElement class="profile-panel__grid">
 
@@ -28,7 +40,7 @@
                     </ui:VisualElement>
 
                     <ui:Label text="Ariana Dela Cruz" class="profile-panel__name" />
-                    <ui:Label text="Grade 6 • Section: Rizal" class="profile-panel__meta" />
+                    <ui:Label text="Grade 5 • Section: Emerald" class="profile-panel__meta" />
                     <ui:Label name="profile-lrn" text="LRN: 1234-****-89" class="profile-panel__meta" />
                     <ui:Label text="School Year: 2025–2026" class="profile-panel__meta profile-panel__meta--school" />
 
@@ -224,45 +236,6 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- ===== BOTTOM NAV (6 items — Friends removed; see AppShell TODO above) ===== -->
-        <ui:VisualElement name="profile-nav" class="profile-panel__nav">
-            <ui:Button name="nav-home" class="profile-panel__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--home profile-panel__nav-icon" />
-                <ui:Label text="Home" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-subjects" class="profile-panel__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--map profile-panel__nav-icon" />
-                <ui:Label text="Subjects" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-missions" class="profile-panel__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--bag profile-panel__nav-icon" />
-                <ui:Label text="Missions" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-progress" class="profile-panel__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--trophy profile-panel__nav-icon" />
-                <ui:Label text="Progress" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-rewards" class="profile-panel__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--treasure profile-panel__nav-icon" />
-                <ui:Label text="Rewards" class="profile-panel__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-more" class="profile-panel__nav-item is-active">
-                <ui:VisualElement class="ds-icon ds-icon--more-horizontal profile-panel__nav-icon" />
-                <ui:Label text="More" class="profile-panel__nav-label" />
-            </ui:Button>
-        </ui:VisualElement>
-
-        <!-- ===== SIGN OUT CONFIRMATION (static preview — does not sign out) ===== -->
-        <ui:VisualElement name="sign-out-confirm-backdrop" class="ds-backdrop profile-panel__confirm-backdrop profile-panel__confirm-backdrop--hidden">
-            <ui:VisualElement class="ds-dialog profile-panel__confirm-dialog">
-                <ui:VisualElement class="ds-icon ds-icon--xxl ds-icon--shield profile-panel__confirm-icon" />
-                <ui:Label text="Sign Out?" class="ds-dialog__title" />
-                <ui:Label text="You'll need to sign back in to continue your learning adventure. This is a preview — no account action happens yet." class="ds-dialog__message" />
-                <ui:VisualElement class="ds-dialog__actions">
-                    <ui:Button name="sign-out-cancel" text="Cancel" class="ds-btn ds-btn--secondary" />
-                    <ui:Button name="sign-out-confirm" text="Sign Out" class="ds-btn ds-btn--danger" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
+        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

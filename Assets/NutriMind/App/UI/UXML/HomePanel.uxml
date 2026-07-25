@@ -11,7 +11,13 @@
         <ui:ScrollView
             name="home-scroll"
             class="app-screen-content__scroll home-panel__scroll"
-            mode="Vertical">
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="Auto"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
 
             <ui:VisualElement
                 name="home-content"

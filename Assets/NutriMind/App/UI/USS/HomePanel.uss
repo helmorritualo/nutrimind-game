@@ -33,11 +33,24 @@
     min-height: 0;
 }
 
-.home-panel__scroll .unity-scroll-view__content-container {
+.home-panel__scroll > .unity-scroll-view__content-and-vertical-scroll-container {
     flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.home-panel__scroll .unity-scroll-view__content-viewport {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.home-panel__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
     width: 100%;
     min-width: 0;
-    min-height: 100%;
+    height: auto;
 }
 
 /* ========== CONTENT ========== */
@@ -48,7 +61,7 @@
     width: 100%;
     min-width: 0;
     min-height: 0;
-    padding: 24px 32px;
+    padding: 12px 16px 8px 16px;
 }
 
 /* ========== ANNOUNCEMENT ========== */
@@ -58,9 +71,9 @@
     flex-shrink: 0;
     width: 100%;
     min-width: 0;
-    margin-bottom: 20px;
-    padding: 12px 18px;
-    border-radius: 16px;
+    margin-bottom: 18px;
+    padding: 16px 22px;
+    border-radius: 18px;
     background-color: var(--color-surface-elev);
     border-width: 1px;
     border-color: var(--color-border);
@@ -75,15 +88,15 @@
 }
 
 .home-panel__announce-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+    width: 26px;
+    height: 26px;
+    margin-right: 12px;
     flex-shrink: 0;
     -unity-background-image-tint-color: var(--nm-brand-blue);
 }
 
 .home-panel__announce-text {
-    font-size: 15px;
+    font-size: 18px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
     white-space: nowrap;
@@ -111,14 +124,14 @@
 }
 
 .home-panel__row--top {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     flex-basis: 44%;
-    min-height: 220px;
+    min-height: 250px;
 }
 
 .home-panel__row--bottom {
     flex-basis: 56%;
-    min-height: 260px;
+    min-height: 290px;
 }
 
 .home-panel__card {
@@ -127,7 +140,7 @@
     border-width: 1px;
     border-color: var(--color-border);
     border-radius: 28px;
-    padding: 28px 32px;
+    padding: 32px 36px;
     overflow: hidden;
     min-height: 0;
     min-width: 0;
@@ -139,11 +152,11 @@
     flex-basis: 0;
     flex-direction: column;
     justify-content: center;
-    padding: 28px 32px;
+    padding: 32px 36px;
 }
 
 .home-panel__card--play {
-    margin-right: 20px;
+    margin-right: 18px;
     background-color: #EAF6E8;
     border-color: #D7EBD2;
 }
@@ -156,16 +169,16 @@
 .home-panel__card--journey {
     flex-grow: 1.75;
     flex-basis: 0;
-    margin-right: 20px;
+    margin-right: 18px;
     flex-direction: column;
-    padding: 22px 26px;
+    padding: 26px 30px;
 }
 
 .home-panel__card--goal {
     flex-grow: 1;
     flex-basis: 0;
     flex-direction: column;
-    padding: 22px 26px;
+    padding: 26px 30px;
 }
 
 /* Soft foliage wash — bottom-right only.
@@ -201,32 +214,32 @@
 }
 
 .home-panel__feature-icon {
-    width: 112px;
-    height: 112px;
-    min-width: 112px;
-    max-width: 112px;
-    min-height: 112px;
+    width: 128px;
+    height: 128px;
+    min-width: 128px;
+    max-width: 128px;
+    min-height: 128px;
     align-items: center;
     justify-content: center;
-    margin-right: 24px;
+    margin-right: 28px;
     flex-grow: 0;
     flex-shrink: 0;
 }
 
 .home-panel__feature-icon--play {
-    border-radius: 28px;
+    border-radius: 32px;
     background-color: #F7F3EA;
     border-width: 0;
 }
 
 .home-panel__feature-icon--quiz {
-    border-radius: 56px;
+    border-radius: 64px;
     background-color: var(--color-tertiary);
 }
 
 .home-panel__feature-glyph {
-    width: 60px;
-    height: 60px;
+    width: 68px;
+    height: 68px;
     -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
@@ -250,8 +263,8 @@
 
 .home-panel__feature-title {
     margin: 0;
-    padding: 0 0 6px 0;
-    font-size: 30px;
+    padding: 0 0 8px 0;
+    font-size: 34px;
     -unity-font-style: bold;
     white-space: nowrap;
     letter-spacing: -1px;
@@ -262,7 +275,7 @@
 
 .home-panel Label.home-panel__feature-title {
     margin: 0;
-    padding: 0 0 6px 0;
+    padding: 0 0 8px 0;
 }
 
 .home-panel__feature-title--play {
@@ -275,18 +288,18 @@
 
 .home-panel__feature-desc {
     margin: 0;
-    padding: 0 0 18px 0;
-    font-size: 17px;
+    padding: 0 0 20px 0;
+    font-size: 19px;
     color: #3D3D3D;
     -unity-font-style: bold;
     white-space: normal;
-    max-width: 420px;
+    max-width: 460px;
     overflow: hidden;
 }
 
 .home-panel Label.home-panel__feature-desc {
     margin: 0;
-    padding: 0 0 18px 0;
+    padding: 0 0 20px 0;
 }
 
 .home-panel__pill {
@@ -295,12 +308,12 @@
     justify-content: center;
     align-self: flex-start;
     width: auto;
-    height: 52px;
-    min-height: 52px;
-    max-height: 52px;
-    padding: 0 26px;
+    height: 58px;
+    min-height: 58px;
+    max-height: 58px;
+    padding: 0 30px;
     border-width: 0;
-    border-radius: 26px;
+    border-radius: 29px;
     margin: 0;
     flex-grow: 0;
     flex-shrink: 0;
@@ -325,7 +338,7 @@
 .home-panel__pill-label {
     margin: 0;
     padding: 0;
-    font-size: 17px;
+    font-size: 19px;
     color: var(--color-text-on-accent);
     -unity-font-style: bold;
     -unity-text-align: middle-left;
@@ -333,13 +346,13 @@
 }
 
 .home-panel Label.home-panel__pill-label {
-    margin: 0 8px 0 0;
+    margin: 0 10px 0 0;
     padding: 0;
 }
 
 .home-panel__pill-chevron {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     -unity-background-image-tint-color: var(--color-text-on-accent);
 }
@@ -359,16 +372,16 @@
 .home-panel__section-head {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     flex-shrink: 0;
     height: auto;
-    min-height: 28px;
+    min-height: 32px;
 }
 
 .home-panel__section-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 10px;
+    width: 28px;
+    height: 28px;
+    margin-right: 12px;
     flex-shrink: 0;
 }
 
@@ -383,7 +396,7 @@
 .home-panel__section-title {
     margin: 0;
     padding: 0;
-    font-size: 20px;
+    font-size: 24px;
     -unity-font-style: bold;
     white-space: nowrap;
 }
@@ -411,15 +424,15 @@
 .home-panel__mission-box {
     flex-direction: row;
     align-items: center;
-    width: 280px;
-    min-width: 220px;
-    max-width: 320px;
+    width: 300px;
+    min-width: 240px;
+    max-width: 340px;
     flex-grow: 0;
     flex-shrink: 0;
     background-color: #F7F3EA;
-    border-radius: 20px;
-    padding: 18px 20px;
-    margin-right: 24px;
+    border-radius: 22px;
+    padding: 20px 22px;
+    margin-right: 26px;
 }
 
 .home-panel__mission-copy {
@@ -434,10 +447,10 @@
 
 .home-panel__mission-badge {
     align-self: flex-start;
-    font-size: 13px;
+    font-size: 15px;
     color: #FFFFFF;
     background-color: var(--color-primary);
-    border-radius: 12px;
+    border-radius: 14px;
     -unity-font-style: bold;
     white-space: nowrap;
     -unity-text-align: middle-center;
@@ -445,11 +458,11 @@
 
 .home-panel Label.home-panel__mission-badge {
     margin: 0 0 10px 0;
-    padding: 6px 14px;
+    padding: 7px 16px;
 }
 
 .home-panel__mission-title {
-    font-size: 22px;
+    font-size: 24px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
     white-space: normal;
@@ -461,11 +474,11 @@
 }
 
 .home-panel__mission-sprout {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-    min-height: 52px;
-    border-radius: 26px;
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    min-height: 58px;
+    border-radius: 29px;
     background-color: #FFFFFF;
     align-items: center;
     justify-content: center;
@@ -475,8 +488,8 @@
 }
 
 .home-panel__mission-sprout-icon {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
@@ -497,7 +510,7 @@
 }
 
 .home-panel__progress-label {
-    font-size: 15px;
+    font-size: 17px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
 }
@@ -508,7 +521,7 @@
 }
 
 .home-panel__progress-pct {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
 }
@@ -519,10 +532,10 @@
 }
 
 .home-panel__progress-track {
-    height: 12px;
-    border-radius: 6px;
+    height: 14px;
+    border-radius: 7px;
     background-color: #E8E8E8;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     overflow: hidden;
 }
 
@@ -530,7 +543,7 @@
     width: 67%;
     height: 100%;
     background-color: var(--color-primary);
-    border-radius: 6px;
+    border-radius: 7px;
 }
 
 .home-panel__journey-metrics {
@@ -543,10 +556,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    min-width: 180px;
+    min-width: 200px;
     background-color: #F7F3EA;
-    border-radius: 14px;
-    padding: 12px 16px;
+    border-radius: 16px;
+    padding: 14px 18px;
     margin-right: 14px;
     margin-bottom: 8px;
 }
@@ -558,22 +571,22 @@
 }
 
 .home-panel__journey-metric-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     margin-right: 10px;
     flex-shrink: 0;
     -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
 .home-panel__journey-metric-label {
-    font-size: 14px;
+    font-size: 16px;
     color: #3D3D3D;
     -unity-font-style: bold;
     white-space: nowrap;
 }
 
 .home-panel__journey-metric-value {
-    font-size: 18px;
+    font-size: 20px;
     color: #1B5E20;
     -unity-font-style: bold;
     white-space: nowrap;
@@ -592,11 +605,11 @@
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
-    font-size: 17px;
+    font-size: 20px;
     color: #3D3D3D;
     -unity-font-style: bold;
     white-space: normal;
-    max-width: 360px;
+    max-width: 400px;
 }
 
 .home-panel Label.home-panel__goal-text {
@@ -605,11 +618,11 @@
 }
 
 .home-panel__goal-star {
-    width: 104px;
-    height: 104px;
-    min-width: 104px;
-    min-height: 104px;
-    border-radius: 22px;
+    width: 116px;
+    height: 116px;
+    min-width: 116px;
+    min-height: 116px;
+    border-radius: 24px;
     background-color: #F7F3EA;
     align-items: center;
     justify-content: center;
@@ -617,8 +630,8 @@
 }
 
 .home-panel__goal-star-icon {
-    width: 68px;
-    height: 68px;
+    width: 76px;
+    height: 76px;
     -unity-background-image-tint-color: #E67E22;
 }
 

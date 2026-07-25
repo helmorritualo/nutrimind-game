@@ -15,24 +15,14 @@
     padding: 0;
 }
 
-/* ========== HEADER ========== */
-.mission-selection__header {
+/* ========== ROUTE INTRO ========== */
+.mission-selection__intro {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     flex-shrink: 0;
-    height: 100px;
-    min-height: 100px;
-    padding: 0 40px;
-    background-color: var(--color-surface);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
-}
-
-.mission-selection__header-left {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
+    min-height: 84px;
+    padding: 20px 36px 8px 36px;
 }
 
 .mission-selection__back {
@@ -72,44 +62,6 @@
     -unity-background-image-tint-color: var(--color-text-primary);
 }
 
-.mission-selection__brand {
-    flex-direction: row;
-    align-items: flex-end;
-    flex-shrink: 0;
-}
-
-.mission-selection__brand-nutri {
-    margin: 0;
-    padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-green);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.mission-selection__brand-mind-wrap {
-    position: relative;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.mission-selection__brand-mind {
-    margin: 0;
-    padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-blue);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.mission-selection__brand-leaf {
-    position: absolute;
-    right: -4px;
-    top: -6px;
-    width: 18px;
-    height: 18px;
-    -unity-background-image-tint-color: var(--nm-brand-green);
-}
 
 /* ========== BODY (list + detail) ========== */
 .mission-selection__body {
@@ -118,7 +70,7 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-height: 0;
-    padding: 24px 36px 20px 36px;
+    padding: 12px 36px 20px 36px;
 }
 
 /* ----- Left list panel (~45%) ----- */
@@ -136,7 +88,8 @@
 
 .mission-selection__term-heading {
     flex-shrink: 0;
-    margin: 0 0 20px 4px;
+    margin: 0;
+    margin-left: 4px;
     padding: 0;
     font-size: 34px;
     color: var(--color-text-primary);
@@ -152,9 +105,16 @@
     width: 100%;
 }
 
+.mission-selection__scroll .unity-scroll-view__content-viewport {
+    min-height: 0;
+}
+
 .mission-selection__scroll .unity-scroll-view__content-container {
     flex-direction: column;
     align-items: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
     padding: 4px 2px 8px 2px;
 }
 
@@ -411,11 +371,32 @@
     overflow: hidden;
 }
 
+.mission-selection__detail-scroll {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.mission-selection__detail-scroll .unity-scroll-view__content-viewport {
+    min-height: 0;
+}
+
+/* Detail content sizes to its children so long missions scroll instead of clipping. */
+.mission-selection__detail-scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    width: 100%;
+    padding-right: 8px;
+}
+
 .mission-selection__detail {
     flex-direction: column;
     align-items: stretch;
-    flex-grow: 1;
-    min-height: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .mission-selection__detail > * {
@@ -649,14 +630,7 @@
     white-space: normal;
 }
 
-.mission-selection__spacer {
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-height: 0;
-    margin-bottom: 0;
-}
-
-/* Primary action button */
+/* Primary action button — pinned below the scrollable detail */
 .mission-selection__primary-action {
     flex-direction: row;
     align-items: center;
@@ -671,7 +645,7 @@
     background-color: var(--color-primary);
     border-width: 0;
     border-radius: 20px;
-    margin-bottom: 0;
+    margin: 20px 0 0 0;
 }
 
 .mission-selection__primary-action:hover {
@@ -713,77 +687,16 @@
     -unity-background-image-tint-color: var(--color-text-primary);
 }
 
-/* ========== BOTTOM NAV ========== */
-.mission-selection__nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    flex-shrink: 0;
-    height: 104px;
-    min-height: 104px;
-    padding: 10px 40px 14px 40px;
-    background-color: var(--color-surface);
-    border-top-width: 1px;
-    border-top-color: var(--color-border);
-}
-
-.mission-selection__nav-item {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    height: 80px;
-    margin: 0 6px;
-    padding: 10px 8px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    border-radius: 18px;
-}
-
-.mission-selection__nav-item:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.mission-selection__nav-item.is-active .mission-selection__nav-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.mission-selection__nav-item.is-active .mission-selection__nav-label {
-    color: var(--color-primary);
-}
-
-.mission-selection__nav-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    -unity-background-image-tint-color: #757575;
-}
-
-.mission-selection__nav-label {
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: #5C5C5C;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-}
 
 /* ========== RESPONSIVE ========== */
-.mission-selection--compact .mission-selection__header {
-    height: auto;
-    min-height: 84px;
-    padding: 14px 24px;
+.mission-selection--compact .mission-selection__intro {
+    min-height: 72px;
+    padding: 16px 24px 6px 24px;
 }
 
-.mission-selection--compact .mission-selection__brand-nutri,
-.mission-selection--compact .mission-selection__brand-mind {
-    font-size: 32px;
-}
 
 .mission-selection--compact .mission-selection__body {
-    padding: 18px 24px 16px 24px;
+    padding: 10px 24px 16px 24px;
 }
 
 .mission-selection--compact .mission-selection__list-panel {
@@ -889,24 +802,8 @@
     font-size: 18px;
 }
 
-.mission-selection--compact .mission-selection__nav {
-    height: auto;
-    min-height: 80px;
-    padding: 8px 12px 12px 12px;
-    flex-wrap: wrap;
-}
-
-.mission-selection--compact .mission-selection__nav-item {
-    flex-grow: 0;
-    width: 84px;
-    height: 72px;
-}
 
 /* Narrow / mobile landscape — stack list above detail */
-.mission-selection--narrow .mission-selection__brand-nutri,
-.mission-selection--narrow .mission-selection__brand-mind {
-    font-size: 28px;
-}
 
 .mission-selection--narrow .mission-selection__back {
     width: 44px;
@@ -1032,18 +929,3 @@
     font-size: 16px;
 }
 
-.mission-selection--narrow .mission-selection__nav-label {
-    font-size: 11px;
-}
-
-.mission-selection--narrow .mission-selection__nav-item {
-    width: 72px;
-    height: 64px;
-    padding: 8px 4px;
-}
-
-.mission-selection--narrow .mission-selection__nav-icon {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 6px;
-}

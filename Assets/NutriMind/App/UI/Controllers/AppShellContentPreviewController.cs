@@ -67,26 +67,19 @@ namespace NutriMind.App.UI
     /// <summary>
     /// Presentation-only host that clones one serialized content UXML into AppShell.
     /// This component is a static UI preview mechanism, not a production router.
-    /// <para>
-    /// A migrated panel UXML represents route content only. Its root fills the shell
-    /// content region and uses <c>ds-root theme-nutrimind app-screen-content</c> plus
-    /// its screen class. It references DesignSystem.uss, NutriMindTheme.uss,
-    /// Shared/AppScreenContent.uss, and its own USS. It must not include the AppShell
-    /// brand, global connection/profile/notifications controls, bottom application
-    /// navigation, global toast/modal/loading hosts, or the offline/sync banner.
-    /// </para>
-    /// <para>
-    /// Route-local headings, breadcrumbs, Back controls, identity, tabs, filters,
-    /// cards, lists, detail layouts, local actions, state hosts, and helper text are
-    /// allowed. Each later migration supplies one plain <see cref="IAppScreenView"/>
-    /// implementation, while the existing MonoBehaviour controller may remain as a
-    /// standalone <c>UIDocument</c> preview adapter for that same view.
-    /// </para>
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(AppShellController))]
     public sealed class AppShellContentPreviewController : MonoBehaviour
     {
+        private enum PreviewConfirmationAction
+        {
+            None,
+            SignOut,
+            RestoreDefaults,
+            ResetTutorial
+        }
+
         private const string ContentInstanceClass = "app-shell__content-instance";
         private const string ScreenContentClass = "app-screen-content";
         private const string EmbeddedContentClass = "app-screen-content--embedded";
@@ -105,12 +98,34 @@ namespace NutriMind.App.UI
         private VisualTreeAsset _dataStatePanelAsset;
 
         [SerializeField]
+        [Tooltip("Shared ConfirmDialog UXML used for Profile and Settings preview confirmations.")]
+        private VisualTreeAsset _confirmDialogAsset;
+
+        [SerializeField]
         [Tooltip("When enabled, AppShell bottom-navigation clicks select matching preview entries.")]
         private bool _respondToShellNavigation = true;
 
         [SerializeField]
         [Tooltip("When enabled, the AppShell profile button selects the Profile preview entry.")]
         private bool _respondToProfileRequest = true;
+
+        [SerializeField]
+        private NutriMindSubject _selectedSubject = NutriMindSubject.LiteraQuest;
+
+        [SerializeField]
+        private NutriMindTerm _selectedTerm = NutriMindTerm.Term1;
+
+        private MissionPreviewSelection _selectedMission =
+            new(2, "Needs of Living Things", false, string.Empty);
+
+        private LockedMissionPreviewContext _lockedMissionContext =
+            new(
+                NutriMindSubject.Science,
+                NutriMindTerm.Term2,
+                5,
+                "Ecosystems and Balance",
+                MissionLockReason.TeacherRestricted,
+                "Prerequisite complete — no additional missions required.");
 
         private AppShellController _appShell;
         private VisualElement _contentRegion;
@@ -120,9 +135,19 @@ namespace NutriMind.App.UI
         private IAppScreenView _currentScreenView;
         private HomePanelView _currentHomeView;
         private SubjectSelectionPanelView _currentSubjectSelectionView;
+        private TermSelectionPanelView _currentTermSelectionView;
+        private MissionSelectionPanelView _currentMissionSelectionView;
+        private LockedMissionPanelView _currentLockedMissionView;
+        private ProfilePanelView _currentProfileView;
+        private SettingsPanelView _currentSettingsView;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
+
+        private TemplateContainer _confirmDialogInstance;
+        private ConfirmDialogView _confirmDialogView;
+        private PreviewConfirmationAction _pendingConfirmation;
+        private bool _warnedMissingConfirmDialogAsset;
 
         private AppShellContentPreviewScreen? _appliedScreen;
         private VisualTreeAsset _appliedAsset;
@@ -230,6 +255,7 @@ namespace NutriMind.App.UI
             _appShell.PreviewRouteRequested += OnPreviewRouteRequested;
             _appShell.ProfileRequested += OnProfileRequested;
             _appShell.NotificationsRequested += OnNotificationsRequested;
+            BindConfirmDialog();
             _isBound = true;
 
             if (!_entriesValidated)
@@ -252,6 +278,7 @@ namespace NutriMind.App.UI
 
             ClearCurrentContent();
             ClearFallback();
+            UnbindConfirmDialog();
 
             _contentRegion = null;
             _appShell = null;
@@ -318,7 +345,7 @@ namespace NutriMind.App.UI
                 : ResolvePageTitle(entry.PageTitle, screen);
             string context = entry == null
                 ? null
-                : NormalizeOptionalText(entry.PageContext);
+                : ResolvePageContext(entry, screen);
             AppShellPreviewRoute? navigation = entry?.ActiveNavigation;
 
             if (!force
@@ -407,7 +434,60 @@ namespace NutriMind.App.UI
             _appShell.SetPreviewRoute(entry.ActiveNavigation);
             _appShell.SetPageTitle(
                 ResolvePageTitle(entry.PageTitle, screen),
-                NormalizeOptionalText(entry.PageContext));
+                ResolvePageContext(entry, screen));
+        }
+
+        private void RefreshShellPageContext()
+        {
+            if (!_isBound || _appShell == null || _previewScreen == AppShellContentPreviewScreen.None)
+            {
+                return;
+            }
+
+            AppShellContentPreviewEntry entry = FindEntry(_previewScreen);
+            if (entry == null)
+            {
+                return;
+            }
+
+            string title = ResolvePageTitle(entry.PageTitle, _previewScreen);
+            string context = ResolvePageContext(entry, _previewScreen);
+            _appShell.SetPageTitle(title, context);
+            _appliedTitle = title;
+            _appliedContext = context;
+        }
+
+        private string ResolvePageContext(
+            AppShellContentPreviewEntry entry,
+            AppShellContentPreviewScreen screen)
+        {
+            switch (screen)
+            {
+                case AppShellContentPreviewScreen.Home:
+                case AppShellContentPreviewScreen.Profile:
+                    return "Grade 5 • Section Emerald";
+
+                case AppShellContentPreviewScreen.Subjects:
+                    return "Grade 5";
+
+                case AppShellContentPreviewScreen.Terms:
+                    return GetSubjectLabel(_selectedSubject);
+
+                case AppShellContentPreviewScreen.Missions:
+                    return $"{GetSubjectLabel(_selectedSubject)} • Term {(int)_selectedTerm}";
+
+                case AppShellContentPreviewScreen.LockedMission:
+                    return
+                        $"{GetSubjectLabel(_lockedMissionContext.Subject)} • " +
+                        $"Term {(int)_lockedMissionContext.Term} • " +
+                        $"Mission {_lockedMissionContext.MissionNumber}";
+
+                case AppShellContentPreviewScreen.Settings:
+                    return "Profile & application";
+
+                default:
+                    return NormalizeOptionalText(entry?.PageContext);
+            }
         }
 
         private static VisualElement ResolveContentRoot(
@@ -435,9 +515,21 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Subjects:
                     return CreateSubjectSelectionView(contentRoot);
 
-                // Remaining screens gain explicit cases as each panel is migrated.
-                // Returning null means the UXML is shown as a static visual preview
-                // without screen-specific callbacks.
+                case AppShellContentPreviewScreen.Terms:
+                    return CreateTermSelectionView(contentRoot);
+
+                case AppShellContentPreviewScreen.Missions:
+                    return CreateMissionSelectionView(contentRoot);
+
+                case AppShellContentPreviewScreen.LockedMission:
+                    return CreateLockedMissionView(contentRoot);
+
+                case AppShellContentPreviewScreen.Profile:
+                    return CreateProfileView(contentRoot);
+
+                case AppShellContentPreviewScreen.Settings:
+                    return CreateSettingsView(contentRoot);
+
                 default:
                     return null;
             }
@@ -511,20 +603,20 @@ namespace NutriMind.App.UI
 
         private void OnSubjectSelected(NutriMindSubject subject)
         {
+            _selectedSubject = subject;
             Debug.Log(
                 $"[AppShellContentPreview] Subject selected: {GetSubjectLabel(subject)}.");
         }
 
         private void OnContinueSubjectRequested(NutriMindSubject subject)
         {
+            _selectedSubject = subject;
             string label = GetSubjectLabel(subject);
 
             Debug.Log(
-                $"[AppShellContentPreview] View Terms requested: {label} — preview only.");
+                $"[AppShellContentPreview] View Terms requested: {label} — showing Terms.");
 
-            _appShell?.ShowToast(
-                $"{label} selected. Term selection will be connected after migration.",
-                AppShellToastTone.Information);
+            SetPreviewScreen(AppShellContentPreviewScreen.Terms);
         }
 
         private void OnUnavailableSubjectRequested(NutriMindSubject subject)
@@ -539,22 +631,445 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Warning);
         }
 
-        private static string GetSubjectLabel(NutriMindSubject subject)
+        private IAppScreenView CreateTermSelectionView(VisualElement contentRoot)
         {
-            switch (subject)
+            var termView = new TermSelectionPanelView(contentRoot);
+            if (!termView.IsBound)
             {
-                case NutriMindSubject.LiteraQuest:
-                    return "LiteraQuest";
+                Debug.LogWarning(
+                    "[AppShellContentPreview] TermSelectionPanelView failed to bind " +
+                    "term-selection-root.");
+                termView.Dispose();
+                return null;
+            }
 
-                case NutriMindSubject.PeAndHealth:
-                    return "PE & Health";
+            termView.SetSubject(_selectedSubject);
+            termView.BackRequested += OnTermBackRequested;
+            termView.TermSelected += OnTermSelected;
+            termView.OpenTermRequested += OnOpenTermRequested;
+            termView.UnavailableTermRequested += OnUnavailableTermRequested;
+            _currentTermSelectionView = termView;
+            return termView;
+        }
 
-                case NutriMindSubject.Science:
-                    return "Science";
+        private void OnTermBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Terms Back requested — showing Subjects preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Subjects);
+        }
+
+        private void OnTermSelected(NutriMindTerm term)
+        {
+            _selectedTerm = term;
+            RefreshShellPageContext();
+            Debug.Log(
+                $"[AppShellContentPreview] Term selected: Term {(int)term}.");
+        }
+
+        private void OnOpenTermRequested(NutriMindTerm term)
+        {
+            _selectedTerm = term;
+            Debug.Log(
+                $"[AppShellContentPreview] Open Term {(int)term} — showing Missions.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+        }
+
+        private void OnUnavailableTermRequested(NutriMindTerm term)
+        {
+            string reason = _currentTermSelectionView != null
+                ? _currentTermSelectionView.GetUnavailableReason(term)
+                : "Previous Term Incomplete";
+
+            Debug.Log(
+                $"[AppShellContentPreview] Term {(int)term} unavailable: {reason}.");
+
+            _appShell?.ShowToast(reason, AppShellToastTone.Warning);
+        }
+
+        private IAppScreenView CreateMissionSelectionView(VisualElement contentRoot)
+        {
+            var missionView = new MissionSelectionPanelView(contentRoot);
+            if (!missionView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] MissionSelectionPanelView failed to bind " +
+                    "mission-selection-root.");
+                missionView.Dispose();
+                return null;
+            }
+
+            missionView.SetContext(_selectedSubject, _selectedTerm);
+            missionView.BackRequested += OnMissionBackRequested;
+            missionView.MissionSelected += OnMissionSelected;
+            missionView.StartMissionRequested += OnStartMissionRequested;
+            missionView.ContinueMissionRequested += OnContinueMissionRequested;
+            missionView.ReviewMissionRequested += OnReviewMissionRequested;
+            missionView.LockedMissionRequested += OnLockedMissionRequested;
+            _currentMissionSelectionView = missionView;
+            return missionView;
+        }
+
+        private void OnMissionBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Missions Back requested — showing Terms preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Terms);
+        }
+
+        private void OnMissionSelected(MissionPreviewSelection selection)
+        {
+            _selectedMission = selection;
+            RefreshShellPageContext();
+            Debug.Log(
+                $"[AppShellContentPreview] Mission selected: {selection.MissionTitle}.");
+        }
+
+        private void OnStartMissionRequested(MissionPreviewSelection selection)
+        {
+            _selectedMission = selection;
+            ShowMissionActionToast("Start", selection.MissionTitle);
+        }
+
+        private void OnContinueMissionRequested(MissionPreviewSelection selection)
+        {
+            _selectedMission = selection;
+            ShowMissionActionToast("Continue", selection.MissionTitle);
+        }
+
+        private void OnReviewMissionRequested(MissionPreviewSelection selection)
+        {
+            _selectedMission = selection;
+            ShowMissionActionToast("Review", selection.MissionTitle);
+        }
+
+        private void ShowMissionActionToast(string action, string missionTitle)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] {action} selected for {missionTitle} — preview only.");
+
+            _appShell?.ShowToast(
+                $"{action} selected for {missionTitle}. Gameplay routing is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnLockedMissionRequested(MissionPreviewSelection selection)
+        {
+            _selectedMission = selection;
+            _lockedMissionContext = BuildLockedContext(selection);
+
+            Debug.Log(
+                $"[AppShellContentPreview] Locked mission requested: {selection.MissionTitle}.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.LockedMission);
+        }
+
+        private LockedMissionPreviewContext BuildLockedContext(
+            MissionPreviewSelection selection)
+        {
+            MissionLockReason reason = selection.MissionNumber == 4
+                ? MissionLockReason.PrerequisiteRequired
+                : MissionLockReason.TeacherRestricted;
+
+            string requirement = selection.MissionNumber == 4
+                ? "Requires: Habitats Around Us (Mission 3)"
+                : "Prerequisite complete — no additional missions required.";
+
+            if (!string.IsNullOrWhiteSpace(selection.LockReason)
+                && selection.MissionNumber == 4)
+            {
+                requirement = selection.LockReason.Contains("Requires")
+                    ? selection.LockReason
+                    : requirement;
+            }
+
+            return new LockedMissionPreviewContext(
+                _selectedSubject,
+                _selectedTerm,
+                selection.MissionNumber,
+                selection.MissionTitle,
+                reason,
+                requirement);
+        }
+
+        private IAppScreenView CreateLockedMissionView(VisualElement contentRoot)
+        {
+            var lockedView = new LockedMissionPanelView(contentRoot);
+            if (!lockedView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] LockedMissionPanelView failed to bind " +
+                    "locked-mission-root.");
+                lockedView.Dispose();
+                return null;
+            }
+
+            lockedView.SetContext(_lockedMissionContext);
+            lockedView.BackRequested += OnLockedBackRequested;
+            lockedView.PrimaryActionRequested += OnLockedPrimaryActionRequested;
+            lockedView.SecondaryActionRequested += OnLockedSecondaryActionRequested;
+            _currentLockedMissionView = lockedView;
+            return lockedView;
+        }
+
+        private void OnLockedBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Locked Mission Back — showing Missions.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+        }
+
+        private void OnLockedPrimaryActionRequested()
+        {
+            MissionLockReason reason = _lockedMissionContext.Reason;
+
+            Debug.Log(
+                $"[AppShellContentPreview] Locked Mission primary action ({reason}).");
+
+            switch (reason)
+            {
+                case MissionLockReason.PrerequisiteRequired:
+                    SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+                    Debug.Log(
+                        "[AppShellContentPreview] Required mission: Habitats Around Us (Mission 3).");
+                    break;
+
+                case MissionLockReason.NotDownloaded:
+                    _appShell?.ShowToast(
+                        "Download options are not connected in this static preview.",
+                        AppShellToastTone.Information);
+                    break;
 
                 default:
-                    return subject.ToString();
+                    SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+                    break;
             }
+        }
+
+        private void OnLockedSecondaryActionRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Locked Mission secondary — showing Missions.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+        }
+
+        private IAppScreenView CreateProfileView(VisualElement contentRoot)
+        {
+            var profileView = new ProfilePanelView(contentRoot);
+            if (!profileView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] ProfilePanelView failed to bind profile-root.");
+                profileView.Dispose();
+                return null;
+            }
+
+            profileView.BackRequested += OnProfileBackRequested;
+            profileView.SettingsRequested += OnProfileSettingsRequested;
+            profileView.SignOutRequested += OnProfileSignOutRequested;
+            _currentProfileView = profileView;
+            return profileView;
+        }
+
+        private void OnProfileBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Profile Back — showing Home.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Home);
+        }
+
+        private void OnProfileSettingsRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Profile Settings — showing Settings.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Settings);
+        }
+
+        private void OnProfileSignOutRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Profile Sign Out — showing ConfirmDialog.");
+
+            ShowPreviewConfirmation(
+                PreviewConfirmationAction.SignOut,
+                ConfirmDialogPresets.SignOut());
+        }
+
+        private IAppScreenView CreateSettingsView(VisualElement contentRoot)
+        {
+            var settingsView = new SettingsPanelView(contentRoot);
+            if (!settingsView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] SettingsPanelView failed to bind settings-root.");
+                settingsView.Dispose();
+                return null;
+            }
+
+            settingsView.BackRequested += OnSettingsBackRequested;
+            settingsView.SaveRequested += OnSettingsSaveRequested;
+            settingsView.RestoreDefaultsRequested += OnSettingsRestoreDefaultsRequested;
+            settingsView.ResetTutorialRequested += OnSettingsResetTutorialRequested;
+            _currentSettingsView = settingsView;
+            return settingsView;
+        }
+
+        private void OnSettingsBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Settings Back — showing Profile.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Profile);
+        }
+
+        private void OnSettingsSaveRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Settings Save requested — preview only.");
+
+            _currentSettingsView?.MarkPreviewSaved();
+            _appShell?.ShowToast(
+                "Settings saved for this preview.",
+                AppShellToastTone.Success);
+        }
+
+        private void OnSettingsRestoreDefaultsRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Restore Defaults — showing ConfirmDialog.");
+
+            ShowPreviewConfirmation(
+                PreviewConfirmationAction.RestoreDefaults,
+                ConfirmDialogPresets.RestoreDefaults());
+        }
+
+        private void OnSettingsResetTutorialRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Reset Tutorial — showing ConfirmDialog.");
+
+            ShowPreviewConfirmation(
+                PreviewConfirmationAction.ResetTutorial,
+                ConfirmDialogPresets.ResetTutorial());
+        }
+
+        private void BindConfirmDialog()
+        {
+            if (_confirmDialogView != null)
+            {
+                return;
+            }
+
+            VisualElement modalLayer = _appShell?.GetModalLayer();
+            if (_confirmDialogAsset == null || modalLayer == null)
+            {
+                if (!_warnedMissingConfirmDialogAsset)
+                {
+                    Debug.LogWarning(
+                        "[AppShellContentPreview] ConfirmDialog VisualTreeAsset or modal layer " +
+                        "is missing. Assign Assets/NutriMind/App/UI/UXML/Shared/ConfirmDialog.uxml.");
+                    _warnedMissingConfirmDialogAsset = true;
+                }
+
+                return;
+            }
+
+            _confirmDialogInstance = _confirmDialogAsset.CloneTree();
+            modalLayer.Add(_confirmDialogInstance);
+            _confirmDialogView = new ConfirmDialogView(_confirmDialogInstance);
+            if (!_confirmDialogView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] ConfirmDialogView failed to bind.");
+                UnbindConfirmDialog();
+                return;
+            }
+
+            _confirmDialogView.Confirmed += OnConfirmDialogConfirmed;
+            _confirmDialogView.Cancelled += OnConfirmDialogCancelled;
+        }
+
+        private void UnbindConfirmDialog()
+        {
+            if (_confirmDialogView != null)
+            {
+                _confirmDialogView.Confirmed -= OnConfirmDialogConfirmed;
+                _confirmDialogView.Cancelled -= OnConfirmDialogCancelled;
+                _confirmDialogView.Dispose();
+                _confirmDialogView = null;
+            }
+
+            if (_confirmDialogInstance != null)
+            {
+                _confirmDialogInstance.RemoveFromHierarchy();
+                _confirmDialogInstance = null;
+            }
+
+            _pendingConfirmation = PreviewConfirmationAction.None;
+        }
+
+        private void ShowPreviewConfirmation(
+            PreviewConfirmationAction action,
+            ConfirmDialogConfiguration configuration)
+        {
+            if (_confirmDialogView == null || !_confirmDialogView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] ConfirmDialog is unavailable for this preview action.");
+                _appShell?.ShowToast(
+                    "Confirmation dialog is not assigned for this preview.",
+                    AppShellToastTone.Warning);
+                return;
+            }
+
+            _pendingConfirmation = action;
+            _confirmDialogView.Show(configuration);
+        }
+
+        private void OnConfirmDialogConfirmed()
+        {
+            PreviewConfirmationAction action = _pendingConfirmation;
+            _pendingConfirmation = PreviewConfirmationAction.None;
+
+            switch (action)
+            {
+                case PreviewConfirmationAction.SignOut:
+                    Debug.Log(
+                        "[AppShellContentPreview] Sign Out confirmed — no auth change.");
+                    _appShell?.ShowToast(
+                        "Sign Out confirmed. Authentication is not connected in this static preview.",
+                        AppShellToastTone.Information);
+                    break;
+
+                case PreviewConfirmationAction.RestoreDefaults:
+                    _currentSettingsView?.RestorePreviewDefaults();
+                    Debug.Log(
+                        "[AppShellContentPreview] Defaults restored for preview.");
+                    _appShell?.ShowToast(
+                        "Default settings restored for this preview.",
+                        AppShellToastTone.Success);
+                    break;
+
+                case PreviewConfirmationAction.ResetTutorial:
+                    Debug.Log(
+                        "[AppShellContentPreview] Tutorial reset requested for preview.");
+                    _appShell?.ShowToast(
+                        "Tutorial reset requested for this preview.",
+                        AppShellToastTone.Information);
+                    break;
+            }
+        }
+
+        private void OnConfirmDialogCancelled()
+        {
+            _pendingConfirmation = PreviewConfirmationAction.None;
         }
 
         private void ClearCurrentContent()
@@ -563,10 +1078,8 @@ namespace NutriMind.App.UI
             {
                 _currentHomeView.ContinueMissionRequested -=
                     OnHomeContinueMissionRequested;
-
                 _currentHomeView.QuizPortalRequested -=
                     OnHomeQuizPortalRequested;
-
                 _currentHomeView = null;
             }
 
@@ -574,17 +1087,67 @@ namespace NutriMind.App.UI
             {
                 _currentSubjectSelectionView.BackRequested -=
                     OnSubjectBackRequested;
-
                 _currentSubjectSelectionView.SubjectSelected -=
                     OnSubjectSelected;
-
                 _currentSubjectSelectionView.ContinueSubjectRequested -=
                     OnContinueSubjectRequested;
-
                 _currentSubjectSelectionView.UnavailableSubjectRequested -=
                     OnUnavailableSubjectRequested;
-
                 _currentSubjectSelectionView = null;
+            }
+
+            if (_currentTermSelectionView != null)
+            {
+                _currentTermSelectionView.BackRequested -= OnTermBackRequested;
+                _currentTermSelectionView.TermSelected -= OnTermSelected;
+                _currentTermSelectionView.OpenTermRequested -= OnOpenTermRequested;
+                _currentTermSelectionView.UnavailableTermRequested -=
+                    OnUnavailableTermRequested;
+                _currentTermSelectionView = null;
+            }
+
+            if (_currentMissionSelectionView != null)
+            {
+                _currentMissionSelectionView.BackRequested -= OnMissionBackRequested;
+                _currentMissionSelectionView.MissionSelected -= OnMissionSelected;
+                _currentMissionSelectionView.StartMissionRequested -=
+                    OnStartMissionRequested;
+                _currentMissionSelectionView.ContinueMissionRequested -=
+                    OnContinueMissionRequested;
+                _currentMissionSelectionView.ReviewMissionRequested -=
+                    OnReviewMissionRequested;
+                _currentMissionSelectionView.LockedMissionRequested -=
+                    OnLockedMissionRequested;
+                _currentMissionSelectionView = null;
+            }
+
+            if (_currentLockedMissionView != null)
+            {
+                _currentLockedMissionView.BackRequested -= OnLockedBackRequested;
+                _currentLockedMissionView.PrimaryActionRequested -=
+                    OnLockedPrimaryActionRequested;
+                _currentLockedMissionView.SecondaryActionRequested -=
+                    OnLockedSecondaryActionRequested;
+                _currentLockedMissionView = null;
+            }
+
+            if (_currentProfileView != null)
+            {
+                _currentProfileView.BackRequested -= OnProfileBackRequested;
+                _currentProfileView.SettingsRequested -= OnProfileSettingsRequested;
+                _currentProfileView.SignOutRequested -= OnProfileSignOutRequested;
+                _currentProfileView = null;
+            }
+
+            if (_currentSettingsView != null)
+            {
+                _currentSettingsView.BackRequested -= OnSettingsBackRequested;
+                _currentSettingsView.SaveRequested -= OnSettingsSaveRequested;
+                _currentSettingsView.RestoreDefaultsRequested -=
+                    OnSettingsRestoreDefaultsRequested;
+                _currentSettingsView.ResetTutorialRequested -=
+                    OnSettingsResetTutorialRequested;
+                _currentSettingsView = null;
             }
 
             _currentScreenView?.Dispose();
@@ -762,6 +1325,24 @@ namespace NutriMind.App.UI
         private static string NormalizeOptionalText(string text)
         {
             return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+        }
+
+        private static string GetSubjectLabel(NutriMindSubject subject)
+        {
+            switch (subject)
+            {
+                case NutriMindSubject.LiteraQuest:
+                    return "LiteraQuest";
+
+                case NutriMindSubject.PeAndHealth:
+                    return "PE & Health";
+
+                case NutriMindSubject.Science:
+                    return "Science";
+
+                default:
+                    return subject.ToString();
+            }
         }
 
         private static string GetScreenDisplayName(

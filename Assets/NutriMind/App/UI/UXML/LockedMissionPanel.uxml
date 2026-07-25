@@ -1,129 +1,53 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/LockedMissionPanel.uss" />
-
-    <ui:VisualElement name="locked-mission-root" class="ds-root theme-nutrimind locked-mission">
-
-        <!-- ===== HEADER ===== -->
-        <ui:VisualElement name="locked-header" class="locked-mission__header">
-            <ui:VisualElement class="locked-mission__header-left">
-                <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost locked-mission__back" tooltip="Back">
-                    <ui:VisualElement class="ds-icon ds-icon--arrow-left locked-mission__back-icon" />
-                </ui:Button>
-
-                <ui:VisualElement class="locked-mission__brand">
-                    <ui:Label text="Nutri" class="locked-mission__brand-nutri" />
-                    <ui:VisualElement class="locked-mission__brand-mind-wrap">
-                        <ui:Label text="Mind" class="locked-mission__brand-mind" />
-                        <ui:VisualElement class="ds-icon ds-icon--leaf locked-mission__brand-leaf" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
+    <ui:VisualElement name="locked-mission-root" class="ds-root theme-nutrimind app-screen-content locked-mission">
+        <ui:VisualElement class="locked-mission__intro">
+            <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost locked-mission__back" tooltip="Back">
+                <ui:VisualElement class="ds-icon ds-icon--arrow-left locked-mission__back-icon" />
+            </ui:Button>
+            <ui:Label text="Mission unavailable" class="locked-mission__intro-title" />
         </ui:VisualElement>
-
-        <!-- ===== MAIN BODY ===== -->
-        <ui:VisualElement name="locked-body" class="locked-mission__body">
-
-            <!-- Left: mission summary -->
-            <ui:VisualElement name="summary-panel" class="locked-mission__summary ds-card ds-card--flush">
+        <ui:ScrollView
+            name="locked-mission-scroll"
+            class="app-screen-content__scroll locked-mission__scroll"
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="Auto"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
+            <ui:VisualElement name="locked-body" class="locked-mission__body">
+                <ui:VisualElement name="summary-panel" class="locked-mission__summary ds-card ds-card--flush">
                 <ui:VisualElement class="locked-mission__lock-visual">
                     <ui:VisualElement class="ds-icon ds-icon--leaf locked-mission__lock-leaf locked-mission__lock-leaf--left" />
-                    <ui:VisualElement class="locked-mission__lock-circle">
-                        <ui:VisualElement name="summary-icon" class="ds-icon ds-icon--lock locked-mission__lock-icon" />
-                    </ui:VisualElement>
+                    <ui:VisualElement class="locked-mission__lock-circle"><ui:VisualElement name="summary-icon" class="ds-icon ds-icon--lock locked-mission__lock-icon" /></ui:VisualElement>
                     <ui:VisualElement class="ds-icon ds-icon--leaf locked-mission__lock-leaf locked-mission__lock-leaf--right" />
                 </ui:VisualElement>
-
                 <ui:Label name="summary-title" text="Ecosystems and Balance" class="locked-mission__summary-title" />
                 <ui:Label name="summary-description" text="Discover how living things depend on each other within an ecosystem." class="locked-mission__summary-desc" />
-
-                <ui:VisualElement class="locked-mission__locked-pill">
-                    <ui:Label name="status-pill-label" text="Locked by Teacher" class="locked-mission__locked-pill-label" />
-                </ui:VisualElement>
+                <ui:VisualElement class="locked-mission__locked-pill"><ui:Label name="status-pill-label" text="Locked by Teacher" class="locked-mission__locked-pill-label" /></ui:VisualElement>
             </ui:VisualElement>
-
-            <!-- Right: lock reason + status -->
             <ui:VisualElement name="content-stack" class="locked-mission__content-stack">
-
-                <!-- Exact lock reason banner -->
                 <ui:VisualElement name="lock-message-banner" class="locked-mission__info-banner">
                     <ui:VisualElement name="banner-icon" class="ds-icon ds-icon--lock locked-mission__info-icon" />
                     <ui:Label name="lock-message" text="This mission is currently locked by your Teacher. Your existing progress is safe." class="locked-mission__info-text" />
                 </ui:VisualElement>
-
-                <!-- Lock details panel: prerequisite / classroom / download -->
                 <ui:VisualElement name="details-panel" class="locked-mission__details ds-card ds-card--flush">
                     <ui:Label text="Mission Status" class="locked-mission__panel-heading" />
                     <ui:Label text="Here is exactly what is standing between you and this mission." class="locked-mission__panel-subheading" />
-
                     <ui:VisualElement name="details-list" class="locked-mission__details-list">
-
-                        <ui:VisualElement name="detail-prerequisite-row" class="locked-mission__detail-row">
-                            <ui:VisualElement class="ds-icon ds-icon--flag locked-mission__detail-row-icon" />
-                            <ui:VisualElement class="locked-mission__detail-row-copy">
-                                <ui:Label text="Prerequisite" class="locked-mission__detail-row-label" />
-                                <ui:Label name="detail-prerequisite" text="Prerequisite complete — no additional missions required." class="locked-mission__detail-row-value" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="detail-classroom-row" class="locked-mission__detail-row">
-                            <ui:VisualElement class="ds-icon ds-icon--info locked-mission__detail-row-icon" />
-                            <ui:VisualElement class="locked-mission__detail-row-copy">
-                                <ui:Label text="Classroom Publication" class="locked-mission__detail-row-label" />
-                                <ui:Label name="detail-classroom" text="Waiting for classroom release" class="locked-mission__detail-row-value" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="detail-download-row" class="locked-mission__detail-row locked-mission__detail-row--last">
-                            <ui:VisualElement class="ds-icon ds-icon--wifi locked-mission__detail-row-icon" />
-                            <ui:VisualElement class="locked-mission__detail-row-copy">
-                                <ui:Label text="Download &amp; Offline" class="locked-mission__detail-row-label" />
-                                <ui:Label name="detail-download" text="Downloaded • Available offline" class="locked-mission__detail-row-value" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-
+                        <ui:VisualElement class="locked-mission__detail-row"><ui:VisualElement class="ds-icon ds-icon--flag locked-mission__detail-row-icon" /><ui:VisualElement class="locked-mission__detail-row-copy"><ui:Label text="Prerequisite" class="locked-mission__detail-row-label" /><ui:Label name="detail-prerequisite" text="Prerequisite complete — no additional missions required." class="locked-mission__detail-row-value" /></ui:VisualElement></ui:VisualElement>
+                        <ui:VisualElement class="locked-mission__detail-row"><ui:VisualElement class="ds-icon ds-icon--info locked-mission__detail-row-icon" /><ui:VisualElement class="locked-mission__detail-row-copy"><ui:Label text="Classroom Publication" class="locked-mission__detail-row-label" /><ui:Label name="detail-classroom" text="Waiting for classroom release" class="locked-mission__detail-row-value" /></ui:VisualElement></ui:VisualElement>
+                        <ui:VisualElement class="locked-mission__detail-row locked-mission__detail-row--last"><ui:VisualElement class="ds-icon ds-icon--wifi locked-mission__detail-row-icon" /><ui:VisualElement class="locked-mission__detail-row-copy"><ui:Label text="Download &amp; Offline" class="locked-mission__detail-row-label" /><ui:Label name="detail-download" text="Downloaded • Available offline" class="locked-mission__detail-row-value" /></ui:VisualElement></ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-
-                <!-- Recommended next action -->
-                <ui:VisualElement name="actions-row" class="locked-mission__actions">
-                    <ui:Button name="action-button" text="" class="ds-btn ds-btn--ghost locked-mission__action-primary">
-                        <ui:Label name="action-label" text="Back to Missions" class="locked-mission__action-primary-label" />
-                        <ui:VisualElement name="action-icon" class="ds-icon ds-icon--arrow-left locked-mission__action-primary-icon" />
-                    </ui:Button>
+                <ui:VisualElement class="locked-mission__actions"><ui:Button name="action-button" text="" class="ds-btn ds-btn--ghost locked-mission__action-primary"><ui:Label name="action-label" text="Back to Missions" class="locked-mission__action-primary-label" /><ui:VisualElement name="action-icon" class="ds-icon ds-icon--arrow-left locked-mission__action-primary-icon" /></ui:Button></ui:VisualElement>
                 </ui:VisualElement>
-
             </ui:VisualElement>
-        </ui:VisualElement>
-
-        <!-- ===== BOTTOM NAV ===== -->
-        <!-- TODO: This bottom nav is a temporary duplicate for static preview. Replace with the shared AppShell.uxml navigation partial once it exists. -->
-        <ui:VisualElement name="locked-nav" class="locked-mission__nav">
-            <ui:Button name="nav-home" class="locked-mission__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--home locked-mission__nav-icon" />
-                <ui:Label text="Home" class="locked-mission__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-subjects" class="locked-mission__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--map locked-mission__nav-icon" />
-                <ui:Label text="Subjects" class="locked-mission__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-missions" class="locked-mission__nav-item is-active">
-                <ui:VisualElement class="ds-icon ds-icon--bag locked-mission__nav-icon" />
-                <ui:Label text="Missions" class="locked-mission__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-progress" class="locked-mission__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--trophy locked-mission__nav-icon" />
-                <ui:Label text="Progress" class="locked-mission__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-rewards" class="locked-mission__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--treasure locked-mission__nav-icon" />
-                <ui:Label text="Rewards" class="locked-mission__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-more" class="locked-mission__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--more-horizontal locked-mission__nav-icon" />
-                <ui:Label text="More" class="locked-mission__nav-label" />
-            </ui:Button>
-        </ui:VisualElement>
+        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,9 +1,17 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/SettingsPanel.uss" />
 
-    <ui:VisualElement name="settings-root" class="ds-root theme-nutrimind settings-panel">
+    <ui:VisualElement name="settings-root" class="ds-root theme-nutrimind settings-panel app-screen-content">
+
+        <ui:VisualElement name="settings-intro" class="settings-panel__route-intro">
+            <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost settings-panel__back" tooltip="Back">
+                <ui:VisualElement class="ds-icon ds-icon--lg ds-icon--chevron-left settings-panel__back-icon" />
+            </ui:Button>
+            <ui:Label text="Back to Profile" class="settings-panel__route-label" />
+        </ui:VisualElement>
 
         <ui:VisualElement name="settings-body" class="settings-panel__body">
 
@@ -37,7 +45,16 @@
 
             <!-- ===== MAIN COLUMN ===== -->
             <ui:VisualElement class="settings-panel__main">
-                <ui:ScrollView name="settings-scroll" class="settings-panel__scroll" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto">
+                <ui:ScrollView
+                    name="settings-scroll"
+                    class="settings-panel__scroll"
+                    mode="Vertical"
+                    horizontal-scroller-visibility="Hidden"
+                    vertical-scroller-visibility="AlwaysVisible"
+                    mouse-wheel-scroll-size="72"
+                    vertical-page-size="0.85"
+                    touch-scroll-type="Clamped"
+                    focusable="true">
 
                     <!-- PAGE: Audio & Display (matches design reference overview) -->
                     <ui:VisualElement name="page-audio-display" class="settings-panel__page">
@@ -416,17 +433,5 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- ===== CONFIRMATION DIALOG (Restore Defaults / Reset Tutorial — static preview) ===== -->
-        <ui:VisualElement name="settings-confirm-backdrop" class="ds-backdrop settings-panel__confirm-backdrop settings-panel__confirm-backdrop--hidden">
-            <ui:VisualElement class="ds-dialog settings-panel__confirm-dialog">
-                <ui:VisualElement name="settings-confirm-icon" class="ds-icon ds-icon--xxl ds-icon--refresh settings-panel__confirm-icon" />
-                <ui:Label name="settings-confirm-title" text="Restore Defaults?" class="ds-dialog__title" />
-                <ui:Label name="settings-confirm-message" text="This resets Audio, Display, and Accessibility settings on this device back to their defaults." class="ds-dialog__message" />
-                <ui:VisualElement class="ds-dialog__actions">
-                    <ui:Button name="settings-confirm-cancel" text="Cancel" class="ds-btn ds-btn--secondary" />
-                    <ui:Button name="settings-confirm-accept" text="Restore" class="ds-btn ds-btn--primary" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

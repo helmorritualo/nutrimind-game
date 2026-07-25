@@ -27,24 +27,43 @@
     -unity-font-style: bold;
 }
 
-/* ========== HEADER ========== */
-.locked-mission__header {
+/* ========== ROUTE INTRO ========== */
+.locked-mission__intro {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     flex-shrink: 0;
-    height: 100px;
-    min-height: 100px;
-    padding: 0 40px;
-    background-color: var(--color-surface);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
+    min-height: 84px;
+    padding: 20px 36px 8px 36px;
 }
 
-.locked-mission__header-left {
-    flex-direction: row;
-    align-items: center;
+.locked-mission__intro-title {
+    margin-left: 20px;
+    font-size: 30px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+}
+
+.locked-mission__scroll {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.locked-mission__scroll > .unity-scroll-view__content-and-vertical-scroll-container,
+.locked-mission__scroll .unity-scroll-view__content-viewport {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.locked-mission__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
     flex-shrink: 0;
+    width: 100%;
+    height: auto;
 }
 
 .locked-mission__back {
@@ -84,44 +103,6 @@
     -unity-background-image-tint-color: var(--color-text-primary);
 }
 
-.locked-mission__brand {
-    flex-direction: row;
-    align-items: flex-end;
-    flex-shrink: 0;
-}
-
-.locked-mission__brand-nutri {
-    margin: 0;
-    padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-green);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.locked-mission__brand-mind-wrap {
-    position: relative;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.locked-mission__brand-mind {
-    margin: 0;
-    padding: 0;
-    font-size: 40px;
-    color: var(--nm-brand-blue);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.locked-mission__brand-leaf {
-    position: absolute;
-    right: -4px;
-    top: -6px;
-    width: 18px;
-    height: 18px;
-    -unity-background-image-tint-color: var(--nm-brand-green);
-}
 
 /* ========== BODY ========== */
 .locked-mission__body {
@@ -130,7 +111,7 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-height: 0;
-    padding: 24px 36px 20px 36px;
+    padding: 12px 36px 20px 36px;
 }
 
 /* ----- Left summary panel (~28%) ----- */
@@ -430,77 +411,15 @@
     -unity-background-image-tint-color: #FFFFFF;
 }
 
-/* ========== BOTTOM NAV ========== */
-.locked-mission__nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    flex-shrink: 0;
-    height: 104px;
-    min-height: 104px;
-    padding: 10px 40px 14px 40px;
-    background-color: var(--color-surface);
-    border-top-width: 1px;
-    border-top-color: var(--color-border);
-}
-
-.locked-mission__nav-item {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    height: 80px;
-    margin: 0 6px;
-    padding: 10px 8px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    border-radius: 18px;
-}
-
-.locked-mission__nav-item:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.locked-mission__nav-item.is-active .locked-mission__nav-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.locked-mission__nav-item.is-active .locked-mission__nav-label {
-    color: var(--color-primary);
-}
-
-.locked-mission__nav-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    -unity-background-image-tint-color: #757575;
-}
-
-.locked-mission__nav-label {
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: #5C5C5C;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-}
 
 /* ========== RESPONSIVE ========== */
-.locked-mission--compact .locked-mission__header {
-    height: auto;
-    min-height: 84px;
-    padding: 14px 24px;
-}
-
-.locked-mission--compact .locked-mission__brand-nutri,
-.locked-mission--compact .locked-mission__brand-mind {
-    font-size: 32px;
+.locked-mission--compact .locked-mission__intro {
+    min-height: 72px;
+    padding: 16px 24px 6px 24px;
 }
 
 .locked-mission--compact .locked-mission__body {
-    padding: 18px 24px 16px 24px;
+    padding: 10px 24px 16px 24px;
 }
 
 .locked-mission--compact .locked-mission__summary {
@@ -565,18 +484,6 @@
     font-size: 18px;
 }
 
-.locked-mission--compact .locked-mission__nav {
-    height: auto;
-    min-height: 80px;
-    padding: 8px 12px 12px 12px;
-    flex-wrap: wrap;
-}
-
-.locked-mission--compact .locked-mission__nav-item {
-    flex-grow: 0;
-    width: 84px;
-    height: 72px;
-}
 
 /* Narrow — stack panels vertically */
 .locked-mission--narrow .locked-mission__body {
@@ -626,18 +533,3 @@
     font-size: 16px;
 }
 
-.locked-mission--narrow .locked-mission__nav-label {
-    font-size: 11px;
-}
-
-.locked-mission--narrow .locked-mission__nav-item {
-    width: 72px;
-    height: 64px;
-    padding: 8px 4px;
-}
-
-.locked-mission--narrow .locked-mission__nav-icon {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 6px;
-}
