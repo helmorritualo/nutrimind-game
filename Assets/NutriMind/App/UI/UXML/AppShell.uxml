@@ -117,18 +117,28 @@
         </ui:VisualElement>
 
         <!-- ===== GLOBAL TOAST LAYER ===== -->
-        <ui:VisualElement name="app-shell-toast-layer" class="app-shell__toast-layer">
+        <ui:VisualElement
+            name="app-shell-toast-layer"
+            class="app-shell__toast-layer"
+            picking-mode="Ignore">
             <ui:VisualElement
-                name="app-shell-toast-preview"
-                class="ds-toast ds-toast--info app-shell__toast-preview app-shell__toast-preview--hidden">
+                name="app-shell-toast"
+                class="ds-toast ds-toast--info app-shell__toast app-shell__toast--hidden">
                 <ui:VisualElement
+                    name="app-shell-toast-icon"
                     class="ds-icon ds-icon--info ds-toast__icon"
                     picking-mode="Ignore" />
                 <ui:Label
-                    text="Preview toast — package styled."
+                    name="app-shell-toast-label"
+                    text=""
                     class="ds-toast__message" />
-                <ui:Button name="app-shell-toast-close" class="ds-toast__close" tooltip="Dismiss">
-                    <ui:VisualElement class="ds-icon ds-icon--close" picking-mode="Ignore" />
+                <ui:Button
+                    name="app-shell-toast-close"
+                    class="ds-toast__close"
+                    tooltip="Dismiss notification">
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--close"
+                        picking-mode="Ignore" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

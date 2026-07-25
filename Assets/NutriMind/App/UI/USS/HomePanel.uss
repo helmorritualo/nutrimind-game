@@ -1,13 +1,20 @@
-/* Home screen — 1920×1080 landscape, matched to HomeScreen design reference */
+/* Home route content — hosted by AppShell or standalone UIDocument preview */
 
 .home-panel {
     flex-grow: 1;
+    flex-shrink: 1;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     flex-direction: column;
     background-color: var(--color-bg);
     padding: 0;
     margin: 0;
+}
+
+.home-panel.app-screen-content--embedded {
+    background-color: rgba(0, 0, 0, 0);
 }
 
 /* Kill Unity Label default margins that shift / soft-overlap text */
@@ -16,164 +23,55 @@
     padding: 0;
 }
 
-/* ========== HEADER ========== */
-.home-panel__header {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-    height: 120px;
-    min-height: 120px;
-    padding: 0 48px;
-    background-color: var(--color-surface);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
-}
-
-.home-panel__brand {
-    flex-direction: row;
-    align-items: flex-end;
-    flex-shrink: 0;
-    margin-right: 40px;
-}
-
-.home-panel__brand-nutri {
-    margin: 0;
-    padding: 0;
-    font-size: 44px;
-    color: var(--nm-brand-green);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.home-panel__brand-mind-wrap {
-    position: relative;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.home-panel__brand-mind {
-    margin: 0;
-    padding: 0;
-    font-size: 44px;
-    color: var(--nm-brand-blue);
-    -unity-font-style: bold;
-    letter-spacing: -1px;
-}
-
-.home-panel__brand-leaf {
-    position: absolute;
-    right: -4px;
-    top: -6px;
-    width: 20px;
-    height: 20px;
-    -unity-background-image-tint-color: var(--nm-brand-green);
-}
-
-.home-panel__greeting {
-    flex-direction: column;
-    justify-content: center;
+/* ========== SCROLL ========== */
+.home-panel__scroll {
     flex-grow: 1;
     flex-shrink: 1;
-    margin-right: 28px;
-    min-width: 240px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
 }
 
-.home-panel__greeting-title {
-    margin: 0 0 6px 0;
-    padding: 0;
-    font-size: 34px;
-    color: var(--color-text-primary);
-    -unity-font-style: bold;
-    white-space: nowrap;
-    letter-spacing: -1px;
+.home-panel__scroll .unity-scroll-view__content-container {
+    flex-grow: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
 }
 
-.home-panel__greeting-sub {
-    margin: 0;
-    padding: 0;
-    font-size: 18px;
-    color: var(--color-text-secondary);
-    -unity-font-style: bold;
-    white-space: nowrap;
+/* ========== CONTENT ========== */
+.home-panel__content {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 24px 32px;
 }
 
-.home-panel__stats {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-    margin-right: 28px;
-}
-
-.home-panel__stat {
-    flex-direction: row;
-    align-items: center;
-    margin-right: 32px;
-}
-
-.home-panel__stat-icon {
-    width: 34px;
-    height: 34px;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.home-panel__stat-icon--grade {
-    -unity-background-image-tint-color: var(--nm-brand-green);
-}
-
-.home-panel__stat-label {
-    margin: 0;
-    padding: 0;
-    font-size: 22px;
-    color: var(--color-text-primary);
-    -unity-font-style: bold;
-    white-space: nowrap;
-}
-
-/* Avatar placeholder — 80×80 */
-.home-panel__avatar {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    min-height: 80px;
-    border-radius: 40px;
-    background-color: #E8F5E9;
-    border-width: 3px;
-    border-color: #C8E6C9;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-
-.home-panel__avatar-label {
-    margin: 0;
-    padding: 0;
-    font-size: 11px;
-    color: #7CB342;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: normal;
-}
-
-/* ========== ANNOUNCEMENT + SYNC STATUS ========== */
+/* ========== ANNOUNCEMENT ========== */
 .home-panel__announce-bar {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     flex-shrink: 0;
-    padding: 14px 48px;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    border-radius: 16px;
     background-color: var(--color-surface-elev);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-border);
+    border-width: 1px;
+    border-color: var(--color-border);
 }
 
 .home-panel__announce {
     flex-direction: row;
     align-items: center;
+    flex-grow: 1;
     flex-shrink: 1;
     min-width: 0;
-    margin-right: 24px;
 }
 
 .home-panel__announce-icon {
@@ -191,50 +89,17 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.home-panel__sync {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.home-panel__sync-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background-color: #43A047;
-    margin-right: 8px;
-    flex-shrink: 0;
-}
-
-.home-panel__sync-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    flex-shrink: 0;
-    -unity-background-image-tint-color: var(--color-text-secondary);
-}
-
-.home-panel__sync-label {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    -unity-font-style: bold;
-    white-space: nowrap;
-}
-
-/* ========== CONTENT ========== */
-.home-panel__content {
     flex-grow: 1;
     flex-shrink: 1;
-    padding: 32px 48px 24px 48px;
-    min-height: 0;
+    min-width: 0;
 }
 
+/* ========== GRID ========== */
 .home-panel__grid {
     flex-grow: 1;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
 }
 
 .home-panel__row {
@@ -242,15 +107,18 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-height: 0;
+    min-width: 0;
 }
 
 .home-panel__row--top {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     flex-basis: 44%;
+    min-height: 220px;
 }
 
 .home-panel__row--bottom {
     flex-basis: 56%;
+    min-height: 260px;
 }
 
 .home-panel__card {
@@ -262,6 +130,7 @@
     padding: 28px 32px;
     overflow: hidden;
     min-height: 0;
+    min-width: 0;
 }
 
 .home-panel__card--play,
@@ -270,11 +139,11 @@
     flex-basis: 0;
     flex-direction: column;
     justify-content: center;
-    padding: 32px 36px;
+    padding: 28px 32px;
 }
 
 .home-panel__card--play {
-    margin-right: 24px;
+    margin-right: 20px;
     background-color: #EAF6E8;
     border-color: #D7EBD2;
 }
@@ -287,20 +156,20 @@
 .home-panel__card--journey {
     flex-grow: 1.75;
     flex-basis: 0;
-    margin-right: 24px;
+    margin-right: 20px;
     flex-direction: column;
-    padding: 24px 28px;
+    padding: 22px 26px;
 }
 
 .home-panel__card--goal {
     flex-grow: 1;
     flex-basis: 0;
     flex-direction: column;
-    padding: 24px 28px;
+    padding: 22px 26px;
 }
 
-/* Soft foliage wash — bottom-right only, no text (ghost labels caused blur).
-   picking-mode is a UXML attribute only — never put it in USS or the whole sheet can fail to apply. */
+/* Soft foliage wash — bottom-right only.
+   picking-mode is a UXML attribute only — never put it in USS. */
 .home-panel__card-deco {
     position: absolute;
     right: 0;
@@ -320,7 +189,6 @@
     background-color: rgba(139, 92, 246, 0.30);
 }
 
-/* Feature cards: icon left, copy+CTA stacked right — matched to HomeScreen ref */
 .home-panel__card-body {
     flex-direction: row;
     align-items: center;
@@ -332,16 +200,15 @@
     overflow: hidden;
 }
 
-/* Play: rounded square badge. Quiz: circular badge. Glyph ~64×64 */
 .home-panel__feature-icon {
-    width: 120px;
-    height: 120px;
-    min-width: 120px;
-    max-width: 120px;
-    min-height: 120px;
+    width: 112px;
+    height: 112px;
+    min-width: 112px;
+    max-width: 112px;
+    min-height: 112px;
     align-items: center;
     justify-content: center;
-    margin-right: 28px;
+    margin-right: 24px;
     flex-grow: 0;
     flex-shrink: 0;
 }
@@ -353,13 +220,13 @@
 }
 
 .home-panel__feature-icon--quiz {
-    border-radius: 60px;
+    border-radius: 56px;
     background-color: var(--color-tertiary);
 }
 
 .home-panel__feature-glyph {
-    width: 64px;
-    height: 64px;
+    width: 60px;
+    height: 60px;
     -unity-background-image-tint-color: var(--nm-brand-green);
 }
 
@@ -367,7 +234,6 @@
     -unity-background-image-tint-color: #FFFFFF;
 }
 
-/* Copy column hugs content — do not stretch across empty foliage area */
 .home-panel__feature-copy {
     flex-grow: 0;
     flex-shrink: 1;
@@ -385,7 +251,7 @@
 .home-panel__feature-title {
     margin: 0;
     padding: 0 0 6px 0;
-    font-size: 34px;
+    font-size: 30px;
     -unity-font-style: bold;
     white-space: nowrap;
     letter-spacing: -1px;
@@ -409,8 +275,8 @@
 
 .home-panel__feature-desc {
     margin: 0;
-    padding: 0 0 20px 0;
-    font-size: 18px;
+    padding: 0 0 18px 0;
+    font-size: 17px;
     color: #3D3D3D;
     -unity-font-style: bold;
     white-space: normal;
@@ -420,22 +286,21 @@
 
 .home-panel Label.home-panel__feature-desc {
     margin: 0;
-    padding: 0 0 20px 0;
+    padding: 0 0 18px 0;
 }
 
-/* Pill CTAs — sized to HomeScreen reference under copy */
 .home-panel__pill {
     flex-direction: row;
     align-items: center;
     justify-content: center;
     align-self: flex-start;
     width: auto;
-    height: 56px;
-    min-height: 56px;
-    max-height: 56px;
-    padding: 0 28px;
+    height: 52px;
+    min-height: 52px;
+    max-height: 52px;
+    padding: 0 26px;
     border-width: 0;
-    border-radius: 28px;
+    border-radius: 26px;
     margin: 0;
     flex-grow: 0;
     flex-shrink: 0;
@@ -460,7 +325,7 @@
 .home-panel__pill-label {
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-size: 17px;
     color: var(--color-text-on-accent);
     -unity-font-style: bold;
     -unity-text-align: middle-left;
@@ -480,8 +345,7 @@
 }
 
 /* Hide Unity Button's built-in text element when we use child Labels.
-   Do not use :not() here — Unity USS rejects it as "Recursive pseudo classes"
-   and fails the entire stylesheet import. */
+   Do not use :not() here — Unity USS rejects it as "Recursive pseudo classes". */
 .home-panel__pill > .unity-button__text {
     display: none;
     width: 0;
@@ -492,11 +356,10 @@
     color: rgba(0, 0, 0, 0);
 }
 
-/* Section heads — Journey / Goal */
 .home-panel__section-head {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     flex-shrink: 0;
     height: auto;
     min-height: 28px;
@@ -520,7 +383,7 @@
 .home-panel__section-title {
     margin: 0;
     padding: 0;
-    font-size: 22px;
+    font-size: 20px;
     -unity-font-style: bold;
     white-space: nowrap;
 }
@@ -538,9 +401,6 @@
     color: #B45309;
 }
 
-/* Journey + Goal cards use padding from .home-panel__card--journey / --goal above */
-
-/* Journey body — mission card + progress side by side */
 .home-panel__journey-body {
     flex-direction: row;
     flex-grow: 1;
@@ -551,15 +411,15 @@
 .home-panel__mission-box {
     flex-direction: row;
     align-items: center;
-    width: 300px;
-    min-width: 240px;
-    max-width: 340px;
+    width: 280px;
+    min-width: 220px;
+    max-width: 320px;
     flex-grow: 0;
     flex-shrink: 0;
     background-color: #F7F3EA;
     border-radius: 20px;
-    padding: 20px 22px;
-    margin-right: 28px;
+    padding: 18px 20px;
+    margin-right: 24px;
 }
 
 .home-panel__mission-copy {
@@ -572,7 +432,6 @@
     margin-right: 14px;
 }
 
-/* Green pill badge — must beat .home-panel Label { padding: 0 } */
 .home-panel__mission-badge {
     align-self: flex-start;
     font-size: 13px;
@@ -590,7 +449,7 @@
 }
 
 .home-panel__mission-title {
-    font-size: 24px;
+    font-size: 22px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
     white-space: normal;
@@ -601,7 +460,6 @@
     padding: 0;
 }
 
-/* Sprout badge beside mission title */
 .home-panel__mission-sprout {
     width: 52px;
     height: 52px;
@@ -639,7 +497,7 @@
 }
 
 .home-panel__progress-label {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
 }
@@ -650,7 +508,7 @@
 }
 
 .home-panel__progress-pct {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--color-text-primary);
     -unity-font-style: bold;
 }
@@ -685,11 +543,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    min-width: 200px;
+    min-width: 180px;
     background-color: #F7F3EA;
     border-radius: 14px;
-    padding: 12px 18px;
-    margin-right: 16px;
+    padding: 12px 16px;
+    margin-right: 14px;
     margin-bottom: 8px;
 }
 
@@ -721,7 +579,6 @@
     white-space: nowrap;
 }
 
-/* Goal card — text left, star badge right */
 .home-panel__goal-body {
     flex-direction: row;
     flex-grow: 1;
@@ -735,7 +592,7 @@
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
-    font-size: 18px;
+    font-size: 17px;
     color: #3D3D3D;
     -unity-font-style: bold;
     white-space: normal;
@@ -747,12 +604,11 @@
     padding: 0;
 }
 
-/* Goal star — warm rounded square */
 .home-panel__goal-star {
-    width: 112px;
-    height: 112px;
-    min-width: 112px;
-    min-height: 112px;
+    width: 104px;
+    height: 104px;
+    min-width: 104px;
+    min-height: 104px;
     border-radius: 22px;
     background-color: #F7F3EA;
     align-items: center;
@@ -761,150 +617,54 @@
 }
 
 .home-panel__goal-star-icon {
-    width: 72px;
-    height: 72px;
+    width: 68px;
+    height: 68px;
     -unity-background-image-tint-color: #E67E22;
 }
 
-/* ========== BOTTOM NAV ========== */
-.home-panel__nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    flex-shrink: 0;
-    height: 104px;
-    min-height: 104px;
-    padding: 10px 40px 14px 40px;
-    background-color: var(--color-surface);
-    border-top-width: 1px;
-    border-top-color: var(--color-border);
-}
-
-.home-panel__nav-item {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    height: 80px;
-    margin: 0 6px;
-    padding: 10px 8px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    border-radius: 18px;
-}
-
-.home-panel__nav-item:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.home-panel__nav-item.is-active {
-    background-color: var(--color-primary-soft);
-    border-width: 1px;
-    border-color: rgba(76, 175, 80, 0.35);
-}
-
-.home-panel__nav-item.is-active .home-panel__nav-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.home-panel__nav-item.is-active .home-panel__nav-label {
-    color: var(--color-primary);
-}
-
-.home-panel__nav-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    -unity-background-image-tint-color: #757575;
-}
-
-.home-panel__nav-label {
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: #5C5C5C;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-}
-
-/* ========== PACKAGE TOAST PLACEMENT (visuals from DesignSystem Overlays) ========== */
-.home-panel__toast-host {
-    position: absolute;
-    right: var(--space-4);
-    bottom: 104px;
-    width: 420px;
-    max-width: 42%;
-}
-
-.home-panel__toast {
-    width: 100%;
-}
-
-.home-panel__toast--hidden {
-    display: none;
-}
-
-/* ========== RESPONSIVE ========== */
-.home-panel--compact .home-panel__header {
-    height: auto;
-    min-height: 88px;
-    padding: 14px 24px;
-    flex-wrap: wrap;
-}
-
-.home-panel--compact .home-panel__brand-nutri,
-.home-panel--compact .home-panel__brand-mind {
-    font-size: 32px;
-}
-
-.home-panel--compact .home-panel__greeting {
-    /* Unity USS in this project rejects `order`; wrap + full width reflows greeting under brand/stats. */
-    width: 100%;
-    margin: 10px 0 0 0;
-}
-
-.home-panel--compact .home-panel__greeting-title {
-    font-size: 26px;
-}
-
+/* ========== RESPONSIVE: compact < 1100 ========== */
 .home-panel--compact .home-panel__content {
-    padding: 18px 24px 14px 24px;
+    padding: 16px 20px;
 }
 
 .home-panel--compact .home-panel__announce-bar {
-    padding: 10px 24px;
-    flex-wrap: wrap;
-}
-
-.home-panel--compact .home-panel__announce {
-    margin-bottom: 6px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
 }
 
 .home-panel--compact .home-panel__announce-text {
     white-space: normal;
 }
 
-.home-panel--compact .home-panel__row--top,
-.home-panel--compact .home-panel__row--bottom {
-    flex-direction: column;
-    flex-basis: auto;
+.home-panel--compact .home-panel__row--top {
+    margin-bottom: 14px;
+    min-height: 180px;
 }
 
-.home-panel--compact .home-panel__card--play,
-.home-panel--compact .home-panel__card--journey {
-    margin-right: 0;
-    margin-bottom: 16px;
+.home-panel--compact .home-panel__row--bottom {
+    min-height: 220px;
 }
 
 .home-panel--compact .home-panel__card--play,
 .home-panel--compact .home-panel__card--quiz {
-    min-height: 200px;
+    padding: 20px 22px;
+}
+
+.home-panel--compact .home-panel__card--play {
+    margin-right: 14px;
+}
+
+.home-panel--compact .home-panel__card--journey {
+    margin-right: 14px;
+    padding: 18px 20px;
+}
+
+.home-panel--compact .home-panel__card--goal {
+    padding: 18px 20px;
 }
 
 .home-panel--compact .home-panel__feature-title {
-    font-size: 28px;
+    font-size: 24px;
 }
 
 .home-panel--compact Label.home-panel__feature-title {
@@ -912,113 +672,104 @@
 }
 
 .home-panel--compact .home-panel__feature-desc {
-    font-size: 16px;
+    font-size: 15px;
     max-width: 100%;
 }
 
 .home-panel--compact Label.home-panel__feature-desc {
-    padding-bottom: 14px;
+    padding-bottom: 12px;
 }
 
 .home-panel--compact .home-panel__feature-icon {
-    width: 96px;
-    height: 96px;
-    min-width: 96px;
-    max-width: 96px;
-    min-height: 96px;
-    margin-right: 20px;
+    width: 88px;
+    height: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    min-height: 88px;
+    margin-right: 16px;
 }
 
 .home-panel--compact .home-panel__feature-icon--play {
-    border-radius: 24px;
+    border-radius: 22px;
 }
 
 .home-panel--compact .home-panel__feature-icon--quiz {
-    border-radius: 48px;
+    border-radius: 44px;
 }
 
 .home-panel--compact .home-panel__feature-glyph {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
 }
 
 .home-panel--compact .home-panel__pill {
-    height: 50px;
-    min-height: 50px;
-    max-height: 50px;
-    padding: 0 22px;
-    border-radius: 25px;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0 20px;
+    border-radius: 24px;
 }
 
 .home-panel--compact .home-panel__pill-label {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .home-panel--compact .home-panel__journey-body {
     flex-direction: column;
+    align-items: stretch;
 }
 
 .home-panel--compact .home-panel__mission-box {
     width: auto;
     max-width: none;
     margin-right: 0;
-    margin-bottom: 14px;
-    padding: 16px 18px;
+    margin-bottom: 12px;
+    padding: 14px 16px;
 }
 
 .home-panel--compact .home-panel__section-head {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .home-panel--compact .home-panel__goal-star {
-    width: 88px;
-    height: 88px;
-    min-width: 88px;
-    min-height: 88px;
+    width: 84px;
+    height: 84px;
+    min-width: 84px;
+    min-height: 84px;
     border-radius: 18px;
 }
 
 .home-panel--compact .home-panel__goal-star-icon {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
 }
 
 .home-panel--compact Label.home-panel__goal-text {
-    font-size: 16px;
-    margin-right: 14px;
+    font-size: 15px;
+    margin-right: 12px;
 }
 
-.home-panel--compact .home-panel__toast-host {
-    right: var(--space-3);
-    width: 380px;
-    max-width: 55%;
+/* ========== RESPONSIVE: narrow < 820 ========== */
+.home-panel--narrow .home-panel__row--top,
+.home-panel--narrow .home-panel__row--bottom {
+    flex-direction: column;
+    flex-basis: auto;
+    min-height: 0;
 }
 
-.home-panel--compact .home-panel__nav {
-    height: auto;
-    min-height: 80px;
-    padding: 8px 12px 12px 12px;
-    flex-wrap: wrap;
+.home-panel--narrow .home-panel__card--play,
+.home-panel--narrow .home-panel__card--journey {
+    margin-right: 0;
+    margin-bottom: 14px;
 }
 
-.home-panel--compact .home-panel__nav-item {
-    flex-grow: 0;
-    width: 84px;
-    height: 72px;
-}
-
-.home-panel--narrow .home-panel__brand-nutri,
-.home-panel--narrow .home-panel__brand-mind {
-    font-size: 28px;
-}
-
-.home-panel--narrow .home-panel__greeting-title {
-    font-size: 22px;
-    white-space: normal;
+.home-panel--narrow .home-panel__card--play,
+.home-panel--narrow .home-panel__card--quiz {
+    min-height: 180px;
 }
 
 .home-panel--narrow .home-panel__feature-title {
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .home-panel--narrow Label.home-panel__feature-title {
@@ -1026,7 +777,7 @@
 }
 
 .home-panel--narrow .home-panel__feature-desc {
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .home-panel--narrow Label.home-panel__feature-desc {
@@ -1034,32 +785,32 @@
 }
 
 .home-panel--narrow .home-panel__feature-icon {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    max-width: 80px;
-    min-height: 80px;
-    margin-right: 16px;
+    width: 76px;
+    height: 76px;
+    min-width: 76px;
+    max-width: 76px;
+    min-height: 76px;
+    margin-right: 14px;
 }
 
 .home-panel--narrow .home-panel__feature-icon--play {
-    border-radius: 20px;
+    border-radius: 18px;
 }
 
 .home-panel--narrow .home-panel__feature-icon--quiz {
-    border-radius: 40px;
+    border-radius: 38px;
 }
 
 .home-panel--narrow .home-panel__feature-glyph {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
 }
 
 .home-panel--narrow .home-panel__pill {
     height: 48px;
     min-height: 48px;
     max-height: 48px;
-    padding: 0 20px;
+    padding: 0 18px;
     border-radius: 24px;
 }
 
@@ -1068,30 +819,19 @@
 }
 
 .home-panel--narrow .home-panel__goal-star {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    min-height: 80px;
+    width: 76px;
+    height: 76px;
+    min-width: 76px;
+    min-height: 76px;
     border-radius: 16px;
 }
 
 .home-panel--narrow .home-panel__goal-star-icon {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
 }
 
 .home-panel--narrow Label.home-panel__goal-text {
-    font-size: 15px;
-    margin-right: 12px;
-}
-
-.home-panel--narrow .home-panel__toast-host {
-    left: var(--space-3);
-    right: var(--space-3);
-    width: auto;
-    max-width: none;
-}
-
-.home-panel--narrow .home-panel__nav-label {
-    font-size: 11px;
+    font-size: 14px;
+    margin-right: 10px;
 }

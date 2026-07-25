@@ -518,8 +518,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 201cd84631572904299ac98fc516bd37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.AppShellContentPreviewController
-  _previewScreen: 0
-  _previewEntries: []
+  _previewScreen: 1
+  _previewEntries:
+  - _screen: 1
+    _contentAsset: {fileID: 9197481963319205126, guid: b14cef9a3f7e4cccab859ae13953bd7d, type: 3}
+    _activeNavigation: 0
+    _pageTitle: Home
+    _pageContext: "Grade 5 \u2022 Section Emerald"
+    _selectFromBottomNavigation: 1
   _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
   _respondToShellNavigation: 1
   _respondToProfileRequest: 1

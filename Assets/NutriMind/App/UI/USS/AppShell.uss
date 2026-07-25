@@ -408,11 +408,11 @@
     justify-content: flex-end;
 }
 
-.app-shell__toast-preview {
+.app-shell__toast {
     width: 100%;
 }
 
-.app-shell__toast-preview--hidden {
+.app-shell__toast--hidden {
     display: none;
 }
 

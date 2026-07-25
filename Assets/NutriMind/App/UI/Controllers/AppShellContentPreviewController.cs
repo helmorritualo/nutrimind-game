@@ -118,6 +118,7 @@ namespace NutriMind.App.UI
         private TemplateContainer _currentContentInstance;
         private VisualElement _currentContentRoot;
         private IAppScreenView _currentScreenView;
+        private HomePanelView _currentHomeView;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
@@ -425,14 +426,69 @@ namespace NutriMind.App.UI
             AppShellContentPreviewScreen screen,
             VisualElement contentRoot)
         {
-            // Each panel-migration prompt will add one explicit case here after its
-            // content-only view class exists. Returning null means the UXML is shown
-            // as a static visual preview without screen-specific callbacks.
-            return null;
+            switch (screen)
+            {
+                case AppShellContentPreviewScreen.Home:
+                    return CreateHomeView(contentRoot);
+
+                // Remaining screens gain explicit cases as each panel is migrated.
+                // Returning null means the UXML is shown as a static visual preview
+                // without screen-specific callbacks.
+                default:
+                    return null;
+            }
+        }
+
+        private IAppScreenView CreateHomeView(VisualElement contentRoot)
+        {
+            var homeView = new HomePanelView(contentRoot);
+            if (!homeView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] HomePanelView failed to bind home-root.");
+                homeView.Dispose();
+                return null;
+            }
+
+            homeView.ContinueMissionRequested += OnHomeContinueMissionRequested;
+            homeView.QuizPortalRequested += OnHomeQuizPortalRequested;
+            _currentHomeView = homeView;
+            return homeView;
+        }
+
+        private void OnHomeContinueMissionRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Home Continue Mission requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Continue Mission selected. Mission routing will be connected later.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnHomeQuizPortalRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Home Quiz Portal requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz Portal selected. Quiz routing will be connected later.",
+                AppShellToastTone.Information);
         }
 
         private void ClearCurrentContent()
         {
+            if (_currentHomeView != null)
+            {
+                _currentHomeView.ContinueMissionRequested -=
+                    OnHomeContinueMissionRequested;
+
+                _currentHomeView.QuizPortalRequested -=
+                    OnHomeQuizPortalRequested;
+
+                _currentHomeView = null;
+            }
+
             _currentScreenView?.Dispose();
             _currentScreenView = null;
 

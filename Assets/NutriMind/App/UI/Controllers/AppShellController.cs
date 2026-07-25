@@ -31,6 +31,18 @@ namespace NutriMind.App.UI
     }
 
     /// <summary>
+    /// Presentation-only toast tone for the shared AppShell toast layer.
+    /// Maps to package <c>ds-toast</c> / <c>ds-icon</c> classes.
+    /// </summary>
+    public enum AppShellToastTone
+    {
+        Information,
+        Success,
+        Warning,
+        Danger
+    }
+
+    /// <summary>
     /// Presentation-only application shell for UI Toolkit layout preview.
     /// Owns shared chrome regions (top bar, nav, offline banner, overlays)
     /// and static preview toggles. Does not perform routing, authentication,
@@ -51,6 +63,8 @@ namespace NutriMind.App.UI
         private const string IconSyncClass = "ds-icon--sync";
         private const string IconWarningClass = "ds-icon--warning";
         private const string IconErrorClass = "ds-icon--error";
+        private const string ToastHiddenClass = "app-shell__toast--hidden";
+        private const float DefaultToastDurationSeconds = 2.5f;
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
 
@@ -68,6 +82,22 @@ namespace NutriMind.App.UI
             ConnectionOfflineClass,
             ConnectionSyncPendingClass,
             ConnectionSyncErrorClass
+        };
+
+        private static readonly string[] ToastVariantClasses =
+        {
+            "ds-toast--info",
+            "ds-toast--success",
+            "ds-toast--warning",
+            "ds-toast--danger"
+        };
+
+        private static readonly string[] ToastIconClasses =
+        {
+            "ds-icon--info",
+            "ds-icon--check",
+            "ds-icon--warning",
+            "ds-icon--error"
         };
 
         [SerializeField]
@@ -100,9 +130,13 @@ namespace NutriMind.App.UI
         private VisualElement _loadingLayer;
         private VisualElement _connectionHost;
         private VisualElement _connectionIcon;
+        private VisualElement _toast;
+        private VisualElement _toastIcon;
         private Label _pageTitle;
         private Label _pageContext;
         private Label _connectionLabel;
+        private Label _toastLabel;
+        private Button _toastCloseButton;
         private Button _notificationsButton;
         private Button _profileButton;
         private Button _navHome;
@@ -147,8 +181,9 @@ namespace NutriMind.App.UI
 
         private void OnDisable()
         {
-            Unbind();
             CancelInvoke(nameof(BindWhenReady));
+            CancelInvoke(nameof(HideToastImmediately));
+            Unbind();
         }
 
         private void OnDestroy()
@@ -302,11 +337,58 @@ namespace NutriMind.App.UI
         }
 
         /// <summary>
-        /// Returns the toast overlay host for future package-styled toasts.
+        /// Returns the toast overlay host for the shared package-styled toast.
         /// </summary>
         public VisualElement GetToastLayer()
         {
             return _toastLayer;
+        }
+
+        /// <summary>
+        /// Shows the shared AppShell toast with package variant styling.
+        /// Presentation only — replaces any currently visible toast message and tone.
+        /// </summary>
+        /// <param name="message">Toast message. Blank values fall back to "Notification".</param>
+        /// <param name="tone">Package toast tone.</param>
+        /// <param name="durationSeconds">
+        /// Auto-hide delay. Values greater than zero schedule hide; zero or negative keeps
+        /// the toast visible until <see cref="HideToast"/> or the close button.
+        /// </param>
+        public void ShowToast(
+            string message,
+            AppShellToastTone tone = AppShellToastTone.Information,
+            float durationSeconds = DefaultToastDurationSeconds)
+        {
+            if (_toast == null || _toastLabel == null)
+            {
+                return;
+            }
+
+            _toastLabel.text = string.IsNullOrWhiteSpace(message)
+                ? "Notification"
+                : message.Trim();
+
+            ClearClassList(_toast, ToastVariantClasses);
+            ClearClassList(_toastIcon, ToastIconClasses);
+            ApplyToastTone(tone);
+
+            _toast.RemoveFromClassList(ToastHiddenClass);
+
+            CancelInvoke(nameof(HideToastImmediately));
+            if (durationSeconds > 0f)
+            {
+                Invoke(nameof(HideToastImmediately), durationSeconds);
+            }
+        }
+
+        /// <summary>
+        /// Hides the shared AppShell toast and cancels any pending auto-hide.
+        /// Safe to call repeatedly.
+        /// </summary>
+        public void HideToast()
+        {
+            CancelInvoke(nameof(HideToastImmediately));
+            HideToastImmediately();
         }
 
         private void BindWhenReady()
@@ -358,6 +440,10 @@ namespace NutriMind.App.UI
             _contentRegion = _root.Q<VisualElement>("app-shell-content-region");
             _navRegion = _root.Q<VisualElement>("app-shell-navigation-region");
             _toastLayer = _root.Q<VisualElement>("app-shell-toast-layer");
+            _toast = _root.Q<VisualElement>("app-shell-toast");
+            _toastIcon = _root.Q<VisualElement>("app-shell-toast-icon");
+            _toastLabel = _root.Q<Label>("app-shell-toast-label");
+            _toastCloseButton = _root.Q<Button>("app-shell-toast-close");
             _modalLayer = _root.Q<VisualElement>("app-shell-modal-layer");
             _loadingLayer = _root.Q<VisualElement>("app-shell-loading-layer");
             _notificationsButton = _root.Q<Button>("app-shell-notifications");
@@ -369,6 +455,8 @@ namespace NutriMind.App.UI
             _navProgress = _root.Q<Button>("nav-progress");
             _navRewards = _root.Q<Button>("nav-rewards");
             _navMore = _root.Q<Button>("nav-more");
+
+            HideToastImmediately();
         }
 
         private void RegisterCallbacks()
@@ -381,6 +469,7 @@ namespace NutriMind.App.UI
             _navMore?.RegisterCallback<ClickEvent>(OnNavMoreClicked);
             _notificationsButton?.RegisterCallback<ClickEvent>(OnNotificationsClicked);
             _profileButton?.RegisterCallback<ClickEvent>(OnProfileClicked);
+            _toastCloseButton?.RegisterCallback<ClickEvent>(OnToastCloseClicked);
         }
 
         private void Unbind()
@@ -393,6 +482,9 @@ namespace NutriMind.App.UI
             _navMore?.UnregisterCallback<ClickEvent>(OnNavMoreClicked);
             _notificationsButton?.UnregisterCallback<ClickEvent>(OnNotificationsClicked);
             _profileButton?.UnregisterCallback<ClickEvent>(OnProfileClicked);
+            _toastCloseButton?.UnregisterCallback<ClickEvent>(OnToastCloseClicked);
+
+            CancelInvoke(nameof(HideToastImmediately));
 
             if (_root != null)
             {
@@ -407,6 +499,10 @@ namespace NutriMind.App.UI
             _contentRegion = null;
             _modalLayer = null;
             _toastLayer = null;
+            _toast = null;
+            _toastIcon = null;
+            _toastLabel = null;
+            _toastCloseButton = null;
             _offlineBanner = null;
             _loadingLayer = null;
             _connectionHost = null;
@@ -659,6 +755,39 @@ namespace NutriMind.App.UI
         {
             Debug.Log("[AppShellController] Profile button tapped — preview only.");
             ProfileRequested?.Invoke();
+        }
+
+        private void OnToastCloseClicked(ClickEvent evt)
+        {
+            HideToast();
+        }
+
+        private void HideToastImmediately()
+        {
+            _toast?.AddToClassList(ToastHiddenClass);
+        }
+
+        private void ApplyToastTone(AppShellToastTone tone)
+        {
+            switch (tone)
+            {
+                case AppShellToastTone.Success:
+                    _toast?.AddToClassList("ds-toast--success");
+                    SetIconClass(_toastIcon, "ds-icon--check");
+                    break;
+                case AppShellToastTone.Warning:
+                    _toast?.AddToClassList("ds-toast--warning");
+                    SetIconClass(_toastIcon, "ds-icon--warning");
+                    break;
+                case AppShellToastTone.Danger:
+                    _toast?.AddToClassList("ds-toast--danger");
+                    SetIconClass(_toastIcon, "ds-icon--error");
+                    break;
+                default:
+                    _toast?.AddToClassList("ds-toast--info");
+                    SetIconClass(_toastIcon, "ds-icon--info");
+                    break;
+            }
         }
 
         private void SelectPreviewRoute(AppShellPreviewRoute route)
