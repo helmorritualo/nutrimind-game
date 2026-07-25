@@ -75,19 +75,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
 
-            <!-- ===== OFFLINE / SYNC BANNER ===== -->
+            <!-- ===== OFFLINE / SYNC BANNER HOST ===== -->
+            <!-- Host only — OfflineSyncBanner owns status visuals when cloned here. -->
             <ui:VisualElement
                 name="app-shell-offline-banner"
-                class="app-shell__offline-banner app-shell__offline-banner--hidden">
-                <ui:VisualElement
-                    name="app-shell-banner-icon"
-                    class="ds-icon ds-icon--warning app-shell__offline-banner-icon"
-                    picking-mode="Ignore" />
-                <ui:Label
-                    name="app-shell-banner-label"
-                    text="You are offline. Showing downloaded progress."
-                    class="app-shell__offline-banner-label" />
-            </ui:VisualElement>
+                class="app-shell__offline-banner"
+                picking-mode="Ignore" />
 
             <!-- ===== CONTENT REGION ===== -->
             <ui:VisualElement name="app-shell-content-region" class="app-shell__content-region">

@@ -42,10 +42,6 @@ namespace NutriMind.App.UI
         private const string CompactClass = "app-shell--compact";
         private const string NarrowClass = "app-shell--narrow";
         private const string MobileClass = "mobile";
-        private const string BannerHiddenClass = "app-shell__offline-banner--hidden";
-        private const string BannerOfflineClass = "app-shell__offline-banner--offline";
-        private const string BannerSyncPendingClass = "app-shell__offline-banner--sync-pending";
-        private const string BannerSyncErrorClass = "app-shell__offline-banner--sync-error";
         private const string PreviewHiddenClass = "app-shell__preview-content--hidden";
         private const string ConnectionOnlineClass = "app-shell__connection--online";
         private const string ConnectionOfflineClass = "app-shell__connection--offline";
@@ -64,13 +60,6 @@ namespace NutriMind.App.UI
             IconSyncClass,
             IconWarningClass,
             IconErrorClass
-        };
-
-        private static readonly string[] BannerStateClasses =
-        {
-            BannerOfflineClass,
-            BannerSyncPendingClass,
-            BannerSyncErrorClass
         };
 
         private static readonly string[] ConnectionStateClasses =
@@ -101,6 +90,10 @@ namespace NutriMind.App.UI
         [Tooltip("Shared LoadingOverlay UXML used by the shell's global loading host.")]
         private VisualTreeAsset _loadingOverlayAsset;
 
+        [SerializeField]
+        [Tooltip("Shared OfflineSyncBanner UXML used by the shell's connectivity and sync status host.")]
+        private VisualTreeAsset _offlineSyncBannerAsset;
+
         private UIDocument _uiDocument;
         private VisualElement _root;
         private VisualElement _navRegion;
@@ -112,11 +105,9 @@ namespace NutriMind.App.UI
         private VisualElement _previewContent;
         private VisualElement _connectionHost;
         private VisualElement _connectionIcon;
-        private VisualElement _bannerIcon;
         private Label _pageTitle;
         private Label _pageContext;
         private Label _connectionLabel;
-        private Label _bannerLabel;
         private Button _notificationsButton;
         private Button _profileButton;
         private Button _navHome;
@@ -128,6 +119,9 @@ namespace NutriMind.App.UI
         private TemplateContainer _loadingOverlayInstance;
         private LoadingOverlayView _loadingOverlayView;
         private bool _warnedMissingLoadingOverlayAsset;
+        private TemplateContainer _offlineSyncBannerInstance;
+        private OfflineSyncBannerView _offlineSyncBannerView;
+        private bool _warnedMissingOfflineSyncBannerAsset;
         private float _lastWidth = -1f;
         private AppShellPreviewRoute? _appliedRoute;
         private AppShellConnectionPreview? _appliedConnection;
@@ -235,6 +229,25 @@ namespace NutriMind.App.UI
         }
 
         /// <summary>
+        /// Shows the shared OfflineSyncBanner with the supplied presentation configuration.
+        /// Does not change the serialized connection preview enum.
+        /// Presentation only — does not network or sync.
+        /// </summary>
+        public void ShowOfflineSyncBanner(OfflineSyncBannerConfiguration configuration)
+        {
+            _offlineSyncBannerView?.Show(configuration);
+        }
+
+        /// <summary>
+        /// Hides the shared OfflineSyncBanner without raising Dismissed or ActionRequested.
+        /// Does not change the serialized connection preview enum.
+        /// </summary>
+        public void HideOfflineSyncBanner()
+        {
+            _offlineSyncBannerView?.Hide();
+        }
+
+        /// <summary>
         /// Updates the top-bar page title and optional context label.
         /// </summary>
         public void SetPageTitle(string title, string context = null)
@@ -302,6 +315,7 @@ namespace NutriMind.App.UI
 
             CacheElements();
             BindLoadingOverlay();
+            BindOfflineSyncBanner();
             RegisterCallbacks();
             ApplySerializedPreviewState(force: true);
             _root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -321,8 +335,6 @@ namespace NutriMind.App.UI
             _connectionIcon = _root.Q<VisualElement>("app-shell-connection-icon");
             _connectionLabel = _root.Q<Label>("app-shell-connection-label");
             _offlineBanner = _root.Q<VisualElement>("app-shell-offline-banner");
-            _bannerIcon = _root.Q<VisualElement>("app-shell-banner-icon");
-            _bannerLabel = _root.Q<Label>("app-shell-banner-label");
             _contentRegion = _root.Q<VisualElement>("app-shell-content-region");
             _previewContent = _root.Q<VisualElement>("app-shell-preview-content");
             _navRegion = _root.Q<VisualElement>("app-shell-navigation-region");
@@ -369,6 +381,7 @@ namespace NutriMind.App.UI
             }
 
             UnbindLoadingOverlay();
+            UnbindOfflineSyncBanner();
 
             _root = null;
             _navRegion = null;
@@ -380,11 +393,9 @@ namespace NutriMind.App.UI
             _previewContent = null;
             _connectionHost = null;
             _connectionIcon = null;
-            _bannerIcon = null;
             _pageTitle = null;
             _pageContext = null;
             _connectionLabel = null;
-            _bannerLabel = null;
             _notificationsButton = null;
             _profileButton = null;
             _navHome = null;
@@ -471,6 +482,85 @@ namespace NutriMind.App.UI
         private void OnLoadingOverlayCancelRequested()
         {
             Debug.Log("[AppShellController] Shared loading overlay cancel requested (preview only).");
+        }
+
+        /// <summary>
+        /// Clones the shared OfflineSyncBanner into the shell banner host once per bind cycle.
+        /// Missing asset logs once and leaves the host empty/non-blocking.
+        /// </summary>
+        private void BindOfflineSyncBanner()
+        {
+            if (_offlineBanner == null)
+            {
+                return;
+            }
+
+            UnbindOfflineSyncBanner();
+
+            if (_offlineSyncBannerAsset == null)
+            {
+                if (!_warnedMissingOfflineSyncBannerAsset)
+                {
+                    Debug.LogWarning(
+                        "[AppShellController] OfflineSyncBanner VisualTreeAsset is not assigned. " +
+                        "Assign Assets/NutriMind/App/UI/UXML/Shared/OfflineSyncBanner.uxml " +
+                        "to _offlineSyncBannerAsset. Banner host remains empty and non-blocking.");
+                    _warnedMissingOfflineSyncBannerAsset = true;
+                }
+
+                _offlineBanner.pickingMode = PickingMode.Ignore;
+                return;
+            }
+
+            _offlineSyncBannerInstance = _offlineSyncBannerAsset.CloneTree();
+            _offlineSyncBannerInstance.style.width = Length.Percent(100);
+            _offlineSyncBannerInstance.style.flexShrink = 0;
+
+            _offlineBanner.Add(_offlineSyncBannerInstance);
+            _offlineSyncBannerView = new OfflineSyncBannerView(_offlineSyncBannerInstance);
+            if (!_offlineSyncBannerView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellController] Failed to bind OfflineSyncBannerView from cloned asset. " +
+                    "Banner host remains empty and non-blocking.");
+                UnbindOfflineSyncBanner();
+                return;
+            }
+
+            _offlineSyncBannerView.ActionRequested += OnOfflineSyncBannerActionRequested;
+            _offlineSyncBannerView.Dismissed += OnOfflineSyncBannerDismissed;
+
+            // Force connection preview once after banner bind so an already-matching
+            // _appliedConnection does not skip the initial shared-banner render.
+            _appliedConnection = null;
+            ApplyConnectionPreview(_connectionPreview);
+        }
+
+        private void UnbindOfflineSyncBanner()
+        {
+            if (_offlineSyncBannerView != null)
+            {
+                _offlineSyncBannerView.ActionRequested -= OnOfflineSyncBannerActionRequested;
+                _offlineSyncBannerView.Dismissed -= OnOfflineSyncBannerDismissed;
+                _offlineSyncBannerView.Dispose();
+                _offlineSyncBannerView = null;
+            }
+
+            if (_offlineSyncBannerInstance != null)
+            {
+                _offlineSyncBannerInstance.RemoveFromHierarchy();
+                _offlineSyncBannerInstance = null;
+            }
+        }
+
+        private void OnOfflineSyncBannerActionRequested()
+        {
+            Debug.Log("[AppShellController] Offline/sync banner action requested (preview only).");
+        }
+
+        private void OnOfflineSyncBannerDismissed()
+        {
+            Debug.Log("[AppShellController] Offline/sync banner dismissed (preview only).");
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -638,9 +728,7 @@ namespace NutriMind.App.UI
             _appliedConnection = state;
 
             ClearClassList(_connectionHost, ConnectionStateClasses);
-            ClearClassList(_offlineBanner, BannerStateClasses);
             ClearClassList(_connectionIcon, ConnectionIconClasses);
-            ClearClassList(_bannerIcon, ConnectionIconClasses);
 
             switch (state)
             {
@@ -652,7 +740,7 @@ namespace NutriMind.App.UI
                         _connectionLabel.text = "Synced • Just now";
                     }
 
-                    _offlineBanner?.AddToClassList(BannerHiddenClass);
+                    _offlineSyncBannerView?.Hide();
                     break;
 
                 case AppShellConnectionPreview.Offline:
@@ -663,10 +751,7 @@ namespace NutriMind.App.UI
                         _connectionLabel.text = "Offline";
                     }
 
-                    ShowBanner(
-                        BannerOfflineClass,
-                        IconWarningClass,
-                        "You are offline. Showing downloaded progress.");
+                    _offlineSyncBannerView?.Show(OfflineSyncBannerPresets.OfflineCached());
                     break;
 
                 case AppShellConnectionPreview.SyncPending:
@@ -677,10 +762,7 @@ namespace NutriMind.App.UI
                         _connectionLabel.text = "3 updates waiting";
                     }
 
-                    ShowBanner(
-                        BannerSyncPendingClass,
-                        IconSyncClass,
-                        "Your progress is saved on this device and will sync when online.");
+                    _offlineSyncBannerView?.Show(OfflineSyncBannerPresets.SyncPending(3));
                     break;
 
                 case AppShellConnectionPreview.SyncError:
@@ -691,27 +773,8 @@ namespace NutriMind.App.UI
                         _connectionLabel.text = "Sync needs attention";
                     }
 
-                    ShowBanner(
-                        BannerSyncErrorClass,
-                        IconErrorClass,
-                        "Some progress could not sync. Retry when your connection is stable.");
+                    _offlineSyncBannerView?.Show(OfflineSyncBannerPresets.SyncError());
                     break;
-            }
-        }
-
-        private void ShowBanner(string bannerClass, string iconClass, string message)
-        {
-            if (_offlineBanner != null)
-            {
-                _offlineBanner.RemoveFromClassList(BannerHiddenClass);
-                _offlineBanner.AddToClassList(bannerClass);
-            }
-
-            SetIconClass(_bannerIcon, iconClass);
-
-            if (_bannerLabel != null)
-            {
-                _bannerLabel.text = message;
             }
         }
 

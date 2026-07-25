@@ -291,63 +291,11 @@
     -unity-background-image-tint-color: var(--color-text-secondary);
 }
 
-/* ========== OFFLINE / SYNC BANNER ========== */
+/* ========== OFFLINE / SYNC BANNER HOST ========== */
+/* Layout host only — OfflineSyncBanner owns visuals, tones, and copy. */
 .app-shell__offline-banner {
-    flex-direction: row;
-    align-items: center;
+    width: 100%;
     flex-shrink: 0;
-    min-height: 48px;
-    padding: 12px 40px;
-    background-color: var(--color-warning-soft);
-    border-bottom-width: 1px;
-    border-bottom-color: var(--color-warning);
-}
-
-.app-shell__offline-banner--hidden {
-    display: none;
-}
-
-.app-shell__offline-banner--offline {
-    background-color: var(--color-surface-elev);
-    border-bottom-color: var(--color-border-strong);
-}
-
-.app-shell__offline-banner--sync-pending {
-    background-color: var(--color-secondary-soft);
-    border-bottom-color: var(--color-secondary);
-}
-
-.app-shell__offline-banner--sync-error {
-    background-color: var(--color-danger-soft);
-    border-bottom-color: var(--color-danger);
-}
-
-.app-shell__offline-banner-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.app-shell__offline-banner--offline .app-shell__offline-banner-icon {
-    -unity-background-image-tint-color: var(--color-text-secondary);
-}
-
-.app-shell__offline-banner--sync-pending .app-shell__offline-banner-icon {
-    -unity-background-image-tint-color: var(--color-secondary);
-}
-
-.app-shell__offline-banner--sync-error .app-shell__offline-banner-icon {
-    -unity-background-image-tint-color: var(--color-danger);
-}
-
-.app-shell__offline-banner-label {
-    flex-grow: 1;
-    flex-shrink: 1;
-    font-size: 16px;
-    color: var(--color-text-primary);
-    -unity-font-style: bold;
-    white-space: normal;
 }
 
 /* ========== CONTENT REGION ========== */
@@ -556,14 +504,6 @@
 
 .app-shell--compact .app-shell__avatar {
     margin-right: 0;
-}
-
-.app-shell--compact .app-shell__offline-banner {
-    padding: 10px 24px;
-}
-
-.app-shell--compact .app-shell__offline-banner-label {
-    font-size: 14px;
 }
 
 .app-shell--compact .app-shell__content-region {

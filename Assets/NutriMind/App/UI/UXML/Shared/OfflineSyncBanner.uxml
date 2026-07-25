@@ -1,0 +1,94 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Reusable NutriMind offline / sync status banner (UI-design / static-preview stage).
+
+        Non-modal shell-level status for connectivity and synchronization messaging.
+        Prefer DataStatePanel for in-content offline/empty/error states.
+        Prefer SystemDialog for blocking system interruptions.
+        Prefer LoadingOverlay for blocking operations.
+
+        Compatible with AppShellController offline-banner host — clone into
+        app-shell-offline-banner, or preview standalone via OfflineSyncBannerPreviewController.
+
+        Presentation only — no connectivity detection, networking, SQLite, sync, or routing.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/OfflineSyncBanner.uss" />
+
+    <ui:VisualElement
+        name="offline-sync-banner-root"
+        class="ds-root theme-nutrimind offline-sync-banner offline-sync-banner--hidden"
+        picking-mode="Ignore">
+
+        <ui:VisualElement
+            name="offline-sync-banner-surface"
+            class="offline-sync-banner__surface"
+            picking-mode="Ignore">
+
+            <ui:VisualElement
+                name="offline-sync-banner-icon-background"
+                class="offline-sync-banner__icon-background"
+                picking-mode="Ignore">
+
+                <ui:VisualElement
+                    name="offline-sync-banner-icon"
+                    class="ds-icon ds-icon--wifi offline-sync-banner__icon"
+                    picking-mode="Ignore" />
+
+                <ui:VisualElement
+                    name="offline-sync-banner-spinner"
+                    class="ds-spinner is-spinning offline-sync-banner__spinner offline-sync-banner__spinner--hidden"
+                    picking-mode="Ignore" />
+
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="offline-sync-banner-copy"
+                class="offline-sync-banner__copy"
+                picking-mode="Ignore">
+
+                <ui:Label
+                    name="offline-sync-banner-title"
+                    text="You are offline"
+                    class="offline-sync-banner__title" />
+
+                <ui:Label
+                    name="offline-sync-banner-message"
+                    text="Showing downloaded progress from this device."
+                    class="offline-sync-banner__message" />
+
+                <ui:Label
+                    name="offline-sync-banner-detail"
+                    text=""
+                    class="offline-sync-banner__detail offline-sync-banner__detail--hidden" />
+
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="offline-sync-banner-actions"
+                class="offline-sync-banner__actions"
+                picking-mode="Ignore">
+
+                <ui:Button
+                    name="offline-sync-banner-action"
+                    text="Retry"
+                    class="ds-btn ds-btn--ghost offline-sync-banner__action offline-sync-banner__action--hidden" />
+
+                <ui:Button
+                    name="offline-sync-banner-dismiss"
+                    class="ds-btn ds-btn--ghost ds-btn--icon offline-sync-banner__dismiss offline-sync-banner__dismiss--hidden"
+                    tooltip="Dismiss status">
+
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--close"
+                        picking-mode="Ignore" />
+
+                </ui:Button>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
