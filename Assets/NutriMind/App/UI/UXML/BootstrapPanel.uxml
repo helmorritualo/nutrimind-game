@@ -1,0 +1,164 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        NutriMind BootstrapPanel — standalone cinematic startup loading screen
+        (UI-design / static-preview stage).
+
+        Always shown first at application launch. Presentation only — no real
+        startup checks, authentication, APIs, SQLite, sync, updates, scene
+        loading, or production routing. Transitions are request events only.
+        Not hosted inside AppShellContentPreviewScreen.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/BootstrapPanel.uss" />
+
+    <ui:VisualElement
+        name="bootstrap-root"
+        class="ds-root theme-nutrimind bootstrap-panel bootstrap-panel--loading">
+
+        <ui:VisualElement
+            name="bootstrap-background"
+            class="bootstrap-panel__background"
+            picking-mode="Ignore">
+
+            <ui:VisualElement
+                name="bootstrap-background-glow"
+                class="bootstrap-panel__background-glow"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="bootstrap-background-orb-one"
+                class="bootstrap-panel__background-orb bootstrap-panel__background-orb--one"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="bootstrap-background-orb-two"
+                class="bootstrap-panel__background-orb bootstrap-panel__background-orb--two"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="bootstrap-background-grid"
+                class="bootstrap-panel__background-grid"
+                picking-mode="Ignore" />
+
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="bootstrap-content"
+            class="bootstrap-panel__content">
+
+            <ui:VisualElement
+                name="bootstrap-brand"
+                class="bootstrap-panel__brand"
+                picking-mode="Ignore">
+
+                <ui:Label
+                    name="bootstrap-brand-nutri"
+                    text="Nutri"
+                    class="bootstrap-panel__brand-nutri" />
+
+                <ui:VisualElement
+                    name="bootstrap-brand-mind-wrap"
+                    class="bootstrap-panel__brand-mind-wrap">
+
+                    <ui:Label
+                        name="bootstrap-brand-mind"
+                        text="Mind"
+                        class="bootstrap-panel__brand-mind" />
+
+                    <ui:VisualElement
+                        name="bootstrap-brand-leaf"
+                        class="ds-icon ds-icon--leaf bootstrap-panel__brand-leaf"
+                        picking-mode="Ignore" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="bootstrap-center"
+                class="bootstrap-panel__center">
+
+                <ui:VisualElement
+                    name="bootstrap-state-icon-background"
+                    class="bootstrap-panel__state-icon-background bootstrap-panel__state-icon-background--hidden"
+                    picking-mode="Ignore">
+
+                    <ui:VisualElement
+                        name="bootstrap-state-icon"
+                        class="ds-icon ds-icon--book bootstrap-panel__state-icon bootstrap-panel__state-icon--hidden"
+                        picking-mode="Ignore" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="bootstrap-progress-region"
+                class="bootstrap-panel__progress-region">
+
+                <ui:VisualElement
+                    name="bootstrap-actions"
+                    class="bootstrap-panel__actions bootstrap-panel__actions--hidden">
+
+                    <ui:Button
+                        name="bootstrap-secondary-action"
+                        text=""
+                        class="ds-btn ds-btn--ghost ds-btn--lg bootstrap-panel__secondary-action bootstrap-panel__secondary-action--hidden"
+                        focusable="false" />
+
+                    <ui:Button
+                        name="bootstrap-primary-action"
+                        text=""
+                        class="ds-btn ds-btn--primary ds-btn--lg bootstrap-panel__primary-action"
+                        focusable="false" />
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="bootstrap-status"
+                    class="bootstrap-panel__status"
+                    picking-mode="Ignore">
+
+                    <ui:Label
+                        name="bootstrap-message"
+                        text="Preparing local learning data..."
+                        class="bootstrap-panel__message" />
+
+                    <ui:Label
+                        name="bootstrap-detail"
+                        text="Please wait."
+                        class="bootstrap-panel__detail" />
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="bootstrap-progress-bar-row"
+                    class="bootstrap-panel__progress-bar-row">
+
+                    <ui:ProgressBar
+                        name="bootstrap-progress"
+                        low-value="0"
+                        high-value="100"
+                        value="8"
+                        title=""
+                        class="ds-progress bootstrap-panel__progress" />
+
+                    <ui:Label
+                        name="bootstrap-progress-percent"
+                        text="8%"
+                        class="bootstrap-panel__progress-percent" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <ui:Label
+                name="bootstrap-reference"
+                text="Startup preview • No real checks are running"
+                class="bootstrap-panel__reference bootstrap-panel__reference--hidden" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

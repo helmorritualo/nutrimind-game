@@ -444,6 +444,7 @@ GameObject:
   - component: {fileID: 1380726510}
   - component: {fileID: 1380726512}
   - component: {fileID: 1380726513}
+  - component: {fileID: 1380726514}
   m_Layer: 0
   m_Name: AppUiPreview
   m_TagString: Untagged
@@ -465,7 +466,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: b4146ba15a6f65947a00ae5c037797af, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 9e9738d3d59703344b92057a013a2f5c, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 8df1d3751fbe4d4db8d3af0113aa9865, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -496,7 +497,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380726508}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee863e7240a306648b65c9f1cb974b78, type: 3}
   m_Name: 
@@ -513,7 +514,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380726508}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 201cd84631572904299ac98fc516bd37, type: 3}
   m_Name: 
@@ -568,6 +569,21 @@ MonoBehaviour:
   _respondToProfileRequest: 1
   _selectedSubject: 0
   _selectedTerm: 1
+--- !u!114 &1380726514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380726508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37c52dba91a0453d9a3ff31b8b22cdf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.BootstrapPanelController
+  _previewState: 0
+  _showReference: 1
+  _referenceText: "Startup preview \u2022 No real checks are running"
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
