@@ -606,10 +606,10 @@ A task is complete only when:
 - Prefer Full HD (1920×1080) landscape framing for static UI layout tests and Penpot boards, while keeping App UITK layouts responsive across Android screen sizes.
 - Prefer building UITK layouts with the installed DesignSystem package (`com.sinanata.designsystem`) reusable components when available; do not modify that package; style via `NutriMindTheme.uss` and panel USS; keep custom illustration placeholders only for the NutriMind logo, student avatars, three subject emblems, small badge emblems, and an optional empty-state mascot.
 - Omit Demo Login and other non-reference chrome unless explicitly requested; on Subject Selection and Term Selection screens, omit Profile/Settings/Logout chrome and the Quiz Portal card (Quiz Portal belongs on Home).
-- When creating a requested folder tree, create the full deep nested structure in one pass—not only shallow top-level folders.
+- Use `ConfirmDialog` only for two-action confirmations; use `SystemDialog` for system-status/info interruptions (session expired, maintenance, connection required, etc.)—do not conflate the two.
 - After a temporary design/layout test is approved, delete the test files and folders when asked rather than leaving them in the project.
 - For large UI refinement passes, inspect references and existing UXML/USS first, plan highest-impact fixes, and wait for approval before rewriting broadly when Plan Mode is requested.
-- Prefer readable, accessible App UITK scale in Game view / device sims—enlarge undersized text/controls, keep dropdown/popup menus legible, use generous padding/margins, prefer medium or bold font weights over thin ones, and design selection cards so layouts stay valid with dynamic/variable text lengths.
+- Prefer readable, accessible App UITK scale in Game view / device sims—enlarge undersized text/controls, keep dropdown/popup menus legible, use generous padding/margins, prefer medium or bold font weights over thin ones, keep state/dialog cards clearly visible against warm App backgrounds, and design selection cards so layouts stay valid with dynamic/variable text lengths.
 - For App UITK visual QA, prefer user-provided Game view screenshots over Unity MCP capture, SceneView, or PlayMode screenshot tools when those MCP tools are unreliable.
 - On Profile, do not expose a full raw LRN (use a masked preview); style Sign Out as a clear red/destructive action.
 - App subjects are only LiteraQuest, PE & Health, and Science—omit Friends navigation and other subjects; mission/term locks use classroom publication, teacher lock, prerequisite completion, or server availability—not stars, learner level, or term-completion percentage.
@@ -619,9 +619,11 @@ A task is complete only when:
 - Canonical first-party content lives under `Assets/NutriMind/` using Core, App, Gameplay, Content, Missions, Shared, Settings, Editor, and Tests (not a nested `NutriMindUnity/` wrapper).
 - Application UI design references are under `Assets/NutriMind/Shared/UI/DesignRefs/` (PNG and JPG variants).
 - Application UI Toolkit screens belong under `Assets/NutriMind/App/UI/` (UXML, USS including `NutriMindTheme.uss`, Controllers); do not edit `Packages/com.sinanata.designsystem`; App panel settings belong under `Assets/NutriMind/Settings/UI/`.
+- Shared App UITK building blocks live under `Assets/NutriMind/App/UI/{UXML,USS,Controllers}/Shared/` (`DataStatePanel`, `ConfirmDialog`, `SystemDialog`); `AppShell` (`AppShell.uxml` / `AppShellController`) hosts shared chrome and the content region for remaining App screens.
+- `DataStatePanel` is an in-content data-state host (loading, empty, cache, offline, recoverable error, permission/locked)—not a modal overlay; modal-style interruptions use `ConfirmDialog` or `SystemDialog`.
 - Application UI is designed in Penpot via the `user-penpot` MCP as the layout source of truth; keep that work separate from Unity App UXML/USS/C#/scene implementation unless explicitly requested.
 - The Unity Design System package is at `Packages/com.sinanata.designsystem`.
 - The project targets Unity 6 (`6000.3.x` per `ProjectSettings/ProjectVersion.txt`).
-- Temporary App UITK screen previews (Login, Home, Subject Selection, Term Selection, Mission Selection, Locked Mission, Profile, Settings) are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
+- Temporary App UITK screen and shared-component previews (Login, Home, Subject/Term/Mission Selection, Locked Mission, Profile, Settings, AppShell, DataStatePanel, ConfirmDialog, SystemDialog) are wired through `Assets/Scenes/SampleScene.unity` until dedicated App scenes exist.
 - Local-only App Settings options should work without the server via `AppLocalSettings`; server-backed settings stay deferred.
 - App UITK iteration commonly uses the Singularity Group Hot Reload package; pause Hot Reload and free RAM before Unity MCP `ManageGameObject`/scene wiring to avoid import/domain-reload hangs.

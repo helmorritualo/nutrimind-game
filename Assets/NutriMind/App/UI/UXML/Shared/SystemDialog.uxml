@@ -1,0 +1,138 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Reusable NutriMind system dialog for application/system information,
+        interruption, availability, and recoverable failure states (UI-design stage).
+
+        Compatible with AppShellController.GetModalLayer() — clone into the modal host,
+        or preview standalone via SystemDialogPreviewController.
+
+        Owns its own ds-backdrop. Do not add a second AppShell backdrop for the same dialog.
+        Not a two-action confirmation — use ConfirmDialog for Confirm / Cancel prompts.
+        Presentation only — no routing, auth, API, SQLite, sync, or gameplay state changes.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/SystemDialog.uss" />
+
+    <ui:VisualElement
+        name="system-dialog-root"
+        class="ds-root theme-nutrimind system-dialog system-dialog--hidden"
+        focusable="true">
+
+        <ui:VisualElement
+            name="system-dialog-backdrop"
+            class="ds-backdrop system-dialog__backdrop">
+
+            <ui:VisualElement
+                name="system-dialog-card"
+                class="ds-modal system-dialog__card">
+
+                <ui:VisualElement
+                    name="system-dialog-header"
+                    class="ds-modal__header system-dialog__header">
+
+                    <ui:VisualElement
+                        name="system-dialog-header-copy"
+                        class="system-dialog__header-copy">
+
+                        <ui:Label
+                            name="system-dialog-eyebrow"
+                            text="NutriMind"
+                            class="system-dialog__eyebrow" />
+
+                        <ui:Label
+                            name="system-dialog-title"
+                            text="System message"
+                            class="ds-modal__title system-dialog__title" />
+
+                    </ui:VisualElement>
+
+                    <ui:Button
+                        name="system-dialog-close"
+                        class="ds-modal__close system-dialog__close system-dialog__close--hidden"
+                        tooltip="Close">
+
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--close"
+                            picking-mode="Ignore" />
+
+                    </ui:Button>
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="system-dialog-body"
+                    class="ds-modal__body system-dialog__body">
+
+                    <ui:VisualElement
+                        name="system-dialog-status-row"
+                        class="system-dialog__status-row">
+
+                        <ui:VisualElement
+                            name="system-dialog-icon-background"
+                            class="system-dialog__icon-background">
+
+                            <ui:VisualElement
+                                name="system-dialog-icon"
+                                class="ds-icon ds-icon--info system-dialog__icon"
+                                picking-mode="Ignore" />
+
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="system-dialog-message-copy"
+                            class="system-dialog__message-copy">
+
+                            <ui:Label
+                                name="system-dialog-message"
+                                text="Important information from NutriMind."
+                                class="ds-modal__body-text system-dialog__message" />
+
+                            <ui:Label
+                                name="system-dialog-detail"
+                                text=""
+                                class="system-dialog__detail system-dialog__detail--hidden" />
+
+                        </ui:VisualElement>
+
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="system-dialog-reference"
+                        class="system-dialog__reference system-dialog__reference--hidden">
+
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--info system-dialog__reference-icon"
+                            picking-mode="Ignore" />
+
+                        <ui:Label
+                            name="system-dialog-reference-label"
+                            text=""
+                            class="system-dialog__reference-label" />
+
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="system-dialog-actions"
+                    class="ds-modal__actions system-dialog__actions">
+
+                    <ui:Button
+                        name="system-dialog-secondary-action"
+                        text="Go Back"
+                        class="ds-btn ds-btn--ghost ds-btn--lg system-dialog__secondary-action system-dialog__secondary-action--hidden" />
+
+                    <ui:Button
+                        name="system-dialog-primary-action"
+                        text="Continue"
+                        class="ds-btn ds-btn--primary ds-btn--lg system-dialog__primary-action" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

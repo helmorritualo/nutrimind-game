@@ -464,7 +464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: b4146ba15a6f65947a00ae5c037797af, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 91243026619ce4249aca4c3ea55ea743, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: a7c3e91f4b2d5840a9e6c1d05f38b274, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -497,18 +497,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1380726508}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d98ce45123010b4798e7ceb4ddb52ad, type: 3}
+  m_Script: {fileID: 11500000, guid: d0f6b24c7e508173d2b9f4a38c61e5a7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.ConfirmDialogPreviewController
+  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.SystemDialogPreviewController
   _previewPreset: 0
   _showOnEnable: 1
-  _dismissOnBackdrop: 0
   _customTone: 0
-  _customTitle: Confirm action?
-  _customMessage: Please confirm before continuing.
+  _customEyebrow: NutriMind
+  _customTitle: System message
+  _customMessage: Important information from NutriMind.
   _customDetail: 
-  _customConfirmLabel: Confirm
-  _customCancelLabel: Cancel
+  _customReferenceText: 
+  _customPrimaryActionLabel: OK
+  _customSecondaryActionLabel: 
+  _customAllowDismiss: 0
+  _customDismissOnBackdrop: 0
+  _customHideAfterPrimaryAction: 1
+  _customHideAfterSecondaryAction: 1
   _customIcon: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
