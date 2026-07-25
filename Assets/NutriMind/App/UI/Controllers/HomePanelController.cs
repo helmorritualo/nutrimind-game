@@ -6,8 +6,8 @@ namespace NutriMind.App.UI
     /// <summary>
     /// Layout-only home panel wiring for UI Toolkit preview.
     /// Handles responsive classes, bottom nav selection, and static click
-    /// feedback (Debug.Log plus a small toast) for Play Adventure, Quiz
-    /// Portal, the avatar, and every nav item.
+    /// feedback (Debug.Log plus a package-styled informational toast) for
+    /// Play Adventure, Quiz Portal, the avatar, and every nav item.
     /// Does not perform routing, progress loading, sync, or networking.
     /// </summary>
     [DisallowMultipleComponent]
@@ -17,6 +17,7 @@ namespace NutriMind.App.UI
         private const string CompactClass = "home-panel--compact";
         private const string NarrowClass = "home-panel--narrow";
         private const string MobileClass = "mobile";
+        private const string ToastHiddenClass = "home-panel__toast--hidden";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
         private const float ToastDurationSeconds = 2.5f;
@@ -26,6 +27,7 @@ namespace NutriMind.App.UI
         private VisualElement _nav;
         private VisualElement _toast;
         private Label _toastLabel;
+        private Button _toastCloseButton;
         private Button _playContinueButton;
         private Button _quizGoButton;
         private VisualElement _avatar;
@@ -88,6 +90,9 @@ namespace NutriMind.App.UI
 
             _toast = _root.Q<VisualElement>("home-toast");
             _toastLabel = _root.Q<Label>("home-toast-label");
+            _toastCloseButton = _root.Q<Button>("home-toast-close");
+            _toastCloseButton?.RegisterCallback<ClickEvent>(OnToastCloseClicked);
+            HideToast();
 
             _nav = _root.Q<VisualElement>("home-nav");
             if (_nav != null)
@@ -127,6 +132,7 @@ namespace NutriMind.App.UI
 
             _playContinueButton?.UnregisterCallback<ClickEvent>(OnPlayContinueClicked);
             _quizGoButton?.UnregisterCallback<ClickEvent>(OnQuizGoClicked);
+            _toastCloseButton?.UnregisterCallback<ClickEvent>(OnToastCloseClicked);
 
             if (_avatar != null && _avatarClickable != null)
             {
@@ -138,10 +144,13 @@ namespace NutriMind.App.UI
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             }
 
+            CancelInvoke(nameof(HideToast));
+
             _root = null;
             _nav = null;
             _toast = null;
             _toastLabel = null;
+            _toastCloseButton = null;
             _playContinueButton = null;
             _quizGoButton = null;
             _avatar = null;
@@ -220,14 +229,21 @@ namespace NutriMind.App.UI
             }
 
             _toastLabel.text = message ?? string.Empty;
-            _toast.EnableInClassList("is-visible", true);
+            _toast.RemoveFromClassList(ToastHiddenClass);
+
             CancelInvoke(nameof(HideToast));
             Invoke(nameof(HideToast), ToastDurationSeconds);
         }
 
         private void HideToast()
         {
-            _toast?.EnableInClassList("is-visible", false);
+            _toast?.AddToClassList(ToastHiddenClass);
+        }
+
+        private void OnToastCloseClicked(ClickEvent evt)
+        {
+            CancelInvoke(nameof(HideToast));
+            HideToast();
         }
     }
 }

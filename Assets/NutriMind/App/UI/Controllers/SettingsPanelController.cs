@@ -49,7 +49,6 @@ namespace NutriMind.App.UI
         private const float NarrowBreakpoint = 820f;
         private const float SaveFeedbackDelaySeconds = 0.6f;
         private const float SaveFeedbackHoldSeconds = 3f;
-        private const float SaveErrorPreviewChance = 0.12f;
         private const string DropdownPopupAssetPath =
             "Assets/NutriMind/App/UI/USS/SettingsDropdownPopup.uss";
 
@@ -75,6 +74,10 @@ namespace NutriMind.App.UI
 
         [SerializeField]
         private StyleSheet _dropdownPopupStyle;
+
+        [SerializeField]
+        [Tooltip("UI-only preview option. When enabled, Save Changes shows an error and does not write the draft to PlayerPrefs.")]
+        private bool _simulateSaveError;
 
         private UIDocument _uiDocument;
         private VisualElement _root;
@@ -135,6 +138,16 @@ namespace NutriMind.App.UI
         private Button _confirmCancelButton;
         private Button _confirmAcceptButton;
         private PendingConfirmAction _pendingConfirmAction = PendingConfirmAction.None;
+
+        private Button _restoreDefaultsButton;
+        private Button _saveChangesButton;
+        private Button _privacyButton;
+        private Button _privacyOverviewButton;
+        private Button _aboutPrivacyButton;
+        private Button _resetTutorialButton;
+        private Button _resetTutorialOverviewButton;
+        private Button _replayTutorialButton;
+        private Button _supportButton;
 
         private void OnEnable()
         {
@@ -293,6 +306,16 @@ namespace NutriMind.App.UI
             _confirmMessage = _root.Q<Label>("settings-confirm-message");
             _confirmCancelButton = _root.Q<Button>("settings-confirm-cancel");
             _confirmAcceptButton = _root.Q<Button>("settings-confirm-accept");
+
+            _restoreDefaultsButton = _root.Q<Button>("btn-restore-defaults");
+            _saveChangesButton = _root.Q<Button>("btn-save-changes");
+            _privacyButton = _root.Q<Button>("btn-privacy");
+            _privacyOverviewButton = _root.Q<Button>("btn-privacy-overview");
+            _aboutPrivacyButton = _root.Q<Button>("btn-about-privacy");
+            _resetTutorialButton = _root.Q<Button>("btn-reset-tutorial");
+            _resetTutorialOverviewButton = _root.Q<Button>("btn-reset-tutorial-overview");
+            _replayTutorialButton = _root.Q<Button>("btn-replay-tutorial");
+            _supportButton = _root.Q<Button>("btn-support");
         }
 
         private void RegisterCallbacks()
@@ -325,15 +348,15 @@ namespace NutriMind.App.UI
             RegisterToggle(_toggleHighContrast, OnHighContrastChanged);
             RegisterToggle(_toggleHighContrastOverview, OnHighContrastOverviewChanged);
 
-            RegisterButton("btn-restore-defaults", OnRestoreDefaultsRequested);
-            RegisterButton("btn-save-changes", OnSaveChanges);
-            RegisterButton("btn-privacy", OnPrivacyClicked);
-            RegisterButton("btn-privacy-overview", OnPrivacyOverviewClicked);
-            RegisterButton("btn-about-privacy", OnPrivacyClicked);
-            RegisterButton("btn-reset-tutorial", OnResetTutorialRequested);
-            RegisterButton("btn-reset-tutorial-overview", OnResetTutorialRequested);
-            RegisterButton("btn-replay-tutorial", OnResetTutorialRequested);
-            RegisterButton("btn-support", OnSupportClicked);
+            _restoreDefaultsButton?.RegisterCallback<ClickEvent>(OnRestoreDefaultsRequested);
+            _saveChangesButton?.RegisterCallback<ClickEvent>(OnSaveChanges);
+            _privacyButton?.RegisterCallback<ClickEvent>(OnPrivacyClicked);
+            _privacyOverviewButton?.RegisterCallback<ClickEvent>(OnPrivacyOverviewClicked);
+            _aboutPrivacyButton?.RegisterCallback<ClickEvent>(OnPrivacyClicked);
+            _resetTutorialButton?.RegisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _resetTutorialOverviewButton?.RegisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _replayTutorialButton?.RegisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _supportButton?.RegisterCallback<ClickEvent>(OnSupportClicked);
 
             _confirmCancelButton?.RegisterCallback<ClickEvent>(OnConfirmCancelClicked);
             _confirmAcceptButton?.RegisterCallback<ClickEvent>(OnConfirmAcceptClicked);
@@ -369,6 +392,16 @@ namespace NutriMind.App.UI
             UnregisterToggle(_toggleHighContrast, OnHighContrastChanged);
             UnregisterToggle(_toggleHighContrastOverview, OnHighContrastOverviewChanged);
 
+            _restoreDefaultsButton?.UnregisterCallback<ClickEvent>(OnRestoreDefaultsRequested);
+            _saveChangesButton?.UnregisterCallback<ClickEvent>(OnSaveChanges);
+            _privacyButton?.UnregisterCallback<ClickEvent>(OnPrivacyClicked);
+            _privacyOverviewButton?.UnregisterCallback<ClickEvent>(OnPrivacyOverviewClicked);
+            _aboutPrivacyButton?.UnregisterCallback<ClickEvent>(OnPrivacyClicked);
+            _resetTutorialButton?.UnregisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _resetTutorialOverviewButton?.UnregisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _replayTutorialButton?.UnregisterCallback<ClickEvent>(OnResetTutorialRequested);
+            _supportButton?.UnregisterCallback<ClickEvent>(OnSupportClicked);
+
             _confirmCancelButton?.UnregisterCallback<ClickEvent>(OnConfirmCancelClicked);
             _confirmAcceptButton?.UnregisterCallback<ClickEvent>(OnConfirmAcceptClicked);
 
@@ -377,16 +410,29 @@ namespace NutriMind.App.UI
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             }
 
+            CancelInvoke(nameof(ClearStatus));
+            CancelInvoke(nameof(CompleteSaveFeedback));
+
             _root = null;
             _sidebar = null;
+            _statusLabel = null;
+            _privacyDetail = null;
+            _confirmBackdrop = null;
+            _confirmTitle = null;
+            _confirmMessage = null;
+            _confirmCancelButton = null;
+            _confirmAcceptButton = null;
+            _restoreDefaultsButton = null;
+            _saveChangesButton = null;
+            _privacyButton = null;
+            _privacyOverviewButton = null;
+            _aboutPrivacyButton = null;
+            _resetTutorialButton = null;
+            _resetTutorialOverviewButton = null;
+            _replayTutorialButton = null;
+            _supportButton = null;
             _lastWidth = -1f;
             _pendingConfirmAction = PendingConfirmAction.None;
-        }
-
-        private void RegisterButton(string name, EventCallback<ClickEvent> callback)
-        {
-            var button = _root.Q<Button>(name);
-            button?.RegisterCallback(callback);
         }
 
         private static void RegisterSlider(Slider slider, EventCallback<ChangeEvent<float>> callback)
@@ -817,8 +863,6 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            _draft.Save();
-            _draft.ApplyRuntimeEffects();
             BeginSaveFeedback();
         }
 
@@ -832,19 +876,26 @@ namespace NutriMind.App.UI
 
         private void CompleteSaveFeedback()
         {
-            bool succeeded = UnityEngine.Random.value >= SaveErrorPreviewChance;
-            if (succeeded)
+            if (_draft == null)
             {
-                SetStatus("Settings saved on this device.", SettingsStatusState.Saved);
+                return;
+            }
+
+            if (_simulateSaveError)
+            {
+                SetStatus(
+                    "Couldn't save settings. Please try again.",
+                    SettingsStatusState.Error);
             }
             else
             {
-                // Static preview of a failed save (e.g. storage write error) —
-                // no real save actually failed; this only exercises the visual state.
-                SetStatus("Couldn't save settings. Please try again.", SettingsStatusState.Error);
-            }
+                _draft.Save();
+                _draft.ApplyRuntimeEffects();
 
-            Invoke(nameof(ClearStatus), SaveFeedbackHoldSeconds);
+                SetStatus(
+                    "Settings saved on this device.",
+                    SettingsStatusState.Saved);
+            }
         }
 
         private void OnPrivacyClicked(ClickEvent evt)

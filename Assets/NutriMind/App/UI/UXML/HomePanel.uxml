@@ -37,7 +37,7 @@
         <ui:VisualElement name="home-announce-bar" class="home-panel__announce-bar">
             <ui:VisualElement name="home-announcement" class="home-panel__announce">
                 <ui:VisualElement class="ds-icon ds-icon--bell home-panel__announce-icon" />
-                <ui:Label name="announcement-text" text="Announcement: A new Science area unlocks this Friday!" class="home-panel__announce-text" />
+                <ui:Label name="announcement-text" text="Announcement: Your teacher will release a new Science mission this Friday!" class="home-panel__announce-text" />
             </ui:VisualElement>
             <ui:VisualElement name="home-sync-status" class="home-panel__sync">
                 <ui:VisualElement name="sync-status-dot" class="home-panel__sync-dot" />
@@ -186,11 +186,31 @@
             </ui:Button>
         </ui:VisualElement>
 
-        <!-- Static click-feedback toast for the preview build. Hidden until a button is pressed. -->
-        <ui:VisualElement name="home-toast-wrap" class="home-panel__toast-wrap" picking-mode="Ignore">
-            <ui:VisualElement name="home-toast" class="home-panel__toast">
-                <ui:VisualElement class="ds-icon ds-icon--check home-panel__toast-icon" />
-                <ui:Label name="home-toast-label" text="" class="home-panel__toast-label" />
+        <!-- Package-styled preview toast. Home owns placement and visibility only. -->
+        <ui:VisualElement name="home-toast-host" class="home-panel__toast-host">
+            <ui:VisualElement
+                name="home-toast"
+                class="ds-toast ds-toast--info home-panel__toast home-panel__toast--hidden">
+
+                <ui:VisualElement
+                    name="home-toast-icon"
+                    class="ds-icon ds-icon--info ds-toast__icon"
+                    picking-mode="Ignore" />
+
+                <ui:Label
+                    name="home-toast-label"
+                    text=""
+                    class="ds-toast__message" />
+
+                <ui:Button
+                    name="home-toast-close"
+                    class="ds-toast__close"
+                    tooltip="Dismiss notification">
+
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--close"
+                        picking-mode="Ignore" />
+                </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

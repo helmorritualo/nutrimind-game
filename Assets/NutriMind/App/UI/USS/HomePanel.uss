@@ -829,42 +829,21 @@
     white-space: nowrap;
 }
 
-/* ========== CLICK-FEEDBACK TOAST ========== */
-.home-panel__toast-wrap {
+/* ========== PACKAGE TOAST PLACEMENT (visuals from DesignSystem Overlays) ========== */
+.home-panel__toast-host {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 128px;
-    flex-direction: row;
-    justify-content: center;
+    right: var(--space-4);
+    bottom: 104px;
+    width: 420px;
+    max-width: 42%;
 }
 
 .home-panel__toast {
+    width: 100%;
+}
+
+.home-panel__toast--hidden {
     display: none;
-    flex-direction: row;
-    align-items: center;
-    background-color: rgba(30, 30, 30, 0.92);
-    border-radius: 24px;
-    padding: 14px 24px;
-}
-
-.home-panel__toast.is-visible {
-    display: flex;
-}
-
-.home-panel__toast-icon {
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    flex-shrink: 0;
-    -unity-background-image-tint-color: #FFFFFF;
-}
-
-.home-panel__toast-label {
-    font-size: 15px;
-    color: #FFFFFF;
-    -unity-font-style: bold;
-    white-space: nowrap;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -1009,6 +988,12 @@
     margin-right: 14px;
 }
 
+.home-panel--compact .home-panel__toast-host {
+    right: var(--space-3);
+    width: 380px;
+    max-width: 55%;
+}
+
 .home-panel--compact .home-panel__nav {
     height: auto;
     min-height: 80px;
@@ -1098,6 +1083,13 @@
 .home-panel--narrow Label.home-panel__goal-text {
     font-size: 15px;
     margin-right: 12px;
+}
+
+.home-panel--narrow .home-panel__toast-host {
+    left: var(--space-3);
+    right: var(--space-3);
+    width: auto;
+    max-width: none;
 }
 
 .home-panel--narrow .home-panel__nav-label {
