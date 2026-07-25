@@ -2,11 +2,9 @@
     <!--
         Shared NutriMind application shell (UI-design / static-preview stage).
 
-        TODO(AppShell migration): Existing panels (Home, Subjects, Term, Mission,
-        Locked Mission, Profile, Settings) still embed duplicated top chrome and
-        bottom navigation. After the remaining screen set is designed, migrate
-        those panels into app-shell-content-region and remove per-panel chrome.
-        New route-level screens should target this content region.
+        AppShell now hosts content-only screen previews through
+        AppShellContentPreviewController. Existing full-screen panels remain
+        standalone until migrated one at a time.
     -->
     <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
@@ -83,17 +81,10 @@
                 picking-mode="Ignore" />
 
             <!-- ===== CONTENT REGION ===== -->
-            <ui:VisualElement name="app-shell-content-region" class="app-shell__content-region">
-                <ui:VisualElement name="app-shell-preview-content" class="app-shell__preview-content ds-empty">
-                    <ui:VisualElement class="ds-empty__icon-bg app-shell__preview-icon-bg">
-                        <ui:VisualElement class="ds-icon ds-icon--leaf ds-empty__icon app-shell__preview-icon" />
-                    </ui:VisualElement>
-                    <ui:Label text="App Shell Preview" class="ds-empty__title app-shell__preview-title" />
-                    <ui:Label
-                        text="Future application panels will be inserted here."
-                        class="ds-empty__message app-shell__preview-message" />
-                </ui:VisualElement>
-            </ui:VisualElement>
+            <ui:VisualElement
+                name="app-shell-content-region"
+                class="app-shell__content-region"
+                picking-mode="Position" />
 
             <!-- ===== BOTTOM NAVIGATION ===== -->
             <ui:VisualElement name="app-shell-navigation-region" class="app-shell__navigation-region">

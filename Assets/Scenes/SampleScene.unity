@@ -443,6 +443,7 @@ GameObject:
   - component: {fileID: 1380726511}
   - component: {fileID: 1380726510}
   - component: {fileID: 1380726512}
+  - component: {fileID: 1380726513}
   m_Layer: 0
   m_Name: AppUiPreview
   m_TagString: Untagged
@@ -503,9 +504,25 @@ MonoBehaviour:
   _previewRoute: 0
   _connectionPreview: 0
   _showLoadingPreview: 0
-  _showPreviewContent: 1
   _loadingOverlayAsset: {fileID: 9197481963319205126, guid: 9ee67f8fa4bc06843acfe9a58dbf1ad7, type: 3}
   _offlineSyncBannerAsset: {fileID: 9197481963319205126, guid: 2ca97f21b3c6ffa41a6bcac2df0f2f84, type: 3}
+--- !u!114 &1380726513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380726508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201cd84631572904299ac98fc516bd37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.AppShellContentPreviewController
+  _previewScreen: 0
+  _previewEntries: []
+  _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
+  _respondToShellNavigation: 1
+  _respondToProfileRequest: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

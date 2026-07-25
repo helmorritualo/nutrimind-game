@@ -302,43 +302,19 @@
 .app-shell__content-region {
     flex-grow: 1;
     flex-shrink: 1;
+    min-width: 0;
     min-height: 0;
     padding: 28px 40px 20px 40px;
-    align-items: center;
-    justify-content: center;
+    position: relative;
 }
 
-.app-shell__preview-content {
-    max-width: 520px;
+.app-shell__content-instance {
+    flex-grow: 1;
+    flex-shrink: 1;
     width: 100%;
-    background-color: var(--color-surface);
-    border-width: 1px;
-    border-color: var(--color-border);
-    border-radius: 28px;
-    padding: 48px 40px;
-}
-
-.app-shell__preview-content--hidden {
-    display: none;
-}
-
-.app-shell__preview-icon-bg {
-    background-color: var(--color-primary-soft);
-}
-
-.app-shell__preview-icon {
-    -unity-background-image-tint-color: var(--color-primary);
-}
-
-.app-shell__preview-title {
-    font-size: 28px;
-    margin-bottom: 8px;
-}
-
-.app-shell__preview-message {
-    font-size: 17px;
-    -unity-font-style: bold;
-    margin-bottom: 0;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* ========== BOTTOM NAV ========== */
@@ -508,15 +484,6 @@
 
 .app-shell--compact .app-shell__content-region {
     padding: 20px 24px 14px 24px;
-}
-
-.app-shell--compact .app-shell__preview-content {
-    padding: 36px 28px;
-    border-radius: 22px;
-}
-
-.app-shell--compact .app-shell__preview-title {
-    font-size: 24px;
 }
 
 .app-shell--compact .app-shell__navigation-region {

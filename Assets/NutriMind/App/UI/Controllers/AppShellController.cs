@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -42,7 +43,6 @@ namespace NutriMind.App.UI
         private const string CompactClass = "app-shell--compact";
         private const string NarrowClass = "app-shell--narrow";
         private const string MobileClass = "mobile";
-        private const string PreviewHiddenClass = "app-shell__preview-content--hidden";
         private const string ConnectionOnlineClass = "app-shell__connection--online";
         private const string ConnectionOfflineClass = "app-shell__connection--offline";
         private const string ConnectionSyncPendingClass = "app-shell__connection--sync-pending";
@@ -83,10 +83,6 @@ namespace NutriMind.App.UI
         private bool _showLoadingPreview;
 
         [SerializeField]
-        [Tooltip("UI-only content placeholder toggle. Shows or hides the temporary App Shell Preview card.")]
-        private bool _showPreviewContent = true;
-
-        [SerializeField]
         [Tooltip("Shared LoadingOverlay UXML used by the shell's global loading host.")]
         private VisualTreeAsset _loadingOverlayAsset;
 
@@ -102,7 +98,6 @@ namespace NutriMind.App.UI
         private VisualElement _toastLayer;
         private VisualElement _offlineBanner;
         private VisualElement _loadingLayer;
-        private VisualElement _previewContent;
         private VisualElement _connectionHost;
         private VisualElement _connectionIcon;
         private Label _pageTitle;
@@ -126,7 +121,23 @@ namespace NutriMind.App.UI
         private AppShellPreviewRoute? _appliedRoute;
         private AppShellConnectionPreview? _appliedConnection;
         private bool? _appliedLoading;
-        private bool? _appliedPreviewContent;
+        /// <summary>
+        /// Raised once after a bottom-navigation click applies its static preview route.
+        /// Presentation-only request; this is not a production routing event.
+        /// </summary>
+        public event Action<AppShellPreviewRoute> PreviewRouteRequested;
+
+        /// <summary>
+        /// Raised once when the shell profile control is clicked in static preview.
+        /// Presentation-only request; this is not a production routing event.
+        /// </summary>
+        public event Action ProfileRequested;
+
+        /// <summary>
+        /// Raised once when the shell notifications control is clicked in static preview.
+        /// Presentation-only request; this is not a production routing event.
+        /// </summary>
+        public event Action NotificationsRequested;
 
         private void OnEnable()
         {
@@ -138,6 +149,13 @@ namespace NutriMind.App.UI
         {
             Unbind();
             CancelInvoke(nameof(BindWhenReady));
+        }
+
+        private void OnDestroy()
+        {
+            PreviewRouteRequested = null;
+            ProfileRequested = null;
+            NotificationsRequested = null;
         }
 
         private void OnValidate()
@@ -170,7 +188,9 @@ namespace NutriMind.App.UI
         }
 
         /// <summary>
-        /// Sets the static preview route (nav + title only).
+        /// Sets the serialized static preview route, active navigation, and default route title.
+        /// Does not raise <see cref="PreviewRouteRequested"/>; content-preview metadata uses
+        /// this method and emitting a request here would create a feedback loop.
         /// </summary>
         public void SetPreviewRoute(AppShellPreviewRoute route)
         {
@@ -336,7 +356,6 @@ namespace NutriMind.App.UI
             _connectionLabel = _root.Q<Label>("app-shell-connection-label");
             _offlineBanner = _root.Q<VisualElement>("app-shell-offline-banner");
             _contentRegion = _root.Q<VisualElement>("app-shell-content-region");
-            _previewContent = _root.Q<VisualElement>("app-shell-preview-content");
             _navRegion = _root.Q<VisualElement>("app-shell-navigation-region");
             _toastLayer = _root.Q<VisualElement>("app-shell-toast-layer");
             _modalLayer = _root.Q<VisualElement>("app-shell-modal-layer");
@@ -390,7 +409,6 @@ namespace NutriMind.App.UI
             _toastLayer = null;
             _offlineBanner = null;
             _loadingLayer = null;
-            _previewContent = null;
             _connectionHost = null;
             _connectionIcon = null;
             _pageTitle = null;
@@ -408,7 +426,6 @@ namespace NutriMind.App.UI
             _appliedRoute = null;
             _appliedConnection = null;
             _appliedLoading = null;
-            _appliedPreviewContent = null;
         }
 
         /// <summary>
@@ -600,10 +617,6 @@ namespace NutriMind.App.UI
                 ApplyLoadingPreview(_showLoadingPreview);
             }
 
-            if (force || _appliedPreviewContent != _showPreviewContent)
-            {
-                ApplyPreviewContentVisibility(_showPreviewContent);
-            }
         }
 
         private void OnNavHomeClicked(ClickEvent evt)
@@ -639,17 +652,20 @@ namespace NutriMind.App.UI
         private void OnNotificationsClicked(ClickEvent evt)
         {
             Debug.Log("[AppShellController] Notifications button tapped — preview only.");
+            NotificationsRequested?.Invoke();
         }
 
         private void OnProfileClicked(ClickEvent evt)
         {
             Debug.Log("[AppShellController] Profile button tapped — preview only.");
+            ProfileRequested?.Invoke();
         }
 
         private void SelectPreviewRoute(AppShellPreviewRoute route)
         {
             _previewRoute = route;
             ApplyPreviewRoute(route, logSelection: true);
+            PreviewRouteRequested?.Invoke(route);
         }
 
         private void ApplyPreviewRoute(AppShellPreviewRoute route, bool logSelection)
@@ -795,12 +811,6 @@ namespace NutriMind.App.UI
             {
                 _loadingOverlayView.Hide();
             }
-        }
-
-        private void ApplyPreviewContentVisibility(bool visible)
-        {
-            _appliedPreviewContent = visible;
-            _previewContent?.EnableInClassList(PreviewHiddenClass, !visible);
         }
 
         private static void SetIconClass(VisualElement icon, string iconClass)
