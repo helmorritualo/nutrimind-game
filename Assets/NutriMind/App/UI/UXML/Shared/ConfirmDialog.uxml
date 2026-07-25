@@ -1,0 +1,75 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Reusable NutriMind two-action confirmation dialog (UI-design / static-preview stage).
+
+        Compatible with AppShellController.GetModalLayer() — clone into the modal host,
+        or preview standalone via ConfirmDialogPreviewController.
+
+        Owns its own ds-backdrop. Do not add a second AppShell backdrop for the same dialog.
+        Presentation only — no routing, auth, API, SQLite, sync, or gameplay state changes.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/ConfirmDialog.uss" />
+
+    <ui:VisualElement
+        name="confirm-dialog-root"
+        class="ds-root theme-nutrimind confirm-dialog confirm-dialog--hidden"
+        focusable="true">
+
+        <ui:VisualElement
+            name="confirm-dialog-backdrop"
+            class="ds-backdrop confirm-dialog__backdrop">
+
+            <ui:VisualElement
+                name="confirm-dialog-card"
+                class="ds-dialog confirm-dialog__card">
+
+                <ui:VisualElement
+                    name="confirm-dialog-icon-background"
+                    class="confirm-dialog__icon-background">
+
+                    <ui:VisualElement
+                        name="confirm-dialog-icon"
+                        class="ds-icon ds-icon--help confirm-dialog__icon"
+                        picking-mode="Ignore" />
+
+                </ui:VisualElement>
+
+                <ui:Label
+                    name="confirm-dialog-title"
+                    text="Are you sure?"
+                    class="ds-dialog__title confirm-dialog__title" />
+
+                <ui:Label
+                    name="confirm-dialog-message"
+                    text="Please confirm before continuing."
+                    class="ds-dialog__message confirm-dialog__message" />
+
+                <ui:Label
+                    name="confirm-dialog-detail"
+                    text=""
+                    class="confirm-dialog__detail confirm-dialog__detail--hidden" />
+
+                <ui:VisualElement
+                    name="confirm-dialog-actions"
+                    class="ds-dialog__actions confirm-dialog__actions">
+
+                    <ui:Button
+                        name="confirm-dialog-cancel"
+                        text="Cancel"
+                        class="ds-btn ds-btn--ghost ds-btn--lg confirm-dialog__cancel" />
+
+                    <ui:Button
+                        name="confirm-dialog-confirm"
+                        text="Confirm"
+                        class="ds-btn ds-btn--primary ds-btn--lg confirm-dialog__confirm" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
