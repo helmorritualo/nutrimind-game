@@ -161,14 +161,11 @@
         </ui:VisualElement>
 
         <!-- ===== GLOBAL LOADING LAYER ===== -->
+        <!-- Host only — LoadingOverlay owns its own ds-backdrop when cloned here. -->
         <ui:VisualElement
             name="app-shell-loading-layer"
-            class="app-shell__overlay-layer app-shell__loading-layer app-shell__loading-layer--hidden ds-backdrop">
-            <ui:VisualElement class="app-shell__loading-card">
-                <ui:VisualElement class="ds-spinner ds-spinner--lg is-spinning app-shell__loading-spinner" />
-                <ui:Label text="Loading NutriMind..." class="app-shell__loading-label" />
-            </ui:VisualElement>
-        </ui:VisualElement>
+            class="app-shell__overlay-layer app-shell__loading-layer"
+            picking-mode="Ignore" />
 
     </ui:VisualElement>
 </ui:UXML>

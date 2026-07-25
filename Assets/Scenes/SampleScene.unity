@@ -464,7 +464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: b4146ba15a6f65947a00ae5c037797af, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: a7c3e91f4b2d5840a9e6c1d05f38b274, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 9e9738d3d59703344b92057a013a2f5c, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -497,24 +497,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1380726508}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f6b24c7e508173d2b9f4a38c61e5a7, type: 3}
+  m_Script: {fileID: 11500000, guid: ee863e7240a306648b65c9f1cb974b78, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.SystemDialogPreviewController
-  _previewPreset: 0
-  _showOnEnable: 1
-  _customTone: 0
-  _customEyebrow: NutriMind
-  _customTitle: System message
-  _customMessage: Important information from NutriMind.
-  _customDetail: 
-  _customReferenceText: 
-  _customPrimaryActionLabel: OK
-  _customSecondaryActionLabel: 
-  _customAllowDismiss: 0
-  _customDismissOnBackdrop: 0
-  _customHideAfterPrimaryAction: 1
-  _customHideAfterSecondaryAction: 1
-  _customIcon: 0
+  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.AppShellController
+  _previewRoute: 0
+  _connectionPreview: 0
+  _showLoadingPreview: 0
+  _showPreviewContent: 1
+  _loadingOverlayAsset: {fileID: 9197481963319205126, guid: 9ee67f8fa4bc06843acfe9a58dbf1ad7, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

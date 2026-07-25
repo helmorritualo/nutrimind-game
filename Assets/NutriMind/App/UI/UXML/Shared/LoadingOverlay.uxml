@@ -1,0 +1,122 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Reusable NutriMind blocking loading overlay (UI-design / static-preview stage).
+
+        Use for temporary blocking operations that must prevent interaction with the
+        screen behind the overlay. Prefer DataStatePanelState.Loading for in-content
+        loading where the rest of the screen remains usable.
+
+        Compatible with AppShellController loading host — clone into app-shell-loading-layer,
+        or preview standalone via LoadingOverlayPreviewController.
+
+        Owns its own ds-backdrop. Do not add a second AppShell backdrop for the same overlay.
+        Presentation only — no routing, auth, API, SQLite, sync, downloads, or gameplay state.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/LoadingOverlay.uss" />
+
+    <ui:VisualElement
+        name="loading-overlay-root"
+        class="ds-root theme-nutrimind loading-overlay loading-overlay--hidden"
+        focusable="true">
+
+        <ui:VisualElement
+            name="loading-overlay-backdrop"
+            class="ds-backdrop loading-overlay__backdrop">
+
+            <ui:VisualElement
+                name="loading-overlay-card"
+                class="loading-overlay__card">
+
+                <ui:VisualElement
+                    name="loading-overlay-brand"
+                    class="loading-overlay__brand"
+                    picking-mode="Ignore">
+
+                    <ui:Label
+                        text="Nutri"
+                        class="loading-overlay__brand-nutri" />
+
+                    <ui:VisualElement
+                        class="loading-overlay__brand-mind-wrap">
+
+                        <ui:Label
+                            text="Mind"
+                            class="loading-overlay__brand-mind" />
+
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--leaf loading-overlay__brand-icon"
+                            picking-mode="Ignore" />
+
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="loading-overlay-indeterminate"
+                    class="loading-overlay__indeterminate">
+
+                    <ui:VisualElement
+                        name="loading-overlay-spinner"
+                        class="ds-spinner ds-spinner--lg is-spinning loading-overlay__spinner"
+                        picking-mode="Ignore" />
+
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="loading-overlay-determinate"
+                    class="loading-overlay__determinate loading-overlay__determinate--hidden">
+
+                    <ui:VisualElement
+                        name="loading-overlay-progress-head"
+                        class="loading-overlay__progress-head">
+
+                        <ui:Label
+                            name="loading-overlay-progress-label"
+                            text="Progress"
+                            class="loading-overlay__progress-label" />
+
+                        <ui:Label
+                            name="loading-overlay-progress-percent"
+                            text="0%"
+                            class="loading-overlay__progress-percent" />
+
+                    </ui:VisualElement>
+
+                    <ui:ProgressBar
+                        name="loading-overlay-progress"
+                        low-value="0"
+                        high-value="100"
+                        value="0"
+                        title=""
+                        class="ds-progress loading-overlay__progress" />
+
+                </ui:VisualElement>
+
+                <ui:Label
+                    name="loading-overlay-title"
+                    text="Loading NutriMind..."
+                    class="loading-overlay__title" />
+
+                <ui:Label
+                    name="loading-overlay-message"
+                    text="Getting everything ready for you."
+                    class="loading-overlay__message" />
+
+                <ui:Label
+                    name="loading-overlay-detail"
+                    text=""
+                    class="loading-overlay__detail loading-overlay__detail--hidden" />
+
+                <ui:Button
+                    name="loading-overlay-cancel"
+                    text="Cancel"
+                    class="ds-btn ds-btn--ghost ds-btn--lg loading-overlay__cancel loading-overlay__cancel--hidden" />
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

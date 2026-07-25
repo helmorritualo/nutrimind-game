@@ -507,36 +507,11 @@
 }
 
 .app-shell__loading-layer {
-    align-items: center;
-    justify-content: center;
-}
-
-.app-shell__loading-layer--hidden {
-    display: none;
-}
-
-.app-shell__loading-card {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 280px;
-    padding: 36px 40px;
-    background-color: var(--color-surface);
-    border-radius: 24px;
-    border-width: 1px;
-    border-color: var(--color-border);
-}
-
-.app-shell__loading-spinner {
-    margin-bottom: 20px;
-}
-
-.app-shell__loading-label {
-    font-size: 18px;
-    color: var(--color-text-primary);
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 /* ========== RESPONSIVE: compact < 1100 ========== */

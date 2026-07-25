@@ -46,7 +46,6 @@ namespace NutriMind.App.UI
         private const string BannerOfflineClass = "app-shell__offline-banner--offline";
         private const string BannerSyncPendingClass = "app-shell__offline-banner--sync-pending";
         private const string BannerSyncErrorClass = "app-shell__offline-banner--sync-error";
-        private const string LoadingHiddenClass = "app-shell__loading-layer--hidden";
         private const string PreviewHiddenClass = "app-shell__preview-content--hidden";
         private const string ConnectionOnlineClass = "app-shell__connection--online";
         private const string ConnectionOfflineClass = "app-shell__connection--offline";
@@ -91,12 +90,16 @@ namespace NutriMind.App.UI
         private AppShellConnectionPreview _connectionPreview = AppShellConnectionPreview.Online;
 
         [SerializeField]
-        [Tooltip("UI-only loading overlay preview. Shows or hides the shell loading layer. Does not load data.")]
+        [Tooltip("UI-only loading overlay preview. Shows or hides the shared LoadingOverlay. Does not load data.")]
         private bool _showLoadingPreview;
 
         [SerializeField]
         [Tooltip("UI-only content placeholder toggle. Shows or hides the temporary App Shell Preview card.")]
         private bool _showPreviewContent = true;
+
+        [SerializeField]
+        [Tooltip("Shared LoadingOverlay UXML used by the shell's global loading host.")]
+        private VisualTreeAsset _loadingOverlayAsset;
 
         private UIDocument _uiDocument;
         private VisualElement _root;
@@ -122,6 +125,9 @@ namespace NutriMind.App.UI
         private Button _navProgress;
         private Button _navRewards;
         private Button _navMore;
+        private TemplateContainer _loadingOverlayInstance;
+        private LoadingOverlayView _loadingOverlayView;
+        private bool _warnedMissingLoadingOverlayAsset;
         private float _lastWidth = -1f;
         private AppShellPreviewRoute? _appliedRoute;
         private AppShellConnectionPreview? _appliedConnection;
@@ -188,12 +194,44 @@ namespace NutriMind.App.UI
         }
 
         /// <summary>
-        /// Shows or hides the shell loading overlay preview.
+        /// Shows or hides the shared LoadingOverlay with the PreparingApplication preset.
+        /// Presentation only — does not load data or start real operations.
         /// </summary>
         public void SetLoadingPreview(bool visible)
         {
             _showLoadingPreview = visible;
             ApplyLoadingPreview(visible);
+        }
+
+        /// <summary>
+        /// Shows the shared LoadingOverlay with the supplied presentation configuration.
+        /// Marks serialized loading preview as shown so Update() does not overwrite with
+        /// PreparingApplication solely because <c>_showLoadingPreview</c> is true.
+        /// </summary>
+        public void ShowLoadingOverlay(LoadingOverlayConfiguration configuration)
+        {
+            _showLoadingPreview = true;
+            _appliedLoading = true;
+            _loadingOverlayView?.Show(configuration);
+        }
+
+        /// <summary>
+        /// Hides the shared LoadingOverlay without raising CancelRequested.
+        /// </summary>
+        public void HideLoadingOverlay()
+        {
+            _showLoadingPreview = false;
+            _appliedLoading = false;
+            _loadingOverlayView?.Hide();
+        }
+
+        /// <summary>
+        /// Forwards normalized progress (0f–1f) to the shared LoadingOverlay when bound.
+        /// Does not create an overlay when none is bound.
+        /// </summary>
+        public void SetLoadingOverlayProgress(float progress)
+        {
+            _loadingOverlayView?.SetProgress(progress);
         }
 
         /// <summary>
@@ -263,6 +301,7 @@ namespace NutriMind.App.UI
             panelRoot.style.height = Length.Percent(100);
 
             CacheElements();
+            BindLoadingOverlay();
             RegisterCallbacks();
             ApplySerializedPreviewState(force: true);
             _root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -329,6 +368,8 @@ namespace NutriMind.App.UI
                 _root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             }
 
+            UnbindLoadingOverlay();
+
             _root = null;
             _navRegion = null;
             _contentRegion = null;
@@ -357,6 +398,79 @@ namespace NutriMind.App.UI
             _appliedConnection = null;
             _appliedLoading = null;
             _appliedPreviewContent = null;
+        }
+
+        /// <summary>
+        /// Clones the shared LoadingOverlay into the shell loading host once per bind cycle.
+        /// Missing asset logs once and leaves the host empty/non-blocking.
+        /// </summary>
+        private void BindLoadingOverlay()
+        {
+            if (_loadingLayer == null)
+            {
+                return;
+            }
+
+            UnbindLoadingOverlay();
+
+            if (_loadingOverlayAsset == null)
+            {
+                if (!_warnedMissingLoadingOverlayAsset)
+                {
+                    Debug.LogWarning(
+                        "[AppShellController] LoadingOverlay VisualTreeAsset is not assigned. " +
+                        "Assign Assets/NutriMind/App/UI/UXML/Shared/LoadingOverlay.uxml to _loadingOverlayAsset. " +
+                        "Loading host remains empty and non-blocking.");
+                    _warnedMissingLoadingOverlayAsset = true;
+                }
+
+                _loadingLayer.pickingMode = PickingMode.Ignore;
+                return;
+            }
+
+            _loadingOverlayInstance = _loadingOverlayAsset.CloneTree();
+
+            // A cloned TemplateContainer has no layout of its own, so the absolutely
+            // positioned overlay root would collapse against a zero-sized parent.
+            _loadingOverlayInstance.style.position = Position.Absolute;
+            _loadingOverlayInstance.style.left = 0f;
+            _loadingOverlayInstance.style.top = 0f;
+            _loadingOverlayInstance.style.right = 0f;
+            _loadingOverlayInstance.style.bottom = 0f;
+
+            _loadingLayer.Add(_loadingOverlayInstance);
+            _loadingOverlayView = new LoadingOverlayView(_loadingOverlayInstance);
+            if (!_loadingOverlayView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellController] Failed to bind LoadingOverlayView from cloned asset. " +
+                    "Loading host remains empty and non-blocking.");
+                UnbindLoadingOverlay();
+                return;
+            }
+
+            _loadingOverlayView.CancelRequested += OnLoadingOverlayCancelRequested;
+        }
+
+        private void UnbindLoadingOverlay()
+        {
+            if (_loadingOverlayView != null)
+            {
+                _loadingOverlayView.CancelRequested -= OnLoadingOverlayCancelRequested;
+                _loadingOverlayView.Dispose();
+                _loadingOverlayView = null;
+            }
+
+            if (_loadingOverlayInstance != null)
+            {
+                _loadingOverlayInstance.RemoveFromHierarchy();
+                _loadingOverlayInstance = null;
+            }
+        }
+
+        private void OnLoadingOverlayCancelRequested()
+        {
+            Debug.Log("[AppShellController] Shared loading overlay cancel requested (preview only).");
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -605,12 +719,19 @@ namespace NutriMind.App.UI
         {
             _appliedLoading = visible;
 
-            if (_loadingLayer == null)
+            if (_loadingOverlayView == null || !_loadingOverlayView.IsBound)
             {
                 return;
             }
 
-            _loadingLayer.EnableInClassList(LoadingHiddenClass, !visible);
+            if (visible)
+            {
+                _loadingOverlayView.Show(LoadingOverlayPresets.PreparingApplication());
+            }
+            else
+            {
+                _loadingOverlayView.Hide();
+            }
         }
 
         private void ApplyPreviewContentVisibility(bool visible)
