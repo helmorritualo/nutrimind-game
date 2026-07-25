@@ -1,0 +1,78 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Reusable NutriMind non-content data state panel (UI-design / static-preview stage).
+
+        Insert into AppShellController.GetContentRegion() or a screen-local state host.
+        When State is Content, the component hides so the owning screen can show normal content.
+
+        Does not include shell chrome (top bar, bottom nav, toast, modal, offline banner).
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/DataStatePanel.uss" />
+
+    <ui:VisualElement
+        name="data-state-panel-root"
+        class="ds-root theme-nutrimind data-state-panel">
+
+        <ui:VisualElement
+            name="data-state-panel-card"
+            class="ds-card data-state-panel__card">
+
+            <ui:VisualElement
+                name="data-state-panel-content"
+                class="ds-empty data-state-panel__content">
+
+                <ui:VisualElement
+                    name="data-state-panel-icon-background"
+                    class="ds-empty__icon-bg data-state-panel__icon-background">
+
+                    <ui:VisualElement
+                        name="data-state-panel-icon"
+                        class="ds-icon ds-icon--info ds-empty__icon data-state-panel__icon"
+                        picking-mode="Ignore" />
+
+                    <ui:VisualElement
+                        name="data-state-panel-spinner"
+                        class="ds-spinner is-spinning data-state-panel__spinner data-state-panel__spinner--hidden"
+                        picking-mode="Ignore" />
+
+                </ui:VisualElement>
+
+                <ui:Label
+                    name="data-state-panel-title"
+                    text="Nothing here yet"
+                    class="ds-empty__title data-state-panel__title" />
+
+                <ui:Label
+                    name="data-state-panel-message"
+                    text="New content will appear here when it becomes available."
+                    class="ds-empty__message data-state-panel__message" />
+
+                <ui:Label
+                    name="data-state-panel-detail"
+                    text=""
+                    class="data-state-panel__detail data-state-panel__detail--hidden" />
+
+                <ui:VisualElement
+                    name="data-state-panel-actions"
+                    class="data-state-panel__actions">
+
+                    <ui:Button
+                        name="data-state-panel-primary-action"
+                        text="Refresh"
+                        class="ds-btn ds-btn--primary data-state-panel__primary-action" />
+
+                    <ui:Button
+                        name="data-state-panel-secondary-action"
+                        text="Go Back"
+                        class="ds-btn ds-btn--ghost data-state-panel__secondary-action data-state-panel__action--hidden" />
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
