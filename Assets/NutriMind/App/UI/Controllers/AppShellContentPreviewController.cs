@@ -119,6 +119,7 @@ namespace NutriMind.App.UI
         private VisualElement _currentContentRoot;
         private IAppScreenView _currentScreenView;
         private HomePanelView _currentHomeView;
+        private SubjectSelectionPanelView _currentSubjectSelectionView;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
@@ -431,6 +432,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Home:
                     return CreateHomeView(contentRoot);
 
+                case AppShellContentPreviewScreen.Subjects:
+                    return CreateSubjectSelectionView(contentRoot);
+
                 // Remaining screens gain explicit cases as each panel is migrated.
                 // Returning null means the UXML is shown as a static visual preview
                 // without screen-specific callbacks.
@@ -476,6 +480,83 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Information);
         }
 
+        private IAppScreenView CreateSubjectSelectionView(
+            VisualElement contentRoot)
+        {
+            var subjectView = new SubjectSelectionPanelView(contentRoot);
+            if (!subjectView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] SubjectSelectionPanelView failed to bind " +
+                    "subject-selection-root.");
+                subjectView.Dispose();
+                return null;
+            }
+
+            subjectView.BackRequested += OnSubjectBackRequested;
+            subjectView.SubjectSelected += OnSubjectSelected;
+            subjectView.ContinueSubjectRequested += OnContinueSubjectRequested;
+            subjectView.UnavailableSubjectRequested += OnUnavailableSubjectRequested;
+            _currentSubjectSelectionView = subjectView;
+            return subjectView;
+        }
+
+        private void OnSubjectBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Subjects Back requested — showing Home preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Home);
+        }
+
+        private void OnSubjectSelected(NutriMindSubject subject)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] Subject selected: {GetSubjectLabel(subject)}.");
+        }
+
+        private void OnContinueSubjectRequested(NutriMindSubject subject)
+        {
+            string label = GetSubjectLabel(subject);
+
+            Debug.Log(
+                $"[AppShellContentPreview] View Terms requested: {label} — preview only.");
+
+            _appShell?.ShowToast(
+                $"{label} selected. Term selection will be connected after migration.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnUnavailableSubjectRequested(NutriMindSubject subject)
+        {
+            string label = GetSubjectLabel(subject);
+
+            Debug.Log(
+                $"[AppShellContentPreview] {label} unavailable in classroom preview.");
+
+            _appShell?.ShowToast(
+                $"{label} is not available in your classroom yet.",
+                AppShellToastTone.Warning);
+        }
+
+        private static string GetSubjectLabel(NutriMindSubject subject)
+        {
+            switch (subject)
+            {
+                case NutriMindSubject.LiteraQuest:
+                    return "LiteraQuest";
+
+                case NutriMindSubject.PeAndHealth:
+                    return "PE & Health";
+
+                case NutriMindSubject.Science:
+                    return "Science";
+
+                default:
+                    return subject.ToString();
+            }
+        }
+
         private void ClearCurrentContent()
         {
             if (_currentHomeView != null)
@@ -487,6 +568,23 @@ namespace NutriMind.App.UI
                     OnHomeQuizPortalRequested;
 
                 _currentHomeView = null;
+            }
+
+            if (_currentSubjectSelectionView != null)
+            {
+                _currentSubjectSelectionView.BackRequested -=
+                    OnSubjectBackRequested;
+
+                _currentSubjectSelectionView.SubjectSelected -=
+                    OnSubjectSelected;
+
+                _currentSubjectSelectionView.ContinueSubjectRequested -=
+                    OnContinueSubjectRequested;
+
+                _currentSubjectSelectionView.UnavailableSubjectRequested -=
+                    OnUnavailableSubjectRequested;
+
+                _currentSubjectSelectionView = null;
             }
 
             _currentScreenView?.Dispose();

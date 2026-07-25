@@ -526,6 +526,12 @@ MonoBehaviour:
     _pageTitle: Home
     _pageContext: "Grade 5 \u2022 Section Emerald"
     _selectFromBottomNavigation: 1
+  - _screen: 2
+    _contentAsset: {fileID: 9197481963319205126, guid: e4337b819fed4044807726e5ec5650e1, type: 3}
+    _activeNavigation: 1
+    _pageTitle: Subjects
+    _pageContext: Grade 5
+    _selectFromBottomNavigation: 1
   _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
   _respondToShellNavigation: 1
   _respondToProfileRequest: 1

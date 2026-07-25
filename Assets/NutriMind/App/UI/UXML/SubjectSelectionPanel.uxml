@@ -1,25 +1,52 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
     <Style src="project://database/Assets/NutriMind/App/UI/USS/SubjectSelectionPanel.uss" />
 
-    <ui:VisualElement name="subject-selection-root" class="ds-root theme-nutrimind subject-selection">
+    <ui:VisualElement
+        name="subject-selection-root"
+        class="ds-root theme-nutrimind app-screen-content subject-selection">
 
-        <!-- ===== HEADER ===== -->
-        <ui:VisualElement name="subject-header" class="subject-selection__header">
-            <ui:VisualElement class="subject-selection__header-left">
-                <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost subject-selection__back" tooltip="Back">
-                    <ui:VisualElement class="ds-icon ds-icon--arrow-left subject-selection__back-icon" />
-                </ui:Button>
+        <!-- ===== ROUTE INTRO (route-local Back + orientation, not global chrome) ===== -->
+        <ui:VisualElement
+            name="subject-selection-intro"
+            class="subject-selection__intro">
 
-                <ui:VisualElement class="subject-selection__brand">
-                    <ui:Label text="Nutri" class="subject-selection__brand-nutri" />
-                    <ui:VisualElement class="subject-selection__brand-mind-wrap">
-                        <ui:Label text="Mind" class="subject-selection__brand-mind" />
-                        <ui:VisualElement class="ds-icon ds-icon--leaf subject-selection__brand-leaf" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
+            <ui:Button
+                name="back-button"
+                text=""
+                class="ds-btn ds-btn--ghost subject-selection__back"
+                tooltip="Back to Home">
+                <ui:VisualElement
+                    class="ds-icon ds-icon--arrow-left subject-selection__back-icon"
+                    picking-mode="Ignore" />
+            </ui:Button>
+
+            <ui:VisualElement
+                name="subject-selection-intro-copy"
+                class="subject-selection__intro-copy">
+                <ui:Label
+                    name="subject-selection-intro-title"
+                    text="Choose your next adventure"
+                    class="subject-selection__intro-title" />
+                <ui:Label
+                    name="subject-selection-intro-message"
+                    text="Explore your Grade 5 subjects and continue where you left off."
+                    class="subject-selection__intro-message" />
             </ui:VisualElement>
+
+            <ui:VisualElement
+                name="subject-selection-count"
+                class="subject-selection__count">
+                <ui:VisualElement
+                    class="ds-icon ds-icon--map subject-selection__count-icon"
+                    picking-mode="Ignore" />
+                <ui:Label
+                    text="3 Subjects"
+                    class="subject-selection__count-label" />
+            </ui:VisualElement>
+
         </ui:VisualElement>
 
         <!-- ===== SUBJECT CARDS (horizontal scroll) ===== -->
@@ -87,7 +114,9 @@
 
                             <ui:Label text="Not available in your classroom yet." class="subject-selection__unavailable-note" />
 
-                            <ui:Button name="continue-peh-button" text="" class="ds-btn subject-selection__cta subject-selection__cta--unavailable">
+                            <ui:Button name="continue-peh-button" text=""
+                                       class="ds-btn subject-selection__cta subject-selection__cta--unavailable"
+                                       tooltip="Not available in your classroom yet">
                                 <ui:Label text="Unavailable" class="subject-selection__cta-label" />
                                 <ui:VisualElement class="ds-icon ds-icon--lock subject-selection__cta-chevron" />
                             </ui:Button>
@@ -128,35 +157,6 @@
 
                 </ui:VisualElement>
             </ui:ScrollView>
-        </ui:VisualElement>
-
-        <!-- ===== BOTTOM NAV =====
-             TODO: duplicated navigation will later be replaced by AppShell.uxml -->
-        <ui:VisualElement name="subject-nav" class="subject-selection__nav">
-            <ui:Button name="nav-home" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--home subject-selection__nav-icon" />
-                <ui:Label text="Home" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-subjects" class="subject-selection__nav-item is-active">
-                <ui:VisualElement class="ds-icon ds-icon--map subject-selection__nav-icon" />
-                <ui:Label text="Subjects" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-missions" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--bag subject-selection__nav-icon" />
-                <ui:Label text="Missions" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-progress" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--trophy subject-selection__nav-icon" />
-                <ui:Label text="Progress" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-rewards" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--treasure subject-selection__nav-icon" />
-                <ui:Label text="Rewards" class="subject-selection__nav-label" />
-            </ui:Button>
-            <ui:Button name="nav-more" class="subject-selection__nav-item">
-                <ui:VisualElement class="ds-icon ds-icon--more-horizontal subject-selection__nav-icon" />
-                <ui:Label text="More" class="subject-selection__nav-label" />
-            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
