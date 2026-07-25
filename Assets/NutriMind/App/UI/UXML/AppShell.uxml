@@ -1,0 +1,174 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!--
+        Shared NutriMind application shell (UI-design / static-preview stage).
+
+        TODO(AppShell migration): Existing panels (Home, Subjects, Term, Mission,
+        Locked Mission, Profile, Settings) still embed duplicated top chrome and
+        bottom navigation. After the remaining screen set is designed, migrate
+        those panels into app-shell-content-region and remove per-panel chrome.
+        New route-level screens should target this content region.
+    -->
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/AppShell.uss" />
+
+    <ui:VisualElement name="app-shell-root" class="ds-root theme-nutrimind app-shell">
+
+        <ui:VisualElement
+            name="app-shell-background"
+            class="app-shell__background"
+            picking-mode="Ignore" />
+
+        <ui:VisualElement name="app-shell-main" class="app-shell__main">
+
+            <!-- ===== TOP BAR ===== -->
+            <ui:VisualElement name="app-shell-top-bar" class="app-shell__top-bar">
+                <ui:VisualElement class="app-shell__top-bar-left">
+                    <ui:VisualElement name="app-shell-brand" class="app-shell__brand">
+                        <ui:Label text="Nutri" class="app-shell__brand-nutri" />
+                        <ui:VisualElement class="app-shell__brand-mind-wrap">
+                            <ui:Label text="Mind" class="app-shell__brand-mind" />
+                            <ui:VisualElement class="ds-icon ds-icon--leaf app-shell__brand-leaf" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="app-shell__page-copy">
+                        <ui:Label name="app-shell-page-title" text="Home" class="app-shell__page-title" />
+                        <ui:Label name="app-shell-page-context" text="Preview shell" class="app-shell__page-context" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="app-shell__top-actions">
+                    <ui:VisualElement name="app-shell-connection" class="app-shell__connection app-shell__connection--online">
+                        <ui:VisualElement name="app-shell-connection-dot" class="app-shell__connection-dot" />
+                        <ui:VisualElement
+                            name="app-shell-connection-icon"
+                            class="ds-icon ds-icon--wifi app-shell__connection-icon" />
+                        <ui:Label
+                            name="app-shell-connection-label"
+                            text="Synced • Just now"
+                            class="app-shell__connection-label" />
+                    </ui:VisualElement>
+
+                    <ui:Button
+                        name="app-shell-notifications"
+                        text=""
+                        class="ds-btn ds-btn--ghost ds-btn--icon app-shell__action-btn"
+                        tooltip="Announcements (preview)">
+                        <ui:VisualElement class="ds-icon ds-icon--bell app-shell__action-icon" picking-mode="Ignore" />
+                    </ui:Button>
+
+                    <ui:Button
+                        name="app-shell-profile"
+                        text=""
+                        class="app-shell__profile"
+                        tooltip="Profile (preview)">
+                        <ui:VisualElement class="app-shell__avatar">
+                            <ui:Label text="ICO&#10;48×48" class="app-shell__avatar-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="app-shell__profile-copy">
+                            <ui:Label text="Ariana" class="app-shell__profile-name" />
+                            <ui:Label text="Grade 5" class="app-shell__profile-meta" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="ds-icon ds-icon--user app-shell__profile-chevron" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- ===== OFFLINE / SYNC BANNER ===== -->
+            <ui:VisualElement
+                name="app-shell-offline-banner"
+                class="app-shell__offline-banner app-shell__offline-banner--hidden">
+                <ui:VisualElement
+                    name="app-shell-banner-icon"
+                    class="ds-icon ds-icon--warning app-shell__offline-banner-icon"
+                    picking-mode="Ignore" />
+                <ui:Label
+                    name="app-shell-banner-label"
+                    text="You are offline. Showing downloaded progress."
+                    class="app-shell__offline-banner-label" />
+            </ui:VisualElement>
+
+            <!-- ===== CONTENT REGION ===== -->
+            <ui:VisualElement name="app-shell-content-region" class="app-shell__content-region">
+                <ui:VisualElement name="app-shell-preview-content" class="app-shell__preview-content ds-empty">
+                    <ui:VisualElement class="ds-empty__icon-bg app-shell__preview-icon-bg">
+                        <ui:VisualElement class="ds-icon ds-icon--leaf ds-empty__icon app-shell__preview-icon" />
+                    </ui:VisualElement>
+                    <ui:Label text="App Shell Preview" class="ds-empty__title app-shell__preview-title" />
+                    <ui:Label
+                        text="Future application panels will be inserted here."
+                        class="ds-empty__message app-shell__preview-message" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- ===== BOTTOM NAVIGATION ===== -->
+            <ui:VisualElement name="app-shell-navigation-region" class="app-shell__navigation-region">
+                <ui:Button name="nav-home" class="app-shell__nav-item is-active">
+                    <ui:VisualElement class="ds-icon ds-icon--home app-shell__nav-icon" />
+                    <ui:Label text="Home" class="app-shell__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-subjects" class="app-shell__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--map app-shell__nav-icon" />
+                    <ui:Label text="Subjects" class="app-shell__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-missions" class="app-shell__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--bag app-shell__nav-icon" />
+                    <ui:Label text="Missions" class="app-shell__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-progress" class="app-shell__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--trophy app-shell__nav-icon" />
+                    <ui:Label text="Progress" class="app-shell__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-rewards" class="app-shell__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--treasure app-shell__nav-icon" />
+                    <ui:Label text="Rewards" class="app-shell__nav-label" />
+                </ui:Button>
+                <ui:Button name="nav-more" class="app-shell__nav-item">
+                    <ui:VisualElement class="ds-icon ds-icon--more-horizontal app-shell__nav-icon" />
+                    <ui:Label text="More" class="app-shell__nav-label" />
+                </ui:Button>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- ===== GLOBAL TOAST LAYER ===== -->
+        <ui:VisualElement name="app-shell-toast-layer" class="app-shell__toast-layer">
+            <ui:VisualElement
+                name="app-shell-toast-preview"
+                class="ds-toast ds-toast--info app-shell__toast-preview app-shell__toast-preview--hidden">
+                <ui:VisualElement
+                    class="ds-icon ds-icon--info ds-toast__icon"
+                    picking-mode="Ignore" />
+                <ui:Label
+                    text="Preview toast — package styled."
+                    class="ds-toast__message" />
+                <ui:Button name="app-shell-toast-close" class="ds-toast__close" tooltip="Dismiss">
+                    <ui:VisualElement class="ds-icon ds-icon--close" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ===== GLOBAL MODAL LAYER ===== -->
+        <ui:VisualElement
+            name="app-shell-modal-layer"
+            class="app-shell__overlay-layer app-shell__modal-layer app-shell__modal-layer--empty"
+            picking-mode="Ignore">
+            <ui:VisualElement
+                name="app-shell-modal-placeholder"
+                class="app-shell__modal-placeholder app-shell__modal-placeholder--hidden"
+                picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- ===== GLOBAL LOADING LAYER ===== -->
+        <ui:VisualElement
+            name="app-shell-loading-layer"
+            class="app-shell__overlay-layer app-shell__loading-layer app-shell__loading-layer--hidden ds-backdrop">
+            <ui:VisualElement class="app-shell__loading-card">
+                <ui:VisualElement class="ds-spinner ds-spinner--lg is-spinning app-shell__loading-spinner" />
+                <ui:Label text="Loading NutriMind..." class="app-shell__loading-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
