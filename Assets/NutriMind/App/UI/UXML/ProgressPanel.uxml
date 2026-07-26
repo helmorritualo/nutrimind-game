@@ -1,0 +1,519 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/ProgressPanel.uss" />
+
+    <ui:VisualElement
+        name="progress-root"
+        class="ds-root theme-nutrimind app-screen-content progress-panel">
+
+        <ui:ScrollView
+            name="progress-scroll"
+            class="app-screen-content__scroll progress-panel__scroll"
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="Auto"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
+
+            <ui:VisualElement
+                name="progress-content"
+                class="app-screen-content__body progress-panel__content">
+
+                <!-- ===== INTRO ===== -->
+                <ui:VisualElement name="progress-intro" class="progress-panel__intro">
+                    <ui:Label
+                        name="progress-intro-title"
+                        text="Your learning progress"
+                        class="progress-panel__intro-title" />
+                    <ui:Label
+                        name="progress-intro-message"
+                        text="See what you have completed and what to review next."
+                        class="progress-panel__intro-message" />
+                </ui:VisualElement>
+
+                <!-- ===== OVERALL GRADE SUMMARY ===== -->
+                <ui:VisualElement name="progress-overall" class="ds-card progress-panel__overall">
+                    <ui:VisualElement class="progress-panel__overall-main">
+                        <ui:VisualElement class="progress-panel__overall-percent-block">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--leaderboard progress-panel__overall-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="overall-percent"
+                                text="67%"
+                                class="progress-panel__overall-percent" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="progress-panel__overall-copy">
+                            <ui:Label
+                                text="Overall Grade 5 Progress"
+                                class="progress-panel__overall-title" />
+                            <ui:ProgressBar
+                                name="overall-progress-bar"
+                                value="67"
+                                low-value="0"
+                                high-value="100"
+                                class="ds-progress progress-panel__overall-progress" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="progress-panel__overall-metrics">
+                        <ui:VisualElement class="progress-panel__metric">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--flag-checkered progress-panel__metric-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="overall-missions"
+                                text="30 / 45 missions completed"
+                                class="progress-panel__metric-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="progress-panel__metric">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--warning progress-panel__metric-icon progress-panel__metric-icon--warning"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="overall-reviews"
+                                text="5 review items"
+                                class="progress-panel__metric-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="progress-panel__metric">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--book progress-panel__metric-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="overall-subjects"
+                                text="3 subjects"
+                                class="progress-panel__metric-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- ===== SUBJECT CARDS ===== -->
+                <ui:VisualElement name="progress-subject-row" class="progress-panel__subject-row">
+
+                    <ui:Button
+                        name="progress-subject-lq"
+                        text=""
+                        class="ds-card progress-panel__subject-card progress-panel__subject-card--lq is-selected"
+                        tooltip="LiteraQuest progress">
+                        <ui:VisualElement class="progress-panel__subject-header" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--book progress-panel__subject-icon progress-panel__subject-icon--lq"
+                                picking-mode="Ignore" />
+                            <ui:Label text="LiteraQuest" class="progress-panel__subject-name" picking-mode="Ignore" />
+                            <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="subject-lq-percent"
+                            text="60%"
+                            class="progress-panel__subject-percent"
+                            picking-mode="Ignore" />
+                        <ui:ProgressBar
+                            name="subject-lq-progress"
+                            value="60"
+                            low-value="0"
+                            high-value="100"
+                            class="ds-progress progress-panel__subject-progress progress-panel__subject-progress--lq"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-lq-missions"
+                            text="9 / 15 missions"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-lq-reviews"
+                            text="2 review items"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-lq-status"
+                            text="Available"
+                            class="progress-panel__subject-status"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+
+                    <ui:Button
+                        name="progress-subject-peh"
+                        text=""
+                        class="ds-card progress-panel__subject-card progress-panel__subject-card--peh progress-panel__subject-card--unavailable"
+                        tooltip="PE &amp; Health progress">
+                        <ui:VisualElement class="progress-panel__subject-header" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--bolt progress-panel__subject-icon progress-panel__subject-icon--peh"
+                                picking-mode="Ignore" />
+                            <ui:Label text="PE &amp; Health" class="progress-panel__subject-name" picking-mode="Ignore" />
+                            <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="subject-peh-percent"
+                            text="67%"
+                            class="progress-panel__subject-percent"
+                            picking-mode="Ignore" />
+                        <ui:ProgressBar
+                            name="subject-peh-progress"
+                            value="67"
+                            low-value="0"
+                            high-value="100"
+                            class="ds-progress progress-panel__subject-progress progress-panel__subject-progress--peh"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-peh-missions"
+                            text="10 / 15 missions"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-peh-reviews"
+                            text="1 review item"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement class="progress-panel__subject-status-row" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--lock progress-panel__subject-lock"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="subject-peh-status"
+                                text="Not available in your classroom yet."
+                                class="progress-panel__subject-status progress-panel__subject-status--unavailable"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:Button>
+
+                    <ui:Button
+                        name="progress-subject-sci"
+                        text=""
+                        class="ds-card progress-panel__subject-card progress-panel__subject-card--sci progress-panel__subject-card--last"
+                        tooltip="Science progress">
+                        <ui:VisualElement class="progress-panel__subject-header" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--potion progress-panel__subject-icon progress-panel__subject-icon--sci"
+                                picking-mode="Ignore" />
+                            <ui:Label text="Science" class="progress-panel__subject-name" picking-mode="Ignore" />
+                            <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="subject-sci-percent"
+                            text="73%"
+                            class="progress-panel__subject-percent"
+                            picking-mode="Ignore" />
+                        <ui:ProgressBar
+                            name="subject-sci-progress"
+                            value="73"
+                            low-value="0"
+                            high-value="100"
+                            class="ds-progress progress-panel__subject-progress progress-panel__subject-progress--sci"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-sci-missions"
+                            text="11 / 15 missions"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-sci-reviews"
+                            text="2 review items"
+                            class="progress-panel__subject-stat"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="subject-sci-status"
+                            text="Available"
+                            class="progress-panel__subject-status"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+
+                </ui:VisualElement>
+
+                <!-- ===== DETAIL REGION (terms/missions + quiz) ===== -->
+                <ui:VisualElement name="progress-detail" class="progress-panel__detail">
+
+                    <ui:VisualElement name="progress-detail-main" class="progress-panel__detail-main">
+
+                        <ui:Label
+                            name="progress-term-heading"
+                            text="Term progress"
+                            class="progress-panel__section-title" />
+
+                        <ui:VisualElement name="progress-term-row" class="progress-panel__term-row">
+                            <ui:Button
+                                name="progress-term-1"
+                                text=""
+                                class="ds-card progress-panel__term-card is-selected"
+                                tooltip="Term 1 progress">
+                                <ui:VisualElement class="progress-panel__term-header" picking-mode="Ignore">
+                                    <ui:Label name="term-1-label" text="Term 1" class="progress-panel__term-label" picking-mode="Ignore" />
+                                    <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Label name="term-1-percent" text="100%" class="progress-panel__term-percent" picking-mode="Ignore" />
+                                <ui:Label name="term-1-missions" text="5 / 5 missions" class="progress-panel__term-stat" picking-mode="Ignore" />
+                                <ui:Label name="term-1-reviews" text="1 review item" class="progress-panel__term-stat" picking-mode="Ignore" />
+                            </ui:Button>
+                            <ui:Button
+                                name="progress-term-2"
+                                text=""
+                                class="ds-card progress-panel__term-card"
+                                tooltip="Term 2 progress">
+                                <ui:VisualElement class="progress-panel__term-header" picking-mode="Ignore">
+                                    <ui:Label name="term-2-label" text="Term 2" class="progress-panel__term-label" picking-mode="Ignore" />
+                                    <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Label name="term-2-percent" text="60%" class="progress-panel__term-percent" picking-mode="Ignore" />
+                                <ui:Label name="term-2-missions" text="3 / 5 missions" class="progress-panel__term-stat" picking-mode="Ignore" />
+                                <ui:Label name="term-2-reviews" text="1 review item" class="progress-panel__term-stat" picking-mode="Ignore" />
+                            </ui:Button>
+                            <ui:Button
+                                name="progress-term-3"
+                                text=""
+                                class="ds-card progress-panel__term-card progress-panel__term-card--last"
+                                tooltip="Term 3 progress">
+                                <ui:VisualElement class="progress-panel__term-header" picking-mode="Ignore">
+                                    <ui:Label name="term-3-label" text="Term 3" class="progress-panel__term-label" picking-mode="Ignore" />
+                                    <ui:VisualElement class="progress-panel__selection-indicator" picking-mode="Ignore">
+                                <ui:Label text="Selected" class="progress-panel__selection-indicator-label" picking-mode="Ignore" />
+                            </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Label name="term-3-percent" text="20%" class="progress-panel__term-percent" picking-mode="Ignore" />
+                                <ui:Label name="term-3-missions" text="1 / 5 missions" class="progress-panel__term-stat" picking-mode="Ignore" />
+                                <ui:Label name="term-3-reviews" text="0 review items" class="progress-panel__term-stat" picking-mode="Ignore" />
+                            </ui:Button>
+                        </ui:VisualElement>
+
+                        <ui:Label
+                            name="progress-mission-heading"
+                            text="Mission progress"
+                            class="progress-panel__section-title" />
+
+                        <ui:VisualElement name="progress-mission-list" class="progress-panel__mission-list">
+
+                            <ui:VisualElement name="progress-mission-row-1" class="ds-card progress-panel__mission-row">
+                                <ui:VisualElement class="progress-panel__mission-number-badge">
+                                    <ui:Label name="mission-1-number" text="1" class="progress-panel__mission-number" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="progress-panel__mission-body">
+                                    <ui:Label name="mission-1-title" text="The Festival Storybook Rescue" class="progress-panel__mission-title" />
+                                    <ui:VisualElement class="progress-panel__mission-meta">
+                                        <ui:VisualElement name="mission-1-status" class="progress-panel__mission-status">
+                                            <ui:VisualElement name="mission-1-status-icon" class="ds-icon ds-icon--check progress-panel__mission-status-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-1-status-label" text="Completed" class="progress-panel__mission-status-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--flag progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-1-areas" text="3 / 3 areas" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--treasure progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-1-collectibles" text="3 / 3 collectibles" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="mission-1-review-badge" class="progress-panel__review-badge">
+                                            <ui:VisualElement class="ds-icon ds-icon--warning progress-panel__review-badge-icon" picking-mode="Ignore" />
+                                            <ui:Label text="Review Required" class="progress-panel__review-badge-label" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Button
+                                    name="mission-1-review-button"
+                                    text=""
+                                    class="ds-btn ds-btn--ghost progress-panel__review-button"
+                                    tooltip="Review this mission">
+                                    <ui:VisualElement class="ds-icon ds-icon--book progress-panel__review-button-icon" picking-mode="Ignore" />
+                                    <ui:Label text="Review" class="progress-panel__review-button-label" picking-mode="Ignore" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="progress-mission-row-2" class="ds-card progress-panel__mission-row">
+                                <ui:VisualElement class="progress-panel__mission-number-badge">
+                                    <ui:Label name="mission-2-number" text="2" class="progress-panel__mission-number" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="progress-panel__mission-body">
+                                    <ui:Label name="mission-2-title" text="The Bell of Seven Moments" class="progress-panel__mission-title" />
+                                    <ui:VisualElement class="progress-panel__mission-meta">
+                                        <ui:VisualElement name="mission-2-status" class="progress-panel__mission-status">
+                                            <ui:VisualElement name="mission-2-status-icon" class="ds-icon ds-icon--check progress-panel__mission-status-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-2-status-label" text="Completed" class="progress-panel__mission-status-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--flag progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-2-areas" text="3 / 3 areas" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--treasure progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-2-collectibles" text="3 / 3 collectibles" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="mission-2-review-badge" class="progress-panel__review-badge progress-panel__review-badge--hidden">
+                                            <ui:VisualElement class="ds-icon ds-icon--warning progress-panel__review-badge-icon" picking-mode="Ignore" />
+                                            <ui:Label text="Review Required" class="progress-panel__review-badge-label" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Button
+                                    name="mission-2-review-button"
+                                    text=""
+                                    class="ds-btn ds-btn--ghost progress-panel__review-button progress-panel__review-button--hidden"
+                                    tooltip="Review this mission">
+                                    <ui:VisualElement class="ds-icon ds-icon--book progress-panel__review-button-icon" picking-mode="Ignore" />
+                                    <ui:Label text="Review" class="progress-panel__review-button-label" picking-mode="Ignore" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="progress-mission-row-3" class="ds-card progress-panel__mission-row">
+                                <ui:VisualElement class="progress-panel__mission-number-badge">
+                                    <ui:Label name="mission-3-number" text="3" class="progress-panel__mission-number" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="progress-panel__mission-body">
+                                    <ui:Label name="mission-3-title" text="The Hall of Speaking Sounds" class="progress-panel__mission-title" />
+                                    <ui:VisualElement class="progress-panel__mission-meta">
+                                        <ui:VisualElement name="mission-3-status" class="progress-panel__mission-status">
+                                            <ui:VisualElement name="mission-3-status-icon" class="ds-icon ds-icon--check progress-panel__mission-status-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-3-status-label" text="Completed" class="progress-panel__mission-status-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--flag progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-3-areas" text="3 / 3 areas" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--treasure progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-3-collectibles" text="3 / 3 collectibles" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="mission-3-review-badge" class="progress-panel__review-badge progress-panel__review-badge--hidden">
+                                            <ui:VisualElement class="ds-icon ds-icon--warning progress-panel__review-badge-icon" picking-mode="Ignore" />
+                                            <ui:Label text="Review Required" class="progress-panel__review-badge-label" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Button
+                                    name="mission-3-review-button"
+                                    text=""
+                                    class="ds-btn ds-btn--ghost progress-panel__review-button progress-panel__review-button--hidden"
+                                    tooltip="Review this mission">
+                                    <ui:VisualElement class="ds-icon ds-icon--book progress-panel__review-button-icon" picking-mode="Ignore" />
+                                    <ui:Label text="Review" class="progress-panel__review-button-label" picking-mode="Ignore" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="progress-mission-row-4" class="ds-card progress-panel__mission-row">
+                                <ui:VisualElement class="progress-panel__mission-number-badge">
+                                    <ui:Label name="mission-4-number" text="4" class="progress-panel__mission-number" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="progress-panel__mission-body">
+                                    <ui:Label name="mission-4-title" text="The Newsroom of True Pages" class="progress-panel__mission-title" />
+                                    <ui:VisualElement class="progress-panel__mission-meta">
+                                        <ui:VisualElement name="mission-4-status" class="progress-panel__mission-status">
+                                            <ui:VisualElement name="mission-4-status-icon" class="ds-icon ds-icon--check progress-panel__mission-status-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-4-status-label" text="Completed" class="progress-panel__mission-status-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--flag progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-4-areas" text="3 / 3 areas" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--treasure progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-4-collectibles" text="3 / 3 collectibles" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="mission-4-review-badge" class="progress-panel__review-badge progress-panel__review-badge--hidden">
+                                            <ui:VisualElement class="ds-icon ds-icon--warning progress-panel__review-badge-icon" picking-mode="Ignore" />
+                                            <ui:Label text="Review Required" class="progress-panel__review-badge-label" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Button
+                                    name="mission-4-review-button"
+                                    text=""
+                                    class="ds-btn ds-btn--ghost progress-panel__review-button progress-panel__review-button--hidden"
+                                    tooltip="Review this mission">
+                                    <ui:VisualElement class="ds-icon ds-icon--book progress-panel__review-button-icon" picking-mode="Ignore" />
+                                    <ui:Label text="Review" class="progress-panel__review-button-label" picking-mode="Ignore" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="progress-mission-row-5" class="ds-card progress-panel__mission-row">
+                                <ui:VisualElement class="progress-panel__mission-number-badge">
+                                    <ui:Label name="mission-5-number" text="5" class="progress-panel__mission-number" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="progress-panel__mission-body">
+                                    <ui:Label name="mission-5-title" text="The Grand Holiday Chronicle" class="progress-panel__mission-title" />
+                                    <ui:VisualElement class="progress-panel__mission-meta">
+                                        <ui:VisualElement name="mission-5-status" class="progress-panel__mission-status">
+                                            <ui:VisualElement name="mission-5-status-icon" class="ds-icon ds-icon--check progress-panel__mission-status-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-5-status-label" text="Completed" class="progress-panel__mission-status-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--flag progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-5-areas" text="3 / 3 areas" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="progress-panel__mission-stat">
+                                            <ui:VisualElement class="ds-icon ds-icon--treasure progress-panel__mission-stat-icon" picking-mode="Ignore" />
+                                            <ui:Label name="mission-5-collectibles" text="3 / 3 collectibles" class="progress-panel__mission-stat-label" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="mission-5-review-badge" class="progress-panel__review-badge progress-panel__review-badge--hidden">
+                                            <ui:VisualElement class="ds-icon ds-icon--warning progress-panel__review-badge-icon" picking-mode="Ignore" />
+                                            <ui:Label text="Review Required" class="progress-panel__review-badge-label" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                <ui:Button
+                                    name="mission-5-review-button"
+                                    text=""
+                                    class="ds-btn ds-btn--ghost progress-panel__review-button progress-panel__review-button--hidden"
+                                    tooltip="Review this mission">
+                                    <ui:VisualElement class="ds-icon ds-icon--book progress-panel__review-button-icon" picking-mode="Ignore" />
+                                    <ui:Label text="Review" class="progress-panel__review-button-label" picking-mode="Ignore" />
+                                </ui:Button>
+                            </ui:VisualElement>
+
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== QUIZ PORTAL SUMMARY ===== -->
+                    <ui:VisualElement name="progress-quiz-summary" class="ds-card progress-panel__quiz">
+                        <ui:VisualElement class="progress-panel__quiz-header">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--book progress-panel__quiz-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label text="Quiz Portal" class="progress-panel__quiz-title" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="progress-panel__quiz-metrics">
+                            <ui:VisualElement class="progress-panel__quiz-metric">
+                                <ui:VisualElement class="ds-icon ds-icon--book progress-panel__quiz-metric-icon" picking-mode="Ignore" />
+                                <ui:Label text="2 assigned" class="progress-panel__quiz-metric-label" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="progress-panel__quiz-metric">
+                                <ui:VisualElement class="ds-icon ds-icon--clock progress-panel__quiz-metric-icon" picking-mode="Ignore" />
+                                <ui:Label text="1 due soon" class="progress-panel__quiz-metric-label" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="progress-panel__quiz-metric">
+                                <ui:VisualElement class="ds-icon ds-icon--check progress-panel__quiz-metric-icon" picking-mode="Ignore" />
+                                <ui:Label text="4 completed" class="progress-panel__quiz-metric-label" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="open-quiz-portal-button"
+                            text=""
+                            class="ds-btn ds-btn--primary progress-panel__quiz-button"
+                            tooltip="Open Quiz Portal">
+                            <ui:Label text="Open Quiz Portal" class="progress-panel__quiz-button-label" picking-mode="Ignore" />
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--chevron-right progress-panel__quiz-button-chevron"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:ScrollView>
+
+        <ui:VisualElement
+            name="progress-data-state-host"
+            class="progress-panel__data-state-host" />
+
+    </ui:VisualElement>
+</ui:UXML>

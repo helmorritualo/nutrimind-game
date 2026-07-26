@@ -115,6 +115,10 @@ namespace NutriMind.App.UI
         [SerializeField]
         private NutriMindTerm _selectedTerm = NutriMindTerm.Term1;
 
+        [SerializeField]
+        [Tooltip("DataStatePanel state used only while previewing Progress inside AppShell.")]
+        private DataStatePanelState _progressPreviewState = DataStatePanelState.Content;
+
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
 
@@ -140,6 +144,7 @@ namespace NutriMind.App.UI
         private LockedMissionPanelView _currentLockedMissionView;
         private ProfilePanelView _currentProfileView;
         private SettingsPanelView _currentSettingsView;
+        private ProgressPanelView _currentProgressView;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
@@ -485,6 +490,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Settings:
                     return "Profile & application";
 
+                case AppShellContentPreviewScreen.Progress:
+                    return $"Grade 5 • {GetSubjectLabel(_selectedSubject)}";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -529,6 +537,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.Settings:
                     return CreateSettingsView(contentRoot);
+
+                case AppShellContentPreviewScreen.Progress:
+                    return CreateProgressView(contentRoot);
 
                 default:
                     return null;
@@ -960,6 +971,81 @@ namespace NutriMind.App.UI
                 ConfirmDialogPresets.ResetTutorial());
         }
 
+        private IAppScreenView CreateProgressView(VisualElement contentRoot)
+        {
+            var progressView = new ProgressPanelView(contentRoot, _dataStatePanelAsset);
+            if (!progressView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] ProgressPanelView failed to bind progress-root.");
+                progressView.Dispose();
+                return null;
+            }
+
+            progressView.SetSelection(_selectedSubject, _selectedTerm);
+            progressView.SetDataState(_progressPreviewState);
+            progressView.SubjectSelected += OnProgressSubjectSelected;
+            progressView.TermSelected += OnProgressTermSelected;
+            progressView.MissionReviewRequested += OnProgressMissionReviewRequested;
+            progressView.QuizPortalRequested += OnProgressQuizPortalRequested;
+            progressView.RetryRequested += OnProgressRetryRequested;
+            _currentProgressView = progressView;
+            return progressView;
+        }
+
+        private void OnProgressSubjectSelected(NutriMindSubject subject)
+        {
+            _selectedSubject = subject;
+            _selectedTerm = NutriMindTerm.Term1;
+            _currentProgressView?.SetSelection(_selectedSubject, _selectedTerm);
+            RefreshShellPageContext();
+            Debug.Log(
+                $"[AppShellContentPreview] Progress subject selected: {GetSubjectLabel(subject)}.");
+        }
+
+        private void OnProgressTermSelected(NutriMindTerm term)
+        {
+            _selectedTerm = term;
+            RefreshShellPageContext();
+            Debug.Log(
+                $"[AppShellContentPreview] Progress term selected: Term {(int)term}.");
+        }
+
+        private void OnProgressMissionReviewRequested(ProgressMissionPreviewSelection selection)
+        {
+            _selectedSubject = selection.Subject;
+            _selectedTerm = selection.Term;
+            RefreshShellPageContext();
+
+            Debug.Log(
+                $"[AppShellContentPreview] Progress review requested: {selection.MissionTitle} " +
+                $"(Mission {selection.MissionNumber}).");
+
+            _appShell?.ShowToast(
+                $"Review selected for {selection.MissionTitle}. Review routing will be connected later.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnProgressQuizPortalRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Progress Quiz Portal requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz Portal selected. Quiz routing will be connected in the next screen prompts.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnProgressRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Progress retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Progress refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
         private void BindConfirmDialog()
         {
             if (_confirmDialogView != null)
@@ -1148,6 +1234,17 @@ namespace NutriMind.App.UI
                 _currentSettingsView.ResetTutorialRequested -=
                     OnSettingsResetTutorialRequested;
                 _currentSettingsView = null;
+            }
+
+            if (_currentProgressView != null)
+            {
+                _currentProgressView.SubjectSelected -= OnProgressSubjectSelected;
+                _currentProgressView.TermSelected -= OnProgressTermSelected;
+                _currentProgressView.MissionReviewRequested -=
+                    OnProgressMissionReviewRequested;
+                _currentProgressView.QuizPortalRequested -= OnProgressQuizPortalRequested;
+                _currentProgressView.RetryRequested -= OnProgressRetryRequested;
+                _currentProgressView = null;
             }
 
             _currentScreenView?.Dispose();
