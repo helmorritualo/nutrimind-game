@@ -134,6 +134,24 @@ namespace NutriMind.App.UI
             return false;
         }
 
+        /// <summary>
+        /// Returns true only when a repository scored-result fixture exists for the attempt id.
+        /// Used by Quiz History → Result handoff. Does not invent alternate attempts.
+        /// </summary>
+        public static bool TryGetResultByAttemptId(
+            string attemptId,
+            out QuizResultPreviewContent content)
+        {
+            if (string.Equals(attemptId, CanonicalAttemptId, StringComparison.Ordinal))
+            {
+                content = CreateCanonicalResult();
+                return true;
+            }
+
+            content = null;
+            return false;
+        }
+
         private static QuizResultPreviewContent CreateCanonicalResult()
         {
             var answers = new QuizResultPreviewAnswer[]

@@ -1,0 +1,248 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/QuizHistoryPanel.uss" />
+
+    <ui:VisualElement
+        name="quiz-history-root"
+        class="ds-root theme-nutrimind app-screen-content quiz-history-panel">
+
+        <ui:VisualElement
+            name="quiz-history-content-shell"
+            class="quiz-history-panel__content-shell">
+
+            <ui:ScrollView
+                name="quiz-history-scroll"
+                class="app-screen-content__scroll quiz-history-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="quiz-history-body"
+                    class="app-screen-content__body quiz-history-panel__body">
+
+                    <!-- ===== OFFLINE CACHE NOTICE ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-offline-notice"
+                        class="ds-card quiz-history-panel__offline-notice quiz-history-panel__offline-notice--hidden"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="quiz-history-offline-icon"
+                            class="ds-icon ds-icon--wifi quiz-history-panel__offline-icon"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            class="quiz-history-panel__offline-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="quiz-history-offline-title"
+                                text="Showing saved results"
+                                class="quiz-history-panel__offline-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-history-offline-message"
+                                text="You’re offline. This history was loaded from saved data and may not include recent submissions."
+                                class="quiz-history-panel__offline-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== OVERVIEW ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-overview"
+                        class="ds-card quiz-history-panel__overview">
+
+                        <ui:VisualElement
+                            name="quiz-history-overview-copy"
+                            class="quiz-history-panel__overview-copy">
+
+                            <ui:VisualElement
+                                name="quiz-history-overview-icon"
+                                class="ds-icon ds-icon--list quiz-history-panel__overview-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-history-overview-eyebrow"
+                                text="Quiz Portal"
+                                class="quiz-history-panel__overview-eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-history-overview-title"
+                                text="Quiz history"
+                                class="quiz-history-panel__overview-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-history-overview-description"
+                                text="Review your completed Quiz Portal results."
+                                class="quiz-history-panel__overview-description"
+                                picking-mode="Ignore" />
+
+                            <ui:Button
+                                name="quiz-history-back-button"
+                                text="Back to Quiz Portal"
+                                class="ds-btn ds-btn--secondary quiz-history-panel__back-button"
+                                tooltip="Back to Quiz Portal" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-history-overview-metrics"
+                            class="quiz-history-panel__overview-metrics"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                class="ds-card quiz-history-panel__metric-card"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="quiz-history-total-value"
+                                    text="1"
+                                    class="quiz-history-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Results available"
+                                    class="quiz-history-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card quiz-history-panel__metric-card"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="quiz-history-passed-value"
+                                    text="1"
+                                    class="quiz-history-panel__metric-value quiz-history-panel__metric-value--pass"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Passed"
+                                    class="quiz-history-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card quiz-history-panel__metric-card quiz-history-panel__metric-card--last"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="quiz-history-latest-score-value"
+                                    text="100%"
+                                    class="quiz-history-panel__metric-value quiz-history-panel__metric-value--score"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Latest score"
+                                    class="quiz-history-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== FILTERS ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-filter-card"
+                        class="ds-card quiz-history-panel__filter-card">
+
+                        <ui:VisualElement
+                            name="quiz-history-filter-copy"
+                            class="quiz-history-panel__filter-copy"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--filter quiz-history-panel__filter-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-history-filter-title"
+                                text="Filter results"
+                                class="quiz-history-panel__filter-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-history-filter-description"
+                                text="Choose a subject and term."
+                                class="quiz-history-panel__filter-description"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-history-filter-controls"
+                            class="quiz-history-panel__filter-controls">
+                            <ui:DropdownField
+                                name="quiz-history-subject-filter"
+                                class="ds-dropdown quiz-history-panel__filter-dropdown"
+                                label="Subject"
+                                choices="All subjects,LiteraQuest,PE &amp; Health,Science"
+                                index="0" />
+                            <ui:DropdownField
+                                name="quiz-history-term-filter"
+                                class="ds-dropdown quiz-history-panel__filter-dropdown"
+                                label="Term"
+                                choices="All terms,Term 1,Term 2,Term 3"
+                                index="0" />
+                            <ui:Button
+                                name="quiz-history-reset-filters"
+                                text="Reset Filters"
+                                class="ds-btn ds-btn--ghost quiz-history-panel__reset-filters"
+                                tooltip="Reset Filters" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== RESULTS HEADER ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-results-header"
+                        class="quiz-history-panel__results-header"
+                        picking-mode="Ignore">
+                        <ui:Label
+                            name="quiz-history-results-title"
+                            text="Results"
+                            class="quiz-history-panel__results-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-history-visible-count"
+                            text="1 result"
+                            class="quiz-history-panel__visible-count"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <!-- ===== RESULTS LIST (generated cards) ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-results-list"
+                        class="quiz-history-panel__results-list" />
+
+                    <!-- ===== FILTER EMPTY ===== -->
+                    <ui:VisualElement
+                        name="quiz-history-filter-empty"
+                        class="ds-card quiz-history-panel__filter-empty quiz-history-panel__filter-empty--hidden">
+                        <ui:VisualElement
+                            name="quiz-history-filter-empty-icon"
+                            class="ds-icon ds-icon--search quiz-history-panel__filter-empty-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-history-filter-empty-title"
+                            text="No results match these filters"
+                            class="quiz-history-panel__filter-empty-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-history-filter-empty-message"
+                            text="Try another subject or term, or reset the filters."
+                            class="quiz-history-panel__filter-empty-message"
+                            picking-mode="Ignore" />
+                        <ui:Button
+                            name="quiz-history-filter-empty-reset"
+                            text="Reset Filters"
+                            class="ds-btn ds-btn--secondary quiz-history-panel__filter-empty-reset"
+                            tooltip="Reset Filters" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        class="quiz-history-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="quiz-history-data-state-host"
+            class="quiz-history-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

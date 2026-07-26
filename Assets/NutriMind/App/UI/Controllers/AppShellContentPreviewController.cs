@@ -23,7 +23,8 @@ namespace NutriMind.App.UI
         QuizList,
         QuizDetail,
         QuizAttempt,
-        QuizResult
+        QuizResult,
+        QuizHistory
     }
 
     /// <summary>
@@ -139,6 +140,19 @@ namespace NutriMind.App.UI
         private QuizResultPreviewState _quizResultPreviewState =
             QuizResultPreviewState.Content;
 
+        [SerializeField]
+        [Tooltip("QuizHistory route state used only by the AppShell static preview.")]
+        private QuizHistoryPreviewState _quizHistoryPreviewState =
+            QuizHistoryPreviewState.Content;
+
+        [SerializeField]
+        private QuizHistoryPreviewSubjectFilter _quizHistorySubjectFilter =
+            QuizHistoryPreviewSubjectFilter.All;
+
+        [SerializeField]
+        private QuizHistoryPreviewTermFilter _quizHistoryTermFilter =
+            QuizHistoryPreviewTermFilter.All;
+
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
 
@@ -169,7 +183,9 @@ namespace NutriMind.App.UI
         private QuizDetailPanelView _currentQuizDetailView;
         private QuizAttemptPanelView _currentQuizAttemptView;
         private QuizResultPanelView _currentQuizResultView;
+        private QuizHistoryPanelView _currentQuizHistoryView;
         private QuizListPreviewItem? _selectedQuiz;
+        private string _selectedQuizResultAttemptId;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
 
         private TemplateContainer _fallbackInstance;
@@ -554,6 +570,9 @@ namespace NutriMind.App.UI
 
                     return "LiteraQuest • Term 1";
 
+                case AppShellContentPreviewScreen.QuizHistory:
+                    return "Grade 5 • Quiz Portal";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -613,6 +632,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.QuizResult:
                     return CreateQuizResultView(contentRoot);
+
+                case AppShellContentPreviewScreen.QuizHistory:
+                    return CreateQuizHistoryView(contentRoot);
 
                 default:
                     return null;
@@ -1187,6 +1209,7 @@ namespace NutriMind.App.UI
         private void OnQuizDetailViewResultRequested(QuizDetailPreviewSelection selection)
         {
             _selectedQuiz = selection.Summary;
+            _selectedQuizResultAttemptId = null;
             Debug.Log(
                 $"[AppShellContentPreview] QuizDetail View Result requested: {selection.Summary.Id} " +
                 $"'{selection.Summary.Title}' — showing QuizResult preview.");
@@ -1318,6 +1341,7 @@ namespace NutriMind.App.UI
         private void OnQuizListResultRequested(QuizListPreviewItem item)
         {
             _selectedQuiz = item;
+            _selectedQuizResultAttemptId = null;
             Debug.Log(
                 $"[AppShellContentPreview] Quiz result requested: {item.Id} '{item.Title}' — showing QuizResult preview.");
 
@@ -1339,13 +1363,46 @@ namespace NutriMind.App.UI
                 ?? QuizDetailPreviewCatalog.CreateCanonicalSummary();
 
             QuizDetailPreviewCatalog.TryGetDetail(summary.Id, out QuizDetailPreviewContent detail);
-            QuizResultPreviewCatalog.TryGetResult(summary.Id, out QuizResultPreviewContent result);
+            QuizResultPreviewContent result = null;
+            bool resolvedByAttempt = false;
+
+            if (!string.IsNullOrWhiteSpace(_selectedQuizResultAttemptId))
+            {
+                resolvedByAttempt = QuizResultPreviewCatalog.TryGetResultByAttemptId(
+                    _selectedQuizResultAttemptId,
+                    out result);
+
+                if (!resolvedByAttempt)
+                {
+                    Debug.LogWarning(
+                        $"[AppShellContentPreview] No scored-result fixture for attempt " +
+                        $"'{_selectedQuizResultAttemptId}'. QuizResult shows fixture-gap state; " +
+                        "no alternate result was substituted.");
+                    result = null;
+                }
+                else if (!string.Equals(result.QuizId, summary.Id, System.StringComparison.Ordinal))
+                {
+                    Debug.LogWarning(
+                        $"[AppShellContentPreview] Attempt '{_selectedQuizResultAttemptId}' quiz ID " +
+                        $"'{result.QuizId}' does not match selected summary '{summary.Id}'. " +
+                        "QuizResult shows fixture-gap state.");
+                    result = null;
+                }
+            }
+            else
+            {
+                QuizResultPreviewCatalog.TryGetResult(summary.Id, out result);
+            }
 
             if (detail == null || result == null)
             {
-                Debug.LogWarning(
-                    $"[AppShellContentPreview] No canonical result fixture for quiz '{summary.Id}'. " +
-                    "QuizResult shows fixture-gap state; no score was invented.");
+                if (!resolvedByAttempt || result == null)
+                {
+                    Debug.LogWarning(
+                        $"[AppShellContentPreview] No canonical result fixture for quiz '{summary.Id}'. " +
+                        "QuizResult shows fixture-gap state; no score was invented.");
+                }
+
                 quizResultView.SetResultContext(summary, detail, null);
             }
             else
@@ -1372,11 +1429,9 @@ namespace NutriMind.App.UI
         private void OnQuizResultViewHistoryRequested()
         {
             Debug.Log(
-                "[AppShellContentPreview] QuizResult View History requested — preview only.");
+                "[AppShellContentPreview] QuizResult View History requested — showing QuizHistory.");
 
-            _appShell?.ShowToast(
-                "Quiz history will be connected in the next Quiz Portal panel.",
-                AppShellToastTone.Information);
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizHistory);
         }
 
         private void OnQuizResultRetryRequested()
@@ -1386,6 +1441,70 @@ namespace NutriMind.App.UI
 
             _appShell?.ShowToast(
                 "Quiz result refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private IAppScreenView CreateQuizHistoryView(VisualElement contentRoot)
+        {
+            var quizHistoryView = new QuizHistoryPanelView(contentRoot, _dataStatePanelAsset);
+            if (!quizHistoryView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] QuizHistoryPanelView failed to bind quiz-history-root.");
+                quizHistoryView.Dispose();
+                return null;
+            }
+
+            quizHistoryView.SetItems(QuizHistoryPreviewCatalog.CreateCanonicalItems());
+            quizHistoryView.SetFilters(
+                new QuizHistoryPreviewFilters(
+                    _quizHistorySubjectFilter,
+                    _quizHistoryTermFilter));
+            quizHistoryView.SetPreviewState(_quizHistoryPreviewState);
+            quizHistoryView.BackToQuizPortalRequested += OnQuizHistoryBackToQuizPortalRequested;
+            quizHistoryView.ViewResultRequested += OnQuizHistoryViewResultRequested;
+            quizHistoryView.FiltersChanged += OnQuizHistoryFiltersChanged;
+            quizHistoryView.RetryRequested += OnQuizHistoryRetryRequested;
+            _currentQuizHistoryView = quizHistoryView;
+            return quizHistoryView;
+        }
+
+        private void OnQuizHistoryBackToQuizPortalRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizHistory Back to Quiz Portal — showing QuizList.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private void OnQuizHistoryViewResultRequested(QuizHistoryPreviewSelection selection)
+        {
+            _selectedQuiz = selection.Summary;
+            _selectedQuizResultAttemptId = selection.AttemptId;
+            Debug.Log(
+                $"[AppShellContentPreview] QuizHistory View Result requested: " +
+                $"attempt={selection.AttemptId}, quiz={selection.Summary.Id} " +
+                $"'{selection.Summary.Title}' — showing QuizResult preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizResult);
+        }
+
+        private void OnQuizHistoryFiltersChanged(QuizHistoryPreviewFilters filters)
+        {
+            _quizHistorySubjectFilter = filters.Subject;
+            _quizHistoryTermFilter = filters.Term;
+            Debug.Log(
+                $"[AppShellContentPreview] QuizHistory filters changed: " +
+                $"subject={filters.Subject}, term={filters.Term}.");
+        }
+
+        private void OnQuizHistoryRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizHistory retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz history refresh requested. Data loading is not connected in this static preview.",
                 AppShellToastTone.Information);
         }
 
@@ -1548,6 +1667,7 @@ namespace NutriMind.App.UI
                 case PreviewConfirmationAction.SubmitQuiz:
                     QuizAttemptPreviewSubmission submission = _pendingQuizAttemptSubmission;
                     _pendingQuizAttemptSubmission = null;
+                    _selectedQuizResultAttemptId = null;
                     if (submission != null)
                     {
                         bool isCanonical = string.Equals(
@@ -1713,6 +1833,17 @@ namespace NutriMind.App.UI
                     OnQuizResultViewHistoryRequested;
                 _currentQuizResultView.RetryRequested -= OnQuizResultRetryRequested;
                 _currentQuizResultView = null;
+            }
+
+            if (_currentQuizHistoryView != null)
+            {
+                _currentQuizHistoryView.BackToQuizPortalRequested -=
+                    OnQuizHistoryBackToQuizPortalRequested;
+                _currentQuizHistoryView.ViewResultRequested -=
+                    OnQuizHistoryViewResultRequested;
+                _currentQuizHistoryView.FiltersChanged -= OnQuizHistoryFiltersChanged;
+                _currentQuizHistoryView.RetryRequested -= OnQuizHistoryRetryRequested;
+                _currentQuizHistoryView = null;
             }
 
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
@@ -1948,6 +2079,8 @@ namespace NutriMind.App.UI
                     return "Quiz Attempt";
                 case AppShellContentPreviewScreen.QuizResult:
                     return "Quiz Result";
+                case AppShellContentPreviewScreen.QuizHistory:
+                    return "Quiz History";
                 default:
                     return "AppShell content preview";
             }
