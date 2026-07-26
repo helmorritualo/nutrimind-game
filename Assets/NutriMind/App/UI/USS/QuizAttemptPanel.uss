@@ -44,7 +44,8 @@
 .quiz-attempt-panel__header {
     flex-shrink: 0;
     flex-direction: column;
-    width: 100%;
+    align-self: stretch;
+    width: auto;
     min-width: 0;
     margin: 24px 36px 0 36px;
     padding: 28px 32px;
@@ -581,7 +582,6 @@
     height: 26px;
     flex-shrink: 0;
     margin-right: 12px;
-    -unity-background-image-tint-color: var(--color-text-on-accent);
 }
 
 .quiz-attempt-panel__next-button .quiz-attempt-panel__footer-icon,
@@ -594,30 +594,18 @@
     -unity-background-image-tint-color: var(--color-text-on-accent);
 }
 
-/* Nested labels — primary/secondary filled buttons use on-accent (white) */
+/* Nested labels — primary uses on-accent; secondary uses text-primary */
 .quiz-attempt-panel__primary-label {
     font-size: 22px;
     -unity-font-style: bold;
     color: var(--color-text-on-accent);
 }
 
-/* Previous (blue secondary): white text + white icon for contrast */
 .quiz-attempt-panel__previous-button.ds-btn--secondary
-.quiz-attempt-panel__primary-label {
-    color: var(--color-text-on-accent);
-}
-
-.quiz-attempt-panel__previous-button .quiz-attempt-panel__footer-icon {
-    -unity-background-image-tint-color: var(--color-text-on-accent);
-}
-
+.quiz-attempt-panel__primary-label,
 .quiz-attempt-panel__back-to-questions-button.ds-btn--secondary
 .quiz-attempt-panel__primary-label {
-    color: var(--color-text-on-accent);
-}
-
-.quiz-attempt-panel__back-to-questions-button .quiz-attempt-panel__footer-icon {
-    -unity-background-image-tint-color: var(--color-text-on-accent);
+    color: var(--color-text-primary);
 }
 
 .quiz-attempt-panel__exit-button.ds-btn--ghost

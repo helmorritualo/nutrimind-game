@@ -303,15 +303,15 @@ namespace NutriMind.App.UI
                 return;
             }
 
+            if (state == QuizAttemptPreviewState.Content && !_hasValidContext)
+            {
+                return;
+            }
+
             PreviewState = state;
 
             if (state == QuizAttemptPreviewState.Content)
             {
-                if (!_hasValidContext)
-                {
-                    return;
-                }
-
                 ShowContentShell();
                 return;
             }
@@ -1254,7 +1254,10 @@ namespace NutriMind.App.UI
 
         private void OnSubmitClicked()
         {
-            if (!_hasValidContext || DetailContent == null)
+            if (PreviewState != QuizAttemptPreviewState.Content
+                || ContentMode != QuizAttemptContentMode.Review
+                || !_hasValidContext
+                || DetailContent == null)
             {
                 return;
             }
@@ -1269,7 +1272,16 @@ namespace NutriMind.App.UI
             {
                 QuizDetailPreviewQuestion question = DetailContent.Questions[i];
                 HashSet<string> selected = GetOrCreateSelectionSet(question.Id);
-                var ids = new List<string>(selected);
+                var ids = new List<string>();
+                for (int optionIndex = 0; optionIndex < question.Options.Count; optionIndex++)
+                {
+                    string optionId = question.Options[optionIndex].Id;
+                    if (selected.Contains(optionId))
+                    {
+                        ids.Add(optionId);
+                    }
+                }
+
                 answers.Add(new QuizAttemptPreviewAnswer(question.Id, ids));
             }
 

@@ -1,0 +1,282 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/QuizResultPanel.uss" />
+
+    <ui:VisualElement
+        name="quiz-result-root"
+        class="ds-root theme-nutrimind app-screen-content quiz-result-panel">
+
+        <ui:VisualElement
+            name="quiz-result-content-shell"
+            class="quiz-result-panel__content-shell">
+
+            <ui:ScrollView
+                name="quiz-result-scroll"
+                class="app-screen-content__scroll quiz-result-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="quiz-result-body"
+                    class="app-screen-content__body quiz-result-panel__body">
+
+                    <!-- ===== HERO ===== -->
+                    <ui:VisualElement
+                        name="quiz-result-hero"
+                        class="ds-card quiz-result-panel__hero">
+
+                        <ui:VisualElement
+                            name="quiz-result-hero-copy"
+                            class="quiz-result-panel__hero-copy">
+
+                            <ui:VisualElement
+                                name="quiz-result-hero-icon"
+                                class="ds-icon ds-icon--trophy quiz-result-panel__hero-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-result-eyebrow"
+                                text="Quiz complete"
+                                class="quiz-result-panel__eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-result-title"
+                                text="Story Elements Check"
+                                class="quiz-result-panel__title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="quiz-result-subject-term"
+                                text="LiteraQuest • Term 1"
+                                class="quiz-result-panel__subject-term"
+                                picking-mode="Ignore" />
+
+                            <ui:VisualElement
+                                name="quiz-result-status-row"
+                                class="quiz-result-panel__status-row"
+                                picking-mode="Ignore">
+
+                                <ui:VisualElement
+                                    name="quiz-result-status-chip"
+                                    class="ds-chip quiz-result-panel__status-chip"
+                                    picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        class="ds-icon ds-icon--check quiz-result-panel__chip-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="quiz-result-status-label"
+                                        text="Scored"
+                                        class="quiz-result-panel__chip-label"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement
+                                    name="quiz-result-pass-chip"
+                                    class="ds-chip quiz-result-panel__pass-chip"
+                                    picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        class="ds-icon ds-icon--trophy quiz-result-panel__chip-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="quiz-result-pass-label"
+                                        text="Passed"
+                                        class="quiz-result-panel__chip-label"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:Label
+                                name="quiz-result-submitted-at"
+                                text="Submitted Jul 19, 2026 • 4:30 AM UTC"
+                                class="quiz-result-panel__submitted-at"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-result-score-panel"
+                            class="quiz-result-panel__score-panel"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                name="quiz-result-score-circle"
+                                class="quiz-result-panel__score-circle"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="quiz-result-percentage"
+                                    text="100%"
+                                    class="quiz-result-panel__percentage"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-result-points"
+                                    text="2 of 2 points"
+                                    class="quiz-result-panel__points"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== METRICS ===== -->
+                    <ui:VisualElement
+                        name="quiz-result-metrics"
+                        class="quiz-result-panel__metrics">
+
+                        <ui:VisualElement class="ds-card quiz-result-panel__metric-card" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--check quiz-result-panel__metric-icon quiz-result-panel__metric-icon--correct"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-result-correct-value"
+                                text="2"
+                                class="quiz-result-panel__metric-value"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Correct"
+                                class="quiz-result-panel__metric-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            class="ds-card quiz-result-panel__metric-card quiz-result-panel__metric-card--even"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--close quiz-result-panel__metric-icon quiz-result-panel__metric-icon--incorrect"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-result-incorrect-value"
+                                text="0"
+                                class="quiz-result-panel__metric-value"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Incorrect"
+                                class="quiz-result-panel__metric-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="ds-card quiz-result-panel__metric-card" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--info quiz-result-panel__metric-icon quiz-result-panel__metric-icon--unanswered"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-result-unanswered-value"
+                                text="0"
+                                class="quiz-result-panel__metric-value"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Unanswered"
+                                class="quiz-result-panel__metric-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            class="ds-card quiz-result-panel__metric-card quiz-result-panel__metric-card--even quiz-result-panel__metric-card--last"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--target quiz-result-panel__metric-icon quiz-result-panel__metric-icon--points"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-result-total-points-value"
+                                text="2 of 2"
+                                class="quiz-result-panel__metric-value"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Points"
+                                class="quiz-result-panel__metric-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== FEEDBACK ===== -->
+                    <ui:VisualElement
+                        name="quiz-result-feedback-section"
+                        class="quiz-result-panel__feedback-section">
+
+                        <ui:VisualElement
+                            name="quiz-result-feedback-header"
+                            class="quiz-result-panel__feedback-header"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="quiz-result-feedback-title"
+                                text="Question feedback"
+                                class="quiz-result-panel__feedback-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-result-feedback-message"
+                                text="Your teacher has made question-level feedback visible for this result."
+                                class="quiz-result-panel__feedback-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-result-feedback-list"
+                            class="quiz-result-panel__feedback-list" />
+
+                        <ui:VisualElement
+                            name="quiz-result-feedback-hidden-note"
+                            class="ds-card quiz-result-panel__feedback-hidden-note quiz-result-panel__feedback-hidden-note--hidden"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--info quiz-result-panel__feedback-hidden-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Question feedback is not visible for this result."
+                                class="quiz-result-panel__feedback-hidden-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Your score summary remains available."
+                                class="quiz-result-panel__feedback-hidden-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="quiz-result-bottom-spacer"
+                        class="quiz-result-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+
+            <!-- ===== FOOTER ===== -->
+            <ui:VisualElement
+                name="quiz-result-footer"
+                class="quiz-result-panel__footer">
+                <ui:Button
+                    name="quiz-result-back-button"
+                    text=""
+                    class="ds-btn ds-btn--secondary quiz-result-panel__back-button"
+                    tooltip="Back to Quiz Portal">
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--arrow-left quiz-result-panel__footer-icon"
+                        picking-mode="Ignore" />
+                    <ui:Label
+                        text="Back to Quiz Portal"
+                        class="quiz-result-panel__footer-label quiz-result-panel__footer-label--secondary"
+                        picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button
+                    name="quiz-result-history-button"
+                    text=""
+                    class="ds-btn ds-btn--primary quiz-result-panel__history-button"
+                    tooltip="View Quiz History">
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--list quiz-result-panel__footer-icon quiz-result-panel__footer-icon--on-accent"
+                        picking-mode="Ignore" />
+                    <ui:Label
+                        text="View Quiz History"
+                        class="quiz-result-panel__footer-label quiz-result-panel__footer-label--primary"
+                        picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="quiz-result-data-state-host"
+            class="quiz-result-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

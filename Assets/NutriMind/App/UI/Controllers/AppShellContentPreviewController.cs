@@ -134,6 +134,11 @@ namespace NutriMind.App.UI
         private QuizAttemptPreviewState _quizAttemptPreviewState =
             QuizAttemptPreviewState.Content;
 
+        [SerializeField]
+        [Tooltip("QuizResult route state used only by the AppShell static preview.")]
+        private QuizResultPreviewState _quizResultPreviewState =
+            QuizResultPreviewState.Content;
+
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
 
@@ -163,6 +168,7 @@ namespace NutriMind.App.UI
         private QuizListPanelView _currentQuizListView;
         private QuizDetailPanelView _currentQuizDetailView;
         private QuizAttemptPanelView _currentQuizAttemptView;
+        private QuizResultPanelView _currentQuizResultView;
         private QuizListPreviewItem? _selectedQuiz;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
 
@@ -538,6 +544,16 @@ namespace NutriMind.App.UI
 
                     return "LiteraQuest • Term 1";
 
+                case AppShellContentPreviewScreen.QuizResult:
+                    if (_selectedQuiz.HasValue)
+                    {
+                        QuizListPreviewItem selected = _selectedQuiz.Value;
+                        return
+                            $"{GetSubjectLabel(selected.Subject)} • Term {(int)selected.Term}";
+                    }
+
+                    return "LiteraQuest • Term 1";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -594,6 +610,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.QuizAttempt:
                     return CreateQuizAttemptView(contentRoot);
+
+                case AppShellContentPreviewScreen.QuizResult:
+                    return CreateQuizResultView(contentRoot);
 
                 default:
                     return null;
@@ -1167,13 +1186,12 @@ namespace NutriMind.App.UI
 
         private void OnQuizDetailViewResultRequested(QuizDetailPreviewSelection selection)
         {
+            _selectedQuiz = selection.Summary;
             Debug.Log(
                 $"[AppShellContentPreview] QuizDetail View Result requested: {selection.Summary.Id} " +
-                $"'{selection.Summary.Title}' — preview only.");
+                $"'{selection.Summary.Title}' — showing QuizResult preview.");
 
-            _appShell?.ShowToast(
-                $"View Result selected for “{selection.Summary.Title}”. QuizResult will be connected in a later panel prompt.",
-                AppShellToastTone.Information);
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizResult);
         }
 
         private void OnQuizDetailRetryRequested()
@@ -1301,10 +1319,73 @@ namespace NutriMind.App.UI
         {
             _selectedQuiz = item;
             Debug.Log(
-                $"[AppShellContentPreview] Quiz result requested: {item.Id} '{item.Title}'.");
+                $"[AppShellContentPreview] Quiz result requested: {item.Id} '{item.Title}' — showing QuizResult preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizResult);
+        }
+
+        private IAppScreenView CreateQuizResultView(VisualElement contentRoot)
+        {
+            var quizResultView = new QuizResultPanelView(contentRoot, _dataStatePanelAsset);
+            if (!quizResultView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] QuizResultPanelView failed to bind quiz-result-root.");
+                quizResultView.Dispose();
+                return null;
+            }
+
+            QuizListPreviewItem summary = _selectedQuiz
+                ?? QuizDetailPreviewCatalog.CreateCanonicalSummary();
+
+            QuizDetailPreviewCatalog.TryGetDetail(summary.Id, out QuizDetailPreviewContent detail);
+            QuizResultPreviewCatalog.TryGetResult(summary.Id, out QuizResultPreviewContent result);
+
+            if (detail == null || result == null)
+            {
+                Debug.LogWarning(
+                    $"[AppShellContentPreview] No canonical result fixture for quiz '{summary.Id}'. " +
+                    "QuizResult shows fixture-gap state; no score was invented.");
+                quizResultView.SetResultContext(summary, detail, null);
+            }
+            else
+            {
+                quizResultView.SetResultContext(summary, detail, result);
+            }
+
+            quizResultView.SetPreviewState(_quizResultPreviewState);
+            quizResultView.BackToQuizPortalRequested += OnQuizResultBackToQuizPortalRequested;
+            quizResultView.ViewHistoryRequested += OnQuizResultViewHistoryRequested;
+            quizResultView.RetryRequested += OnQuizResultRetryRequested;
+            _currentQuizResultView = quizResultView;
+            return quizResultView;
+        }
+
+        private void OnQuizResultBackToQuizPortalRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizResult Back to Quiz Portal — showing QuizList.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private void OnQuizResultViewHistoryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizResult View History requested — preview only.");
 
             _appShell?.ShowToast(
-                $"Selected the result for “{item.Title}”. Quiz results will be connected in a later panel prompt.",
+                "Quiz history will be connected in the next Quiz Portal panel.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizResultRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizResult retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz result refresh requested. Data loading is not connected in this static preview.",
                 AppShellToastTone.Information);
         }
 
@@ -1469,16 +1550,23 @@ namespace NutriMind.App.UI
                     _pendingQuizAttemptSubmission = null;
                     if (submission != null)
                     {
+                        bool isCanonical = string.Equals(
+                            submission.QuizId,
+                            QuizDetailPreviewCatalog.CanonicalQuizId,
+                            System.StringComparison.Ordinal);
+
                         Debug.Log(
                             $"[AppShellContentPreview] QuizAttempt submit confirmed: " +
                             $"quiz={submission.QuizId}, answered={submission.AnsweredCount}/" +
                             $"{submission.TotalQuestions}, unanswered={submission.UnansweredCount}, " +
-                            $"marked={submission.MarkedCount} — no request sent.");
+                            $"marked={submission.MarkedCount}, canonical={isCanonical} — " +
+                            "routing to canonical scored-result fixture; no request sent. " +
+                            "Static preview does not calculate the result from selected answers.");
                     }
 
-                    _currentQuizAttemptView?.SetPreviewState(QuizAttemptPreviewState.Submitting);
+                    SetPreviewScreen(AppShellContentPreviewScreen.QuizResult);
                     _appShell?.ShowToast(
-                        "Submission preview started. No request was sent.",
+                        "Static submission confirmed. Showing the canonical scored result; no request was sent.",
                         AppShellToastTone.Information);
                     break;
             }
@@ -1615,6 +1703,16 @@ namespace NutriMind.App.UI
                 _currentQuizAttemptView.BackToQuizPortalRequested -=
                     OnQuizAttemptBackToQuizPortalRequested;
                 _currentQuizAttemptView = null;
+            }
+
+            if (_currentQuizResultView != null)
+            {
+                _currentQuizResultView.BackToQuizPortalRequested -=
+                    OnQuizResultBackToQuizPortalRequested;
+                _currentQuizResultView.ViewHistoryRequested -=
+                    OnQuizResultViewHistoryRequested;
+                _currentQuizResultView.RetryRequested -= OnQuizResultRetryRequested;
+                _currentQuizResultView = null;
             }
 
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
