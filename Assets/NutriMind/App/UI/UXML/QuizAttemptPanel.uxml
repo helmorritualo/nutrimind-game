@@ -1,0 +1,343 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/QuizAttemptPanel.uss" />
+
+    <ui:VisualElement
+        name="quiz-attempt-root"
+        class="ds-root theme-nutrimind app-screen-content quiz-attempt-panel">
+
+        <ui:VisualElement
+            name="quiz-attempt-content-shell"
+            class="quiz-attempt-panel__content-shell">
+
+            <!-- ===== HEADER (fixed) ===== -->
+            <ui:VisualElement
+                name="quiz-attempt-header"
+                class="ds-card quiz-attempt-panel__header">
+
+                <ui:VisualElement class="quiz-attempt-panel__header-row">
+                    <ui:Button
+                        name="quiz-attempt-exit-button"
+                        text="Exit Quiz"
+                        class="ds-btn ds-btn--ghost quiz-attempt-panel__exit-button"
+                        tooltip="Exit this quiz" />
+
+                    <ui:VisualElement class="quiz-attempt-panel__header-center" picking-mode="Ignore">
+                        <ui:Label
+                            name="quiz-attempt-title"
+                            text="Story Elements Check"
+                            class="quiz-attempt-panel__title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-attempt-subject-term"
+                            text="LiteraQuest • Term 1"
+                            class="quiz-attempt-panel__subject-term"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-attempt-question-progress-label"
+                            text="Question 1 of 2"
+                            class="quiz-attempt-panel__question-progress-label"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="quiz-attempt-panel__header-chips" picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="quiz-attempt-attempt-chip"
+                            class="ds-chip quiz-attempt-panel__attempt-chip">
+                            <ui:Label
+                                text="Attempt 1 of 1"
+                                class="quiz-attempt-panel__chip-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:VisualElement
+                            name="quiz-attempt-online-chip"
+                            class="ds-chip quiz-attempt-panel__online-chip"
+                            tooltip="This quiz requires an online connection">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--wifi quiz-attempt-panel__online-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Online required"
+                                class="quiz-attempt-panel__chip-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:ProgressBar
+                    name="quiz-attempt-progress-bar"
+                    class="ds-progress quiz-attempt-panel__progress-bar"
+                    value="50"
+                    title=""
+                    low-value="0"
+                    high-value="100" />
+            </ui:VisualElement>
+
+            <!-- ===== BODY SCROLL ===== -->
+            <ui:ScrollView
+                name="quiz-attempt-body-scroll"
+                class="app-screen-content__scroll quiz-attempt-panel__body-scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="quiz-attempt-body"
+                    class="app-screen-content__body quiz-attempt-panel__body">
+
+                    <!-- Answering mode -->
+                    <ui:VisualElement
+                        name="quiz-attempt-answer-mode"
+                        class="quiz-attempt-panel__answer-mode">
+
+                        <ui:VisualElement
+                            name="quiz-attempt-workspace"
+                            class="quiz-attempt-panel__workspace">
+
+                            <ui:VisualElement
+                                name="quiz-attempt-question-column"
+                                class="quiz-attempt-panel__question-column">
+
+                                <ui:VisualElement
+                                    name="quiz-attempt-question-card"
+                                    class="ds-card quiz-attempt-panel__question-card">
+
+                                    <ui:VisualElement
+                                        class="quiz-attempt-panel__question-meta"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            name="quiz-attempt-question-number"
+                                            text="Question 1"
+                                            class="quiz-attempt-panel__question-number"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="quiz-attempt-question-type"
+                                            text="Single choice"
+                                            class="quiz-attempt-panel__question-type"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+
+                                    <ui:Label
+                                        name="quiz-attempt-question-prompt"
+                                        text="Who is the main character?"
+                                        class="quiz-attempt-panel__question-prompt"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="quiz-attempt-selection-instruction"
+                                        text="Select one answer."
+                                        class="quiz-attempt-panel__selection-instruction"
+                                        picking-mode="Ignore" />
+
+                                    <ui:VisualElement
+                                        name="quiz-attempt-options-host"
+                                        class="quiz-attempt-panel__options-host" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="quiz-attempt-navigator-column"
+                                class="quiz-attempt-panel__navigator-column">
+
+                                <ui:VisualElement
+                                    name="quiz-attempt-navigator-card"
+                                    class="ds-card quiz-attempt-panel__navigator-card">
+
+                                    <ui:Label
+                                        text="Quiz progress"
+                                        class="quiz-attempt-panel__navigator-title"
+                                        picking-mode="Ignore" />
+
+                                    <ui:VisualElement class="quiz-attempt-panel__summary-rows" picking-mode="Ignore">
+                                        <ui:VisualElement class="quiz-attempt-panel__summary-row" picking-mode="Ignore">
+                                            <ui:Label
+                                                text="Answered"
+                                                class="quiz-attempt-panel__summary-label"
+                                                picking-mode="Ignore" />
+                                            <ui:Label
+                                                name="quiz-attempt-answered-count"
+                                                text="0 of 2"
+                                                class="quiz-attempt-panel__summary-value"
+                                                picking-mode="Ignore" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="quiz-attempt-panel__summary-row" picking-mode="Ignore">
+                                            <ui:Label
+                                                text="Unanswered"
+                                                class="quiz-attempt-panel__summary-label"
+                                                picking-mode="Ignore" />
+                                            <ui:Label
+                                                name="quiz-attempt-unanswered-count"
+                                                text="2"
+                                                class="quiz-attempt-panel__summary-value"
+                                                picking-mode="Ignore" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement class="quiz-attempt-panel__summary-row" picking-mode="Ignore">
+                                            <ui:Label
+                                                text="Marked"
+                                                class="quiz-attempt-panel__summary-label"
+                                                picking-mode="Ignore" />
+                                            <ui:Label
+                                                name="quiz-attempt-marked-count"
+                                                text="0"
+                                                class="quiz-attempt-panel__summary-value"
+                                                picking-mode="Ignore" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+
+                                    <ui:VisualElement
+                                        name="quiz-attempt-question-nav-host"
+                                        class="quiz-attempt-panel__question-nav-host" />
+
+                                    <ui:VisualElement
+                                        class="quiz-attempt-panel__legend"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            text="Current · Answered · Unanswered · Marked"
+                                            class="quiz-attempt-panel__legend-text"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+
+                                    <ui:Label
+                                        name="quiz-attempt-connection-note"
+                                        text="Stay connected. Submitting requires an online connection."
+                                        class="quiz-attempt-panel__connection-note"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- Review mode -->
+                    <ui:VisualElement
+                        name="quiz-attempt-review-mode"
+                        class="quiz-attempt-panel__review-mode quiz-attempt-panel__review-mode--hidden">
+
+                        <ui:VisualElement class="quiz-attempt-panel__review-intro" picking-mode="Ignore">
+                            <ui:Label
+                                text="Review your answers"
+                                class="quiz-attempt-panel__review-heading"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Check each response before submitting. You can return to any question."
+                                class="quiz-attempt-panel__review-supporting"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-attempt-review-summary"
+                                text="2 questions · 0 answered · 2 unanswered · 0 marked"
+                                class="quiz-attempt-panel__review-summary"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-attempt-review-list"
+                            class="quiz-attempt-panel__review-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+
+            <!-- ===== FOOTER (fixed) ===== -->
+            <ui:VisualElement
+                name="quiz-attempt-footer"
+                class="quiz-attempt-panel__footer">
+
+                <ui:VisualElement
+                    name="quiz-attempt-answer-footer"
+                    class="quiz-attempt-panel__answer-footer">
+
+                    <ui:Button
+                        name="quiz-attempt-previous-button"
+                        text=""
+                        class="ds-btn ds-btn--secondary quiz-attempt-panel__previous-button"
+                        tooltip="Go to the previous question">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--arrow-left quiz-attempt-panel__footer-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            text="Previous"
+                            class="quiz-attempt-panel__primary-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+
+                    <ui:VisualElement
+                        name="quiz-attempt-review-toggle-row"
+                        class="quiz-attempt-panel__review-toggle-row">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--flag quiz-attempt-panel__review-flag-icon"
+                            picking-mode="Ignore" />
+                        <ui:Toggle
+                            name="quiz-attempt-review-toggle"
+                            text="Mark for review"
+                            class="ds-check quiz-attempt-panel__review-toggle"
+                            tooltip="Mark this question so you can review it later" />
+                    </ui:VisualElement>
+
+                    <ui:Button
+                        name="quiz-attempt-next-button"
+                        text=""
+                        class="ds-btn ds-btn--primary quiz-attempt-panel__next-button"
+                        tooltip="Go to the next question">
+                        <ui:Label
+                            name="quiz-attempt-next-label"
+                            text="Next Question"
+                            class="quiz-attempt-panel__primary-label"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            name="quiz-attempt-next-icon"
+                            class="ds-icon ds-icon--arrow-right quiz-attempt-panel__footer-icon quiz-attempt-panel__footer-icon--on-accent"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="quiz-attempt-review-footer"
+                    class="quiz-attempt-panel__review-footer quiz-attempt-panel__review-footer--hidden">
+
+                    <ui:Button
+                        name="quiz-attempt-back-to-questions-button"
+                        text=""
+                        class="ds-btn ds-btn--secondary quiz-attempt-panel__back-to-questions-button"
+                        tooltip="Return to answering questions">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--arrow-left quiz-attempt-panel__footer-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            text="Back to Questions"
+                            class="quiz-attempt-panel__primary-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+
+                    <ui:Button
+                        name="quiz-attempt-submit-button"
+                        text=""
+                        class="ds-btn ds-btn--primary quiz-attempt-panel__submit-button"
+                        tooltip="Submit your quiz answers">
+                        <ui:VisualElement
+                            name="quiz-attempt-submit-icon"
+                            class="ds-icon ds-icon--check quiz-attempt-panel__footer-icon quiz-attempt-panel__footer-icon--on-accent"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-attempt-submit-label"
+                            text="Submit Quiz"
+                            class="quiz-attempt-panel__primary-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="quiz-attempt-data-state-host"
+            class="quiz-attempt-panel__data-state-host" />
+
+        <ui:VisualElement
+            name="quiz-attempt-local-modal-host"
+            class="quiz-attempt-panel__local-modal-host"
+            picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

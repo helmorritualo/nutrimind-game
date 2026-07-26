@@ -77,7 +77,9 @@ namespace NutriMind.App.UI
             None,
             SignOut,
             RestoreDefaults,
-            ResetTutorial
+            ResetTutorial,
+            ExitQuiz,
+            SubmitQuiz
         }
 
         private const string ContentInstanceClass = "app-shell__content-instance";
@@ -98,7 +100,7 @@ namespace NutriMind.App.UI
         private VisualTreeAsset _dataStatePanelAsset;
 
         [SerializeField]
-        [Tooltip("Shared ConfirmDialog UXML used for Profile and Settings preview confirmations.")]
+        [Tooltip("Shared ConfirmDialog UXML used by Profile, Settings, and QuizAttempt preview confirmations.")]
         private VisualTreeAsset _confirmDialogAsset;
 
         [SerializeField]
@@ -126,6 +128,11 @@ namespace NutriMind.App.UI
         [SerializeField]
         [Tooltip("DataStatePanel state used only while previewing QuizDetail inside AppShell.")]
         private DataStatePanelState _quizDetailPreviewState = DataStatePanelState.Content;
+
+        [SerializeField]
+        [Tooltip("QuizAttempt route state used only by the AppShell static preview.")]
+        private QuizAttemptPreviewState _quizAttemptPreviewState =
+            QuizAttemptPreviewState.Content;
 
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
@@ -155,7 +162,9 @@ namespace NutriMind.App.UI
         private ProgressPanelView _currentProgressView;
         private QuizListPanelView _currentQuizListView;
         private QuizDetailPanelView _currentQuizDetailView;
+        private QuizAttemptPanelView _currentQuizAttemptView;
         private QuizListPreviewItem? _selectedQuiz;
+        private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
@@ -519,6 +528,16 @@ namespace NutriMind.App.UI
                         ? "Grade 5 • Quiz Portal"
                         : NormalizeOptionalText(entry.PageContext);
 
+                case AppShellContentPreviewScreen.QuizAttempt:
+                    if (_selectedQuiz.HasValue)
+                    {
+                        QuizListPreviewItem selected = _selectedQuiz.Value;
+                        return
+                            $"{GetSubjectLabel(selected.Subject)} • Term {(int)selected.Term}";
+                    }
+
+                    return "LiteraQuest • Term 1";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -572,6 +591,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.QuizDetail:
                     return CreateQuizDetailView(contentRoot);
+
+                case AppShellContentPreviewScreen.QuizAttempt:
+                    return CreateQuizAttemptView(contentRoot);
 
                 default:
                     return null;
@@ -1135,13 +1157,12 @@ namespace NutriMind.App.UI
 
         private void OnQuizDetailStartRequested(QuizDetailPreviewSelection selection)
         {
+            _selectedQuiz = selection.Summary;
             Debug.Log(
                 $"[AppShellContentPreview] QuizDetail Start requested: {selection.Summary.Id} " +
-                $"'{selection.Summary.Title}' ({selection.QuestionCount} questions) — preview only.");
+                $"'{selection.Summary.Title}' ({selection.QuestionCount} questions) — showing QuizAttempt preview.");
 
-            _appShell?.ShowToast(
-                $"Start selected for “{selection.Summary.Title}”. QuizAttempt will be connected in the next Quiz Portal panel prompt.",
-                AppShellToastTone.Information);
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizAttempt);
         }
 
         private void OnQuizDetailViewResultRequested(QuizDetailPreviewSelection selection)
@@ -1163,6 +1184,117 @@ namespace NutriMind.App.UI
             _appShell?.ShowToast(
                 "Quiz detail refresh requested. Data loading is not connected in this static preview.",
                 AppShellToastTone.Information);
+        }
+
+        private IAppScreenView CreateQuizAttemptView(VisualElement contentRoot)
+        {
+            var quizAttemptView = new QuizAttemptPanelView(contentRoot, _dataStatePanelAsset);
+            if (!quizAttemptView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] QuizAttemptPanelView failed to bind quiz-attempt-root.");
+                quizAttemptView.Dispose();
+                return null;
+            }
+
+            QuizListPreviewItem summary = _selectedQuiz
+                ?? QuizDetailPreviewCatalog.CreateCanonicalSummary();
+
+            if (!QuizDetailPreviewCatalog.TryGetDetail(summary.Id, out QuizDetailPreviewContent detail))
+            {
+                Debug.LogWarning(
+                    $"[AppShellContentPreview] No detail fixture for quiz '{summary.Id}'. " +
+                    "QuizAttempt shows unavailable state.");
+                quizAttemptView.SetQuizContext(summary, null);
+            }
+            else
+            {
+                quizAttemptView.SetQuizContext(summary, detail);
+            }
+
+            quizAttemptView.SetPreviewState(_quizAttemptPreviewState);
+            quizAttemptView.ExitRequested += OnQuizAttemptExitRequested;
+            quizAttemptView.QuestionChanged += OnQuizAttemptQuestionChanged;
+            quizAttemptView.SubmitRequested += OnQuizAttemptSubmitRequested;
+            quizAttemptView.CheckSubmissionStatusRequested += OnQuizAttemptCheckSubmissionStatusRequested;
+            quizAttemptView.ReturnToReviewRequested += OnQuizAttemptReturnToReviewRequested;
+            quizAttemptView.BackToQuizPortalRequested += OnQuizAttemptBackToQuizPortalRequested;
+            _currentQuizAttemptView = quizAttemptView;
+            return quizAttemptView;
+        }
+
+        private void OnQuizAttemptExitRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizAttempt Exit requested — showing confirmation.");
+
+            ShowPreviewConfirmation(
+                PreviewConfirmationAction.ExitQuiz,
+                ConfirmDialogPresets.ExitQuiz());
+        }
+
+        private void OnQuizAttemptQuestionChanged(int index) =>
+            Debug.Log(
+                $"[AppShellContentPreview] QuizAttempt question changed to index {index}.");
+
+        private void OnQuizAttemptSubmitRequested(QuizAttemptPreviewSubmission submission)
+        {
+            _pendingQuizAttemptSubmission = submission;
+            Debug.Log(
+                $"[AppShellContentPreview] QuizAttempt Submit requested: quiz={submission.QuizId}, " +
+                $"answered={submission.AnsweredCount}/{submission.TotalQuestions}.");
+
+            if (submission.UnansweredCount == 0)
+            {
+                ShowPreviewConfirmation(
+                    PreviewConfirmationAction.SubmitQuiz,
+                    ConfirmDialogPresets.SubmitQuiz());
+                return;
+            }
+
+            ShowPreviewConfirmation(
+                PreviewConfirmationAction.SubmitQuiz,
+                new ConfirmDialogConfiguration(
+                    title: "Submit your quiz?",
+                    message: $"You answered {submission.AnsweredCount} of {submission.TotalQuestions} questions.",
+                    confirmLabel: "Submit Quiz",
+                    cancelLabel: "Keep Reviewing",
+                    detail: "Unanswered questions will remain unanswered. You will not be able to change your answers after submission.",
+                    iconClass: "ds-icon--warning",
+                    tone: ConfirmDialogTone.Warning,
+                    dismissOnBackdrop: false));
+        }
+
+        private void OnQuizAttemptCheckSubmissionStatusRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Check submission status requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Submission status check requested. Server recovery is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizAttemptReturnToReviewRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Return to Review requested — answers preserved.");
+
+            if (_currentQuizAttemptView == null)
+            {
+                return;
+            }
+
+            _currentQuizAttemptView.SetPreviewState(QuizAttemptPreviewState.Content);
+            _currentQuizAttemptView.ShowReview();
+        }
+
+        private void OnQuizAttemptBackToQuizPortalRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizAttempt Back to Quiz Portal — showing QuizList.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
         }
 
         private void OnQuizListResultRequested(QuizListPreviewItem item)
@@ -1325,11 +1457,40 @@ namespace NutriMind.App.UI
                         "Tutorial reset requested for this preview.",
                         AppShellToastTone.Information);
                     break;
+
+                case PreviewConfirmationAction.ExitQuiz:
+                    Debug.Log(
+                        "[AppShellContentPreview] QuizAttempt exit confirmed — showing QuizDetail.");
+                    SetPreviewScreen(AppShellContentPreviewScreen.QuizDetail);
+                    break;
+
+                case PreviewConfirmationAction.SubmitQuiz:
+                    QuizAttemptPreviewSubmission submission = _pendingQuizAttemptSubmission;
+                    _pendingQuizAttemptSubmission = null;
+                    if (submission != null)
+                    {
+                        Debug.Log(
+                            $"[AppShellContentPreview] QuizAttempt submit confirmed: " +
+                            $"quiz={submission.QuizId}, answered={submission.AnsweredCount}/" +
+                            $"{submission.TotalQuestions}, unanswered={submission.UnansweredCount}, " +
+                            $"marked={submission.MarkedCount} — no request sent.");
+                    }
+
+                    _currentQuizAttemptView?.SetPreviewState(QuizAttemptPreviewState.Submitting);
+                    _appShell?.ShowToast(
+                        "Submission preview started. No request was sent.",
+                        AppShellToastTone.Information);
+                    break;
             }
         }
 
         private void OnConfirmDialogCancelled()
         {
+            if (_pendingConfirmation == PreviewConfirmationAction.SubmitQuiz)
+            {
+                _pendingQuizAttemptSubmission = null;
+            }
+
             _pendingConfirmation = PreviewConfirmationAction.None;
         }
 
@@ -1441,6 +1602,29 @@ namespace NutriMind.App.UI
                 _currentQuizDetailView.RetryRequested -= OnQuizDetailRetryRequested;
                 _currentQuizDetailView = null;
             }
+
+            if (_currentQuizAttemptView != null)
+            {
+                _currentQuizAttemptView.ExitRequested -= OnQuizAttemptExitRequested;
+                _currentQuizAttemptView.QuestionChanged -= OnQuizAttemptQuestionChanged;
+                _currentQuizAttemptView.SubmitRequested -= OnQuizAttemptSubmitRequested;
+                _currentQuizAttemptView.CheckSubmissionStatusRequested -=
+                    OnQuizAttemptCheckSubmissionStatusRequested;
+                _currentQuizAttemptView.ReturnToReviewRequested -=
+                    OnQuizAttemptReturnToReviewRequested;
+                _currentQuizAttemptView.BackToQuizPortalRequested -=
+                    OnQuizAttemptBackToQuizPortalRequested;
+                _currentQuizAttemptView = null;
+            }
+
+            if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
+                || _pendingConfirmation == PreviewConfirmationAction.SubmitQuiz)
+            {
+                _confirmDialogView?.Hide();
+                _pendingConfirmation = PreviewConfirmationAction.None;
+            }
+
+            _pendingQuizAttemptSubmission = null;
 
             _currentScreenView?.Dispose();
             _currentScreenView = null;
@@ -1663,7 +1847,7 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.QuizDetail:
                     return "Quiz Details";
                 case AppShellContentPreviewScreen.QuizAttempt:
-                    return "Quiz";
+                    return "Quiz Attempt";
                 case AppShellContentPreviewScreen.QuizResult:
                     return "Quiz Result";
                 default:
