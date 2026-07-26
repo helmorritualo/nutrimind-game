@@ -269,6 +269,10 @@ namespace NutriMind.App.UI
         private const string MobileClass = "mobile";
         private const string HiddenClass = "mission-detail-panel__hidden";
         private const string DataStateVisibleClass = "mission-detail-panel__data-state-host--visible";
+        private const string StatusChipAvailableClass = "mission-detail-panel__status-chip--available";
+        private const string StatusChipProgressClass = "mission-detail-panel__status-chip--progress";
+        private const string StatusChipCompletedClass = "mission-detail-panel__status-chip--completed";
+        private const string StatusChipLockedClass = "mission-detail-panel__status-chip--locked";
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
 
@@ -596,6 +600,17 @@ namespace NutriMind.App.UI
             if (_statusLabel != null) _statusLabel.text = GetMissionStatusLabel(state);
             SetIconClass(_statusIcon, GetMissionIconClass(state));
             SetIconClass(_offlineIcon, GetOfflineIconClass(Content?.LocalAvailability ?? MissionDetailLocalAvailability.Unknown));
+
+            if (_statusChip == null)
+            {
+                return;
+            }
+
+            _statusChip.RemoveFromClassList(StatusChipAvailableClass);
+            _statusChip.RemoveFromClassList(StatusChipProgressClass);
+            _statusChip.RemoveFromClassList(StatusChipCompletedClass);
+            _statusChip.RemoveFromClassList(StatusChipLockedClass);
+            _statusChip.AddToClassList(GetStatusChipModifierClass(state));
         }
 
         private void ApplyCurrentArea(MissionDetailAuthoredContent authored, string activeAreaId)
@@ -862,6 +877,14 @@ namespace NutriMind.App.UI
             MissionDetailProgressState.Available => "ds-icon--play",
             MissionDetailProgressState.Started or MissionDetailProgressState.InProgress => "ds-icon--flag",
             _ => "ds-icon--check"
+        };
+
+        private static string GetStatusChipModifierClass(MissionDetailProgressState state) => state switch
+        {
+            MissionDetailProgressState.Locked => StatusChipLockedClass,
+            MissionDetailProgressState.Available => StatusChipAvailableClass,
+            MissionDetailProgressState.MissionCompleted => StatusChipCompletedClass,
+            _ => StatusChipProgressClass
         };
 
         private static string GetAreaModifierClass(MissionDetailAreaState state) => state switch

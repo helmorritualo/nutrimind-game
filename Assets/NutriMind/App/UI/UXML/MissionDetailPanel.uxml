@@ -61,10 +61,10 @@
 
                             <ui:VisualElement
                                 name="mission-detail-status-chip"
-                                class="ds-chip mission-detail-panel__status-chip">
+                                class="ds-chip mission-detail-panel__status-chip mission-detail-panel__status-chip--progress">
                                 <ui:VisualElement
                                     name="mission-detail-status-icon"
-                                    class="ds-icon ds-icon--play mission-detail-panel__status-icon"
+                                    class="ds-icon ds-icon--flag mission-detail-panel__status-icon"
                                     picking-mode="Ignore" />
                                 <ui:Label
                                     name="mission-detail-status-label"

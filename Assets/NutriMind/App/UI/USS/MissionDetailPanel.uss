@@ -146,21 +146,69 @@
     align-self: flex-start;
     margin-bottom: 20px;
     padding: 12px 18px;
-    background-color: rgba(59, 130, 246, 0.12);
+    background-color: var(--color-secondary-soft);
     border-radius: 999px;
+}
+
+.mission-detail-panel__status-chip--available {
+    background-color: var(--color-tertiary-soft);
+}
+
+.mission-detail-panel__status-chip--progress {
+    background-color: var(--color-secondary-soft);
+}
+
+.mission-detail-panel__status-chip--completed {
+    background-color: var(--color-primary-soft);
+}
+
+.mission-detail-panel__status-chip--locked {
+    background-color: var(--color-surface-elev);
 }
 
 .mission-detail-panel__status-icon {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    -unity-background-image-tint-color: #1565C0;
+    -unity-background-image-tint-color: var(--color-secondary);
+}
+
+.mission-detail-panel__status-chip--available .mission-detail-panel__status-icon {
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__status-chip--progress .mission-detail-panel__status-icon {
+    -unity-background-image-tint-color: var(--color-secondary);
+}
+
+.mission-detail-panel__status-chip--completed .mission-detail-panel__status-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.mission-detail-panel__status-chip--locked .mission-detail-panel__status-icon {
+    -unity-background-image-tint-color: var(--color-text-disabled);
 }
 
 .mission-detail-panel__status-label {
     font-size: 18px;
-    color: #1565C0;
+    color: var(--color-secondary);
     white-space: nowrap;
+}
+
+.mission-detail-panel__status-chip--available .mission-detail-panel__status-label {
+    color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__status-chip--progress .mission-detail-panel__status-label {
+    color: var(--color-secondary);
+}
+
+.mission-detail-panel__status-chip--completed .mission-detail-panel__status-label {
+    color: var(--color-primary);
+}
+
+.mission-detail-panel__status-chip--locked .mission-detail-panel__status-label {
+    color: var(--color-text-secondary);
 }
 
 .mission-detail-panel__premise {

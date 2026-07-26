@@ -25,7 +25,8 @@ namespace NutriMind.App.UI
         QuizAttempt,
         QuizResult,
         QuizHistory,
-        MissionDetail
+        MissionDetail,
+        Rewards
     }
 
     /// <summary>
@@ -159,6 +160,15 @@ namespace NutriMind.App.UI
         private MissionDetailPreviewState _missionDetailPreviewState =
             MissionDetailPreviewState.Content;
 
+        [SerializeField]
+        [Tooltip("Rewards route state used only by the AppShell static preview.")]
+        private RewardsPreviewState _rewardsPreviewState =
+            RewardsPreviewState.Content;
+
+        [SerializeField]
+        private RewardsPreviewFilter _rewardsPreviewFilter =
+            RewardsPreviewFilter.All;
+
         private MissionPreviewSelection _selectedMission =
             new(
                 "g5_lq_t1_m02",
@@ -198,6 +208,7 @@ namespace NutriMind.App.UI
         private QuizResultPanelView _currentQuizResultView;
         private QuizHistoryPanelView _currentQuizHistoryView;
         private MissionDetailPanelView _currentMissionDetailView;
+        private RewardsPanelView _currentRewardsView;
         private QuizListPreviewItem? _selectedQuiz;
         private string _selectedQuizResultAttemptId;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
@@ -400,6 +411,12 @@ namespace NutriMind.App.UI
             }
 
             AppShellContentPreviewEntry entry = FindEntry(screen);
+            if (screen == AppShellContentPreviewScreen.Missions)
+            {
+                _selectedSubject = NutriMindSubject.LiteraQuest;
+                _selectedTerm = NutriMindTerm.Term1;
+            }
+
             VisualTreeAsset asset = entry?.ContentAsset;
             string title = entry == null
                 ? null
@@ -596,6 +613,9 @@ namespace NutriMind.App.UI
                         $"Mission {selection.MissionNumber}";
                 }
 
+                case AppShellContentPreviewScreen.Rewards:
+                    return "Grade 5 • My collection";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -661,6 +681,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.MissionDetail:
                     return CreateMissionDetailView(contentRoot);
+
+                case AppShellContentPreviewScreen.Rewards:
+                    return CreateRewardsView(contentRoot);
 
                 default:
                     return null;
@@ -831,7 +854,9 @@ namespace NutriMind.App.UI
                 return null;
             }
 
-            missionView.SetContext(_selectedSubject, _selectedTerm);
+            _selectedSubject = NutriMindSubject.LiteraQuest;
+            _selectedTerm = NutriMindTerm.Term1;
+            missionView.SetContext(NutriMindSubject.LiteraQuest, NutriMindTerm.Term1);
             missionView.BackRequested += OnMissionBackRequested;
             missionView.MissionSelected += OnMissionSelected;
             missionView.StartMissionRequested += OnStartMissionRequested;
@@ -839,6 +864,7 @@ namespace NutriMind.App.UI
             missionView.ReviewMissionRequested += OnReviewMissionRequested;
             missionView.LockedMissionRequested += OnLockedMissionRequested;
             _currentMissionSelectionView = missionView;
+            RefreshShellPageContext();
             return missionView;
         }
 
@@ -1628,6 +1654,64 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Information);
         }
 
+        private IAppScreenView CreateRewardsView(VisualElement contentRoot)
+        {
+            var rewardsView = new RewardsPanelView(contentRoot, _dataStatePanelAsset);
+            if (!rewardsView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] RewardsPanelView failed to bind rewards-root.");
+                rewardsView.Dispose();
+                return null;
+            }
+
+            rewardsView.SetItems(RewardsPreviewCatalog.CreateItems());
+            rewardsView.SetFilter(_rewardsPreviewFilter);
+            rewardsView.SetPreviewState(_rewardsPreviewState);
+            rewardsView.BackToHomeRequested += OnRewardsBackToHomeRequested;
+            rewardsView.UseRewardRequested += OnRewardsUseRewardRequested;
+            rewardsView.FilterChanged += OnRewardsFilterChanged;
+            rewardsView.RetryRequested += OnRewardsRetryRequested;
+            _currentRewardsView = rewardsView;
+            return rewardsView;
+        }
+
+        private void OnRewardsBackToHomeRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Rewards Back to Home — showing Home.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Home);
+        }
+
+        private void OnRewardsUseRewardRequested(RewardsPreviewSelection selection)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] Rewards Use requested: key={selection.PresentationKey}, " +
+                $"title='{selection.Title}' — preview only. No request UUID generated.");
+
+            _appShell?.ShowToast(
+                $"Use requested for {selection.Title}. Reward use is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnRewardsFilterChanged(RewardsPreviewFilter filter)
+        {
+            _rewardsPreviewFilter = filter;
+            Debug.Log(
+                $"[AppShellContentPreview] Rewards filter changed: {filter}.");
+        }
+
+        private void OnRewardsRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Rewards retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Rewards refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
         private void OnQuizListFiltersChanged(QuizListPreviewFilters filters)
         {
             Debug.Log(
@@ -1975,6 +2059,15 @@ namespace NutriMind.App.UI
                 _currentMissionDetailView = null;
             }
 
+            if (_currentRewardsView != null)
+            {
+                _currentRewardsView.BackToHomeRequested -= OnRewardsBackToHomeRequested;
+                _currentRewardsView.UseRewardRequested -= OnRewardsUseRewardRequested;
+                _currentRewardsView.FilterChanged -= OnRewardsFilterChanged;
+                _currentRewardsView.RetryRequested -= OnRewardsRetryRequested;
+                _currentRewardsView = null;
+            }
+
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
                 || _pendingConfirmation == PreviewConfirmationAction.SubmitQuiz)
             {
@@ -2210,6 +2303,10 @@ namespace NutriMind.App.UI
                     return "Quiz Result";
                 case AppShellContentPreviewScreen.QuizHistory:
                     return "Quiz History";
+                case AppShellContentPreviewScreen.MissionDetail:
+                    return "Mission Details";
+                case AppShellContentPreviewScreen.Rewards:
+                    return "Rewards";
                 default:
                     return "AppShell content preview";
             }

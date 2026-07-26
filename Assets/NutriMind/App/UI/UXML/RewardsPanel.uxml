@@ -1,0 +1,260 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/RewardsPanel.uss" />
+
+    <ui:VisualElement
+        name="rewards-root"
+        class="ds-root theme-nutrimind app-screen-content rewards-panel">
+
+        <ui:VisualElement
+            name="rewards-content-shell"
+            class="rewards-panel__content-shell">
+
+            <ui:ScrollView
+                name="rewards-scroll"
+                class="app-screen-content__scroll rewards-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="rewards-body"
+                    class="app-screen-content__body rewards-panel__body">
+
+                    <!-- ===== OFFLINE CACHE NOTICE ===== -->
+                    <ui:VisualElement
+                        name="rewards-offline-notice"
+                        class="ds-card rewards-panel__offline-notice rewards-panel__offline-notice--hidden"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="rewards-offline-icon"
+                            class="ds-icon ds-icon--wifi rewards-panel__offline-icon"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            class="rewards-panel__offline-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="rewards-offline-title"
+                                text="Showing saved rewards"
+                                class="rewards-panel__offline-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="rewards-offline-message"
+                                text="You’re offline. This collection was loaded from saved data and may not include recent reward changes."
+                                class="rewards-panel__offline-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== OVERVIEW ===== -->
+                    <ui:VisualElement
+                        name="rewards-overview"
+                        class="ds-card rewards-panel__overview">
+
+                        <ui:VisualElement
+                            name="rewards-overview-copy"
+                            class="rewards-panel__overview-copy"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                name="rewards-overview-icon"
+                                class="ds-icon ds-icon--gift rewards-panel__overview-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="rewards-overview-eyebrow"
+                                text="My collection"
+                                class="rewards-panel__overview-eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="rewards-overview-title"
+                                text="Your rewards"
+                                class="rewards-panel__overview-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="rewards-overview-description"
+                                text="See what you own, what is ready to use, and what you can unlock next."
+                                class="rewards-panel__overview-description"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="rewards-overview-metrics"
+                            class="rewards-panel__overview-metrics"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                class="ds-card rewards-panel__metric-card rewards-panel__metric-card--owned"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="rewards-owned-value"
+                                    text="1"
+                                    class="rewards-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Owned"
+                                    class="rewards-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card rewards-panel__metric-card rewards-panel__metric-card--available"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="rewards-available-value"
+                                    text="1"
+                                    class="rewards-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Available"
+                                    class="rewards-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card rewards-panel__metric-card rewards-panel__metric-card--used"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="rewards-used-value"
+                                    text="1"
+                                    class="rewards-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Used"
+                                    class="rewards-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card rewards-panel__metric-card rewards-panel__metric-card--locked rewards-panel__metric-card--last"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="rewards-locked-value"
+                                    text="1"
+                                    class="rewards-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Locked"
+                                    class="rewards-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== FILTERS ===== -->
+                    <ui:VisualElement
+                        name="rewards-filter-card"
+                        class="ds-card rewards-panel__filter-card">
+
+                        <ui:VisualElement
+                            name="rewards-filter-copy"
+                            class="rewards-panel__filter-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="rewards-filter-title"
+                                text="Filter rewards"
+                                class="rewards-panel__filter-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="rewards-filter-description"
+                                text="Choose which reward status to view."
+                                class="rewards-panel__filter-description"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="rewards-filter-controls"
+                            class="rewards-panel__filter-controls">
+                            <ui:Button
+                                name="rewards-filter-all"
+                                text="All Rewards"
+                                class="ds-btn ds-btn--secondary ds-tab rewards-panel__filter-button rewards-panel__filter-button--selected"
+                                tooltip="Show all rewards" />
+                            <ui:Button
+                                name="rewards-filter-owned"
+                                text="Owned"
+                                class="ds-btn ds-btn--ghost ds-tab rewards-panel__filter-button"
+                                tooltip="Show owned rewards" />
+                            <ui:Button
+                                name="rewards-filter-available"
+                                text="Available"
+                                class="ds-btn ds-btn--ghost ds-tab rewards-panel__filter-button"
+                                tooltip="Show available rewards" />
+                            <ui:Button
+                                name="rewards-filter-used"
+                                text="Used"
+                                class="ds-btn ds-btn--ghost ds-tab rewards-panel__filter-button"
+                                tooltip="Show used rewards" />
+                            <ui:Button
+                                name="rewards-filter-locked"
+                                text="Locked"
+                                class="ds-btn ds-btn--ghost ds-tab rewards-panel__filter-button"
+                                tooltip="Show locked rewards" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== RESULTS HEADER ===== -->
+                    <ui:VisualElement
+                        name="rewards-results-header"
+                        class="rewards-panel__results-header"
+                        picking-mode="Ignore">
+                        <ui:Label
+                            name="rewards-results-title"
+                            text="Reward collection"
+                            class="rewards-panel__results-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="rewards-visible-count"
+                            text="4 rewards"
+                            class="rewards-panel__visible-count"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <!-- ===== REWARD GRID ===== -->
+                    <ui:VisualElement
+                        name="rewards-grid"
+                        class="rewards-panel__grid" />
+
+                    <!-- ===== FILTER EMPTY ===== -->
+                    <ui:VisualElement
+                        name="rewards-filter-empty"
+                        class="ds-card rewards-panel__filter-empty rewards-panel__filter-empty--hidden"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="rewards-filter-empty-icon"
+                            class="ds-icon ds-icon--filter rewards-panel__filter-empty-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="rewards-filter-empty-title"
+                            text="No rewards match this filter"
+                            class="rewards-panel__filter-empty-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="rewards-filter-empty-message"
+                            text="Choose another reward status or show all rewards."
+                            class="rewards-panel__filter-empty-message"
+                            picking-mode="Ignore" />
+                        <ui:Button
+                            name="rewards-filter-empty-reset"
+                            text="Show All Rewards"
+                            class="ds-btn ds-btn--secondary rewards-panel__filter-empty-reset"
+                            tooltip="Show all rewards" />
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="rewards-data-state-host"
+            class="rewards-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -50,6 +50,16 @@ namespace NutriMind.App.UI
         private const float CompactBreakpoint = 1100f;
         private const float NarrowBreakpoint = 820f;
 
+        /// <summary>
+        /// Canonical subject for the five-item LiteraQuest Term 1 static preview catalog.
+        /// </summary>
+        private const NutriMindSubject CatalogSubject = NutriMindSubject.LiteraQuest;
+
+        /// <summary>
+        /// Canonical term for the five-item LiteraQuest Term 1 static preview catalog.
+        /// </summary>
+        private const NutriMindTerm CatalogTerm = NutriMindTerm.Term1;
+
         private static readonly string[] StatusStates = { "completed", "progress", "available", "locked" };
 
         private readonly Dictionary<string, MissionPreviewData> _missionData = new()
@@ -164,6 +174,7 @@ namespace NutriMind.App.UI
         private Label _detailDownloaded;
         private Button _primaryActionButton;
         private Label _primaryActionLabel;
+        private bool _warnedNonCanonicalContext;
         private bool _disposed;
         private float _lastWidth = -1f;
 
@@ -184,8 +195,8 @@ namespace NutriMind.App.UI
 
         public VisualElement Root => _root;
         public bool IsBound => _root != null && !_disposed;
-        public NutriMindSubject Subject { get; private set; } = NutriMindSubject.LiteraQuest;
-        public NutriMindTerm Term { get; private set; } = NutriMindTerm.Term1;
+        public NutriMindSubject Subject { get; private set; } = CatalogSubject;
+        public NutriMindTerm Term { get; private set; } = CatalogTerm;
         public int SelectedMissionNumber { get; private set; } = 2;
 
         public event Action BackRequested;
@@ -196,7 +207,8 @@ namespace NutriMind.App.UI
         public event Action<MissionPreviewSelection> LockedMissionRequested;
 
         /// <summary>
-        /// Updates only the contextual heading for this static preview route.
+        /// Keeps the LiteraQuest Term 1 static preview catalog. Non-canonical contexts
+        /// log one warning per view instance and do not relabel or replace mission cards.
         /// </summary>
         public void SetContext(NutriMindSubject subject, NutriMindTerm term)
         {
@@ -205,11 +217,21 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            Subject = subject;
-            Term = term;
+            Subject = CatalogSubject;
+            Term = CatalogTerm;
+
+            if ((subject != CatalogSubject || term != CatalogTerm) && !_warnedNonCanonicalContext)
+            {
+                Debug.LogWarning(
+                    $"[MissionSelectionPanelView] Requested {GetSubjectLabel(subject)} Term {(int)term}, " +
+                    "but this static preview contains only LiteraQuest Term 1. " +
+                    "Using the canonical preview catalog.");
+                _warnedNonCanonicalContext = true;
+            }
+
             if (_termHeading != null)
             {
-                _termHeading.text = $"Term {(int)term}: {GetTermTitle(subject, term)}";
+                _termHeading.text = $"Term {(int)CatalogTerm}: {GetTermTitle(CatalogSubject, CatalogTerm)}";
             }
         }
 
@@ -246,6 +268,7 @@ namespace NutriMind.App.UI
             _detailDownloaded = null;
             _primaryActionButton = null;
             _primaryActionLabel = null;
+            _warnedNonCanonicalContext = false;
             _lastWidth = -1f;
         }
 
@@ -384,8 +407,8 @@ namespace NutriMind.App.UI
         private MissionPreviewSelection CreateSelection(MissionPreviewData data) =>
             new(
                 data.MissionId,
-                Subject,
-                Term,
+                CatalogSubject,
+                CatalogTerm,
                 data.MissionNumber,
                 data.Title,
                 data.IsLocked,
