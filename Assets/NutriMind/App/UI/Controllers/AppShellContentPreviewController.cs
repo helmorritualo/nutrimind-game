@@ -119,6 +119,10 @@ namespace NutriMind.App.UI
         [Tooltip("DataStatePanel state used only while previewing Progress inside AppShell.")]
         private DataStatePanelState _progressPreviewState = DataStatePanelState.Content;
 
+        [SerializeField]
+        [Tooltip("DataStatePanel state used only while previewing QuizList inside AppShell.")]
+        private DataStatePanelState _quizListPreviewState = DataStatePanelState.Content;
+
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
 
@@ -145,6 +149,8 @@ namespace NutriMind.App.UI
         private ProfilePanelView _currentProfileView;
         private SettingsPanelView _currentSettingsView;
         private ProgressPanelView _currentProgressView;
+        private QuizListPanelView _currentQuizListView;
+        private QuizListPreviewItem? _selectedQuiz;
 
         private TemplateContainer _fallbackInstance;
         private DataStatePanelView _fallbackView;
@@ -493,6 +499,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Progress:
                     return $"Grade 5 • {GetSubjectLabel(_selectedSubject)}";
 
+                case AppShellContentPreviewScreen.QuizList:
+                    return "Grade 5 • Assignments";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -541,6 +550,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Progress:
                     return CreateProgressView(contentRoot);
 
+                case AppShellContentPreviewScreen.QuizList:
+                    return CreateQuizListView(contentRoot);
+
                 default:
                     return null;
             }
@@ -576,11 +588,9 @@ namespace NutriMind.App.UI
         private void OnHomeQuizPortalRequested()
         {
             Debug.Log(
-                "[AppShellContentPreview] Home Quiz Portal requested — preview only.");
+                "[AppShellContentPreview] Home Quiz Portal requested — showing QuizList preview.");
 
-            _appShell?.ShowToast(
-                "Quiz Portal selected. Quiz routing will be connected later.",
-                AppShellToastTone.Information);
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
         }
 
         private IAppScreenView CreateSubjectSelectionView(
@@ -1029,11 +1039,95 @@ namespace NutriMind.App.UI
         private void OnProgressQuizPortalRequested()
         {
             Debug.Log(
-                "[AppShellContentPreview] Progress Quiz Portal requested — preview only.");
+                "[AppShellContentPreview] Progress Quiz Portal requested — showing QuizList preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private IAppScreenView CreateQuizListView(VisualElement contentRoot)
+        {
+            var quizListView = new QuizListPanelView(contentRoot, _dataStatePanelAsset);
+            if (!quizListView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] QuizListPanelView failed to bind quiz-list-root.");
+                quizListView.Dispose();
+                return null;
+            }
+
+            quizListView.SetFilters(
+                new QuizListPreviewFilters(
+                    QuizListPreviewSubjectFilter.All,
+                    QuizListPreviewTermFilter.All,
+                    QuizListPreviewStatusFilter.All));
+            quizListView.SetPagination(1, 2, true);
+            quizListView.SetDataState(_quizListPreviewState);
+            quizListView.QuizDetailsRequested += OnQuizListDetailsRequested;
+            quizListView.QuizResultRequested += OnQuizListResultRequested;
+            quizListView.FiltersChanged += OnQuizListFiltersChanged;
+            quizListView.PageRequested += OnQuizListPageRequested;
+            quizListView.RetryRequested += OnQuizListRetryRequested;
+            quizListView.ReturnToMainRequested += OnQuizListReturnToMainRequested;
+            _currentQuizListView = quizListView;
+            return quizListView;
+        }
+
+        private void OnQuizListDetailsRequested(QuizListPreviewItem item)
+        {
+            _selectedQuiz = item;
+            Debug.Log(
+                $"[AppShellContentPreview] Quiz details requested: {item.Id} '{item.Title}' " +
+                $"({item.Status}).");
 
             _appShell?.ShowToast(
-                "Quiz Portal selected. Quiz routing will be connected in the next screen prompts.",
+                $"Selected “{item.Title}”. Quiz details will be connected in the next Quiz Portal panel prompt.",
                 AppShellToastTone.Information);
+        }
+
+        private void OnQuizListResultRequested(QuizListPreviewItem item)
+        {
+            _selectedQuiz = item;
+            Debug.Log(
+                $"[AppShellContentPreview] Quiz result requested: {item.Id} '{item.Title}'.");
+
+            _appShell?.ShowToast(
+                $"Selected the result for “{item.Title}”. Quiz results will be connected in a later panel prompt.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizListFiltersChanged(QuizListPreviewFilters filters)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] QuizList filters changed: " +
+                $"subject={filters.Subject}, term={filters.Term}, status={filters.Status}.");
+        }
+
+        private void OnQuizListPageRequested(int page)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] QuizList page requested: {page} — preview only.");
+
+            _appShell?.ShowToast(
+                $"Page {page} requested. Production Quiz Portal pagination is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizListRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizList retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizListReturnToMainRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizList Return Home requested — showing Home preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Home);
         }
 
         private void OnProgressRetryRequested()
@@ -1245,6 +1339,17 @@ namespace NutriMind.App.UI
                 _currentProgressView.QuizPortalRequested -= OnProgressQuizPortalRequested;
                 _currentProgressView.RetryRequested -= OnProgressRetryRequested;
                 _currentProgressView = null;
+            }
+
+            if (_currentQuizListView != null)
+            {
+                _currentQuizListView.QuizDetailsRequested -= OnQuizListDetailsRequested;
+                _currentQuizListView.QuizResultRequested -= OnQuizListResultRequested;
+                _currentQuizListView.FiltersChanged -= OnQuizListFiltersChanged;
+                _currentQuizListView.PageRequested -= OnQuizListPageRequested;
+                _currentQuizListView.RetryRequested -= OnQuizListRetryRequested;
+                _currentQuizListView.ReturnToMainRequested -= OnQuizListReturnToMainRequested;
+                _currentQuizListView = null;
             }
 
             _currentScreenView?.Dispose();
@@ -1464,7 +1569,7 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Progress:
                     return "Progress";
                 case AppShellContentPreviewScreen.QuizList:
-                    return "Quiz Portal";
+                    return "Quiz List";
                 case AppShellContentPreviewScreen.QuizDetail:
                     return "Quiz Details";
                 case AppShellContentPreviewScreen.QuizAttempt:

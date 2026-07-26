@@ -1,0 +1,359 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/QuizListPanel.uss" />
+
+    <ui:VisualElement
+        name="quiz-list-root"
+        class="ds-root theme-nutrimind app-screen-content quiz-list-panel">
+
+        <ui:ScrollView
+            name="quiz-list-scroll"
+            class="app-screen-content__scroll quiz-list-panel__scroll"
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="Auto"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
+
+            <ui:VisualElement
+                name="quiz-list-content"
+                class="app-screen-content__body quiz-list-panel__content">
+
+                <!-- ===== INTRO ===== -->
+                <ui:VisualElement name="quiz-list-intro" class="quiz-list-panel__intro">
+                    <ui:VisualElement class="quiz-list-panel__intro-header" picking-mode="Ignore">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--book quiz-list-panel__intro-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-list-intro-title"
+                            text="Your Quiz Portal"
+                            class="quiz-list-panel__intro-title" />
+                    </ui:VisualElement>
+                    <ui:Label
+                        name="quiz-list-intro-message"
+                        text="View assigned quizzes, check availability, and review results when they are released."
+                        class="quiz-list-panel__intro-message" />
+                </ui:VisualElement>
+
+                <!-- ===== SUMMARY ===== -->
+                <ui:VisualElement name="quiz-list-summary" class="quiz-list-panel__summary">
+                    <ui:VisualElement name="quiz-list-summary-available" class="ds-card quiz-list-panel__summary-card quiz-list-panel__summary-card--available">
+                        <ui:VisualElement class="quiz-list-panel__summary-icon-wrap" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--play quiz-list-panel__summary-icon"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="quiz-list-summary-available-count"
+                            text="2"
+                            class="quiz-list-panel__summary-count" />
+                        <ui:Label text="Available" class="quiz-list-panel__summary-label" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-summary-closing" class="ds-card quiz-list-panel__summary-card quiz-list-panel__summary-card--closing">
+                        <ui:VisualElement class="quiz-list-panel__summary-icon-wrap" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--clock quiz-list-panel__summary-icon"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="quiz-list-summary-closing-count"
+                            text="1"
+                            class="quiz-list-panel__summary-count" />
+                        <ui:Label text="Closing Soon" class="quiz-list-panel__summary-label" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-summary-completed" class="ds-card quiz-list-panel__summary-card quiz-list-panel__summary-card--completed quiz-list-panel__summary-card--last">
+                        <ui:VisualElement class="quiz-list-panel__summary-icon-wrap" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--check quiz-list-panel__summary-icon"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:Label
+                            name="quiz-list-summary-completed-count"
+                            text="1"
+                            class="quiz-list-panel__summary-count" />
+                        <ui:Label text="Completed" class="quiz-list-panel__summary-label" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- ===== FILTERS ===== -->
+                <ui:VisualElement name="quiz-list-filter-card" class="ds-card quiz-list-panel__filter-card">
+                    <ui:VisualElement class="quiz-list-panel__filter-header" picking-mode="Ignore">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--filter quiz-list-panel__filter-heading-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label text="Filter assignments" class="quiz-list-panel__filter-heading" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="quiz-list-panel__filter-controls">
+                        <ui:VisualElement class="quiz-list-panel__filter-field">
+                            <ui:Label text="Subject" class="quiz-list-panel__filter-label" />
+                            <ui:DropdownField
+                                name="quiz-list-filter-subject"
+                                choices="All Subjects,LiteraQuest,PE &amp; Health,Science"
+                                index="0"
+                                class="ds-dropdown quiz-list-panel__dropdown"
+                                tooltip="Filter by subject" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="quiz-list-panel__filter-field">
+                            <ui:Label text="Term" class="quiz-list-panel__filter-label" />
+                            <ui:DropdownField
+                                name="quiz-list-filter-term"
+                                choices="All Terms,Term 1,Term 2,Term 3"
+                                index="0"
+                                class="ds-dropdown quiz-list-panel__dropdown"
+                                tooltip="Filter by term" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="quiz-list-panel__filter-field">
+                            <ui:Label text="Status" class="quiz-list-panel__filter-label" />
+                            <ui:DropdownField
+                                name="quiz-list-filter-status"
+                                choices="All Statuses,Available,Completed,Locked,Unavailable"
+                                index="0"
+                                class="ds-dropdown quiz-list-panel__dropdown"
+                                tooltip="Filter by status" />
+                        </ui:VisualElement>
+
+                        <ui:Button
+                            name="quiz-list-reset-filters"
+                            text=""
+                            class="ds-btn ds-btn--ghost quiz-list-panel__reset-button"
+                            tooltip="Reset filters">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--refresh quiz-list-panel__reset-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Reset Filters"
+                                class="quiz-list-panel__reset-label"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- ===== LIST HEADER ===== -->
+                <ui:VisualElement name="quiz-list-list-header" class="quiz-list-panel__list-header">
+                    <ui:Label text="Assignments" class="quiz-list-panel__list-title" />
+                    <ui:Label
+                        name="quiz-list-visible-count"
+                        text="5 quizzes shown"
+                        class="quiz-list-panel__visible-count" />
+                </ui:VisualElement>
+
+                <!-- ===== ITEMS ===== -->
+                <ui:VisualElement name="quiz-list-items" class="quiz-list-panel__items">
+
+                    <ui:VisualElement name="quiz-list-item-1" class="ds-card quiz-list-panel__item">
+                        <ui:VisualElement name="quiz-1-subject-icon" class="ds-icon ds-icon--book quiz-list-panel__item-subject-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="quiz-list-panel__item-main">
+                            <ui:Label name="quiz-1-title" text="Story Elements Check" class="quiz-list-panel__item-title" />
+                            <ui:Label name="quiz-1-subject-term" text="LiteraQuest • Term 1" class="quiz-list-panel__item-subject-term" />
+                            <ui:VisualElement class="quiz-list-panel__item-schedule-row" picking-mode="Ignore">
+                                <ui:VisualElement name="quiz-1-schedule-icon" class="ds-icon ds-icon--calendar quiz-list-panel__item-schedule-icon" picking-mode="Ignore" />
+                                <ui:Label name="quiz-1-schedule" text="Available now" class="quiz-list-panel__item-schedule" />
+                            </ui:VisualElement>
+                            <ui:Label name="quiz-1-lock-reason" text="" class="quiz-list-panel__lock-reason quiz-list-panel__lock-reason--hidden" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="quiz-list-panel__item-meta">
+                            <ui:Label name="quiz-1-attempts" text="0 of 1 attempt used" class="quiz-list-panel__item-attempts" />
+                            <ui:Label name="quiz-1-result-visibility" text="Results available after submission" class="quiz-list-panel__item-result-visibility" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="quiz-1-status" class="quiz-list-panel__status quiz-list-panel__status--available">
+                            <ui:VisualElement name="quiz-1-status-icon" class="ds-icon ds-icon--play quiz-list-panel__status-icon" picking-mode="Ignore" />
+                            <ui:Label name="quiz-1-status-label" text="Available" class="quiz-list-panel__status-label" />
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="quiz-1-action-button"
+                            text=""
+                            class="ds-btn ds-btn--primary quiz-list-panel__item-action"
+                            tooltip="View quiz">
+                            <ui:Label name="quiz-1-action-label" text="View Quiz" class="quiz-list-panel__item-action-label" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-item-2" class="ds-card quiz-list-panel__item">
+                        <ui:VisualElement name="quiz-2-subject-icon" class="ds-icon ds-icon--bolt quiz-list-panel__item-subject-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="quiz-list-panel__item-main">
+                            <ui:Label name="quiz-2-title" text="Healthy Choices Check" class="quiz-list-panel__item-title" />
+                            <ui:Label name="quiz-2-subject-term" text="PE &amp; Health • Term 1" class="quiz-list-panel__item-subject-term" />
+                            <ui:VisualElement class="quiz-list-panel__item-schedule-row" picking-mode="Ignore">
+                                <ui:VisualElement name="quiz-2-schedule-icon" class="ds-icon ds-icon--clock quiz-list-panel__item-schedule-icon" picking-mode="Ignore" />
+                                <ui:Label name="quiz-2-schedule" text="Closes Jul 21, 2026" class="quiz-list-panel__item-schedule" />
+                            </ui:VisualElement>
+                            <ui:Label name="quiz-2-lock-reason" text="" class="quiz-list-panel__lock-reason quiz-list-panel__lock-reason--hidden" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="quiz-list-panel__item-meta">
+                            <ui:Label name="quiz-2-attempts" text="1 of 2 attempts used" class="quiz-list-panel__item-attempts" />
+                            <ui:Label name="quiz-2-result-visibility" text="Results available after the quiz closes" class="quiz-list-panel__item-result-visibility" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="quiz-2-status" class="quiz-list-panel__status quiz-list-panel__status--available">
+                            <ui:VisualElement name="quiz-2-status-icon" class="ds-icon ds-icon--clock quiz-list-panel__status-icon" picking-mode="Ignore" />
+                            <ui:Label name="quiz-2-status-label" text="Closing Soon" class="quiz-list-panel__status-label" />
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="quiz-2-action-button"
+                            text=""
+                            class="ds-btn ds-btn--primary quiz-list-panel__item-action"
+                            tooltip="View quiz">
+                            <ui:Label name="quiz-2-action-label" text="View Quiz" class="quiz-list-panel__item-action-label" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-item-3" class="ds-card quiz-list-panel__item">
+                        <ui:VisualElement name="quiz-3-subject-icon" class="ds-icon ds-icon--potion quiz-list-panel__item-subject-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="quiz-list-panel__item-main">
+                            <ui:Label name="quiz-3-title" text="Living Things Review" class="quiz-list-panel__item-title" />
+                            <ui:Label name="quiz-3-subject-term" text="Science • Term 1" class="quiz-list-panel__item-subject-term" />
+                            <ui:VisualElement class="quiz-list-panel__item-schedule-row" picking-mode="Ignore">
+                                <ui:VisualElement name="quiz-3-schedule-icon" class="ds-icon ds-icon--check quiz-list-panel__item-schedule-icon" picking-mode="Ignore" />
+                                <ui:Label name="quiz-3-schedule" text="Completed" class="quiz-list-panel__item-schedule" />
+                            </ui:VisualElement>
+                            <ui:Label name="quiz-3-lock-reason" text="" class="quiz-list-panel__lock-reason quiz-list-panel__lock-reason--hidden" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="quiz-list-panel__item-meta">
+                            <ui:Label name="quiz-3-attempts" text="1 of 1 attempt used" class="quiz-list-panel__item-attempts" />
+                            <ui:Label name="quiz-3-result-visibility" text="Results available after submission" class="quiz-list-panel__item-result-visibility" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="quiz-3-status" class="quiz-list-panel__status quiz-list-panel__status--completed">
+                            <ui:VisualElement name="quiz-3-status-icon" class="ds-icon ds-icon--check quiz-list-panel__status-icon" picking-mode="Ignore" />
+                            <ui:Label name="quiz-3-status-label" text="Completed" class="quiz-list-panel__status-label" />
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="quiz-3-action-button"
+                            text=""
+                            class="ds-btn ds-btn--secondary quiz-list-panel__item-action"
+                            tooltip="View result">
+                            <ui:Label name="quiz-3-action-label" text="View Result" class="quiz-list-panel__item-action-label" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-item-4" class="ds-card quiz-list-panel__item">
+                        <ui:VisualElement name="quiz-4-subject-icon" class="ds-icon ds-icon--potion quiz-list-panel__item-subject-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="quiz-list-panel__item-main">
+                            <ui:Label name="quiz-4-title" text="Matter and Materials Check" class="quiz-list-panel__item-title" />
+                            <ui:Label name="quiz-4-subject-term" text="Science • Term 2" class="quiz-list-panel__item-subject-term" />
+                            <ui:VisualElement class="quiz-list-panel__item-schedule-row" picking-mode="Ignore">
+                                <ui:VisualElement name="quiz-4-schedule-icon" class="ds-icon ds-icon--lock quiz-list-panel__item-schedule-icon" picking-mode="Ignore" />
+                                <ui:Label name="quiz-4-schedule" text="Opens Jul 25, 2026" class="quiz-list-panel__item-schedule" />
+                            </ui:VisualElement>
+                            <ui:Label name="quiz-4-lock-reason" text="Your Teacher will open this quiz later." class="quiz-list-panel__lock-reason" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="quiz-list-panel__item-meta">
+                            <ui:Label name="quiz-4-attempts" text="0 of 1 attempt used" class="quiz-list-panel__item-attempts" />
+                            <ui:Label name="quiz-4-result-visibility" text="Results available after your Teacher releases them" class="quiz-list-panel__item-result-visibility" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="quiz-4-status" class="quiz-list-panel__status quiz-list-panel__status--locked">
+                            <ui:VisualElement name="quiz-4-status-icon" class="ds-icon ds-icon--lock quiz-list-panel__status-icon" picking-mode="Ignore" />
+                            <ui:Label name="quiz-4-status-label" text="Locked" class="quiz-list-panel__status-label" />
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="quiz-4-action-button"
+                            text=""
+                            class="ds-btn ds-btn--ghost quiz-list-panel__item-action"
+                            tooltip="View details">
+                            <ui:Label name="quiz-4-action-label" text="View Details" class="quiz-list-panel__item-action-label" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-list-item-5" class="ds-card quiz-list-panel__item">
+                        <ui:VisualElement name="quiz-5-subject-icon" class="ds-icon ds-icon--book quiz-list-panel__item-subject-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="quiz-list-panel__item-main">
+                            <ui:Label name="quiz-5-title" text="Reading Strategies Check" class="quiz-list-panel__item-title" />
+                            <ui:Label name="quiz-5-subject-term" text="LiteraQuest • Term 2" class="quiz-list-panel__item-subject-term" />
+                            <ui:VisualElement class="quiz-list-panel__item-schedule-row" picking-mode="Ignore">
+                                <ui:VisualElement name="quiz-5-schedule-icon" class="ds-icon ds-icon--warning quiz-list-panel__item-schedule-icon" picking-mode="Ignore" />
+                                <ui:Label name="quiz-5-schedule" text="Closed Jul 15, 2026" class="quiz-list-panel__item-schedule" />
+                            </ui:VisualElement>
+                            <ui:Label name="quiz-5-lock-reason" text="This quiz is no longer available." class="quiz-list-panel__lock-reason" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="quiz-list-panel__item-meta">
+                            <ui:Label name="quiz-5-attempts" text="0 of 1 attempt used" class="quiz-list-panel__item-attempts" />
+                            <ui:Label name="quiz-5-result-visibility" text="Results are not currently visible" class="quiz-list-panel__item-result-visibility" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="quiz-5-status" class="quiz-list-panel__status quiz-list-panel__status--unavailable">
+                            <ui:VisualElement name="quiz-5-status-icon" class="ds-icon ds-icon--warning quiz-list-panel__status-icon" picking-mode="Ignore" />
+                            <ui:Label name="quiz-5-status-label" text="Unavailable" class="quiz-list-panel__status-label" />
+                        </ui:VisualElement>
+                        <ui:Button
+                            name="quiz-5-action-button"
+                            text=""
+                            class="ds-btn ds-btn--ghost quiz-list-panel__item-action"
+                            tooltip="View details">
+                            <ui:Label name="quiz-5-action-label" text="View Details" class="quiz-list-panel__item-action-label" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                </ui:VisualElement>
+
+                <!-- ===== FILTERED EMPTY ===== -->
+                <ui:VisualElement
+                    name="quiz-list-filter-empty"
+                    class="ds-card quiz-list-panel__filter-empty quiz-list-panel__filter-empty--hidden">
+                    <ui:VisualElement
+                        class="ds-icon ds-icon--filter quiz-list-panel__filter-empty-icon"
+                        picking-mode="Ignore" />
+                    <ui:Label
+                        text="No quizzes match these filters"
+                        class="quiz-list-panel__filter-empty-title" />
+                    <ui:Label
+                        text="Try another subject, term, or status."
+                        class="quiz-list-panel__filter-empty-message" />
+                    <ui:Button
+                        name="quiz-list-filter-empty-reset"
+                        text=""
+                        class="ds-btn ds-btn--secondary quiz-list-panel__filter-empty-reset"
+                        tooltip="Reset filters">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--refresh quiz-list-panel__filter-empty-reset-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            text="Reset Filters"
+                            class="quiz-list-panel__filter-empty-reset-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <!-- ===== PAGINATION ===== -->
+                <ui:VisualElement name="quiz-list-pagination" class="quiz-list-panel__pagination">
+                    <ui:Button
+                        name="quiz-list-page-previous"
+                        text=""
+                        class="ds-btn ds-btn--ghost quiz-list-panel__page-button"
+                        tooltip="Previous page">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--chevron-left quiz-list-panel__page-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label text="Previous" class="quiz-list-panel__page-label" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Label
+                        name="quiz-list-page-label"
+                        text="Page 1 of 2"
+                        class="quiz-list-panel__page-status" />
+                    <ui:Button
+                        name="quiz-list-page-next"
+                        text=""
+                        class="ds-btn ds-btn--ghost quiz-list-panel__page-button"
+                        tooltip="Next page">
+                        <ui:Label text="Next" class="quiz-list-panel__page-label" picking-mode="Ignore" />
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--chevron-right quiz-list-panel__page-icon"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:ScrollView>
+
+        <ui:VisualElement
+            name="quiz-list-data-state-host"
+            class="quiz-list-panel__data-state-host" />
+
+    </ui:VisualElement>
+</ui:UXML>
