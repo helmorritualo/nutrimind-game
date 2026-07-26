@@ -167,7 +167,7 @@
 
                         <ui:VisualElement
                             name="certificates-detail-section"
-                            class="ds-card certificates-panel__detail-section">
+                            class="ds-card certificates-panel__detail-section certificates-panel__detail-section--issued">
 
                             <!-- Document preview -->
                             <ui:VisualElement

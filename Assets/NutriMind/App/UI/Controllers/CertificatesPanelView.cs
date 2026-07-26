@@ -200,6 +200,7 @@ namespace NutriMind.App.UI
         private Label _lockedValue;
         private Label _listCount;
         private VisualElement _list;
+        private VisualElement _detailSection;
         private VisualElement _documentIcon;
         private Label _documentHeading;
         private Label _documentTitle;
@@ -442,6 +443,7 @@ namespace NutriMind.App.UI
             _lockedValue = null;
             _listCount = null;
             _list = null;
+            _detailSection = null;
             _documentIcon = null;
             _documentHeading = null;
             _documentTitle = null;
@@ -484,6 +486,7 @@ namespace NutriMind.App.UI
             _lockedValue = _root.Q<Label>("certificates-locked-value");
             _listCount = _root.Q<Label>("certificates-list-count");
             _list = _root.Q<VisualElement>("certificates-list");
+            _detailSection = _root.Q<VisualElement>("certificates-detail-section");
             _documentIcon = _root.Q<VisualElement>("certificates-document-icon");
             _documentHeading = _root.Q<Label>("certificates-document-heading");
             _documentTitle = _root.Q<Label>("certificates-document-title");
@@ -806,6 +809,7 @@ namespace NutriMind.App.UI
                 return;
             }
 
+            ApplyDetailSectionTone(item.Availability);
             SetDocumentIcon(item.IconClass);
 
             if (_documentHeading != null) _documentHeading.text = item.DocumentHeading;
@@ -857,8 +861,38 @@ namespace NutriMind.App.UI
             ApplyDownloadAction(item);
         }
 
+        private void ApplyDetailSectionTone(CertificatePreviewAvailability availability)
+        {
+            if (_detailSection == null)
+            {
+                return;
+            }
+
+            _detailSection.RemoveFromClassList("certificates-panel__detail-section--issued");
+            _detailSection.RemoveFromClassList("certificates-panel__detail-section--progress");
+            _detailSection.RemoveFromClassList("certificates-panel__detail-section--locked");
+
+            switch (availability)
+            {
+                case CertificatePreviewAvailability.Issued:
+                    _detailSection.AddToClassList("certificates-panel__detail-section--issued");
+                    break;
+                case CertificatePreviewAvailability.InProgress:
+                    _detailSection.AddToClassList("certificates-panel__detail-section--progress");
+                    break;
+                case CertificatePreviewAvailability.Locked:
+                    _detailSection.AddToClassList("certificates-panel__detail-section--locked");
+                    break;
+                default:
+                    _detailSection.AddToClassList("certificates-panel__detail-section--locked");
+                    break;
+            }
+        }
+
         private void ApplyEmptyDetailPlaceholder()
         {
+            ApplyDetailSectionTone(CertificatePreviewAvailability.Locked);
+
             if (_documentHeading != null) _documentHeading.text = "No certificate selected";
             if (_documentTitle != null) _documentTitle.text = "Certificate collection is empty";
             if (_documentAwardedTo != null) _documentAwardedTo.text = "—";

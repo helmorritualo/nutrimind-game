@@ -27,7 +27,8 @@ namespace NutriMind.App.UI
         QuizHistory,
         MissionDetail,
         Rewards,
-        Certificates
+        Certificates,
+        Announcements
     }
 
     /// <summary>
@@ -178,6 +179,15 @@ namespace NutriMind.App.UI
         [SerializeField]
         private int _selectedCertificatePreviewIndex;
 
+        [SerializeField]
+        [Tooltip("Announcements route state used only by the AppShell static preview.")]
+        private AnnouncementsPreviewState _announcementsPreviewState =
+            AnnouncementsPreviewState.Content;
+
+        [SerializeField]
+        private AnnouncementsPreviewFilter _announcementsPreviewFilter =
+            AnnouncementsPreviewFilter.All;
+
         private MissionPreviewSelection _selectedMission =
             new(
                 "g5_lq_t1_m02",
@@ -219,6 +229,11 @@ namespace NutriMind.App.UI
         private MissionDetailPanelView _currentMissionDetailView;
         private RewardsPanelView _currentRewardsView;
         private CertificatesPanelView _currentCertificatesView;
+        private AnnouncementsPanelView _currentAnnouncementsView;
+        private readonly HashSet<string> _readAnnouncementPreviewIds =
+            new(System.StringComparer.Ordinal);
+        private AppShellContentPreviewScreen _announcementsReturnScreen =
+            AppShellContentPreviewScreen.Home;
         private QuizListPreviewItem? _selectedQuiz;
         private string _selectedQuizResultAttemptId;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
@@ -339,6 +354,7 @@ namespace NutriMind.App.UI
             _appShell.NotificationsRequested += OnNotificationsRequested;
             BindConfirmDialog();
             _isBound = true;
+            RefreshAnnouncementsUnreadChrome();
 
             if (!_entriesValidated)
             {
@@ -629,6 +645,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Certificates:
                     return "Grade 5 • Achievements";
 
+                case AppShellContentPreviewScreen.Announcements:
+                    return "Grade 5 • Updates";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -701,6 +720,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Certificates:
                     return CreateCertificatesView(contentRoot);
 
+                case AppShellContentPreviewScreen.Announcements:
+                    return CreateAnnouncementsView(contentRoot);
+
                 default:
                     return null;
             }
@@ -719,6 +741,7 @@ namespace NutriMind.App.UI
 
             homeView.ContinueMissionRequested += OnHomeContinueMissionRequested;
             homeView.QuizPortalRequested += OnHomeQuizPortalRequested;
+            homeView.AnnouncementsRequested += OnHomeAnnouncementsRequested;
             _currentHomeView = homeView;
             return homeView;
         }
@@ -739,6 +762,14 @@ namespace NutriMind.App.UI
                 "[AppShellContentPreview] Home Quiz Portal requested — showing QuizList preview.");
 
             SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private void OnHomeAnnouncementsRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Home Announcements requested — showing Announcements.");
+
+            OpenAnnouncements(AppShellContentPreviewScreen.Home);
         }
 
         private IAppScreenView CreateSubjectSelectionView(
@@ -1825,6 +1856,117 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Information);
         }
 
+        private IAppScreenView CreateAnnouncementsView(VisualElement contentRoot)
+        {
+            var announcementsView = new AnnouncementsPanelView(contentRoot, _dataStatePanelAsset);
+            if (!announcementsView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] AnnouncementsPanelView failed to bind announcements-root.");
+                announcementsView.Dispose();
+                return null;
+            }
+
+            var items = AnnouncementsPreviewCatalog.CreateItems();
+            announcementsView.SetItems(items);
+            announcementsView.SetReadPresentationIds(_readAnnouncementPreviewIds);
+            announcementsView.SetFilter(_announcementsPreviewFilter);
+
+            if (_announcementsPreviewState == AnnouncementsPreviewState.Empty
+                || items.Count == 0)
+            {
+                announcementsView.SetPreviewState(AnnouncementsPreviewState.Empty);
+            }
+            else
+            {
+                announcementsView.SetPreviewState(_announcementsPreviewState);
+            }
+
+            announcementsView.BackRequested += OnAnnouncementsBackRequested;
+            announcementsView.SelectionChanged += OnAnnouncementsSelectionChanged;
+            announcementsView.ReadStateChanged += OnAnnouncementsReadStateChanged;
+            announcementsView.FilterChanged += OnAnnouncementsFilterChanged;
+            announcementsView.RetryRequested += OnAnnouncementsRetryRequested;
+            _currentAnnouncementsView = announcementsView;
+            RefreshAnnouncementsUnreadChrome();
+            return announcementsView;
+        }
+
+        private void OnAnnouncementsBackRequested()
+        {
+            AppShellContentPreviewScreen returnScreen = _announcementsReturnScreen;
+            if (returnScreen == AppShellContentPreviewScreen.None
+                || returnScreen == AppShellContentPreviewScreen.Announcements
+                || FindEntry(returnScreen) == null)
+            {
+                returnScreen = AppShellContentPreviewScreen.Home;
+            }
+
+            Debug.Log(
+                $"[AppShellContentPreview] Announcements Back — returning to {returnScreen}.");
+
+            SetPreviewScreen(returnScreen);
+        }
+
+        private void OnAnnouncementsSelectionChanged(AnnouncementPreviewSelection selection)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] Announcements selection changed: " +
+                $"id={selection.PresentationId}, title='{selection.Title}'.");
+        }
+
+        private void OnAnnouncementsReadStateChanged(AnnouncementsPreviewReadState snapshot)
+        {
+            _readAnnouncementPreviewIds.Clear();
+            for (int i = 0; i < snapshot.ReadPresentationIds.Count; i++)
+            {
+                _readAnnouncementPreviewIds.Add(snapshot.ReadPresentationIds[i]);
+            }
+
+            RefreshAnnouncementsUnreadChrome();
+        }
+
+        private void OnAnnouncementsFilterChanged(AnnouncementsPreviewFilter filter)
+        {
+            _announcementsPreviewFilter = filter;
+            Debug.Log(
+                $"[AppShellContentPreview] Announcements filter changed: {filter}.");
+        }
+
+        private void OnAnnouncementsRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Announcements retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Announcements refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OpenAnnouncements(AppShellContentPreviewScreen returnScreen)
+        {
+            if (returnScreen == AppShellContentPreviewScreen.None)
+            {
+                returnScreen = AppShellContentPreviewScreen.Home;
+            }
+
+            if (returnScreen != AppShellContentPreviewScreen.Announcements)
+            {
+                _announcementsReturnScreen = returnScreen;
+            }
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Announcements);
+        }
+
+        private void RefreshAnnouncementsUnreadChrome()
+        {
+            var items = AnnouncementsPreviewCatalog.CreateItems();
+            int unread = AnnouncementsPreviewCatalog.CountUnread(
+                items,
+                _readAnnouncementPreviewIds);
+            _appShell?.SetAnnouncementUnreadCount(unread);
+        }
+
         private void OnQuizListFiltersChanged(QuizListPreviewFilters filters)
         {
             Debug.Log(
@@ -2027,6 +2169,8 @@ namespace NutriMind.App.UI
                     OnHomeContinueMissionRequested;
                 _currentHomeView.QuizPortalRequested -=
                     OnHomeQuizPortalRequested;
+                _currentHomeView.AnnouncementsRequested -=
+                    OnHomeAnnouncementsRequested;
                 _currentHomeView = null;
             }
 
@@ -2191,6 +2335,16 @@ namespace NutriMind.App.UI
                 _currentCertificatesView = null;
             }
 
+            if (_currentAnnouncementsView != null)
+            {
+                _currentAnnouncementsView.BackRequested -= OnAnnouncementsBackRequested;
+                _currentAnnouncementsView.SelectionChanged -= OnAnnouncementsSelectionChanged;
+                _currentAnnouncementsView.ReadStateChanged -= OnAnnouncementsReadStateChanged;
+                _currentAnnouncementsView.FilterChanged -= OnAnnouncementsFilterChanged;
+                _currentAnnouncementsView.RetryRequested -= OnAnnouncementsRetryRequested;
+                _currentAnnouncementsView = null;
+            }
+
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
                 || _pendingConfirmation == PreviewConfirmationAction.SubmitQuiz)
             {
@@ -2329,8 +2483,9 @@ namespace NutriMind.App.UI
         private void OnNotificationsRequested()
         {
             Debug.Log(
-                "[AppShellContentPreview] Notifications requested — " +
-                "no Announcements screen is assigned in this milestone preview.");
+                "[AppShellContentPreview] Notifications requested — showing Announcements.");
+
+            OpenAnnouncements(_previewScreen);
         }
 
         private void HoldRequestFallback()
@@ -2432,6 +2587,8 @@ namespace NutriMind.App.UI
                     return "Rewards";
                 case AppShellContentPreviewScreen.Certificates:
                     return "Certificates";
+                case AppShellContentPreviewScreen.Announcements:
+                    return "Announcements";
                 default:
                     return "AppShell content preview";
             }

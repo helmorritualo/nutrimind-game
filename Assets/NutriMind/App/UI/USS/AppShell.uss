@@ -211,6 +211,39 @@
     height: 20px;
 }
 
+.app-shell__notifications {
+    position: relative;
+    overflow: visible;
+}
+
+.app-shell__notifications-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    min-height: 22px;
+    padding-left: 5px;
+    padding-right: 5px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background-color: var(--color-danger);
+}
+
+.app-shell__notifications-badge.app-shell__notifications-badge--hidden {
+    display: none;
+}
+
+.app-shell__notifications-badge-label {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: var(--color-text-on-accent);
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
 .app-shell__profile {
     flex-direction: row;
     align-items: center;

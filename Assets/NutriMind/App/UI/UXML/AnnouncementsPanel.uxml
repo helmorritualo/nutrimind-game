@@ -1,0 +1,394 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/AnnouncementsPanel.uss" />
+
+    <ui:VisualElement
+        name="announcements-root"
+        class="ds-root theme-nutrimind app-screen-content announcements-panel">
+
+        <ui:VisualElement
+            name="announcements-content-shell"
+            class="announcements-panel__content-shell">
+
+            <ui:ScrollView
+                name="announcements-scroll"
+                class="app-screen-content__scroll announcements-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="announcements-body"
+                    class="app-screen-content__body announcements-panel__body">
+
+                    <!-- ===== OFFLINE CACHE NOTICE ===== -->
+                    <ui:VisualElement
+                        name="announcements-offline-notice"
+                        class="ds-card announcements-panel__offline-notice announcements-panel__offline-notice--hidden"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="announcements-offline-icon"
+                            class="ds-icon ds-icon--wifi announcements-panel__offline-icon"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            class="announcements-panel__offline-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="announcements-offline-title"
+                                text="Showing saved announcements"
+                                class="announcements-panel__offline-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="announcements-offline-message"
+                                text="You’re offline. These announcements were loaded from saved data and may not include recent updates."
+                                class="announcements-panel__offline-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== OVERVIEW ===== -->
+                    <ui:VisualElement
+                        name="announcements-overview"
+                        class="ds-card announcements-panel__overview">
+
+                        <ui:VisualElement
+                            name="announcements-overview-copy"
+                            class="announcements-panel__overview-copy"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                name="announcements-overview-icon"
+                                class="ds-icon ds-icon--bell announcements-panel__overview-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="announcements-overview-eyebrow"
+                                text="Classroom updates"
+                                class="announcements-panel__overview-eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="announcements-overview-title"
+                                text="Announcements"
+                                class="announcements-panel__overview-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="announcements-overview-description"
+                                text="Read visible learning reminders and schedule updates."
+                                class="announcements-panel__overview-description"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="announcements-overview-metrics"
+                            class="announcements-panel__overview-metrics"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                class="ds-card announcements-panel__metric-card"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="announcements-visible-value"
+                                    text="3"
+                                    class="announcements-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Visible"
+                                    class="announcements-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card announcements-panel__metric-card announcements-panel__metric-card--unread"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="announcements-unread-value"
+                                    text="2"
+                                    class="announcements-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Unread"
+                                    class="announcements-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:Button
+                            name="announcements-mark-all-read"
+                            text=""
+                            class="ds-btn ds-btn--secondary announcements-panel__mark-all"
+                            tooltip="Mark all announcements as read on this device">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--check announcements-panel__mark-all-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Mark all as read"
+                                class="announcements-panel__mark-all-label"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <!-- ===== FILTER CARD ===== -->
+                    <ui:VisualElement
+                        name="announcements-filter-card"
+                        class="ds-card announcements-panel__filter-card">
+
+                        <ui:VisualElement
+                            name="announcements-filter-copy"
+                            class="announcements-panel__filter-copy"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--filter announcements-panel__filter-icon"
+                                picking-mode="Ignore" />
+                            <ui:VisualElement
+                                class="announcements-panel__filter-text"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="announcements-filter-title"
+                                    text="Filter announcements"
+                                    class="announcements-panel__filter-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="announcements-filter-description"
+                                    text="Show all visible updates or only unread items."
+                                    class="announcements-panel__filter-description"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="announcements-filter-controls"
+                            class="announcements-panel__filter-controls">
+                            <ui:Button
+                                name="announcements-filter-all"
+                                text="All Announcements"
+                                class="ds-btn ds-btn--secondary ds-tab announcements-panel__filter-btn announcements-panel__filter-btn--selected"
+                                tooltip="Show all announcements" />
+                            <ui:Button
+                                name="announcements-filter-unread"
+                                text="Unread"
+                                class="ds-btn ds-btn--ghost ds-tab announcements-panel__filter-btn announcements-panel__filter-btn--trailing"
+                                tooltip="Show unread announcements" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== MAIN LIST + DETAIL ===== -->
+                    <ui:VisualElement
+                        name="announcements-main-layout"
+                        class="announcements-panel__main-layout">
+
+                        <ui:VisualElement
+                            name="announcements-list-section"
+                            class="ds-card announcements-panel__list-section">
+
+                            <ui:VisualElement
+                                name="announcements-list-header"
+                                class="announcements-panel__list-header"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="announcements-list-title"
+                                    text="Visible announcements"
+                                    class="announcements-panel__list-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="announcements-list-count"
+                                    text="3 announcements"
+                                    class="announcements-panel__list-count"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="announcements-list"
+                                class="announcements-panel__list" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="announcements-detail-section"
+                            class="ds-card announcements-panel__detail-section">
+
+                            <ui:VisualElement
+                                name="announcements-detail-header"
+                                class="announcements-panel__detail-header"
+                                picking-mode="Ignore">
+
+                                <ui:VisualElement
+                                    class="announcements-panel__detail-header-top"
+                                    picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        name="announcements-detail-kind-icon"
+                                        class="ds-icon ds-icon--book announcements-panel__detail-kind-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="announcements-detail-kind-label"
+                                        text="Learning update"
+                                        class="announcements-panel__detail-kind-label"
+                                        picking-mode="Ignore" />
+                                    <ui:VisualElement
+                                        name="announcements-detail-read-chip"
+                                        class="ds-chip announcements-panel__detail-read-chip"
+                                        picking-mode="Ignore">
+                                        <ui:VisualElement
+                                            name="announcements-detail-read-icon"
+                                            class="ds-icon ds-icon--info announcements-panel__detail-read-icon"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="announcements-detail-read-label"
+                                            text="Unread"
+                                            class="announcements-panel__detail-read-label"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+
+                                <ui:Label
+                                    name="announcements-detail-title"
+                                    text="LiteraQuest Term 1 learning reminder"
+                                    class="announcements-panel__detail-title"
+                                    picking-mode="Ignore"
+                                    enable-rich-text="false" />
+                            </ui:VisualElement>
+
+                            <ui:Label
+                                name="announcements-detail-summary"
+                                text="Review The Bell of Seven Moments before the next classroom activity."
+                                class="announcements-panel__detail-summary"
+                                picking-mode="Ignore"
+                                enable-rich-text="false" />
+
+                            <ui:VisualElement
+                                name="announcements-detail-meta"
+                                class="announcements-panel__detail-meta"
+                                picking-mode="Ignore">
+
+                                <ui:VisualElement
+                                    class="announcements-panel__meta-item"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Published"
+                                        class="announcements-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="announcements-published-value"
+                                        text="July 24, 2026"
+                                        class="announcements-panel__meta-value"
+                                        picking-mode="Ignore"
+                                        enable-rich-text="false" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement
+                                    class="announcements-panel__meta-item"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Audience"
+                                        class="announcements-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="announcements-audience-value"
+                                        text="Grade 5 • Section Emerald"
+                                        class="announcements-panel__meta-value"
+                                        picking-mode="Ignore"
+                                        enable-rich-text="false" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement
+                                    class="announcements-panel__meta-item announcements-panel__meta-item--last"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Publication window"
+                                        class="announcements-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="announcements-window-value"
+                                        text="Visible July 24–August 2, 2026"
+                                        class="announcements-panel__meta-value"
+                                        picking-mode="Ignore"
+                                        enable-rich-text="false" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="announcements-detail-body-card"
+                                class="announcements-panel__detail-body-card"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="announcements-detail-body-title"
+                                    text="Announcement"
+                                    class="announcements-panel__detail-body-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="announcements-detail-body"
+                                    text="Continue from Bell Tower and review the sequence of seven moments before your next LiteraQuest classroom activity."
+                                    class="announcements-panel__detail-body"
+                                    picking-mode="Ignore"
+                                    enable-rich-text="false" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="announcements-detail-actions"
+                                class="announcements-panel__detail-actions">
+                                <ui:Button
+                                    name="announcements-mark-read"
+                                    text=""
+                                    class="ds-btn ds-btn--primary announcements-panel__mark-read"
+                                    tooltip="Mark this announcement as read on this device">
+                                    <ui:VisualElement
+                                        class="ds-icon ds-icon--check announcements-panel__mark-read-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        text="Mark as read"
+                                        class="announcements-panel__mark-read-label"
+                                        picking-mode="Ignore" />
+                                </ui:Button>
+                                <ui:Label
+                                    name="announcements-read-helper"
+                                    text="Read on this device"
+                                    class="announcements-panel__read-helper announcements-panel__read-helper--hidden"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== UNREAD FILTER EMPTY ===== -->
+                    <ui:VisualElement
+                        name="announcements-filter-empty"
+                        class="ds-card announcements-panel__filter-empty announcements-panel__filter-empty--hidden">
+                        <ui:VisualElement
+                            name="announcements-filter-empty-icon"
+                            class="ds-icon ds-icon--check announcements-panel__filter-empty-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="announcements-filter-empty-title"
+                            text="You’re all caught up"
+                            class="announcements-panel__filter-empty-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="announcements-filter-empty-message"
+                            text="There are no unread announcements."
+                            class="announcements-panel__filter-empty-message"
+                            picking-mode="Ignore" />
+                        <ui:Button
+                            name="announcements-filter-empty-reset"
+                            text="Show All Announcements"
+                            class="ds-btn ds-btn--secondary announcements-panel__filter-empty-reset"
+                            tooltip="Show all announcements" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="announcements-bottom-spacer"
+                        class="announcements-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="announcements-data-state-host"
+            class="announcements-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

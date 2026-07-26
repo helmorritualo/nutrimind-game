@@ -87,6 +87,16 @@
     min-width: 0;
 }
 
+.home-panel__announce-button {
+    width: 100%;
+    min-height: 56px;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: var(--color-text-primary);
+}
+
 .home-panel__announce-icon {
     width: 26px;
     height: 26px;
@@ -95,8 +105,26 @@
     -unity-background-image-tint-color: var(--nm-brand-blue);
 }
 
-.home-panel__announce-text {
+.home-panel__announce-copy {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    min-width: 0;
+    margin-right: 10px;
+}
+
+.home-panel__announce-title {
     font-size: 18px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.home-panel__announce-text {
+    font-size: 16px;
     color: var(--color-text-secondary);
     -unity-font-style: bold;
     white-space: nowrap;
@@ -105,6 +133,13 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 0;
+}
+
+.home-panel__announce-chevron {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-text-secondary);
 }
 
 /* ========== GRID ========== */
@@ -645,6 +680,7 @@
     padding: 10px 14px;
 }
 
+.home-panel--compact .home-panel__announce-title,
 .home-panel--compact .home-panel__announce-text {
     white-space: normal;
 }

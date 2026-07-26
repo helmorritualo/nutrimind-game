@@ -138,6 +138,8 @@ namespace NutriMind.App.UI
         private Label _toastLabel;
         private Button _toastCloseButton;
         private Button _notificationsButton;
+        private VisualElement _notificationsBadge;
+        private Label _notificationsBadgeLabel;
         private Button _profileButton;
         private Button _navHome;
         private Button _navSubjects;
@@ -447,6 +449,8 @@ namespace NutriMind.App.UI
             _modalLayer = _root.Q<VisualElement>("app-shell-modal-layer");
             _loadingLayer = _root.Q<VisualElement>("app-shell-loading-layer");
             _notificationsButton = _root.Q<Button>("app-shell-notifications");
+            _notificationsBadge = _root.Q<VisualElement>("app-shell-notifications-badge");
+            _notificationsBadgeLabel = _root.Q<Label>("app-shell-notifications-badge-label");
             _profileButton = _root.Q<Button>("app-shell-profile");
 
             _navHome = _root.Q<Button>("nav-home");
@@ -511,6 +515,8 @@ namespace NutriMind.App.UI
             _pageContext = null;
             _connectionLabel = null;
             _notificationsButton = null;
+            _notificationsBadge = null;
+            _notificationsBadgeLabel = null;
             _profileButton = null;
             _navHome = null;
             _navSubjects = null;
@@ -743,6 +749,56 @@ namespace NutriMind.App.UI
         private void OnNavMoreClicked(ClickEvent evt)
         {
             SelectPreviewRoute(AppShellPreviewRoute.More);
+        }
+
+        /// <summary>
+        /// Updates the top-bar announcements unread badge for static preview only.
+        /// Does not store read IDs or call any announcements endpoint.
+        /// </summary>
+        public void SetAnnouncementUnreadCount(int unreadCount)
+        {
+            if (_notificationsButton == null)
+            {
+                return;
+            }
+
+            int count = unreadCount < 0 ? 0 : unreadCount;
+
+            if (_notificationsBadge != null)
+            {
+                _notificationsBadge.EnableInClassList(
+                    "app-shell__notifications-badge--hidden",
+                    count == 0);
+            }
+
+            if (_notificationsBadgeLabel != null)
+            {
+                if (count <= 0)
+                {
+                    _notificationsBadgeLabel.text = string.Empty;
+                }
+                else if (count >= 100)
+                {
+                    _notificationsBadgeLabel.text = "99+";
+                }
+                else
+                {
+                    _notificationsBadgeLabel.text = count.ToString();
+                }
+            }
+
+            if (count <= 0)
+            {
+                _notificationsButton.tooltip = "Announcements";
+            }
+            else if (count == 1)
+            {
+                _notificationsButton.tooltip = "Announcements — 1 unread";
+            }
+            else
+            {
+                _notificationsButton.tooltip = $"Announcements — {count} unread";
+            }
         }
 
         private void OnNotificationsClicked(ClickEvent evt)

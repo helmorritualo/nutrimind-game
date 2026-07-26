@@ -616,6 +616,30 @@
     -unity-background-image-tint-color: var(--color-primary);
 }
 
+.certificates-panel__detail-section--issued .certificates-panel__meta-status-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.certificates-panel__detail-section--progress .certificates-panel__meta-status-icon {
+    -unity-background-image-tint-color: var(--color-secondary);
+}
+
+.certificates-panel__detail-section--locked .certificates-panel__meta-status-icon {
+    -unity-background-image-tint-color: var(--color-text-disabled);
+}
+
+.certificates-panel__detail-section--issued .certificates-panel__meta-status-row .certificates-panel__meta-value {
+    color: var(--color-primary);
+}
+
+.certificates-panel__detail-section--progress .certificates-panel__meta-status-row .certificates-panel__meta-value {
+    color: var(--color-secondary);
+}
+
+.certificates-panel__detail-section--locked .certificates-panel__meta-status-row .certificates-panel__meta-value {
+    color: var(--color-text-secondary);
+}
+
 /* ========== ELIGIBILITY ========== */
 .certificates-panel__eligibility {
     flex-direction: column;
@@ -655,12 +679,36 @@
     -unity-background-image-tint-color: var(--color-primary);
 }
 
+.certificates-panel__detail-section--issued .certificates-panel__eligibility-icon {
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.certificates-panel__detail-section--progress .certificates-panel__eligibility-icon {
+    -unity-background-image-tint-color: var(--color-secondary);
+}
+
+.certificates-panel__detail-section--locked .certificates-panel__eligibility-icon {
+    -unity-background-image-tint-color: var(--color-text-disabled);
+}
+
 .certificates-panel__eligibility-support {
     flex-grow: 1;
     flex-shrink: 1;
     font-size: 18px;
     color: var(--color-text-primary);
     min-width: 0;
+}
+
+.certificates-panel__detail-section--issued .certificates-panel__eligibility-support {
+    color: var(--color-primary);
+}
+
+.certificates-panel__detail-section--progress .certificates-panel__eligibility-support {
+    color: var(--color-secondary);
+}
+
+.certificates-panel__detail-section--locked .certificates-panel__eligibility-support {
+    color: var(--color-text-secondary);
 }
 
 /* ========== ACTIONS ========== */

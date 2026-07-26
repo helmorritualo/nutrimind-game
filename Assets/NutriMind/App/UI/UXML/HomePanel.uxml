@@ -23,17 +23,34 @@
                 name="home-content"
                 class="app-screen-content__body home-panel__content">
 
-                <!-- ===== ANNOUNCEMENT ===== -->
+                <!-- ===== ANNOUNCEMENT ROUTE ACTION ===== -->
                 <ui:VisualElement name="home-announce-bar" class="home-panel__announce-bar">
-                    <ui:VisualElement name="home-announcement" class="home-panel__announce">
+                    <ui:Button
+                        name="home-announcement-button"
+                        text=""
+                        class="home-panel__announce home-panel__announce-button"
+                        tooltip="Open Announcements">
                         <ui:VisualElement
                             class="ds-icon ds-icon--bell home-panel__announce-icon"
                             picking-mode="Ignore" />
-                        <ui:Label
-                            name="announcement-text"
-                            text="Announcement: Your teacher will release a new Science mission this Friday!"
-                            class="home-panel__announce-text" />
-                    </ui:VisualElement>
+                        <ui:VisualElement
+                            class="home-panel__announce-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="announcement-title"
+                                text="Announcements and classroom updates"
+                                class="home-panel__announce-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="announcement-text"
+                                text="View the latest visible learning reminders."
+                                class="home-panel__announce-text"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--chevron-right home-panel__announce-chevron"
+                            picking-mode="Ignore" />
+                    </ui:Button>
                 </ui:VisualElement>
 
                 <!-- ===== MAIN CARD GRID ===== -->

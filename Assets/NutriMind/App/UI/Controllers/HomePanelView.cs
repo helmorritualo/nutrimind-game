@@ -7,7 +7,7 @@ namespace NutriMind.App.UI
     /// <summary>
     /// Presentation-only Home route view for content-only <c>HomePanel.uxml</c>.
     /// Binds greeting, announcement, and action cards inside an already-instantiated
-    /// root. Raises Continue / Quiz Portal requests for the host to handle.
+    /// root. Raises Continue / Quiz Portal / Announcements requests for the host to handle.
     /// Does not perform routing, mission loading, Quiz Portal networking, API calls,
     /// SQLite, synchronization, or AppShell chrome ownership.
     /// </summary>
@@ -23,6 +23,7 @@ namespace NutriMind.App.UI
         private VisualElement _root;
         private Button _continueButton;
         private Button _quizPortalButton;
+        private Button _announcementsButton;
         private Label _areasCompletedLabel;
         private Label _storyFragmentsLabel;
         private bool _disposed;
@@ -39,6 +40,12 @@ namespace NutriMind.App.UI
         /// Presentation request only — the host decides how to respond.
         /// </summary>
         public event Action QuizPortalRequested;
+
+        /// <summary>
+        /// Raised when the Home announcements preview action is clicked.
+        /// Presentation request only — the host decides how to respond.
+        /// </summary>
+        public event Action AnnouncementsRequested;
 
         /// <summary>
         /// Creates a view bound to an already-instantiated Home root,
@@ -76,9 +83,11 @@ namespace NutriMind.App.UI
             UnregisterCallbacks();
             ContinueMissionRequested = null;
             QuizPortalRequested = null;
+            AnnouncementsRequested = null;
             _root = null;
             _continueButton = null;
             _quizPortalButton = null;
+            _announcementsButton = null;
             _areasCompletedLabel = null;
             _storyFragmentsLabel = null;
             _lastWidth = -1f;
@@ -104,6 +113,7 @@ namespace NutriMind.App.UI
         {
             _continueButton = _root.Q<Button>("play-continue-button");
             _quizPortalButton = _root.Q<Button>("quiz-go-button");
+            _announcementsButton = _root.Q<Button>("home-announcement-button");
             _areasCompletedLabel = _root.Q<Label>("areas-completed-label");
             _storyFragmentsLabel = _root.Q<Label>("story-fragments-label");
         }
@@ -125,6 +135,7 @@ namespace NutriMind.App.UI
         {
             _continueButton?.RegisterCallback<ClickEvent>(OnContinueClicked);
             _quizPortalButton?.RegisterCallback<ClickEvent>(OnQuizPortalClicked);
+            _announcementsButton?.RegisterCallback<ClickEvent>(OnAnnouncementsClicked);
             _root?.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
 
@@ -132,6 +143,7 @@ namespace NutriMind.App.UI
         {
             _continueButton?.UnregisterCallback<ClickEvent>(OnContinueClicked);
             _quizPortalButton?.UnregisterCallback<ClickEvent>(OnQuizPortalClicked);
+            _announcementsButton?.UnregisterCallback<ClickEvent>(OnAnnouncementsClicked);
             _root?.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
 
@@ -143,6 +155,11 @@ namespace NutriMind.App.UI
         private void OnQuizPortalClicked(ClickEvent evt)
         {
             QuizPortalRequested?.Invoke();
+        }
+
+        private void OnAnnouncementsClicked(ClickEvent evt)
+        {
+            AnnouncementsRequested?.Invoke();
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)

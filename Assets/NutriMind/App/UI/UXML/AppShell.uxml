@@ -51,9 +51,19 @@
                     <ui:Button
                         name="app-shell-notifications"
                         text=""
-                        class="ds-btn ds-btn--ghost ds-btn--icon app-shell__action-btn"
-                        tooltip="Announcements (preview)">
+                        class="ds-btn ds-btn--ghost ds-btn--icon app-shell__action-btn app-shell__notifications"
+                        tooltip="Announcements">
                         <ui:VisualElement class="ds-icon ds-icon--bell app-shell__action-icon" picking-mode="Ignore" />
+                        <ui:VisualElement
+                            name="app-shell-notifications-badge"
+                            class="app-shell__notifications-badge app-shell__notifications-badge--hidden"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="app-shell-notifications-badge-label"
+                                text="2"
+                                class="app-shell__notifications-badge-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
                     </ui:Button>
 
                     <ui:Button

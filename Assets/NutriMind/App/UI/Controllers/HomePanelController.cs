@@ -6,7 +6,7 @@ namespace NutriMind.App.UI
     /// <summary>
     /// Standalone <c>UIDocument</c> preview adapter for <see cref="HomePanelView"/>.
     /// Binds the content-only Home route for isolated layout review.
-    /// Logs Continue / Quiz Portal requests without recreating AppShell chrome or toasts.
+    /// Logs Continue / Quiz Portal / Announcements requests without recreating AppShell chrome or toasts.
     /// Does not perform routing, progress loading, sync, or networking.
     /// </summary>
     [DisallowMultipleComponent]
@@ -69,6 +69,7 @@ namespace NutriMind.App.UI
             {
                 _view.ContinueMissionRequested += OnContinueMissionRequested;
                 _view.QuizPortalRequested += OnQuizPortalRequested;
+                _view.AnnouncementsRequested += OnAnnouncementsRequested;
                 _eventsRegistered = true;
             }
         }
@@ -87,6 +88,7 @@ namespace NutriMind.App.UI
                 {
                     _view.ContinueMissionRequested -= OnContinueMissionRequested;
                     _view.QuizPortalRequested -= OnQuizPortalRequested;
+                    _view.AnnouncementsRequested -= OnAnnouncementsRequested;
                     _eventsRegistered = false;
                 }
 
@@ -103,6 +105,11 @@ namespace NutriMind.App.UI
         private void OnQuizPortalRequested()
         {
             Debug.Log("[HomePanelController] Quiz Portal requested — preview only.");
+        }
+
+        private void OnAnnouncementsRequested()
+        {
+            Debug.Log("[HomePanelController] Announcements requested — preview only.");
         }
     }
 }
