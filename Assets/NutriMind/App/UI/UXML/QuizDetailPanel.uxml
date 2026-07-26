@@ -1,0 +1,332 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/QuizDetailPanel.uss" />
+
+    <ui:VisualElement
+        name="quiz-detail-root"
+        class="ds-root theme-nutrimind app-screen-content quiz-detail-panel">
+
+        <ui:ScrollView
+            name="quiz-detail-scroll"
+            class="app-screen-content__scroll quiz-detail-panel__scroll"
+            mode="Vertical"
+            horizontal-scroller-visibility="Hidden"
+            vertical-scroller-visibility="Auto"
+            mouse-wheel-scroll-size="72"
+            vertical-page-size="0.85"
+            touch-scroll-type="Clamped"
+            focusable="true">
+
+            <ui:VisualElement
+                name="quiz-detail-content"
+                class="app-screen-content__body quiz-detail-panel__content">
+
+                <!-- ===== TOP ROW ===== -->
+                <ui:VisualElement name="quiz-detail-top-row" class="quiz-detail-panel__top-row">
+                    <ui:Button
+                        name="quiz-detail-back-button"
+                        text=""
+                        class="ds-btn ds-btn--ghost quiz-detail-panel__back-button"
+                        tooltip="Back to Quiz Portal">
+                        <ui:VisualElement
+                            class="ds-icon ds-icon--chevron-left quiz-detail-panel__back-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            text="Back to Quiz Portal"
+                            class="quiz-detail-panel__back-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <!-- ===== HERO ===== -->
+                <ui:VisualElement
+                    name="quiz-detail-hero"
+                    class="ds-card quiz-detail-panel__hero">
+                    <ui:VisualElement class="quiz-detail-panel__hero-meta" picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="quiz-detail-subject-icon"
+                            class="ds-icon ds-icon--book quiz-detail-panel__subject-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="quiz-detail-subject-term"
+                            text="LiteraQuest • Term 1"
+                            class="quiz-detail-panel__subject-term"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            name="quiz-detail-status"
+                            class="ds-chip ds-chip--equipped quiz-detail-panel__status quiz-detail-panel__status--available">
+                            <ui:VisualElement
+                                name="quiz-detail-status-icon"
+                                class="ds-icon ds-icon--play quiz-detail-panel__status-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-detail-status-label"
+                                text="Available"
+                                class="quiz-detail-panel__status-label"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label
+                        name="quiz-detail-title"
+                        text="Story Elements Check"
+                        class="quiz-detail-panel__title"
+                        picking-mode="Ignore" />
+                    <ui:Label
+                        name="quiz-detail-instructions"
+                        text="Choose the best answer."
+                        class="quiz-detail-panel__instructions"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+
+                <!-- ===== TWO-COLUMN LAYOUT ===== -->
+                <ui:VisualElement name="quiz-detail-layout" class="quiz-detail-panel__layout">
+
+                    <ui:VisualElement name="quiz-detail-main-column" class="quiz-detail-panel__main-column">
+                        <ui:VisualElement class="quiz-detail-panel__section-header" picking-mode="Ignore">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--list quiz-detail-panel__section-icon"
+                                picking-mode="Ignore" />
+                            <ui:VisualElement class="quiz-detail-panel__section-copy" picking-mode="Ignore">
+                                <ui:Label
+                                    text="Question overview"
+                                    class="quiz-detail-panel__section-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Review what the quiz will ask before you begin."
+                                    class="quiz-detail-panel__section-message"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-detail-question-list"
+                            class="quiz-detail-panel__question-list">
+
+                            <!-- Question 1 -->
+                            <ui:VisualElement
+                                name="quiz-detail-question-1"
+                                class="ds-card quiz-detail-panel__question-card">
+                                <ui:VisualElement class="quiz-detail-panel__question-header" picking-mode="Ignore">
+                                    <ui:Label
+                                        name="quiz-detail-question-1-number"
+                                        text="Question 1"
+                                        class="quiz-detail-panel__question-number"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="quiz-detail-question-1-type"
+                                        text="Single choice"
+                                        class="quiz-detail-panel__question-type"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                                <ui:Label
+                                    name="quiz-detail-question-1-prompt"
+                                    text="Who is the main character?"
+                                    class="quiz-detail-panel__question-prompt"
+                                    picking-mode="Ignore" />
+                                <ui:VisualElement class="quiz-detail-panel__option-list" picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        class="quiz-detail-panel__option-row"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            text="A"
+                                            class="quiz-detail-panel__option-badge"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="quiz-detail-question-1-option-1"
+                                            text="Farmer Lira"
+                                            class="quiz-detail-panel__option-text"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement
+                                        class="quiz-detail-panel__option-row"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            text="B"
+                                            class="quiz-detail-panel__option-badge"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="quiz-detail-question-1-option-2"
+                                            text="The bridge"
+                                            class="quiz-detail-panel__option-text"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <!-- Question 2 -->
+                            <ui:VisualElement
+                                name="quiz-detail-question-2"
+                                class="ds-card quiz-detail-panel__question-card">
+                                <ui:VisualElement class="quiz-detail-panel__question-header" picking-mode="Ignore">
+                                    <ui:Label
+                                        name="quiz-detail-question-2-number"
+                                        text="Question 2"
+                                        class="quiz-detail-panel__question-number"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="quiz-detail-question-2-type"
+                                        text="True or false"
+                                        class="quiz-detail-panel__question-type"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                                <ui:Label
+                                    name="quiz-detail-question-2-prompt"
+                                    text="The story happens during a festival."
+                                    class="quiz-detail-panel__question-prompt"
+                                    picking-mode="Ignore" />
+                                <ui:VisualElement class="quiz-detail-panel__option-list" picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        class="quiz-detail-panel__option-row"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            text="A"
+                                            class="quiz-detail-panel__option-badge"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="quiz-detail-question-2-option-1"
+                                            text="True"
+                                            class="quiz-detail-panel__option-text"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                    <ui:VisualElement
+                                        class="quiz-detail-panel__option-row"
+                                        picking-mode="Ignore">
+                                        <ui:Label
+                                            text="B"
+                                            class="quiz-detail-panel__option-badge"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="quiz-detail-question-2-option-2"
+                                            text="False"
+                                            class="quiz-detail-panel__option-text"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="quiz-detail-side-column" class="quiz-detail-panel__side-column">
+                        <ui:VisualElement
+                            name="quiz-detail-rules-card"
+                            class="ds-card quiz-detail-panel__rules-card">
+                            <ui:Label
+                                text="Assignment summary"
+                                class="quiz-detail-panel__rules-title"
+                                picking-mode="Ignore" />
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--list quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Questions" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-question-count"
+                                    text="2"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--refresh quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Attempts" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-max-attempts"
+                                    text="1 allowed"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--check quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Used" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-attempts-used"
+                                    text="0"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--clock quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Remaining" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-attempts-remaining"
+                                    text="1"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--calendar quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Availability" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-availability"
+                                    text="Available now"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="quiz-detail-panel__rule-row quiz-detail-panel__rule-row--last" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--eye quiz-detail-panel__rule-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label text="Results" class="quiz-detail-panel__rule-label" picking-mode="Ignore" />
+                                <ui:Label
+                                    name="quiz-detail-result-visibility"
+                                    text="After submission"
+                                    class="quiz-detail-panel__rule-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="quiz-detail-network-note"
+                            class="quiz-detail-panel__network-note">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--wifi quiz-detail-panel__network-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Quiz attempts are submitted to the server for scoring. Make sure you are connected before you begin."
+                                class="quiz-detail-panel__network-text"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:Button
+                            name="quiz-detail-start-button"
+                            text=""
+                            class="ds-btn ds-btn--primary quiz-detail-panel__start-button"
+                            tooltip="Start Quiz">
+                            <ui:VisualElement
+                                name="quiz-detail-start-icon"
+                                class="ds-icon ds-icon--play quiz-detail-panel__start-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="quiz-detail-start-label"
+                                text="Start Quiz"
+                                class="quiz-detail-panel__start-label"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="quiz-detail-panel__bottom-spacer" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+
+        <ui:VisualElement
+            name="quiz-detail-data-state-host"
+            class="quiz-detail-panel__data-state-host"
+            picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

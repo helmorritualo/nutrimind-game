@@ -123,6 +123,10 @@ namespace NutriMind.App.UI
         [Tooltip("DataStatePanel state used only while previewing QuizList inside AppShell.")]
         private DataStatePanelState _quizListPreviewState = DataStatePanelState.Content;
 
+        [SerializeField]
+        [Tooltip("DataStatePanel state used only while previewing QuizDetail inside AppShell.")]
+        private DataStatePanelState _quizDetailPreviewState = DataStatePanelState.Content;
+
         private MissionPreviewSelection _selectedMission =
             new(2, "Needs of Living Things", false, string.Empty);
 
@@ -150,6 +154,7 @@ namespace NutriMind.App.UI
         private SettingsPanelView _currentSettingsView;
         private ProgressPanelView _currentProgressView;
         private QuizListPanelView _currentQuizListView;
+        private QuizDetailPanelView _currentQuizDetailView;
         private QuizListPreviewItem? _selectedQuiz;
 
         private TemplateContainer _fallbackInstance;
@@ -502,6 +507,18 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.QuizList:
                     return "Grade 5 • Assignments";
 
+                case AppShellContentPreviewScreen.QuizDetail:
+                    if (_selectedQuiz.HasValue)
+                    {
+                        QuizListPreviewItem selected = _selectedQuiz.Value;
+                        return
+                            $"{GetSubjectLabel(selected.Subject)} • Term {(int)selected.Term}";
+                    }
+
+                    return string.IsNullOrWhiteSpace(entry?.PageContext)
+                        ? "Grade 5 • Quiz Portal"
+                        : NormalizeOptionalText(entry.PageContext);
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -552,6 +569,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.QuizList:
                     return CreateQuizListView(contentRoot);
+
+                case AppShellContentPreviewScreen.QuizDetail:
+                    return CreateQuizDetailView(contentRoot);
 
                 default:
                     return null;
@@ -1077,10 +1097,71 @@ namespace NutriMind.App.UI
             _selectedQuiz = item;
             Debug.Log(
                 $"[AppShellContentPreview] Quiz details requested: {item.Id} '{item.Title}' " +
-                $"({item.Status}).");
+                $"({item.Status}) — showing QuizDetail preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizDetail);
+        }
+
+        private IAppScreenView CreateQuizDetailView(VisualElement contentRoot)
+        {
+            var quizDetailView = new QuizDetailPanelView(contentRoot, _dataStatePanelAsset);
+            if (!quizDetailView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] QuizDetailPanelView failed to bind quiz-detail-root.");
+                quizDetailView.Dispose();
+                return null;
+            }
+
+            QuizListPreviewItem summary = _selectedQuiz
+                ?? QuizDetailPreviewCatalog.CreateCanonicalSummary();
+            quizDetailView.SetQuizContext(summary);
+            quizDetailView.SetDataState(_quizDetailPreviewState);
+            quizDetailView.BackRequested += OnQuizDetailBackRequested;
+            quizDetailView.StartRequested += OnQuizDetailStartRequested;
+            quizDetailView.ViewResultRequested += OnQuizDetailViewResultRequested;
+            quizDetailView.RetryRequested += OnQuizDetailRetryRequested;
+            _currentQuizDetailView = quizDetailView;
+            return quizDetailView;
+        }
+
+        private void OnQuizDetailBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizDetail Back requested — showing QuizList preview.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private void OnQuizDetailStartRequested(QuizDetailPreviewSelection selection)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] QuizDetail Start requested: {selection.Summary.Id} " +
+                $"'{selection.Summary.Title}' ({selection.QuestionCount} questions) — preview only.");
 
             _appShell?.ShowToast(
-                $"Selected “{item.Title}”. Quiz details will be connected in the next Quiz Portal panel prompt.",
+                $"Start selected for “{selection.Summary.Title}”. QuizAttempt will be connected in the next Quiz Portal panel prompt.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizDetailViewResultRequested(QuizDetailPreviewSelection selection)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] QuizDetail View Result requested: {selection.Summary.Id} " +
+                $"'{selection.Summary.Title}' — preview only.");
+
+            _appShell?.ShowToast(
+                $"View Result selected for “{selection.Summary.Title}”. QuizResult will be connected in a later panel prompt.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnQuizDetailRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] QuizDetail retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Quiz detail refresh requested. Data loading is not connected in this static preview.",
                 AppShellToastTone.Information);
         }
 
@@ -1350,6 +1431,15 @@ namespace NutriMind.App.UI
                 _currentQuizListView.RetryRequested -= OnQuizListRetryRequested;
                 _currentQuizListView.ReturnToMainRequested -= OnQuizListReturnToMainRequested;
                 _currentQuizListView = null;
+            }
+
+            if (_currentQuizDetailView != null)
+            {
+                _currentQuizDetailView.BackRequested -= OnQuizDetailBackRequested;
+                _currentQuizDetailView.StartRequested -= OnQuizDetailStartRequested;
+                _currentQuizDetailView.ViewResultRequested -= OnQuizDetailViewResultRequested;
+                _currentQuizDetailView.RetryRequested -= OnQuizDetailRetryRequested;
+                _currentQuizDetailView = null;
             }
 
             _currentScreenView?.Dispose();
