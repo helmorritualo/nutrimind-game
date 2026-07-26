@@ -13,7 +13,7 @@
             <ui:Button name="back-button" text="" class="ds-btn ds-btn--ghost mission-selection__back" tooltip="Back">
                 <ui:VisualElement class="ds-icon ds-icon--arrow-left mission-selection__back-icon" picking-mode="Ignore" />
             </ui:Button>
-            <ui:Label name="term-heading" text="Term 2: Life and Living Things" class="mission-selection__term-heading" />
+            <ui:Label name="term-heading" text="Term 1: Pages of the Nation" class="mission-selection__term-heading" />
         </ui:VisualElement>
 
         <!-- ===== MAIN BODY (list + detail) ===== -->
@@ -33,7 +33,7 @@
                             <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--completed">
                                 <ui:Label text="1" class="mission-selection__item-badge-label" />
                             </ui:VisualElement>
-                            <ui:Label name="mission-1-title" text="What Is a Living Thing?" class="mission-selection__item-title" />
+                            <ui:Label name="mission-1-title" text="The Festival Storybook Rescue" class="mission-selection__item-title" />
                             <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--completed">
                                 <ui:VisualElement class="ds-icon ds-icon--check mission-selection__item-status-icon" />
                                 <ui:Label text="Completed" class="mission-selection__item-status-label" />
@@ -44,7 +44,7 @@
                             <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--progress">
                                 <ui:Label text="2" class="mission-selection__item-badge-label" />
                             </ui:VisualElement>
-                            <ui:Label name="mission-2-title" text="Needs of Living Things" class="mission-selection__item-title mission-selection__item-title--active" />
+                            <ui:Label name="mission-2-title" text="The Bell of Seven Moments" class="mission-selection__item-title mission-selection__item-title--active" />
                             <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--progress">
                                 <ui:VisualElement class="mission-selection__mini-ring">
                                     <ui:VisualElement class="mission-selection__mini-ring-track" />
@@ -58,7 +58,7 @@
                             <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--available">
                                 <ui:Label text="3" class="mission-selection__item-badge-label" />
                             </ui:VisualElement>
-                            <ui:Label name="mission-3-title" text="Habitats Around Us" class="mission-selection__item-title" />
+                            <ui:Label name="mission-3-title" text="The Hall of Speaking Sounds" class="mission-selection__item-title" />
                             <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--available">
                                 <ui:VisualElement class="mission-selection__available-ring" />
                                 <ui:Label text="Available" class="mission-selection__item-status-label" />
@@ -69,7 +69,7 @@
                             <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--locked">
                                 <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-badge-lock" />
                             </ui:VisualElement>
-                            <ui:Label name="mission-4-title" text="Life Cycles" class="mission-selection__item-title mission-selection__item-title--locked" />
+                            <ui:Label name="mission-4-title" text="The Newsroom of True Pages" class="mission-selection__item-title mission-selection__item-title--locked" />
                             <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--locked">
                                 <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-status-icon mission-selection__item-status-icon--locked" />
                                 <ui:Label text="Prerequisite Locked" class="mission-selection__item-status-label" />
@@ -80,7 +80,7 @@
                             <ui:VisualElement class="mission-selection__item-badge mission-selection__item-badge--locked">
                                 <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-badge-lock" />
                             </ui:VisualElement>
-                            <ui:Label name="mission-5-title" text="Ecosystems and Balance" class="mission-selection__item-title mission-selection__item-title--locked" />
+                            <ui:Label name="mission-5-title" text="The Grand Holiday Chronicle" class="mission-selection__item-title mission-selection__item-title--locked" />
                             <ui:VisualElement class="mission-selection__item-status mission-selection__item-status--locked">
                                 <ui:VisualElement class="ds-icon ds-icon--lock mission-selection__item-status-icon mission-selection__item-status-icon--locked" />
                                 <ui:Label text="Teacher Locked" class="mission-selection__item-status-label" />
@@ -105,8 +105,8 @@
                     <ui:VisualElement name="mission-detail" class="mission-selection__detail">
 
                         <ui:VisualElement class="mission-selection__detail-header">
-                            <ui:Label name="detail-title" text="Needs of Living Things" class="mission-selection__detail-title" />
-                            <ui:Label name="detail-description" text="Discover what living things need to survive and how they get what they need." class="mission-selection__detail-desc" />
+                            <ui:Label name="detail-title" text="The Bell of Seven Moments" class="mission-selection__detail-title" />
+                            <ui:Label name="detail-description" text="The memorial bell rings seven times, but every witness remembers the order differently. A young bell keeper is blamed unfairly because of a misleading poster. The Pathfinder investigates the seven moments, corrects the record, and restores the bell’s true story." class="mission-selection__detail-desc" />
 
                             <ui:VisualElement name="detail-status" class="mission-selection__detail-status mission-selection__detail-status--progress">
                                 <ui:VisualElement name="detail-status-icon" class="mission-selection__mini-ring mission-selection__detail-status-icon">
@@ -122,7 +122,7 @@
                                 <ui:VisualElement class="ds-icon ds-icon--target mission-selection__goal-icon" />
                                 <ui:Label text="Learning Goal" class="mission-selection__goal-heading" />
                             </ui:VisualElement>
-                            <ui:Label name="detail-learning-goal" text="I can identify the basic needs of living things and explain why they are important." class="mission-selection__goal-text" />
+                            <ui:Label name="detail-learning-goal" text="Sequencing at least seven events; main idea and summary; progressive tenses; adverbs of manner and time; character feelings and traits; prediction, conclusion, real-life possibility; analogy and dictionary use; formal tone; compound-complex sentences; visual purpose and stereotypes." class="mission-selection__goal-text" />
                         </ui:VisualElement>
 
                         <ui:VisualElement name="progress-section" class="mission-selection__info-card mission-selection__progress-section">

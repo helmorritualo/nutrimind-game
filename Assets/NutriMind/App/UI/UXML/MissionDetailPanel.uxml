@@ -1,0 +1,256 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/MissionDetailPanel.uss" />
+
+    <ui:VisualElement
+        name="mission-detail-root"
+        class="ds-root theme-nutrimind app-screen-content mission-detail-panel">
+
+        <ui:VisualElement
+            name="mission-detail-content-shell"
+            class="mission-detail-panel__content-shell">
+
+            <ui:ScrollView
+                name="mission-detail-scroll"
+                class="app-screen-content__scroll mission-detail-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="mission-detail-body"
+                    class="app-screen-content__body mission-detail-panel__body">
+
+                    <!-- ===== HERO ===== -->
+                    <ui:VisualElement
+                        name="mission-detail-hero"
+                        class="ds-card ds-card--flush mission-detail-panel__hero">
+
+                        <ui:VisualElement
+                            name="mission-detail-hero-copy"
+                            class="mission-detail-panel__hero-copy">
+
+                            <ui:VisualElement
+                                name="mission-detail-subject-icon"
+                                class="ds-icon ds-icon--book mission-detail-panel__subject-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-eyebrow"
+                                text="LiteraQuest • Term 1 • Mission 2"
+                                class="mission-detail-panel__eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-title"
+                                text="The Bell of Seven Moments"
+                                class="mission-detail-panel__title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-curriculum-block"
+                                text="Weeks 3–4"
+                                class="mission-detail-panel__curriculum-block"
+                                picking-mode="Ignore" />
+
+                            <ui:VisualElement
+                                name="mission-detail-status-chip"
+                                class="ds-chip mission-detail-panel__status-chip">
+                                <ui:VisualElement
+                                    name="mission-detail-status-icon"
+                                    class="ds-icon ds-icon--play mission-detail-panel__status-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="mission-detail-status-label"
+                                    text="In Progress"
+                                    class="mission-detail-panel__status-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:Label
+                                name="mission-detail-premise"
+                                text="The memorial bell rings seven times, but every witness remembers the order differently. A young bell keeper is blamed unfairly because of a misleading poster. The Pathfinder investigates the seven moments, corrects the record, and restores the bell’s true story."
+                                class="mission-detail-panel__premise"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="mission-detail-hero-summary"
+                            class="ds-card ds-card--flush mission-detail-panel__hero-summary">
+
+                            <ui:Label
+                                name="mission-detail-summary-title"
+                                text="Your progress"
+                                class="mission-detail-panel__summary-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-areas-value"
+                                text="2 of 3 areas"
+                                class="mission-detail-panel__summary-metric"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-collectibles-value"
+                                text="2 of 3 Story Fragments"
+                                class="mission-detail-panel__summary-metric"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="mission-detail-current-area"
+                                text="Current area: Bell Tower"
+                                class="mission-detail-panel__summary-support"
+                                picking-mode="Ignore" />
+
+                            <ui:VisualElement class="mission-detail-panel__offline-row" picking-mode="Ignore">
+                                <ui:VisualElement
+                                    name="mission-detail-offline-icon"
+                                    class="ds-icon ds-icon--wifi mission-detail-panel__offline-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="mission-detail-offline-status"
+                                    text="Downloaded • Available offline"
+                                    class="mission-detail-panel__summary-support"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== LEARNING FOCUS ===== -->
+                    <ui:VisualElement
+                        name="mission-detail-learning-card"
+                        class="ds-card ds-card--flush mission-detail-panel__learning-card">
+
+                        <ui:VisualElement class="mission-detail-panel__learning-header" picking-mode="Ignore">
+                            <ui:VisualElement
+                                name="mission-detail-learning-icon"
+                                class="ds-icon ds-icon--target mission-detail-panel__learning-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="mission-detail-learning-title"
+                                text="Learning focus"
+                                class="mission-detail-panel__learning-title"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:Label
+                            name="mission-detail-learning-text"
+                            text="Sequencing at least seven events; main idea and summary; progressive tenses; adverbs of manner and time; character feelings and traits; prediction, conclusion, real-life possibility; analogy and dictionary use; formal tone; compound-complex sentences; visual purpose and stereotypes."
+                            class="mission-detail-panel__learning-text"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <!-- ===== JOURNEY ===== -->
+                    <ui:VisualElement
+                        name="mission-detail-journey-header"
+                        class="mission-detail-panel__journey-header"
+                        picking-mode="Ignore">
+                        <ui:Label
+                            name="mission-detail-journey-title"
+                            text="Your mission journey"
+                            class="mission-detail-panel__journey-title"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="mission-detail-journey-description"
+                            text="Complete three connected areas in one open-world mission."
+                            class="mission-detail-panel__journey-description"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="mission-detail-area-list"
+                        class="mission-detail-panel__area-list" />
+
+                    <!-- ===== COLLECTIBLES ===== -->
+                    <ui:VisualElement
+                        name="mission-detail-collectible-card"
+                        class="ds-card ds-card--flush mission-detail-panel__collectible-card">
+
+                        <ui:VisualElement class="mission-detail-panel__collectible-header" picking-mode="Ignore">
+                            <ui:Label
+                                name="mission-detail-collectible-title"
+                                text="Story Fragments"
+                                class="mission-detail-panel__collectible-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="mission-detail-collectible-count"
+                                text="2 of 3 collected"
+                                class="mission-detail-panel__collectible-count"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="mission-detail-collectible-list"
+                            class="mission-detail-panel__collectible-list" />
+                    </ui:VisualElement>
+
+                    <!-- ===== AVAILABILITY ===== -->
+                    <ui:VisualElement
+                        name="mission-detail-availability-card"
+                        class="ds-card ds-card--flush mission-detail-panel__availability-card">
+
+                        <ui:VisualElement class="mission-detail-panel__availability-column" picking-mode="Ignore">
+                            <ui:VisualElement class="ds-icon ds-icon--flag mission-detail-panel__availability-icon" picking-mode="Ignore" />
+                            <ui:Label text="Classroom availability" class="mission-detail-panel__availability-label" picking-mode="Ignore" />
+                            <ui:Label
+                                name="mission-detail-classroom-value"
+                                text="Published to your classroom"
+                                class="mission-detail-panel__availability-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="mission-detail-panel__availability-column" picking-mode="Ignore">
+                            <ui:VisualElement class="ds-icon ds-icon--info mission-detail-panel__availability-icon" picking-mode="Ignore" />
+                            <ui:Label text="Prerequisite" class="mission-detail-panel__availability-label" picking-mode="Ignore" />
+                            <ui:Label
+                                name="mission-detail-prerequisite-value"
+                                text="No prerequisite"
+                                class="mission-detail-panel__availability-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="mission-detail-panel__availability-column mission-detail-panel__availability-column--last" picking-mode="Ignore">
+                            <ui:VisualElement class="ds-icon ds-icon--wifi mission-detail-panel__availability-icon" picking-mode="Ignore" />
+                            <ui:Label text="Offline availability" class="mission-detail-panel__availability-label" picking-mode="Ignore" />
+                            <ui:Label
+                                name="mission-detail-download-value"
+                                text="Downloaded • Available offline"
+                                class="mission-detail-panel__availability-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        class="mission-detail-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- ===== FOOTER ===== -->
+        <ui:VisualElement
+            name="mission-detail-footer"
+            class="mission-detail-panel__footer">
+            <ui:Button
+                name="mission-detail-back-button"
+                text="Back to Missions"
+                class="ds-btn ds-btn--secondary mission-detail-panel__back-button"
+                tooltip="Back to Missions" />
+            <ui:Button
+                name="mission-detail-primary-button"
+                text="Continue Mission"
+                class="ds-btn ds-btn--primary mission-detail-panel__primary-button"
+                tooltip="Continue Mission" />
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="mission-detail-data-state-host"
+            class="mission-detail-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

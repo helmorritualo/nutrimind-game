@@ -7,14 +7,27 @@ namespace NutriMind.App.UI
 {
     public readonly struct MissionPreviewSelection
     {
-        public MissionPreviewSelection(int missionNumber, string missionTitle, bool isLocked, string lockReason)
+        public MissionPreviewSelection(
+            string missionId,
+            NutriMindSubject subject,
+            NutriMindTerm term,
+            int missionNumber,
+            string missionTitle,
+            bool isLocked,
+            string lockReason)
         {
+            MissionId = missionId;
+            Subject = subject;
+            Term = term;
             MissionNumber = missionNumber;
             MissionTitle = missionTitle;
             IsLocked = isLocked;
             LockReason = lockReason;
         }
 
+        public string MissionId { get; }
+        public NutriMindSubject Subject { get; }
+        public NutriMindTerm Term { get; }
         public int MissionNumber { get; }
         public string MissionTitle { get; }
         public bool IsLocked { get; }
@@ -41,11 +54,96 @@ namespace NutriMind.App.UI
 
         private readonly Dictionary<string, MissionPreviewData> _missionData = new()
         {
-            ["mission-item-1"] = new MissionPreviewData(1, "What Is a Living Thing?", "Learn how to tell living things apart from non-living things.", "I can describe characteristics of living things.", 3, 3, 3, 3, "Completed", "completed", "No prerequisite", "Published to your classroom", "Downloaded • Available offline", "Review Mission", false, string.Empty),
-            ["mission-item-2"] = new MissionPreviewData(2, "Needs of Living Things", "Discover what living things need to survive and how they get what they need.", "I can identify the basic needs of living things and explain why they are important.", 2, 3, 2, 3, "In Progress", "progress", "No prerequisite", "Published to your classroom", "Downloaded • Available offline", "Continue Mission", false, string.Empty),
-            ["mission-item-3"] = new MissionPreviewData(3, "Habitats Around Us", "Explore different habitats and how living things adapt to them.", "I can name common habitats and describe how organisms survive in each one.", 0, 3, 0, 3, "Available", "available", "No prerequisite", "Published to your classroom", "Downloaded • Available offline", "Start Mission", false, string.Empty),
-            ["mission-item-4"] = new MissionPreviewData(4, "Life Cycles", "Follow the stages of life for plants and animals in your community.", "I can explain basic life-cycle stages for familiar living things.", 0, 3, 0, 3, "Prerequisite Locked", "locked", "Requires: Habitats Around Us (Mission 3)", "Published to your classroom", "Downloaded • Available offline", "Back to Missions", true, "Prerequisite Locked"),
-            ["mission-item-5"] = new MissionPreviewData(5, "Ecosystems and Balance", "Discover how living things depend on each other within an ecosystem.", "I can describe how organisms interact within an ecosystem to survive.", 0, 3, 0, 3, "Teacher Locked", "locked", "Prerequisite complete — no additional missions required.", "Waiting for classroom release", "Not downloaded on this device", "Back to Missions", true, "Teacher Locked")
+            ["mission-item-1"] = new MissionPreviewData(
+                "g5_lq_t1_m01",
+                1,
+                "The Festival Storybook Rescue",
+                "On the morning of Bayang Haraya’s Freedom and Friendship Festival, the town storybook loses its first chapter. Farmer Lira remembers pieces of the parade story, but the Haze has scattered the events, captions, and illustrations across three connected festival zones. The Pathfinder must restore the chapter in correct order before the opening ceremony.",
+                "Story grammar; sequential plot; main idea; collective/concrete/abstract nouns; demonstrative and relative pronouns; verb-forming suffixes; helping/linking/transitive verbs; noun complements; narrative text; layout, tone, and mood.",
+                3,
+                3,
+                3,
+                3,
+                "Completed",
+                "completed",
+                "No prerequisite",
+                "Published to your classroom",
+                "Downloaded • Available offline",
+                "Review Mission",
+                false,
+                string.Empty),
+            ["mission-item-2"] = new MissionPreviewData(
+                "g5_lq_t1_m02",
+                2,
+                "The Bell of Seven Moments",
+                "The memorial bell rings seven times, but every witness remembers the order differently. A young bell keeper is blamed unfairly because of a misleading poster. The Pathfinder investigates the seven moments, corrects the record, and restores the bell’s true story.",
+                "Sequencing at least seven events; main idea and summary; progressive tenses; adverbs of manner and time; character feelings and traits; prediction, conclusion, real-life possibility; analogy and dictionary use; formal tone; compound-complex sentences; visual purpose and stereotypes.",
+                2,
+                3,
+                2,
+                3,
+                "In Progress",
+                "progress",
+                "No prerequisite",
+                "Published to your classroom",
+                "Downloaded • Available offline",
+                "Continue Mission",
+                false,
+                string.Empty),
+            ["mission-item-3"] = new MissionPreviewData(
+                "g5_lq_t1_m03",
+                3,
+                "The Hall of Speaking Sounds",
+                "A hall of oral stories has gone silent because the sounds, comparisons, and gestures were separated from their meanings. The Pathfinder helps performers rebuild a respectful community presentation.",
+                "Onomatopoeia, alliteration, assonance, consonance; simile, metaphor, and personification; adjective order; non-verbal cues; cultural appropriateness; creation of a visual narrative.",
+                0,
+                3,
+                0,
+                3,
+                "Available",
+                "available",
+                "No prerequisite",
+                "Published to your classroom",
+                "Downloaded • Available offline",
+                "Start Mission",
+                false,
+                string.Empty),
+            ["mission-item-4"] = new MissionPreviewData(
+                "g5_lq_t1_m04",
+                4,
+                "The Newsroom of True Pages",
+                "Festival reports have been mixed with rumors. The town newsroom cannot publish until the Pathfinder separates evidence from opinion and rebuilds the report.",
+                "Informational text; topic, main idea, and supporting details; explanation and news report; author’s purpose; fact, opinion, and fact-based opinion; formal/informal tone; visual and multimedia meaning.",
+                0,
+                3,
+                0,
+                3,
+                "Prerequisite Locked",
+                "locked",
+                "Requires: The Hall of Speaking Sounds (Mission 3)",
+                "Published to your classroom",
+                "Downloaded • Available offline",
+                "Back to Missions",
+                true,
+                "Prerequisite Locked"),
+            ["mission-item-5"] = new MissionPreviewData(
+                "g5_lq_t1_m05",
+                5,
+                "The Grand Holiday Chronicle",
+                "The restored pages must be bound into the Grand Holiday Chronicle, but each district wants its part placed first. The Pathfinder must create one fair, coherent record for the whole community.",
+                "Term synthesis: narrative and expository organization, story elements, vocabulary and grammar, audience awareness, visual composition, summary, and cultural appropriateness.",
+                0,
+                3,
+                0,
+                3,
+                "Teacher Locked",
+                "locked",
+                "Prerequisite complete — no additional missions required.",
+                "Waiting for classroom release",
+                "Not downloaded on this device",
+                "Back to Missions",
+                true,
+                "Teacher Locked")
         };
 
         private VisualElement _root;
@@ -86,8 +184,8 @@ namespace NutriMind.App.UI
 
         public VisualElement Root => _root;
         public bool IsBound => _root != null && !_disposed;
-        public NutriMindSubject Subject { get; private set; } = NutriMindSubject.Science;
-        public NutriMindTerm Term { get; private set; } = NutriMindTerm.Term2;
+        public NutriMindSubject Subject { get; private set; } = NutriMindSubject.LiteraQuest;
+        public NutriMindTerm Term { get; private set; } = NutriMindTerm.Term1;
         public int SelectedMissionNumber { get; private set; } = 2;
 
         public event Action BackRequested;
@@ -283,8 +381,15 @@ namespace NutriMind.App.UI
             return _missionData["mission-item-2"];
         }
 
-        private static MissionPreviewSelection CreateSelection(MissionPreviewData data) =>
-            new(data.MissionNumber, data.Title, data.IsLocked, data.LockReason);
+        private MissionPreviewSelection CreateSelection(MissionPreviewData data) =>
+            new(
+                data.MissionId,
+                Subject,
+                Term,
+                data.MissionNumber,
+                data.Title,
+                data.IsLocked,
+                data.LockReason);
 
         private void ApplyMissionData(MissionPreviewData data)
         {
@@ -338,6 +443,11 @@ namespace NutriMind.App.UI
 
         private static string GetTermTitle(NutriMindSubject subject, NutriMindTerm term)
         {
+            if (subject == NutriMindSubject.LiteraQuest && term == NutriMindTerm.Term1)
+            {
+                return "Pages of the Nation";
+            }
+
             if (subject == NutriMindSubject.Science && term == NutriMindTerm.Term2)
             {
                 return "Life and Living Things";
@@ -358,8 +468,26 @@ namespace NutriMind.App.UI
 
         private readonly struct MissionPreviewData
         {
-            public MissionPreviewData(int missionNumber, string title, string description, string learningGoal, int areasCompleted, int areasTotal, int collectiblesCompleted, int collectiblesTotal, string statusLabel, string statusState, string prerequisiteText, string classroomText, string downloadedText, string primaryActionLabel, bool isLocked, string lockReason)
+            public MissionPreviewData(
+                string missionId,
+                int missionNumber,
+                string title,
+                string description,
+                string learningGoal,
+                int areasCompleted,
+                int areasTotal,
+                int collectiblesCompleted,
+                int collectiblesTotal,
+                string statusLabel,
+                string statusState,
+                string prerequisiteText,
+                string classroomText,
+                string downloadedText,
+                string primaryActionLabel,
+                bool isLocked,
+                string lockReason)
             {
+                MissionId = missionId;
                 MissionNumber = missionNumber;
                 Title = title;
                 Description = description;
@@ -378,6 +506,7 @@ namespace NutriMind.App.UI
                 LockReason = lockReason;
             }
 
+            public string MissionId { get; }
             public int MissionNumber { get; }
             public string Title { get; }
             public string Description { get; }

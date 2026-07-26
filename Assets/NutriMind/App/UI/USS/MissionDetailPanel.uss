@@ -1,0 +1,722 @@
+/* Mission Detail route — hosted by AppShell or standalone UIDocument preview */
+
+.mission-detail-panel {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+    flex-direction: column;
+    background-color: var(--color-bg);
+    padding: 0;
+    margin: 0;
+}
+
+.mission-detail-panel.app-screen-content--embedded {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mission-detail-panel Label {
+    margin: 0;
+    padding: 0;
+    white-space: normal;
+    -unity-font-style: bold;
+}
+
+.mission-detail-panel__hidden {
+    display: none;
+}
+
+/* ========== SHELL ========== */
+.mission-detail-panel__content-shell {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.mission-detail-panel__content-shell.mission-detail-panel__hidden {
+    display: none;
+}
+
+/* ========== SCROLL ========== */
+.mission-detail-panel__scroll {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.mission-detail-panel__scroll > .unity-scroll-view__content-and-vertical-scroll-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.mission-detail-panel__scroll .unity-scroll-view__content-viewport {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.mission-detail-panel__scroll .unity-scroll-view__content-container {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+}
+
+.mission-detail-panel__body {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    padding: 32px 40px 48px 40px;
+}
+
+.mission-detail-panel__bottom-spacer {
+    height: 32px;
+    flex-shrink: 0;
+}
+
+/* ========== HERO ========== */
+.mission-detail-panel .mission-detail-panel__hero {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    min-width: 0;
+    min-height: 300px;
+    margin-bottom: 28px;
+    padding: 40px 42px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-panel__hero-copy {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    width: 62%;
+    min-width: 0;
+    margin-right: 32px;
+}
+
+.mission-detail-panel__subject-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 16px;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__eyebrow {
+    margin-bottom: 12px;
+    font-size: 21px;
+    color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__title {
+    margin-bottom: 12px;
+    font-size: 44px;
+    color: var(--color-text-primary);
+    white-space: normal;
+}
+
+.mission-detail-panel__curriculum-block {
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: var(--color-text-secondary);
+}
+
+.mission-detail-panel__status-chip {
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background-color: rgba(59, 130, 246, 0.12);
+    border-radius: 999px;
+}
+
+.mission-detail-panel__status-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    -unity-background-image-tint-color: #1565C0;
+}
+
+.mission-detail-panel__status-label {
+    font-size: 18px;
+    color: #1565C0;
+    white-space: nowrap;
+}
+
+.mission-detail-panel__premise {
+    margin-top: 4px;
+    font-size: 22px;
+    color: var(--color-text-secondary);
+    white-space: normal;
+}
+
+.mission-detail-panel .mission-detail-panel__hero-summary {
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 36%;
+    min-width: 400px;
+    min-height: 240px;
+    padding: 32px 30px;
+    background-color: rgba(139, 92, 246, 0.06);
+    border-width: 1px;
+    border-color: rgba(139, 92, 246, 0.22);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-panel__summary-title {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: var(--color-text-primary);
+}
+
+.mission-detail-panel__summary-metric {
+    margin-bottom: 14px;
+    font-size: 34px;
+    color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__summary-support {
+    margin-top: 12px;
+    font-size: 19px;
+    color: var(--color-text-secondary);
+    white-space: normal;
+}
+
+.mission-detail-panel__offline-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.mission-detail-panel__offline-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+/* ========== LEARNING ========== */
+.mission-detail-panel .mission-detail-panel__learning-card {
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 170px;
+    margin-bottom: 28px;
+    padding: 32px 34px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-panel__learning-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.mission-detail-panel__learning-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__learning-title {
+    font-size: 29px;
+    color: var(--color-text-primary);
+}
+
+.mission-detail-panel__learning-text {
+    font-size: 21px;
+    color: var(--color-text-secondary);
+    white-space: normal;
+}
+
+/* ========== JOURNEY ========== */
+.mission-detail-panel__journey-header {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 22px;
+}
+
+.mission-detail-panel__journey-title {
+    margin-bottom: 10px;
+    font-size: 32px;
+    color: var(--color-text-primary);
+}
+
+.mission-detail-panel__journey-description {
+    font-size: 20px;
+    color: var(--color-text-secondary);
+}
+
+.mission-detail-panel__area-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 28px;
+}
+
+.mission-detail-panel .mission-detail-area-card {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 30%;
+    width: auto;
+    min-width: 280px;
+    min-height: 320px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    padding: 28px 26px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-area-card--last {
+    margin-right: 0;
+}
+
+.mission-detail-area-card--completed {
+    border-color: rgba(76, 175, 80, 0.45);
+}
+
+.mission-detail-area-card--progress {
+    border-color: rgba(59, 130, 246, 0.55);
+}
+
+.mission-detail-area-card--available {
+    border-color: rgba(139, 92, 246, 0.35);
+}
+
+.mission-detail-area-card--locked {
+    opacity: 0.78;
+}
+
+.mission-detail-area-card__eyebrow {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: var(--nm-literaquest);
+}
+
+.mission-detail-area-card__phase {
+    margin-bottom: 12px;
+    font-size: 18px;
+    color: var(--color-text-secondary);
+}
+
+.mission-detail-area-card__title {
+    margin-bottom: 14px;
+    font-size: 30px;
+    color: var(--color-text-primary);
+    white-space: normal;
+}
+
+.mission-detail-area-card__story {
+    flex-grow: 1;
+    margin-bottom: 18px;
+    font-size: 19px;
+    color: var(--color-text-secondary);
+    white-space: normal;
+}
+
+.mission-detail-area-card__state {
+    align-self: flex-start;
+    margin-bottom: 12px;
+    padding: 8px 14px;
+    font-size: 17px;
+}
+
+.mission-detail-area-card__collectible {
+    font-size: 17px;
+    color: var(--color-text-secondary);
+}
+
+/* ========== COLLECTIBLES ========== */
+.mission-detail-panel .mission-detail-panel__collectible-card {
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 28px;
+    padding: 32px 34px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-panel__collectible-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 40px;
+    margin-bottom: 22px;
+}
+
+.mission-detail-panel__collectible-title {
+    font-size: 28px;
+    color: var(--color-text-primary);
+}
+
+.mission-detail-panel__collectible-count {
+    margin-left: 16px;
+    font-size: 20px;
+    color: var(--color-text-secondary);
+}
+
+.mission-detail-panel__collectible-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    min-height: 140px;
+}
+
+.mission-detail-panel .mission-detail-collectible-slot {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 30%;
+    width: auto;
+    min-width: 220px;
+    min-height: 148px;
+    margin-right: 18px;
+    margin-bottom: 16px;
+    padding: 24px 22px;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.mission-detail-collectible-slot--collected {
+    border-color: rgba(76, 175, 80, 0.45);
+    background-color: var(--color-primary-soft);
+}
+
+.mission-detail-collectible-slot--last {
+    margin-right: 0;
+}
+
+.mission-detail-collectible-slot__icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 14px;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.mission-detail-collectible-slot__title {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: var(--color-text-primary);
+}
+
+.mission-detail-collectible-slot__status {
+    font-size: 17px;
+    color: var(--color-text-secondary);
+}
+
+/* ========== AVAILABILITY ========== */
+.mission-detail-panel .mission-detail-panel__availability-card {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 16px;
+    padding: 30px 32px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.mission-detail-panel__availability-column {
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 30%;
+    width: auto;
+    min-width: 220px;
+    margin-right: 28px;
+    margin-bottom: 12px;
+}
+
+.mission-detail-panel__availability-column--last {
+    margin-right: 0;
+}
+
+.mission-detail-panel__availability-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 14px;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.mission-detail-panel__availability-label {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: var(--color-text-secondary);
+}
+
+.mission-detail-panel__availability-value {
+    font-size: 20px;
+    color: var(--color-text-primary);
+    white-space: normal;
+}
+
+/* ========== FOOTER ========== */
+.mission-detail-panel__footer {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 104px;
+    padding: 20px 40px;
+    background-color: var(--color-surface);
+    border-top-width: 1px;
+    border-top-color: var(--color-border);
+}
+
+.mission-detail-panel__back-button,
+.mission-detail-panel__primary-button {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    margin: 0;
+    padding: 16px 32px;
+    font-size: 21px;
+}
+
+.mission-detail-panel__back-button {
+    color: var(--color-text-primary);
+}
+
+.mission-detail-panel__primary-button {
+    color: var(--color-text-on-accent);
+}
+
+.mission-detail-panel__back-button:disabled,
+.mission-detail-panel__primary-button:disabled {
+    color: var(--color-text-disabled);
+}
+
+/* ========== STATE HOST ========== */
+.mission-detail-panel__data-state-host {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 0;
+}
+
+.mission-detail-panel__data-state-host.mission-detail-panel__data-state-host--visible {
+    display: flex;
+}
+
+/* ========== COMPACT (< 1100) ========== */
+.mission-detail-panel--compact .mission-detail-panel__body {
+    padding: 28px 28px 40px 28px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__hero {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding: 32px 30px;
+    margin-bottom: 24px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__hero-copy {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 24px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__title {
+    font-size: 38px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__hero-summary {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 28px 26px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__learning-card,
+.mission-detail-panel--compact .mission-detail-panel__collectible-card,
+.mission-detail-panel--compact .mission-detail-panel__availability-card {
+    padding: 28px 28px;
+    margin-bottom: 24px;
+}
+
+.mission-detail-panel--compact .mission-detail-area-card {
+    flex-basis: 46%;
+    min-width: 240px;
+    margin-right: 18px;
+    margin-bottom: 18px;
+    padding: 24px;
+}
+
+.mission-detail-panel--compact .mission-detail-collectible-slot {
+    flex-basis: 46%;
+    margin-right: 18px;
+    margin-bottom: 16px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__availability-column {
+    flex-basis: 46%;
+    margin-bottom: 18px;
+}
+
+.mission-detail-panel--compact .mission-detail-panel__footer {
+    min-height: 100px;
+    padding: 18px 28px;
+}
+
+/* ========== NARROW (< 820) ========== */
+.mission-detail-panel--narrow .mission-detail-panel__body {
+    padding: 22px 16px 36px 16px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__hero {
+    flex-direction: column;
+    padding: 26px 22px;
+    margin-bottom: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__hero-copy,
+.mission-detail-panel--narrow .mission-detail-panel__hero-summary,
+.mission-detail-panel--narrow .mission-detail-panel__learning-card,
+.mission-detail-panel--narrow .mission-detail-panel__collectible-card,
+.mission-detail-panel--narrow .mission-detail-panel__availability-card,
+.mission-detail-panel--narrow .mission-detail-area-card,
+.mission-detail-panel--narrow .mission-detail-collectible-slot,
+.mission-detail-panel--narrow .mission-detail-panel__availability-column {
+    width: 100%;
+    min-width: 0;
+    flex-basis: auto;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__hero-copy {
+    margin-bottom: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__hero-summary {
+    padding: 24px 22px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__learning-card,
+.mission-detail-panel--narrow .mission-detail-panel__collectible-card,
+.mission-detail-panel--narrow .mission-detail-panel__availability-card {
+    padding: 24px 22px;
+    margin-bottom: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__title {
+    font-size: 32px;
+}
+
+.mission-detail-panel.mobile .mission-detail-panel__title {
+    font-size: 30px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__premise {
+    font-size: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__summary-metric {
+    font-size: 30px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__learning-title {
+    font-size: 26px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__journey-title {
+    font-size: 28px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__journey-header {
+    margin-bottom: 18px;
+}
+
+.mission-detail-panel--narrow .mission-detail-area-card {
+    min-height: 0;
+    margin-bottom: 16px;
+    padding: 22px 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-area-card__title {
+    font-size: 26px;
+}
+
+.mission-detail-panel--narrow .mission-detail-collectible-slot {
+    margin-bottom: 14px;
+    padding: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__availability-column {
+    margin-bottom: 20px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__footer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 16px;
+    min-height: 0;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__back-button,
+.mission-detail-panel--narrow .mission-detail-panel__primary-button {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 12px;
+    min-height: 58px;
+}
+
+.mission-detail-panel--narrow .mission-detail-panel__primary-button {
+    margin-bottom: 0;
+}

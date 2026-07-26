@@ -24,7 +24,8 @@ namespace NutriMind.App.UI
         QuizDetail,
         QuizAttempt,
         QuizResult,
-        QuizHistory
+        QuizHistory,
+        MissionDetail
     }
 
     /// <summary>
@@ -153,15 +154,27 @@ namespace NutriMind.App.UI
         private QuizHistoryPreviewTermFilter _quizHistoryTermFilter =
             QuizHistoryPreviewTermFilter.All;
 
+        [SerializeField]
+        [Tooltip("MissionDetail route state used only by the AppShell static preview.")]
+        private MissionDetailPreviewState _missionDetailPreviewState =
+            MissionDetailPreviewState.Content;
+
         private MissionPreviewSelection _selectedMission =
-            new(2, "Needs of Living Things", false, string.Empty);
+            new(
+                "g5_lq_t1_m02",
+                NutriMindSubject.LiteraQuest,
+                NutriMindTerm.Term1,
+                2,
+                "The Bell of Seven Moments",
+                false,
+                string.Empty);
 
         private LockedMissionPreviewContext _lockedMissionContext =
             new(
-                NutriMindSubject.Science,
-                NutriMindTerm.Term2,
+                NutriMindSubject.LiteraQuest,
+                NutriMindTerm.Term1,
                 5,
-                "Ecosystems and Balance",
+                "The Grand Holiday Chronicle",
                 MissionLockReason.TeacherRestricted,
                 "Prerequisite complete — no additional missions required.");
 
@@ -184,6 +197,7 @@ namespace NutriMind.App.UI
         private QuizAttemptPanelView _currentQuizAttemptView;
         private QuizResultPanelView _currentQuizResultView;
         private QuizHistoryPanelView _currentQuizHistoryView;
+        private MissionDetailPanelView _currentMissionDetailView;
         private QuizListPreviewItem? _selectedQuiz;
         private string _selectedQuizResultAttemptId;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
@@ -573,6 +587,15 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.QuizHistory:
                     return "Grade 5 • Quiz Portal";
 
+                case AppShellContentPreviewScreen.MissionDetail:
+                {
+                    MissionPreviewSelection selection = ResolveMissionDetailSelection();
+                    return
+                        $"{GetSubjectLabel(selection.Subject)} • " +
+                        $"Term {(int)selection.Term} • " +
+                        $"Mission {selection.MissionNumber}";
+                }
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -635,6 +658,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.QuizHistory:
                     return CreateQuizHistoryView(contentRoot);
+
+                case AppShellContentPreviewScreen.MissionDetail:
+                    return CreateMissionDetailView(contentRoot);
 
                 default:
                     return null;
@@ -826,7 +852,7 @@ namespace NutriMind.App.UI
 
         private void OnMissionSelected(MissionPreviewSelection selection)
         {
-            _selectedMission = selection;
+            StoreMissionSelection(selection);
             RefreshShellPageContext();
             Debug.Log(
                 $"[AppShellContentPreview] Mission selected: {selection.MissionTitle}.");
@@ -834,35 +860,44 @@ namespace NutriMind.App.UI
 
         private void OnStartMissionRequested(MissionPreviewSelection selection)
         {
-            _selectedMission = selection;
-            ShowMissionActionToast("Start", selection.MissionTitle);
+            StoreMissionSelection(selection);
+            Debug.Log(
+                $"[AppShellContentPreview] Start Mission selected: {selection.MissionId} " +
+                $"'{selection.MissionTitle}' — showing MissionDetail.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.MissionDetail);
         }
 
         private void OnContinueMissionRequested(MissionPreviewSelection selection)
         {
-            _selectedMission = selection;
-            ShowMissionActionToast("Continue", selection.MissionTitle);
+            StoreMissionSelection(selection);
+            Debug.Log(
+                $"[AppShellContentPreview] Continue Mission selected: {selection.MissionId} " +
+                $"'{selection.MissionTitle}' — showing MissionDetail.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.MissionDetail);
         }
 
         private void OnReviewMissionRequested(MissionPreviewSelection selection)
         {
-            _selectedMission = selection;
-            ShowMissionActionToast("Review", selection.MissionTitle);
+            StoreMissionSelection(selection);
+            Debug.Log(
+                $"[AppShellContentPreview] Review Mission selected: {selection.MissionId} " +
+                $"'{selection.MissionTitle}' — showing MissionDetail.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.MissionDetail);
         }
 
-        private void ShowMissionActionToast(string action, string missionTitle)
+        private void StoreMissionSelection(MissionPreviewSelection selection)
         {
-            Debug.Log(
-                $"[AppShellContentPreview] {action} selected for {missionTitle} — preview only.");
-
-            _appShell?.ShowToast(
-                $"{action} selected for {missionTitle}. Gameplay routing is not connected in this static preview.",
-                AppShellToastTone.Information);
+            _selectedMission = selection;
+            _selectedSubject = selection.Subject;
+            _selectedTerm = selection.Term;
         }
 
         private void OnLockedMissionRequested(MissionPreviewSelection selection)
         {
-            _selectedMission = selection;
+            StoreMissionSelection(selection);
             _lockedMissionContext = BuildLockedContext(selection);
 
             Debug.Log(
@@ -879,7 +914,7 @@ namespace NutriMind.App.UI
                 : MissionLockReason.TeacherRestricted;
 
             string requirement = selection.MissionNumber == 4
-                ? "Requires: Habitats Around Us (Mission 3)"
+                ? "Requires: The Hall of Speaking Sounds (Mission 3)"
                 : "Prerequisite complete — no additional missions required.";
 
             if (!string.IsNullOrWhiteSpace(selection.LockReason)
@@ -891,8 +926,8 @@ namespace NutriMind.App.UI
             }
 
             return new LockedMissionPreviewContext(
-                _selectedSubject,
-                _selectedTerm,
+                selection.Subject,
+                selection.Term,
                 selection.MissionNumber,
                 selection.MissionTitle,
                 reason,
@@ -939,7 +974,7 @@ namespace NutriMind.App.UI
                 case MissionLockReason.PrerequisiteRequired:
                     SetPreviewScreen(AppShellContentPreviewScreen.Missions);
                     Debug.Log(
-                        "[AppShellContentPreview] Required mission: Habitats Around Us (Mission 3).");
+                        "[AppShellContentPreview] Required mission: The Hall of Speaking Sounds (Mission 3).");
                     break;
 
                 case MissionLockReason.NotDownloaded:
@@ -1508,6 +1543,91 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Information);
         }
 
+        private IAppScreenView CreateMissionDetailView(VisualElement contentRoot)
+        {
+            var missionDetailView = new MissionDetailPanelView(contentRoot, _dataStatePanelAsset);
+            if (!missionDetailView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] MissionDetailPanelView failed to bind mission-detail-root.");
+                missionDetailView.Dispose();
+                return null;
+            }
+
+            MissionPreviewSelection selection = ResolveMissionDetailSelection();
+            if (!MissionDetailPreviewCatalog.TryGetContent(
+                    selection,
+                    out MissionDetailPreviewContent content))
+            {
+                Debug.LogWarning(
+                    $"[AppShellContentPreview] MissionDetail catalog lookup failed for " +
+                    $"{selection.MissionId} '{selection.MissionTitle}'.");
+                missionDetailView.SetContent(null);
+                missionDetailView.SetPreviewState(MissionDetailPreviewState.RecoverableError);
+            }
+            else
+            {
+                missionDetailView.SetContent(content);
+                missionDetailView.SetPreviewState(_missionDetailPreviewState);
+            }
+
+            missionDetailView.BackRequested += OnMissionDetailBackRequested;
+            missionDetailView.PrimaryActionRequested += OnMissionDetailPrimaryActionRequested;
+            missionDetailView.RetryRequested += OnMissionDetailRetryRequested;
+            _currentMissionDetailView = missionDetailView;
+            return missionDetailView;
+        }
+
+        private MissionPreviewSelection ResolveMissionDetailSelection()
+        {
+            if (!string.IsNullOrWhiteSpace(_selectedMission.MissionId)
+                && _selectedMission.MissionNumber >= 1)
+            {
+                return _selectedMission;
+            }
+
+            return MissionDetailPreviewCatalog.CreateCanonicalDefaultSelection();
+        }
+
+        private void OnMissionDetailBackRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] MissionDetail Back — showing Missions.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Missions);
+        }
+
+        private void OnMissionDetailPrimaryActionRequested(
+            MissionDetailPreviewActionRequest request)
+        {
+            string actionLabel = request.Action switch
+            {
+                MissionDetailPrimaryAction.Start => "Start",
+                MissionDetailPrimaryAction.Continue => "Continue",
+                MissionDetailPrimaryAction.Review => "Review",
+                _ => request.Action.ToString()
+            };
+
+            Debug.Log(
+                $"[AppShellContentPreview] MissionDetail primary action: " +
+                $"action={request.Action}, mission={request.MissionId}.");
+
+            _appShell?.ShowToast(
+                $"{actionLabel} selected for {request.MissionTitle}. " +
+                "Gameplay scene loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnMissionDetailRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] MissionDetail retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Mission detail refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
         private void OnQuizListFiltersChanged(QuizListPreviewFilters filters)
         {
             Debug.Log(
@@ -1844,6 +1964,15 @@ namespace NutriMind.App.UI
                 _currentQuizHistoryView.FiltersChanged -= OnQuizHistoryFiltersChanged;
                 _currentQuizHistoryView.RetryRequested -= OnQuizHistoryRetryRequested;
                 _currentQuizHistoryView = null;
+            }
+
+            if (_currentMissionDetailView != null)
+            {
+                _currentMissionDetailView.BackRequested -= OnMissionDetailBackRequested;
+                _currentMissionDetailView.PrimaryActionRequested -=
+                    OnMissionDetailPrimaryActionRequested;
+                _currentMissionDetailView.RetryRequested -= OnMissionDetailRetryRequested;
+                _currentMissionDetailView = null;
             }
 
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz

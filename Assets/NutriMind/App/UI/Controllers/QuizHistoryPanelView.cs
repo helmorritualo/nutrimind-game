@@ -1104,8 +1104,12 @@ namespace NutriMind.App.UI
 
         private static string FormatPercentage(float percentage)
         {
-            float rounded = Mathf.Round(percentage);
-            return $"{rounded.ToString("0", CultureInfo.InvariantCulture)}%";
+            if (Mathf.Approximately(percentage, Mathf.Round(percentage)))
+            {
+                return $"{Mathf.RoundToInt(percentage)}%";
+            }
+
+            return percentage.ToString("0.##", CultureInfo.InvariantCulture) + "%";
         }
 
         private static string FormatPoints(float earned, float possible)
