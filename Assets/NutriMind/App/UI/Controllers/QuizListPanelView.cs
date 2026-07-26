@@ -780,7 +780,8 @@ namespace NutriMind.App.UI
 
             if (resetPageVisual)
             {
-                SetPagination(1, LastPage, _hasMore);
+                bool firstPageHasMore = LastPage > 1;
+                SetPagination(1, LastPage, firstPageHasMore);
             }
 
             if (raiseEvent)
