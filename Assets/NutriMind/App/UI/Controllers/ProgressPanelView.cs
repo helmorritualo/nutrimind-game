@@ -93,6 +93,7 @@ namespace NutriMind.App.UI
         private Label _term3Missions;
         private Label _term3Reviews;
         private Button _openQuizPortalButton;
+        private Button _viewLeaderboardButton;
         private readonly SubjectCardElements[] _subjectCards = new SubjectCardElements[3];
         private readonly MissionRowElements[] _missionRows = new MissionRowElements[5];
 
@@ -136,6 +137,7 @@ namespace NutriMind.App.UI
         public event Action<NutriMindTerm> TermSelected;
         public event Action<ProgressMissionPreviewSelection> MissionReviewRequested;
         public event Action QuizPortalRequested;
+        public event Action LeaderboardRequested;
         public event Action RetryRequested;
 
         /// <summary>
@@ -197,6 +199,7 @@ namespace NutriMind.App.UI
             TermSelected = null;
             MissionReviewRequested = null;
             QuizPortalRequested = null;
+            LeaderboardRequested = null;
             RetryRequested = null;
 
             _root = null;
@@ -219,6 +222,7 @@ namespace NutriMind.App.UI
             _term3Missions = null;
             _term3Reviews = null;
             _openQuizPortalButton = null;
+            _viewLeaderboardButton = null;
             for (int i = 0; i < _subjectCards.Length; i++)
             {
                 _subjectCards[i] = default;
@@ -269,6 +273,7 @@ namespace NutriMind.App.UI
             _term3Reviews = _root.Q<Label>("term-3-reviews");
 
             _openQuizPortalButton = _root.Q<Button>("open-quiz-portal-button");
+            _viewLeaderboardButton = _root.Q<Button>("progress-view-leaderboard-button");
 
             for (int i = 0; i < _missionRows.Length; i++)
             {
@@ -355,6 +360,7 @@ namespace NutriMind.App.UI
             }
 
             _openQuizPortalButton?.RegisterCallback<ClickEvent>(OnQuizPortalClicked);
+            _viewLeaderboardButton?.RegisterCallback<ClickEvent>(OnLeaderboardClicked);
             _root?.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
             if (_dataStateView != null && _dataStateView.IsBound)
@@ -380,6 +386,7 @@ namespace NutriMind.App.UI
             }
 
             _openQuizPortalButton?.UnregisterCallback<ClickEvent>(OnQuizPortalClicked);
+            _viewLeaderboardButton?.UnregisterCallback<ClickEvent>(OnLeaderboardClicked);
             _root?.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
             if (_dataStateView != null)
@@ -515,6 +522,8 @@ namespace NutriMind.App.UI
         }
 
         private void OnQuizPortalClicked(ClickEvent evt) => QuizPortalRequested?.Invoke();
+
+        private void OnLeaderboardClicked(ClickEvent evt) => LeaderboardRequested?.Invoke();
 
         private void OnDataStatePrimaryAction()
         {

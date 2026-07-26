@@ -704,7 +704,7 @@ MonoBehaviour:
     _activeNavigation: 5
     _pageTitle: Profile
     _pageContext: "Grade 5 \u2022 Section Emerald"
-    _selectFromBottomNavigation: 1
+    _selectFromBottomNavigation: 0
   - _screen: 7
     _contentAsset: {fileID: 9197481963319205126, guid: 21602a34e19806342aa0e119fc6b5331, type: 3}
     _activeNavigation: 5
@@ -771,6 +771,12 @@ MonoBehaviour:
     _pageTitle: Announcements
     _pageContext: "Grade 5 \u2022 Updates"
     _selectFromBottomNavigation: 0
+  - _screen: 18
+    _contentAsset: {fileID: 9197481963319205126, guid: 4e8a1c2f9b3d4756a8e0f1c2d3b4a5e6, type: 3}
+    _activeNavigation: 5
+    _pageTitle: Leaderboard
+    _pageContext: "Grade 5 \u2022 Section standings"
+    _selectFromBottomNavigation: 1
   _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
   _confirmDialogAsset: {fileID: 9197481963319205126, guid: 91243026619ce4249aca4c3ea55ea743, type: 3}
   _respondToShellNavigation: 1
@@ -792,6 +798,7 @@ MonoBehaviour:
   _selectedCertificatePreviewIndex: 0
   _announcementsPreviewState: 0
   _announcementsPreviewFilter: 0
+  _leaderboardPreviewState: 0
 --- !u!114 &1380726514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1375,6 +1382,76 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2670526180
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2670526183}
+  - component: {fileID: 2670526182}
+  - component: {fileID: 2670526181}
+  m_Layer: 0
+  m_Name: LeaderboardPanelPreview
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &2670526181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2670526180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b1d4f5a2e607a89d1b3c4f5a6e7d8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.UI.LeaderboardPanelController
+  _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
+  _previewState: 0
+--- !u!114 &2670526182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2670526180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: b4146ba15a6f65947a00ae5c037797af, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 4e8a1c2f9b3d4756a8e0f1c2d3b4a5e6, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &2670526183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2670526180}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1393,3 +1470,4 @@ SceneRoots:
   - {fileID: 2370526177}
   - {fileID: 2470526177}
   - {fileID: 2570526183}
+  - {fileID: 2670526183}

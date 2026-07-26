@@ -88,6 +88,21 @@
                                 class="progress-panel__metric-label" />
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement class="progress-panel__overall-actions">
+                        <ui:Button
+                            name="progress-view-leaderboard-button"
+                            text=""
+                            class="ds-btn ds-btn--secondary progress-panel__view-leaderboard-button"
+                            tooltip="View Section Leaderboard">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--leaderboard progress-panel__view-leaderboard-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="View Section Leaderboard"
+                                class="progress-panel__view-leaderboard-label"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
                 </ui:VisualElement>
 
                 <!-- ===== SUBJECT CARDS ===== -->

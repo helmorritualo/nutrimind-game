@@ -1,0 +1,296 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/LeaderboardPanel.uss" />
+
+    <ui:VisualElement
+        name="leaderboard-root"
+        class="ds-root theme-nutrimind app-screen-content leaderboard-panel">
+
+        <ui:VisualElement
+            name="leaderboard-content-shell"
+            class="leaderboard-panel__content-shell">
+
+            <ui:ScrollView
+                name="leaderboard-scroll"
+                class="app-screen-content__scroll leaderboard-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="leaderboard-body"
+                    class="app-screen-content__body leaderboard-panel__body">
+
+                    <!-- ===== OVERVIEW ===== -->
+                    <ui:VisualElement
+                        name="leaderboard-overview"
+                        class="ds-card leaderboard-panel__overview">
+
+                        <ui:VisualElement
+                            name="leaderboard-overview-copy"
+                            class="leaderboard-panel__overview-copy"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                name="leaderboard-overview-icon"
+                                class="ds-icon ds-icon--leaderboard leaderboard-panel__overview-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="leaderboard-overview-eyebrow"
+                                text="Section standings"
+                                class="leaderboard-panel__overview-eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="leaderboard-overview-title"
+                                text="Leaderboard"
+                                class="leaderboard-panel__overview-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="leaderboard-overview-description"
+                                text="See your privacy-safe position for completed Grade 5 missions."
+                                class="leaderboard-panel__overview-description"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="leaderboard-overview-context"
+                                text="All subjects • All terms"
+                                class="leaderboard-panel__overview-context"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:Button
+                            name="leaderboard-back-progress-button"
+                            text=""
+                            class="ds-btn ds-btn--secondary leaderboard-panel__back-button"
+                            tooltip="Back to Progress">
+                            <ui:VisualElement
+                                class="ds-icon ds-icon--arrow-left leaderboard-panel__back-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                text="Back to Progress"
+                                class="leaderboard-panel__back-label"
+                                picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <!-- ===== CONTEXT CARDS ===== -->
+                    <ui:VisualElement
+                        name="leaderboard-context-row"
+                        class="leaderboard-panel__context-row"
+                        picking-mode="Ignore">
+
+                        <ui:VisualElement
+                            name="leaderboard-scope-card"
+                            class="ds-card leaderboard-panel__context-card"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                name="leaderboard-scope-icon"
+                                class="ds-icon ds-icon--user leaderboard-panel__context-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-scope-label"
+                                text="Scope"
+                                class="leaderboard-panel__context-label"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-scope-value"
+                                text="Your section"
+                                class="leaderboard-panel__context-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="leaderboard-metric-card"
+                            class="ds-card leaderboard-panel__context-card"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                name="leaderboard-metric-icon"
+                                class="ds-icon ds-icon--flag-checkered leaderboard-panel__context-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-metric-label"
+                                text="Metric"
+                                class="leaderboard-panel__context-label"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-metric-value"
+                                text="Missions completed"
+                                class="leaderboard-panel__context-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="leaderboard-period-card"
+                            class="ds-card leaderboard-panel__context-card leaderboard-panel__context-card--last"
+                            picking-mode="Ignore">
+                            <ui:VisualElement
+                                name="leaderboard-period-icon"
+                                class="ds-icon ds-icon--calendar leaderboard-panel__context-icon"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-period-label"
+                                text="Period"
+                                class="leaderboard-panel__context-label"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="leaderboard-period-value"
+                                text="Grade 5 • All terms"
+                                class="leaderboard-panel__context-value"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== MAIN LAYOUT ===== -->
+                    <ui:VisualElement
+                        name="leaderboard-main-layout"
+                        class="leaderboard-panel__main-layout">
+
+                        <ui:VisualElement
+                            name="leaderboard-summary-column"
+                            class="leaderboard-panel__summary-column">
+
+                            <ui:VisualElement
+                                name="leaderboard-own-position"
+                                class="ds-card leaderboard-panel__own-position"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="leaderboard-own-eyebrow"
+                                    text="Your section position"
+                                    class="leaderboard-panel__own-eyebrow"
+                                    picking-mode="Ignore" />
+                                <ui:VisualElement
+                                    class="leaderboard-panel__own-rank-ring"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        name="leaderboard-own-rank"
+                                        text="4"
+                                        class="leaderboard-panel__own-rank"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                                <ui:Label
+                                    name="leaderboard-own-name"
+                                    text="Pathfinder"
+                                    class="leaderboard-panel__own-name"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-own-metric"
+                                    text="30 missions completed"
+                                    class="leaderboard-panel__own-metric"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-own-count"
+                                    text="4 of 6 displayed positions"
+                                    class="leaderboard-panel__own-count"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-own-support"
+                                    text="Your position is highlighted in the section standings."
+                                    class="leaderboard-panel__own-support"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="leaderboard-privacy-card"
+                                class="ds-card leaderboard-panel__privacy-card"
+                                picking-mode="Ignore">
+                                <ui:VisualElement
+                                    name="leaderboard-privacy-icon"
+                                    class="ds-icon ds-icon--shield leaderboard-panel__privacy-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-privacy-title"
+                                    text="Privacy-safe names"
+                                    class="leaderboard-panel__privacy-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-privacy-message"
+                                    text="This leaderboard uses display aliases and never shows LRN, email, or full legal names."
+                                    class="leaderboard-panel__privacy-message"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="leaderboard-standings-section"
+                            class="ds-card leaderboard-panel__standings-section"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                name="leaderboard-standings-header"
+                                class="leaderboard-panel__standings-header"
+                                picking-mode="Ignore">
+                                <ui:VisualElement
+                                    class="leaderboard-panel__standings-header-copy"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        name="leaderboard-standings-title"
+                                        text="Section standings"
+                                        class="leaderboard-panel__standings-title"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="leaderboard-standings-metric"
+                                        text="Metric: Missions completed"
+                                        class="leaderboard-panel__standings-metric"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        text="Static layout examples — not live classroom standings."
+                                        class="leaderboard-panel__standings-note"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                                <ui:Label
+                                    name="leaderboard-standings-count"
+                                    text="6 displayed positions"
+                                    class="leaderboard-panel__standings-count"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="leaderboard-column-header"
+                                class="leaderboard-panel__column-header"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="leaderboard-column-position"
+                                    text="Position"
+                                    class="leaderboard-panel__column-position"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-column-name"
+                                    text="Privacy-safe name"
+                                    class="leaderboard-panel__column-name"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="leaderboard-column-value"
+                                    text="Missions completed"
+                                    class="leaderboard-panel__column-value"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="leaderboard-list"
+                                class="leaderboard-panel__list"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="leaderboard-bottom-spacer"
+                        class="leaderboard-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="leaderboard-data-state-host"
+            class="leaderboard-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

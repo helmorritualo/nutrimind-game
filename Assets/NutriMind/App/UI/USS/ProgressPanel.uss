@@ -208,6 +208,54 @@
     color: var(--color-text-secondary);
 }
 
+.progress-panel__overall-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    margin-top: 18px;
+}
+
+.progress-panel__view-leaderboard-button {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    min-height: 56px;
+    margin: 0;
+    padding: 12px 22px;
+    color: var(--color-text-primary);
+}
+
+.progress-panel__view-leaderboard-button:disabled {
+    color: var(--color-text-disabled);
+}
+
+.progress-panel__view-leaderboard-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-text-primary);
+}
+
+.progress-panel__view-leaderboard-button:disabled .progress-panel__view-leaderboard-icon {
+    -unity-background-image-tint-color: var(--color-text-disabled);
+}
+
+.progress-panel__view-leaderboard-label {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: var(--color-text-primary);
+    margin: 0;
+    padding: 0;
+}
+
+.progress-panel__view-leaderboard-button:disabled .progress-panel__view-leaderboard-label {
+    color: var(--color-text-disabled);
+}
+
 /* ========== SUBJECT CARDS ========== */
 .progress-panel__subject-row {
     flex-direction: row;
@@ -797,6 +845,17 @@
 .progress-panel--narrow .progress-panel__overall-percent-block {
     margin-right: 0;
     margin-bottom: 10px;
+}
+
+.progress-panel--narrow .progress-panel__overall-actions {
+    justify-content: stretch;
+    margin-top: 16px;
+}
+
+.progress-panel--narrow .progress-panel__view-leaderboard-button {
+    width: 100%;
+    align-self: stretch;
+    min-height: 56px;
 }
 
 .progress-panel--narrow .progress-panel__subject-row {

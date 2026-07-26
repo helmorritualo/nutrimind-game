@@ -140,6 +140,7 @@ namespace NutriMind.App.UI
             _view.TermSelected += OnTermSelected;
             _view.MissionReviewRequested += OnMissionReviewRequested;
             _view.QuizPortalRequested += OnQuizPortalRequested;
+            _view.LeaderboardRequested += OnLeaderboardRequested;
             _view.RetryRequested += OnRetryRequested;
             _eventsRegistered = true;
         }
@@ -156,6 +157,7 @@ namespace NutriMind.App.UI
             _view.TermSelected -= OnTermSelected;
             _view.MissionReviewRequested -= OnMissionReviewRequested;
             _view.QuizPortalRequested -= OnQuizPortalRequested;
+            _view.LeaderboardRequested -= OnLeaderboardRequested;
             _view.RetryRequested -= OnRetryRequested;
             _eventsRegistered = false;
         }
@@ -212,6 +214,9 @@ namespace NutriMind.App.UI
 
         private void OnQuizPortalRequested() =>
             Debug.Log("[ProgressPanelController] Quiz Portal requested — preview only.");
+
+        private void OnLeaderboardRequested() =>
+            Debug.Log("[ProgressPanelController] View Section Leaderboard requested — preview only.");
 
         private void OnRetryRequested() =>
             Debug.Log("[ProgressPanelController] Retry requested — preview only.");

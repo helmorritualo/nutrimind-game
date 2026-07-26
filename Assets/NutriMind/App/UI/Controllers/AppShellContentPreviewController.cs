@@ -28,7 +28,8 @@ namespace NutriMind.App.UI
         MissionDetail,
         Rewards,
         Certificates,
-        Announcements
+        Announcements,
+        Leaderboard
     }
 
     /// <summary>
@@ -188,6 +189,11 @@ namespace NutriMind.App.UI
         private AnnouncementsPreviewFilter _announcementsPreviewFilter =
             AnnouncementsPreviewFilter.All;
 
+        [SerializeField]
+        [Tooltip("Leaderboard route state used only by the AppShell static preview.")]
+        private LeaderboardPreviewState _leaderboardPreviewState =
+            LeaderboardPreviewState.Content;
+
         private MissionPreviewSelection _selectedMission =
             new(
                 "g5_lq_t1_m02",
@@ -230,6 +236,7 @@ namespace NutriMind.App.UI
         private RewardsPanelView _currentRewardsView;
         private CertificatesPanelView _currentCertificatesView;
         private AnnouncementsPanelView _currentAnnouncementsView;
+        private LeaderboardPanelView _currentLeaderboardView;
         private readonly HashSet<string> _readAnnouncementPreviewIds =
             new(System.StringComparer.Ordinal);
         private AppShellContentPreviewScreen _announcementsReturnScreen =
@@ -648,6 +655,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Announcements:
                     return "Grade 5 • Updates";
 
+                case AppShellContentPreviewScreen.Leaderboard:
+                    return "Grade 5 • Section standings";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -722,6 +732,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.Announcements:
                     return CreateAnnouncementsView(contentRoot);
+
+                case AppShellContentPreviewScreen.Leaderboard:
+                    return CreateLeaderboardView(contentRoot);
 
                 default:
                     return null;
@@ -1189,6 +1202,7 @@ namespace NutriMind.App.UI
             progressView.TermSelected += OnProgressTermSelected;
             progressView.MissionReviewRequested += OnProgressMissionReviewRequested;
             progressView.QuizPortalRequested += OnProgressQuizPortalRequested;
+            progressView.LeaderboardRequested += OnProgressLeaderboardRequested;
             progressView.RetryRequested += OnProgressRetryRequested;
             _currentProgressView = progressView;
             return progressView;
@@ -1233,6 +1247,14 @@ namespace NutriMind.App.UI
                 "[AppShellContentPreview] Progress Quiz Portal requested — showing QuizList preview.");
 
             SetPreviewScreen(AppShellContentPreviewScreen.QuizList);
+        }
+
+        private void OnProgressLeaderboardRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Progress View Leaderboard requested — showing Leaderboard.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Leaderboard);
         }
 
         private IAppScreenView CreateQuizListView(VisualElement contentRoot)
@@ -1943,6 +1965,52 @@ namespace NutriMind.App.UI
                 AppShellToastTone.Information);
         }
 
+        private IAppScreenView CreateLeaderboardView(VisualElement contentRoot)
+        {
+            var leaderboardView = new LeaderboardPanelView(contentRoot, _dataStatePanelAsset);
+            if (!leaderboardView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] LeaderboardPanelView failed to bind leaderboard-root.");
+                leaderboardView.Dispose();
+                return null;
+            }
+
+            LeaderboardPreviewData preview = LeaderboardPreviewCatalog.CreateCanonicalPreview();
+            leaderboardView.SetData(preview);
+            if (leaderboardView.LoadedEntryCount == 0)
+            {
+                leaderboardView.SetPreviewState(LeaderboardPreviewState.Empty);
+            }
+            else
+            {
+                leaderboardView.SetPreviewState(_leaderboardPreviewState);
+            }
+
+            leaderboardView.BackToProgressRequested += OnLeaderboardBackToProgressRequested;
+            leaderboardView.RetryRequested += OnLeaderboardRetryRequested;
+            _currentLeaderboardView = leaderboardView;
+            return leaderboardView;
+        }
+
+        private void OnLeaderboardBackToProgressRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Leaderboard Back to Progress — showing Progress.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Progress);
+        }
+
+        private void OnLeaderboardRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Leaderboard retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Leaderboard refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
         private void OpenAnnouncements(AppShellContentPreviewScreen returnScreen)
         {
             if (returnScreen == AppShellContentPreviewScreen.None)
@@ -2248,6 +2316,7 @@ namespace NutriMind.App.UI
                 _currentProgressView.MissionReviewRequested -=
                     OnProgressMissionReviewRequested;
                 _currentProgressView.QuizPortalRequested -= OnProgressQuizPortalRequested;
+                _currentProgressView.LeaderboardRequested -= OnProgressLeaderboardRequested;
                 _currentProgressView.RetryRequested -= OnProgressRetryRequested;
                 _currentProgressView = null;
             }
@@ -2343,6 +2412,14 @@ namespace NutriMind.App.UI
                 _currentAnnouncementsView.FilterChanged -= OnAnnouncementsFilterChanged;
                 _currentAnnouncementsView.RetryRequested -= OnAnnouncementsRetryRequested;
                 _currentAnnouncementsView = null;
+            }
+
+            if (_currentLeaderboardView != null)
+            {
+                _currentLeaderboardView.BackToProgressRequested -=
+                    OnLeaderboardBackToProgressRequested;
+                _currentLeaderboardView.RetryRequested -= OnLeaderboardRetryRequested;
+                _currentLeaderboardView = null;
             }
 
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
@@ -2589,6 +2666,8 @@ namespace NutriMind.App.UI
                     return "Certificates";
                 case AppShellContentPreviewScreen.Announcements:
                     return "Announcements";
+                case AppShellContentPreviewScreen.Leaderboard:
+                    return "Leaderboard";
                 default:
                     return "AppShell content preview";
             }
