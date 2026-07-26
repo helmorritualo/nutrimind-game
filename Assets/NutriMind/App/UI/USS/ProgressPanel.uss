@@ -840,7 +840,7 @@
 
 .progress-panel--narrow .progress-panel__review-button {
     width: 100%;
-    margin-left: 54px;
+    margin-left: 0;
 }
 
 .progress-panel--narrow .progress-panel__quiz {
