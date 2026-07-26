@@ -500,7 +500,17 @@
 .quiz-detail-panel__start-label {
     font-size: 20px;
     -unity-font-style: bold;
+    color: var(--color-text-on-accent);
+}
+
+.quiz-detail-panel__start-button.ds-btn--secondary
+.quiz-detail-panel__start-label {
     color: var(--color-text-primary);
+}
+
+.quiz-detail-panel__start-button:disabled
+.quiz-detail-panel__start-label {
+    color: var(--color-text-disabled);
 }
 
 .quiz-detail-panel__bottom-spacer {
