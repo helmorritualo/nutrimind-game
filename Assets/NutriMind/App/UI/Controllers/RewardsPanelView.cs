@@ -190,6 +190,7 @@ namespace NutriMind.App.UI
         private VisualElement _grid;
         private VisualElement _filterEmpty;
         private Button _filterEmptyReset;
+        private Button _viewCertificatesButton;
         private VisualElement _dataStateHost;
 
         private TemplateContainer _ownedDataStateInstance;
@@ -207,6 +208,7 @@ namespace NutriMind.App.UI
         private EventCallback<ClickEvent> _filterUsedClicked;
         private EventCallback<ClickEvent> _filterLockedClicked;
         private EventCallback<ClickEvent> _filterEmptyResetClicked;
+        private EventCallback<ClickEvent> _viewCertificatesClicked;
         private EventCallback<GeometryChangedEvent> _geometryChanged;
         private bool _disposed;
         private float _lastWidth = -1f;
@@ -236,6 +238,7 @@ namespace NutriMind.App.UI
         public int VisibleRewardCount => _visibleItems.Count;
 
         public event Action BackToHomeRequested;
+        public event Action ViewCertificatesRequested;
         public event Action<RewardsPreviewSelection> UseRewardRequested;
         public event Action<RewardsPreviewFilter> FilterChanged;
         public event Action RetryRequested;
@@ -361,6 +364,7 @@ namespace NutriMind.App.UI
             DisposeOwnedDataState();
 
             BackToHomeRequested = null;
+            ViewCertificatesRequested = null;
             UseRewardRequested = null;
             FilterChanged = null;
             RetryRequested = null;
@@ -383,6 +387,7 @@ namespace NutriMind.App.UI
             _grid = null;
             _filterEmpty = null;
             _filterEmptyReset = null;
+            _viewCertificatesButton = null;
             _dataStateHost = null;
             _lastWidth = -1f;
             _loadedItems.Clear();
@@ -418,6 +423,7 @@ namespace NutriMind.App.UI
             _grid = _root.Q<VisualElement>("rewards-grid");
             _filterEmpty = _root.Q<VisualElement>("rewards-filter-empty");
             _filterEmptyReset = _root.Q<Button>("rewards-filter-empty-reset");
+            _viewCertificatesButton = _root.Q<Button>("rewards-view-certificates-button");
             _dataStateHost = _root.Q<VisualElement>("rewards-data-state-host");
         }
 
@@ -469,6 +475,13 @@ namespace NutriMind.App.UI
             _filterUsedClicked = _ => ApplyFilter(RewardsPreviewFilter.Used, raiseEvent: true);
             _filterLockedClicked = _ => ApplyFilter(RewardsPreviewFilter.Locked, raiseEvent: true);
             _filterEmptyResetClicked = _ => ResetFilter();
+            _viewCertificatesClicked = _ =>
+            {
+                if (!_disposed)
+                {
+                    ViewCertificatesRequested?.Invoke();
+                }
+            };
             _geometryChanged = OnGeometryChanged;
 
             _filterAll?.RegisterCallback(_filterAllClicked);
@@ -477,6 +490,7 @@ namespace NutriMind.App.UI
             _filterUsed?.RegisterCallback(_filterUsedClicked);
             _filterLocked?.RegisterCallback(_filterLockedClicked);
             _filterEmptyReset?.RegisterCallback(_filterEmptyResetClicked);
+            _viewCertificatesButton?.RegisterCallback(_viewCertificatesClicked);
             _root?.RegisterCallback(_geometryChanged);
         }
 
@@ -512,6 +526,11 @@ namespace NutriMind.App.UI
                 _filterEmptyReset.UnregisterCallback(_filterEmptyResetClicked);
             }
 
+            if (_viewCertificatesButton != null && _viewCertificatesClicked != null)
+            {
+                _viewCertificatesButton.UnregisterCallback(_viewCertificatesClicked);
+            }
+
             if (_root != null && _geometryChanged != null)
             {
                 _root.UnregisterCallback(_geometryChanged);
@@ -523,6 +542,7 @@ namespace NutriMind.App.UI
             _filterUsedClicked = null;
             _filterLockedClicked = null;
             _filterEmptyResetClicked = null;
+            _viewCertificatesClicked = null;
             _geometryChanged = null;
         }
 

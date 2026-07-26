@@ -1,0 +1,350 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/Shared/AppScreenContent.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/CertificatesPanel.uss" />
+
+    <ui:VisualElement
+        name="certificates-root"
+        class="ds-root theme-nutrimind app-screen-content certificates-panel">
+
+        <ui:VisualElement
+            name="certificates-content-shell"
+            class="certificates-panel__content-shell">
+
+            <ui:ScrollView
+                name="certificates-scroll"
+                class="app-screen-content__scroll certificates-panel__scroll"
+                mode="Vertical"
+                horizontal-scroller-visibility="Hidden"
+                vertical-scroller-visibility="Auto"
+                mouse-wheel-scroll-size="72"
+                vertical-page-size="0.85"
+                touch-scroll-type="Clamped"
+                focusable="true">
+
+                <ui:VisualElement
+                    name="certificates-body"
+                    class="app-screen-content__body certificates-panel__body">
+
+                    <!-- ===== OFFLINE CACHE NOTICE ===== -->
+                    <ui:VisualElement
+                        name="certificates-offline-notice"
+                        class="ds-card certificates-panel__offline-notice certificates-panel__offline-notice--hidden"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="certificates-offline-icon"
+                            class="ds-icon ds-icon--wifi certificates-panel__offline-icon"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            class="certificates-panel__offline-copy"
+                            picking-mode="Ignore">
+                            <ui:Label
+                                name="certificates-offline-title"
+                                text="Showing saved certificates"
+                                class="certificates-panel__offline-title"
+                                picking-mode="Ignore" />
+                            <ui:Label
+                                name="certificates-offline-message"
+                                text="You’re offline. This collection was loaded from saved data and may not include recently issued certificates."
+                                class="certificates-panel__offline-message"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== OVERVIEW ===== -->
+                    <ui:VisualElement
+                        name="certificates-overview"
+                        class="ds-card certificates-panel__overview">
+
+                        <ui:VisualElement
+                            name="certificates-overview-copy"
+                            class="certificates-panel__overview-copy"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                name="certificates-overview-icon"
+                                class="ds-icon ds-icon--medal certificates-panel__overview-icon"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="certificates-overview-eyebrow"
+                                text="Achievements"
+                                class="certificates-panel__overview-eyebrow"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="certificates-overview-title"
+                                text="Your certificates"
+                                class="certificates-panel__overview-title"
+                                picking-mode="Ignore" />
+
+                            <ui:Label
+                                name="certificates-overview-description"
+                                text="View issued certificates and see what is still in progress."
+                                class="certificates-panel__overview-description"
+                                picking-mode="Ignore" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="certificates-overview-metrics"
+                            class="certificates-panel__overview-metrics"
+                            picking-mode="Ignore">
+
+                            <ui:VisualElement
+                                class="ds-card certificates-panel__metric-card certificates-panel__metric-card--issued"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="certificates-issued-value"
+                                    text="1"
+                                    class="certificates-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Issued"
+                                    class="certificates-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card certificates-panel__metric-card certificates-panel__metric-card--progress"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="certificates-progress-value"
+                                    text="1"
+                                    class="certificates-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="In progress"
+                                    class="certificates-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                class="ds-card certificates-panel__metric-card certificates-panel__metric-card--locked certificates-panel__metric-card--last"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="certificates-locked-value"
+                                    text="1"
+                                    class="certificates-panel__metric-value"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="Locked"
+                                    class="certificates-panel__metric-label"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- ===== MAIN LIST + DETAIL ===== -->
+                    <ui:VisualElement
+                        name="certificates-main-layout"
+                        class="certificates-panel__main-layout">
+
+                        <ui:VisualElement
+                            name="certificates-list-section"
+                            class="ds-card certificates-panel__list-section">
+
+                            <ui:VisualElement
+                                name="certificates-list-header"
+                                class="certificates-panel__list-header"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="certificates-list-title"
+                                    text="Certificate collection"
+                                    class="certificates-panel__list-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="certificates-list-count"
+                                    text="3 certificates"
+                                    class="certificates-panel__list-count"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement
+                                name="certificates-list"
+                                class="certificates-panel__list" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement
+                            name="certificates-detail-section"
+                            class="ds-card certificates-panel__detail-section">
+
+                            <!-- Document preview -->
+                            <ui:VisualElement
+                                name="certificates-document-preview"
+                                class="certificates-panel__document"
+                                picking-mode="Ignore">
+                                <ui:VisualElement
+                                    name="certificates-document-inner"
+                                    class="certificates-panel__document-inner"
+                                    picking-mode="Ignore">
+
+                                    <ui:VisualElement
+                                        name="certificates-document-icon"
+                                        class="ds-icon ds-icon--medal certificates-panel__document-icon"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-heading"
+                                        text="Certificate of Completion"
+                                        class="certificates-panel__document-heading"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-title"
+                                        text="Pages of the Nation — Term 1"
+                                        class="certificates-panel__document-title"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-awarded-label"
+                                        text="Awarded to"
+                                        class="certificates-panel__document-awarded-label"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-awarded-to"
+                                        text="Grade 5 Learner"
+                                        class="certificates-panel__document-awarded-to"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-recognition"
+                                        text="Recognizes completion of the Pages of the Nation term journey."
+                                        class="certificates-panel__document-recognition"
+                                        picking-mode="Ignore" />
+
+                                    <ui:Label
+                                        name="certificates-document-date"
+                                        text="Issued July 19, 2026"
+                                        class="certificates-panel__document-date"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <!-- Detail meta -->
+                            <ui:VisualElement
+                                name="certificates-detail-meta"
+                                class="certificates-panel__detail-meta"
+                                picking-mode="Ignore">
+
+                                <ui:VisualElement
+                                    class="certificates-panel__meta-item"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Certificate type"
+                                        class="certificates-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="certificates-type-value"
+                                        text="LiteraQuest Certificate"
+                                        class="certificates-panel__meta-value"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement
+                                    class="certificates-panel__meta-item"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Availability"
+                                        class="certificates-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:VisualElement
+                                        class="certificates-panel__meta-status-row"
+                                        picking-mode="Ignore">
+                                        <ui:VisualElement
+                                            name="certificates-status-icon"
+                                            class="ds-icon ds-icon--check certificates-panel__meta-status-icon"
+                                            picking-mode="Ignore" />
+                                        <ui:Label
+                                            name="certificates-status-value"
+                                            text="Issued"
+                                            class="certificates-panel__meta-value"
+                                            picking-mode="Ignore" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+
+                                <ui:VisualElement
+                                    class="certificates-panel__meta-item certificates-panel__meta-item--last"
+                                    picking-mode="Ignore">
+                                    <ui:Label
+                                        text="Issue date"
+                                        class="certificates-panel__meta-label"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="certificates-issue-value"
+                                        text="July 19, 2026"
+                                        class="certificates-panel__meta-value"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <!-- Eligibility -->
+                            <ui:VisualElement
+                                name="certificates-eligibility-card"
+                                class="certificates-panel__eligibility"
+                                picking-mode="Ignore">
+                                <ui:Label
+                                    name="certificates-eligibility-title"
+                                    text="Eligibility"
+                                    class="certificates-panel__eligibility-title"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    name="certificates-eligibility-description"
+                                    text="Completed the required LiteraQuest Term 1 learning path."
+                                    class="certificates-panel__eligibility-description"
+                                    picking-mode="Ignore" />
+                                <ui:VisualElement
+                                    class="certificates-panel__eligibility-support-row"
+                                    picking-mode="Ignore">
+                                    <ui:VisualElement
+                                        name="certificates-eligibility-icon"
+                                        class="ds-icon ds-icon--check certificates-panel__eligibility-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        name="certificates-eligibility-support"
+                                        text="Requirements complete"
+                                        class="certificates-panel__eligibility-support"
+                                        picking-mode="Ignore" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <!-- Actions -->
+                            <ui:VisualElement
+                                name="certificates-detail-actions"
+                                class="certificates-panel__detail-actions">
+                                <ui:Button
+                                    name="certificates-download-button"
+                                    text=""
+                                    class="ds-btn ds-btn--primary certificates-panel__download"
+                                    tooltip="Download certificate (preview intent only)">
+                                    <ui:VisualElement
+                                        class="ds-icon ds-icon--save certificates-panel__download-icon"
+                                        picking-mode="Ignore" />
+                                    <ui:Label
+                                        text="Download Certificate"
+                                        class="certificates-panel__download-label"
+                                        picking-mode="Ignore" />
+                                </ui:Button>
+                                <ui:Label
+                                    name="certificates-download-helper"
+                                    text=""
+                                    class="certificates-panel__download-helper certificates-panel__download-helper--hidden"
+                                    picking-mode="Ignore" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement
+                        name="certificates-bottom-spacer"
+                        class="certificates-panel__bottom-spacer"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement
+            name="certificates-data-state-host"
+            class="certificates-panel__data-state-host" />
+    </ui:VisualElement>
+</ui:UXML>

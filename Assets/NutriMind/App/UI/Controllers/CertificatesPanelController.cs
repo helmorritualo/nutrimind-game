@@ -7,30 +7,29 @@ using UnityEditor;
 namespace NutriMind.App.UI
 {
     /// <summary>
-    /// Standalone <c>UIDocument</c> preview adapter for <see cref="RewardsPanelView"/>.
+    /// Standalone <c>UIDocument</c> preview adapter for <see cref="CertificatesPanelView"/>.
     /// Presentation only — applies inspector preview state and logs requests.
-    /// Does not call APIs, generate request UUIDs, mutate reward state, or persist.
+    /// Does not call APIs, create files, download certificates, or persist.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
-    public sealed class RewardsPanelController : MonoBehaviour
+    public sealed class CertificatesPanelController : MonoBehaviour
     {
         [SerializeField]
         private VisualTreeAsset _dataStatePanelAsset;
 
         [SerializeField]
-        private RewardsPreviewState _previewState =
-            RewardsPreviewState.Content;
+        private CertificatesPreviewState _previewState =
+            CertificatesPreviewState.Content;
 
         [SerializeField]
-        private RewardsPreviewFilter _previewFilter =
-            RewardsPreviewFilter.All;
+        private int _previewCertificateIndex;
 
         private UIDocument _uiDocument;
-        private RewardsPanelView _view;
+        private CertificatesPanelView _view;
         private bool _eventsRegistered;
-        private RewardsPreviewState? _appliedState;
-        private RewardsPreviewFilter? _appliedFilter;
+        private CertificatesPreviewState? _appliedState;
+        private int? _appliedCertificateIndex;
 
         private void OnEnable()
         {
@@ -46,6 +45,8 @@ namespace NutriMind.App.UI
 
         private void OnValidate()
         {
+            _previewCertificateIndex = Mathf.Clamp(_previewCertificateIndex, 0, 2);
+
             if (!isActiveAndEnabled || _view == null || !_view.IsBound)
             {
                 return;
@@ -77,7 +78,7 @@ namespace NutriMind.App.UI
             }
 
             VisualElement panelRoot = _uiDocument.rootVisualElement;
-            VisualElement componentRoot = panelRoot?.Q<VisualElement>("rewards-root");
+            VisualElement componentRoot = panelRoot?.Q<VisualElement>("certificates-root");
             if (componentRoot == null)
             {
                 Invoke(nameof(BindWhenReady), 0.05f);
@@ -89,18 +90,18 @@ namespace NutriMind.App.UI
             panelRoot.style.height = Length.Percent(100);
 
             UnbindView();
-            _view = new RewardsPanelView(componentRoot, _dataStatePanelAsset);
+            _view = new CertificatesPanelView(componentRoot, _dataStatePanelAsset);
             if (!_view.IsBound)
             {
                 Debug.LogWarning(
-                    "[RewardsPanelController] RewardsPanelView failed to bind rewards-root.");
+                    "[CertificatesPanelController] CertificatesPanelView failed to bind certificates-root.");
                 _view.Dispose();
                 _view = null;
                 return;
             }
 
             RegisterEvents();
-            _view.SetItems(RewardsPreviewCatalog.CreateItems());
+            _view.SetItems(CertificatesPreviewCatalog.CreateItems());
             ApplyPreviewValues(force: true);
         }
 
@@ -109,7 +110,7 @@ namespace NutriMind.App.UI
             UnbindView();
             _uiDocument = null;
             _appliedState = null;
-            _appliedFilter = null;
+            _appliedCertificateIndex = null;
         }
 
         private void UnbindView()
@@ -131,10 +132,9 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            _view.BackToHomeRequested += OnBackToHomeRequested;
-            _view.ViewCertificatesRequested += OnViewCertificatesRequested;
-            _view.UseRewardRequested += OnUseRewardRequested;
-            _view.FilterChanged += OnFilterChanged;
+            _view.BackToRewardsRequested += OnBackToRewardsRequested;
+            _view.SelectionChanged += OnSelectionChanged;
+            _view.DownloadRequested += OnDownloadRequested;
             _view.RetryRequested += OnRetryRequested;
             _eventsRegistered = true;
         }
@@ -147,10 +147,9 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            _view.BackToHomeRequested -= OnBackToHomeRequested;
-            _view.ViewCertificatesRequested -= OnViewCertificatesRequested;
-            _view.UseRewardRequested -= OnUseRewardRequested;
-            _view.FilterChanged -= OnFilterChanged;
+            _view.BackToRewardsRequested -= OnBackToRewardsRequested;
+            _view.SelectionChanged -= OnSelectionChanged;
+            _view.DownloadRequested -= OnDownloadRequested;
             _view.RetryRequested -= OnRetryRequested;
             _eventsRegistered = false;
         }
@@ -162,11 +161,19 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            bool filterChanged = force || _appliedFilter != _previewFilter;
-            if (filterChanged)
+            int clampedIndex = Mathf.Clamp(_previewCertificateIndex, 0, 2);
+            bool indexChanged = force || _appliedCertificateIndex != clampedIndex;
+            if (indexChanged)
             {
-                _view.SetFilter(_previewFilter);
-                _appliedFilter = _previewFilter;
+                var items = CertificatesPreviewCatalog.CreateItems();
+                if (items.Count > 0)
+                {
+                    int safeIndex = Mathf.Clamp(clampedIndex, 0, items.Count - 1);
+                    _view.SelectByPresentationId(items[safeIndex].PresentationId);
+                    _previewCertificateIndex = safeIndex;
+                }
+
+                _appliedCertificateIndex = _previewCertificateIndex;
             }
 
             bool stateChanged = force || _appliedState != _previewState;
@@ -177,38 +184,52 @@ namespace NutriMind.App.UI
             }
         }
 
-        private void OnBackToHomeRequested() =>
-            Debug.Log("[RewardsPanelController] Back to Home requested — preview only.");
+        private void OnBackToRewardsRequested() =>
+            Debug.Log("[CertificatesPanelController] Back to Rewards requested — preview only.");
 
-        private void OnViewCertificatesRequested() =>
-            Debug.Log("[RewardsPanelController] View Certificates requested — preview only.");
+        private void OnSelectionChanged(CertificatePreviewSelection selection)
+        {
+            var items = CertificatesPreviewCatalog.CreateItems();
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (string.Equals(
+                        items[i].PresentationId,
+                        selection.PresentationId,
+                        System.StringComparison.Ordinal))
+                {
+                    _previewCertificateIndex = i;
+                    _appliedCertificateIndex = i;
+                    break;
+                }
+            }
 
-        private void OnUseRewardRequested(RewardsPreviewSelection selection) =>
             Debug.Log(
-                $"[RewardsPanelController] Use Reward requested: key={selection.PresentationKey}, " +
-                $"title='{selection.Title}' — preview only. No request UUID generated.");
+                $"[CertificatesPanelController] Selection changed: id={selection.PresentationId}, " +
+                $"title='{selection.Title}' — preview only.");
+        }
 
-        private void OnFilterChanged(RewardsPreviewFilter filter) =>
-            Debug.Log($"[RewardsPanelController] Filter changed: {filter}.");
+        private void OnDownloadRequested(CertificatePreviewSelection selection) =>
+            Debug.Log(
+                $"[CertificatesPanelController] Download requested: id={selection.PresentationId}, " +
+                $"title='{selection.Title}' — preview only. No file created.");
 
         private void OnRetryRequested() =>
-            Debug.Log("[RewardsPanelController] Retry requested — preview only.");
+            Debug.Log("[CertificatesPanelController] Retry requested — preview only.");
 
 #if UNITY_EDITOR
-        [ContextMenu("Cycle Rewards State")]
-        private void CycleRewardsState()
+        [ContextMenu("Cycle Certificates State")]
+        private void CycleCertificatesState()
         {
-            _previewState = (RewardsPreviewState)(
-                ((int)_previewState + 1) % System.Enum.GetValues(typeof(RewardsPreviewState)).Length);
+            _previewState = (CertificatesPreviewState)(
+                ((int)_previewState + 1) % System.Enum.GetValues(typeof(CertificatesPreviewState)).Length);
             ApplyPreviewValues(force: true);
             EditorUtility.SetDirty(this);
         }
 
-        [ContextMenu("Cycle Rewards Filter")]
-        private void CycleRewardsFilter()
+        [ContextMenu("Cycle Selected Certificate")]
+        private void CycleSelectedCertificate()
         {
-            _previewFilter = (RewardsPreviewFilter)(
-                ((int)_previewFilter + 1) % System.Enum.GetValues(typeof(RewardsPreviewFilter)).Length);
+            _previewCertificateIndex = (_previewCertificateIndex + 1) % 3;
             ApplyPreviewValues(force: true);
             EditorUtility.SetDirty(this);
         }

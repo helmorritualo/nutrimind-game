@@ -84,6 +84,20 @@
                                 text="See what you own, what is ready to use, and what you can unlock next."
                                 class="rewards-panel__overview-description"
                                 picking-mode="Ignore" />
+
+                            <ui:Button
+                                name="rewards-view-certificates-button"
+                                text=""
+                                class="ds-btn ds-btn--secondary rewards-panel__view-certificates"
+                                tooltip="View certificates">
+                                <ui:VisualElement
+                                    class="ds-icon ds-icon--medal rewards-panel__view-certificates-icon"
+                                    picking-mode="Ignore" />
+                                <ui:Label
+                                    text="View Certificates"
+                                    class="rewards-panel__view-certificates-label"
+                                    picking-mode="Ignore" />
+                            </ui:Button>
                         </ui:VisualElement>
 
                         <ui:VisualElement

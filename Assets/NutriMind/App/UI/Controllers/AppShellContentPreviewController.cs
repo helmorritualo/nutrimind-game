@@ -26,7 +26,8 @@ namespace NutriMind.App.UI
         QuizResult,
         QuizHistory,
         MissionDetail,
-        Rewards
+        Rewards,
+        Certificates
     }
 
     /// <summary>
@@ -169,6 +170,14 @@ namespace NutriMind.App.UI
         private RewardsPreviewFilter _rewardsPreviewFilter =
             RewardsPreviewFilter.All;
 
+        [SerializeField]
+        [Tooltip("Certificates route state used only by the AppShell static preview.")]
+        private CertificatesPreviewState _certificatesPreviewState =
+            CertificatesPreviewState.Content;
+
+        [SerializeField]
+        private int _selectedCertificatePreviewIndex;
+
         private MissionPreviewSelection _selectedMission =
             new(
                 "g5_lq_t1_m02",
@@ -209,6 +218,7 @@ namespace NutriMind.App.UI
         private QuizHistoryPanelView _currentQuizHistoryView;
         private MissionDetailPanelView _currentMissionDetailView;
         private RewardsPanelView _currentRewardsView;
+        private CertificatesPanelView _currentCertificatesView;
         private QuizListPreviewItem? _selectedQuiz;
         private string _selectedQuizResultAttemptId;
         private QuizAttemptPreviewSubmission _pendingQuizAttemptSubmission;
@@ -616,6 +626,9 @@ namespace NutriMind.App.UI
                 case AppShellContentPreviewScreen.Rewards:
                     return "Grade 5 • My collection";
 
+                case AppShellContentPreviewScreen.Certificates:
+                    return "Grade 5 • Achievements";
+
                 default:
                     return NormalizeOptionalText(entry?.PageContext);
             }
@@ -684,6 +697,9 @@ namespace NutriMind.App.UI
 
                 case AppShellContentPreviewScreen.Rewards:
                     return CreateRewardsView(contentRoot);
+
+                case AppShellContentPreviewScreen.Certificates:
+                    return CreateCertificatesView(contentRoot);
 
                 default:
                     return null;
@@ -1669,6 +1685,7 @@ namespace NutriMind.App.UI
             rewardsView.SetFilter(_rewardsPreviewFilter);
             rewardsView.SetPreviewState(_rewardsPreviewState);
             rewardsView.BackToHomeRequested += OnRewardsBackToHomeRequested;
+            rewardsView.ViewCertificatesRequested += OnRewardsViewCertificatesRequested;
             rewardsView.UseRewardRequested += OnRewardsUseRewardRequested;
             rewardsView.FilterChanged += OnRewardsFilterChanged;
             rewardsView.RetryRequested += OnRewardsRetryRequested;
@@ -1682,6 +1699,14 @@ namespace NutriMind.App.UI
                 "[AppShellContentPreview] Rewards Back to Home — showing Home.");
 
             SetPreviewScreen(AppShellContentPreviewScreen.Home);
+        }
+
+        private void OnRewardsViewCertificatesRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Rewards View Certificates — showing Certificates.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Certificates);
         }
 
         private void OnRewardsUseRewardRequested(RewardsPreviewSelection selection)
@@ -1709,6 +1734,94 @@ namespace NutriMind.App.UI
 
             _appShell?.ShowToast(
                 "Rewards refresh requested. Data loading is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private IAppScreenView CreateCertificatesView(VisualElement contentRoot)
+        {
+            var certificatesView = new CertificatesPanelView(contentRoot, _dataStatePanelAsset);
+            if (!certificatesView.IsBound)
+            {
+                Debug.LogWarning(
+                    "[AppShellContentPreview] CertificatesPanelView failed to bind certificates-root.");
+                certificatesView.Dispose();
+                return null;
+            }
+
+            var items = CertificatesPreviewCatalog.CreateItems();
+            certificatesView.SetItems(items);
+
+            if (items.Count == 0)
+            {
+                _selectedCertificatePreviewIndex = 0;
+                certificatesView.SetPreviewState(CertificatesPreviewState.Empty);
+            }
+            else
+            {
+                int safeIndex = Mathf.Clamp(_selectedCertificatePreviewIndex, 0, items.Count - 1);
+                if (safeIndex != _selectedCertificatePreviewIndex)
+                {
+                    _selectedCertificatePreviewIndex = safeIndex;
+                }
+
+                certificatesView.SelectByPresentationId(items[safeIndex].PresentationId);
+                certificatesView.SetPreviewState(_certificatesPreviewState);
+            }
+
+            certificatesView.BackToRewardsRequested += OnCertificatesBackToRewardsRequested;
+            certificatesView.SelectionChanged += OnCertificatesSelectionChanged;
+            certificatesView.DownloadRequested += OnCertificatesDownloadRequested;
+            certificatesView.RetryRequested += OnCertificatesRetryRequested;
+            _currentCertificatesView = certificatesView;
+            return certificatesView;
+        }
+
+        private void OnCertificatesBackToRewardsRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Certificates Back to Rewards — showing Rewards.");
+
+            SetPreviewScreen(AppShellContentPreviewScreen.Rewards);
+        }
+
+        private void OnCertificatesSelectionChanged(CertificatePreviewSelection selection)
+        {
+            var items = CertificatesPreviewCatalog.CreateItems();
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (string.Equals(
+                        items[i].PresentationId,
+                        selection.PresentationId,
+                        System.StringComparison.Ordinal))
+                {
+                    _selectedCertificatePreviewIndex = i;
+                    break;
+                }
+            }
+
+            Debug.Log(
+                $"[AppShellContentPreview] Certificates selection changed: " +
+                $"id={selection.PresentationId}, title='{selection.Title}' — preview only.");
+        }
+
+        private void OnCertificatesDownloadRequested(CertificatePreviewSelection selection)
+        {
+            Debug.Log(
+                $"[AppShellContentPreview] Certificates download requested: " +
+                $"id={selection.PresentationId}, title='{selection.Title}' — preview only. No file created.");
+
+            _appShell?.ShowToast(
+                $"Download requested for {selection.Title}. Certificate download is not connected in this static preview.",
+                AppShellToastTone.Information);
+        }
+
+        private void OnCertificatesRetryRequested()
+        {
+            Debug.Log(
+                "[AppShellContentPreview] Certificates retry requested — preview only.");
+
+            _appShell?.ShowToast(
+                "Certificates refresh requested. Data loading is not connected in this static preview.",
                 AppShellToastTone.Information);
         }
 
@@ -2062,10 +2175,20 @@ namespace NutriMind.App.UI
             if (_currentRewardsView != null)
             {
                 _currentRewardsView.BackToHomeRequested -= OnRewardsBackToHomeRequested;
+                _currentRewardsView.ViewCertificatesRequested -= OnRewardsViewCertificatesRequested;
                 _currentRewardsView.UseRewardRequested -= OnRewardsUseRewardRequested;
                 _currentRewardsView.FilterChanged -= OnRewardsFilterChanged;
                 _currentRewardsView.RetryRequested -= OnRewardsRetryRequested;
                 _currentRewardsView = null;
+            }
+
+            if (_currentCertificatesView != null)
+            {
+                _currentCertificatesView.BackToRewardsRequested -= OnCertificatesBackToRewardsRequested;
+                _currentCertificatesView.SelectionChanged -= OnCertificatesSelectionChanged;
+                _currentCertificatesView.DownloadRequested -= OnCertificatesDownloadRequested;
+                _currentCertificatesView.RetryRequested -= OnCertificatesRetryRequested;
+                _currentCertificatesView = null;
             }
 
             if (_pendingConfirmation == PreviewConfirmationAction.ExitQuiz
@@ -2307,6 +2430,8 @@ namespace NutriMind.App.UI
                     return "Mission Details";
                 case AppShellContentPreviewScreen.Rewards:
                     return "Rewards";
+                case AppShellContentPreviewScreen.Certificates:
+                    return "Certificates";
                 default:
                     return "AppShell content preview";
             }
