@@ -251,5 +251,69 @@ namespace NutriMind.Tests.PlayMode
 
             Assert.That(loginRoots, Is.EqualTo(1));
         }
+
+        [UnityTest]
+        [Timeout(120000)]
+        public IEnumerator ResetLocalDatabase_RealAppLifetimePath_ChangesInstallationUuidAndReturnsBootstrap()
+        {
+            yield return PlayModeAppTestHelpers.LoadBootstrapScene();
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            yield return PlayModeAppTestHelpers.ForceZeroMockLatency();
+
+            AppLifetime lifetime = AppLifetime.Instance;
+            Assert.That(lifetime.IsReady, Is.True);
+
+            AppResult<string> beforeResult = lifetime.InstallationRepository.GetOrCreateDeviceId();
+            Assert.That(beforeResult.IsSuccess, Is.True);
+            string beforeUuid = beforeResult.Value;
+            Assert.That(beforeUuid, Is.Not.Null.And.Not.Empty);
+            lifetime.SetInstallationDeviceId(beforeUuid);
+
+            var resetTask = lifetime.ResetLocalDatabaseAsync(System.Threading.CancellationToken.None);
+            while (!resetTask.IsCompleted)
+            {
+                yield return null;
+            }
+
+            Assert.That(resetTask.IsFaulted, Is.False, "ResetLocalDatabaseAsync faulted.");
+            AppResult resetResult = resetTask.Result;
+            Assert.That(resetResult.IsSuccess, Is.True,
+                resetResult.Error != null
+                    ? resetResult.Error.Code + " — " + resetResult.Error.Message
+                    : "reset failed");
+
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            lifetime = AppLifetime.Instance;
+
+            Assert.That(lifetime.IsReady, Is.True);
+            Assert.That(lifetime.Database, Is.Not.Null);
+            Assert.That(lifetime.Database.IsOpen, Is.True);
+            Assert.That(lifetime.Database.SchemaVersion, Is.EqualTo(1));
+            Assert.That(lifetime.Gateway, Is.Not.Null);
+            Assert.That(lifetime.Router, Is.Not.Null);
+            Assert.That(lifetime.SceneNavigator, Is.Not.Null);
+            Assert.That(lifetime.MissionProgressRepository, Is.Not.Null);
+            Assert.That(lifetime.OutboxRepository, Is.Not.Null);
+            Assert.That(lifetime.AnnouncementReadRepository, Is.Not.Null);
+            Assert.That(lifetime.IdempotentRequestRepository, Is.Not.Null);
+            Assert.That(lifetime.LocalProgressWriter, Is.Not.Null);
+
+            string afterUuid = lifetime.InstallationDeviceId;
+            if (string.IsNullOrEmpty(afterUuid))
+            {
+                AppResult<string> afterResult = lifetime.InstallationRepository.GetOrCreateDeviceId();
+                Assert.That(afterResult.IsSuccess, Is.True);
+                afterUuid = afterResult.Value;
+            }
+
+            Assert.That(afterUuid, Is.Not.EqualTo(beforeUuid),
+                "Installation UUID must change after ResetLocalDatabaseAsync.");
+
+            yield return PlayModeAppTestHelpers.WaitForScene(
+                AppSceneNavigator.BootstrapSceneName,
+                PlayModeAppTestHelpers.DefaultTimeoutSeconds);
+            Assert.That(SceneManager.GetActiveScene().name,
+                Is.EqualTo(AppSceneNavigator.BootstrapSceneName));
+        }
     }
 }

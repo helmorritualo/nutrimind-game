@@ -109,6 +109,46 @@ namespace NutriMind.App.UI
             _root = root.Q<VisualElement>(RootName);
         }
 
+        /// <summary>
+        /// Sets the student greeting text (e.g. "Hello, Alex!").
+        /// </summary>
+        public void SetGreeting(string greeting)
+        {
+            if (_disposed || _root == null)
+            {
+                return;
+            }
+
+            Label label = _root.Q<Label>("home-greeting-label");
+            if (label != null)
+            {
+                label.text = string.IsNullOrEmpty(greeting) ? string.Empty : "Hello, " + greeting + "!";
+            }
+        }
+
+        /// <summary>
+        /// Sets the mission-progress indicators.
+        /// </summary>
+        public void SetProgress(int completedAreas, int totalAreas)
+        {
+            if (_disposed || _root == null)
+            {
+                return;
+            }
+
+            string progressText = completedAreas + " / " + totalAreas;
+
+            if (_areasCompletedLabel != null)
+            {
+                _areasCompletedLabel.text = progressText;
+            }
+
+            if (_storyFragmentsLabel != null)
+            {
+                _storyFragmentsLabel.text = progressText;
+            }
+        }
+
         private void CacheElements()
         {
             _continueButton = _root.Q<Button>("play-continue-button");

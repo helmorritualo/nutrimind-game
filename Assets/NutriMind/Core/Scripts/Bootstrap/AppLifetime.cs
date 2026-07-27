@@ -3,7 +3,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NutriMind.App.Composition;
+using NutriMind.App.Features;
 using NutriMind.App.Routing;
+using NutriMind.App.State;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
 using NutriMind.Core.Persistence;
@@ -56,6 +58,30 @@ namespace NutriMind.Core.Bootstrap
         public IAppSceneNavigator SceneNavigator => _compositionRoot?.SceneNavigator;
 
         public IAppRouter Router => _compositionRoot?.Router;
+
+        public AuthenticatedStudentState AuthenticatedStudentState =>
+            _compositionRoot?.AuthenticatedStudentState;
+
+        public ILocalSettingsStore LocalSettingsStore => _compositionRoot?.LocalSettingsStore;
+
+        private IMissionLaunchService _missionLaunchService;
+
+        /// <summary>
+        /// Returns the application-mode mission launch service.
+        /// Lazily created after composition. In Mock mode returns <see cref="MockMissionLaunchService"/>.
+        /// </summary>
+        public IMissionLaunchService MissionLaunchService
+        {
+            get
+            {
+                if (_missionLaunchService == null && IsReady)
+                {
+                    _missionLaunchService = new MockMissionLaunchService(this);
+                }
+
+                return _missionLaunchService;
+            }
+        }
 
         public IInstallationRepository InstallationRepository => _compositionRoot?.InstallationRepository;
 
@@ -175,15 +201,24 @@ namespace NutriMind.Core.Bootstrap
             ConfigureBeforeCompose(options);
         }
 
+        public void SetBootstrap(BootstrapSnapshot snapshot)
+        {
+            LastBootstrap = snapshot;
+            AuthenticatedStudentState?.ApplyBootstrap(snapshot);
+        }
+
         public void SetAuthenticated(StudentProfile profile, bool authenticated)
         {
             IsAuthenticated = authenticated;
             CurrentProfile = profile;
-        }
-
-        public void SetBootstrap(BootstrapSnapshot snapshot)
-        {
-            LastBootstrap = snapshot;
+            if (authenticated && profile != null)
+            {
+                AuthenticatedStudentState?.ApplyProfile(profile);
+            }
+            else if (!authenticated)
+            {
+                AuthenticatedStudentState?.Clear();
+            }
         }
 
         public void SetClientConfiguration(ClientConfiguration configuration)
@@ -208,6 +243,7 @@ namespace NutriMind.Core.Bootstrap
             CurrentProfile = null;
             LastBootstrap = null;
             OfflineEligible = false;
+            AuthenticatedStudentState?.Clear();
 
             if (TokenStore != null)
             {
@@ -273,6 +309,7 @@ namespace NutriMind.Core.Bootstrap
                 LastClientConfiguration = null;
                 InstallationDeviceId = null;
                 OfflineEligible = false;
+                AuthenticatedStudentState?.Clear();
 
                 RecreateLifetimeCts();
                 AppResult recompose = RecomposeInternal();
@@ -292,7 +329,8 @@ namespace NutriMind.Core.Bootstrap
                     }
                 }
 
-                await LoadBootstrapSceneAsync(cancellationToken).ConfigureAwait(false);
+                // Caller token may have been LifetimeToken and is now cancelled — use the new lifetime.
+                await LoadBootstrapSceneAsync(LifetimeToken).ConfigureAwait(false);
                 NutriMindLog.Sqlite("Local database reset and recomposed.");
                 return AppResult.Success();
             }, cancellationToken);
@@ -322,6 +360,7 @@ namespace NutriMind.Core.Bootstrap
                 InstallationDeviceId = null;
                 OfflineEligible = false;
                 ConfigurationError = null;
+                AuthenticatedStudentState?.Clear();
 
                 RecreateLifetimeCts();
                 AppResult recompose = RecomposeInternal();
@@ -343,7 +382,7 @@ namespace NutriMind.Core.Bootstrap
                     }
                 }
 
-                await LoadBootstrapSceneAsync(cancellationToken).ConfigureAwait(false);
+                await LoadBootstrapSceneAsync(LifetimeToken).ConfigureAwait(false);
                 NutriMindLog.Runtime("Full installation reset completed.");
                 return AppResult.Success();
             }, cancellationToken);
@@ -411,6 +450,7 @@ namespace NutriMind.Core.Bootstrap
             _compositionRoot?.Dispose();
             _compositionRoot = null;
             _isInitialized = false;
+            _missionLaunchService = null;
         }
 
         private AppResult RecomposeInternal()

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 using System;
+using System.Threading;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Utilities;
@@ -101,6 +102,7 @@ namespace NutriMind.App.Composition
             GUILayout.Space(8f);
             if (GUILayout.Button("Reset mock server state"))
             {
+                // Mock-server reset does not cancel lifetime; LifetimeToken is safe here.
                 TaskUtilities.ForgetSafely(
                     controller.ResetMockServerAsync(AppLifetime.Instance.LifetimeToken),
                     AppLifetime.Instance.LifetimeToken,
@@ -122,9 +124,10 @@ namespace NutriMind.App.Composition
                 if (GUILayout.Button("Confirm DB reset"))
                 {
                     _confirmDatabaseReset = false;
+                    // Destructive resets cancel LifetimeToken — never pass it as the caller token.
                     TaskUtilities.ForgetSafely(
-                        controller.ResetLocalDatabaseAsync(AppLifetime.Instance.LifetimeToken),
-                        AppLifetime.Instance.LifetimeToken,
+                        controller.ResetLocalDatabaseAsync(CancellationToken.None),
+                        CancellationToken.None,
                         "ResetLocalDatabase");
                     _status = "Local database reset requested.";
                     _visible = false;
@@ -153,8 +156,8 @@ namespace NutriMind.App.Composition
                 {
                     _confirmFullReset = false;
                     TaskUtilities.ForgetSafely(
-                        controller.FullInstallationResetAsync(AppLifetime.Instance.LifetimeToken),
-                        AppLifetime.Instance.LifetimeToken,
+                        controller.FullInstallationResetAsync(CancellationToken.None),
+                        CancellationToken.None,
                         "FullInstallationReset");
                     _status = "Full installation reset requested.";
                     _visible = false;

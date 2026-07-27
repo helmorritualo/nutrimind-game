@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NutriMind.App.Features;
 using NutriMind.App.Routing;
+using NutriMind.App.State;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
 using NutriMind.Core.Persistence;
@@ -33,7 +35,15 @@ namespace NutriMind.App.Composition
 
         public IAppClock Clock { get; private set; }
 
+        /// <summary>
+        /// Deterministic in Mock mode for mutation/request UUIDs; system GUIDs otherwise.
+        /// </summary>
         public IIdGenerator IdGenerator { get; private set; }
+
+        /// <summary>
+        /// Always system-generated. Installation identity must not reuse the Mock mutation sequence.
+        /// </summary>
+        public IIdGenerator InstallationIdGenerator { get; private set; }
 
         public NutriMindDatabase Database { get; private set; }
 
@@ -73,6 +83,10 @@ namespace NutriMind.App.Composition
 
         public IAppRouter Router { get; private set; }
 
+        public AuthenticatedStudentState AuthenticatedStudentState { get; private set; }
+
+        public ILocalSettingsStore LocalSettingsStore { get; private set; }
+
         public AppError ComposeError { get; private set; }
 
         public bool IsDisposed => _disposed;
@@ -92,6 +106,9 @@ namespace NutriMind.App.Composition
                 Clock = new SystemAppClock();
                 IdGenerator = new SystemIdGenerator();
             }
+
+            // Installation UUID stays independent of Mock deterministic mutation IDs.
+            InstallationIdGenerator = new SystemIdGenerator();
 
             AppResult tokenResult = CreateTokenStore();
             if (tokenResult.IsFailure)
@@ -125,7 +142,10 @@ namespace NutriMind.App.Composition
                 }
             }
 
-            InstallationRepository = new SqliteInstallationRepository(Database, IdGenerator, Clock);
+            InstallationRepository = new SqliteInstallationRepository(
+                Database,
+                InstallationIdGenerator,
+                Clock);
             SessionRepository = new SqliteLocalSessionRepository(Database);
             ResourceCacheRepository = new SqliteResourceCacheRepository(Database);
             MissionProgressRepository = new SqliteMissionProgressRepository(Database);
@@ -151,6 +171,8 @@ namespace NutriMind.App.Composition
                 OutboxPayloadSerializer);
             SceneNavigator = new AppSceneNavigator();
             Router = new AppRouter(SceneNavigator);
+            AuthenticatedStudentState = new AuthenticatedStudentState();
+            LocalSettingsStore = new PlayerPrefsLocalSettingsStore();
             return AppResult.Success();
         }
 
@@ -317,6 +339,10 @@ namespace NutriMind.App.Composition
             InstallationRepository = null;
             Connectivity = null;
             TokenStore = null;
+            LocalSettingsStore = null;
+            AuthenticatedStudentState?.Clear();
+            AuthenticatedStudentState = null;
+            InstallationIdGenerator = null;
             IdGenerator = null;
             Clock = null;
 

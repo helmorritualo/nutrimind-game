@@ -43,6 +43,35 @@ namespace NutriMind.App.UI
         public event Action SettingsRequested;
         public event Action SignOutRequested;
 
+        /// <summary>
+        /// Binds runtime profile data. LRN must already be masked by the caller.
+        /// </summary>
+        public void Bind(string displayName, string gradeSection, string maskedLrn, string avatarKey)
+        {
+            if (_disposed || _root == null)
+            {
+                return;
+            }
+
+            Label nameLabel = _root.Q<Label>("profile-display-name");
+            if (nameLabel != null)
+            {
+                nameLabel.text = string.IsNullOrEmpty(displayName) ? string.Empty : displayName;
+            }
+
+            Label gradeLabel = _root.Q<Label>("profile-grade-section");
+            if (gradeLabel != null)
+            {
+                gradeLabel.text = string.IsNullOrEmpty(gradeSection) ? string.Empty : gradeSection;
+            }
+
+            Label lrnLabel = _root.Q<Label>("profile-lrn");
+            if (lrnLabel != null)
+            {
+                lrnLabel.text = string.IsNullOrEmpty(maskedLrn) ? "••••••••••••" : maskedLrn;
+            }
+        }
+
         public void Dispose()
         {
             if (_disposed) return;

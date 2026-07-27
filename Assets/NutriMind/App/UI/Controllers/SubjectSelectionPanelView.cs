@@ -114,6 +114,42 @@ namespace NutriMind.App.UI
         public NutriMindSubject SelectedSubject { get; private set; } =
             NutriMindSubject.LiteraQuest;
 
+        /// <summary>
+        /// Binds the runtime subject list. Subjects not in the list are disabled.
+        /// Subjects not in the canonical set (LiteraQuest, PEHealth, Science) are ignored.
+        /// </summary>
+        public void Bind(System.Collections.Generic.IReadOnlyList<NutriMindSubject> availableSubjects)
+        {
+            if (_disposed || _root == null || availableSubjects == null)
+            {
+                return;
+            }
+
+            bool hasLq = false;
+            bool hasPeh = false;
+            bool hasSci = false;
+            for (int i = 0; i < availableSubjects.Count; i++)
+            {
+                NutriMindSubject subject = availableSubjects[i];
+                if (subject == NutriMindSubject.LiteraQuest)
+                {
+                    hasLq = true;
+                }
+                else if (subject == NutriMindSubject.PeAndHealth)
+                {
+                    hasPeh = true;
+                }
+                else if (subject == NutriMindSubject.Science)
+                {
+                    hasSci = true;
+                }
+            }
+
+            _literaQuestCard?.SetEnabled(hasLq);
+            _peAndHealthCard?.SetEnabled(hasPeh);
+            _scienceCard?.SetEnabled(hasSci);
+        }
+
         public void Dispose()
         {
             if (_disposed)

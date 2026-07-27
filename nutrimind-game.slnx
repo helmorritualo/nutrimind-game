@@ -30,6 +30,7 @@
   <Project Path="Unity.AI.Generators.Redux.csproj" />
   <Project Path="Unity.InferenceEngine.Editor.Visualizer.csproj" />
   <Project Path="Unity.VisualScripting.Flow.Editor.csproj" />
+  <Project Path="NutriMind.csproj" />
   <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="PPv2URPConverters.csproj" />
   <Project Path="Unity.InferenceEngine.csproj" />
@@ -40,7 +41,6 @@
   <Project Path="UnityEditor.TestRunner.csproj" />
   <Project Path="Unity.VisualScripting.Core.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Runtime.csproj" />
-  <Project Path="NutriMind.csproj" />
   <Project Path="Unity.UnifiedRayTracing.Runtime.csproj" />
   <Project Path="Unity.InferenceEngine.Editor.csproj" />
   <Project Path="Unity.VisualScripting.State.Editor.csproj" />

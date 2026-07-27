@@ -151,8 +151,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.Composition.AppQuizPortalSceneRoot
   _shellDocument: {fileID: 1775078884}
-  _quizListTreeAsset: {fileID: 9197481963319205126, guid: dae02d228a965574cb864154ddb1c18d, type: 3}
   _shellController: {fileID: 1775078883}
+  _confirmDialogAsset: {fileID: 9197481963319205126, guid: 91243026619ce4249aca4c3ea55ea743, type: 3}
+  _systemDialogAsset: {fileID: 9197481963319205126, guid: a7c3e91f4b2d5840a9e6c1d05f38b274, type: 3}
+  _quizListTreeAsset: {fileID: 9197481963319205126, guid: dae02d228a965574cb864154ddb1c18d, type: 3}
+  _quizDetailAsset: {fileID: 9197481963319205126, guid: 808f797bd9514778a64924b965c7427d, type: 3}
+  _quizAttemptAsset: {fileID: 9197481963319205126, guid: 7f3a91c2e8b14d6a9c5e2f0b8d4a6e1c, type: 3}
+  _quizResultAsset: {fileID: 9197481963319205126, guid: b2c4e6f8a0d15e3b7c9f1a4d6e8b0c2f, type: 3}
+  _quizHistoryAsset: {fileID: 9197481963319205126, guid: 2543faa5e1574a5eb5663453d4ad1386, type: 3}
+  _dataStatePanelAsset: {fileID: 9197481963319205126, guid: 5c4fffbd02efb514e9984d1973a4d6cb, type: 3}
 --- !u!114 &1775078883
 MonoBehaviour:
   m_ObjectHideFlags: 0

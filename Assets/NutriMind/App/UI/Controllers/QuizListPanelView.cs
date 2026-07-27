@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -286,6 +287,7 @@ namespace NutriMind.App.UI
         private bool _suppressFilterEvents;
         private bool _hasMore;
         private float _lastWidth = -1f;
+        private QuizListPreviewItem[] _boundItems = PreviewFixtures;
 
         public QuizListPanelView(
             VisualElement root,
@@ -329,6 +331,37 @@ namespace NutriMind.App.UI
         public event Action<int> PageRequested;
         public event Action RetryRequested;
         public event Action ReturnToMainRequested;
+
+        /// <summary>
+        /// Replaces the static preview fixtures with runtime presentation items.
+        /// </summary>
+        public void SetItems(IReadOnlyList<QuizListPreviewItem> items)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            if (items == null || items.Count == 0)
+            {
+                _boundItems = Array.Empty<QuizListPreviewItem>();
+            }
+            else
+            {
+                var copy = new QuizListPreviewItem[items.Count];
+                for (int i = 0; i < items.Count; i++)
+                {
+                    copy[i] = items[i];
+                }
+
+                _boundItems = copy;
+            }
+
+            ApplyBoundItems();
+            SetDataState(_boundItems.Length == 0
+                ? DataStatePanelState.Empty
+                : DataStatePanelState.Content);
+        }
 
         /// <summary>
         /// Restores retained filter values without raising <see cref="FiltersChanged"/>.
@@ -626,14 +659,27 @@ namespace NutriMind.App.UI
 
         private void ApplyStaticFixtures()
         {
-            ApplySummaryCounts();
-            for (int i = 0; i < PreviewFixtures.Length && i < _itemShells.Length; i++)
-            {
-                BindItemShell(_itemShells[i], PreviewFixtures[i]);
-            }
-
+            _boundItems = PreviewFixtures;
+            ApplyBoundItems();
             ApplyFilters(Filters, raiseEvent: false, resetPageVisual: false);
             SetPagination(1, 2, true);
+        }
+
+        private void ApplyBoundItems()
+        {
+            ApplySummaryCounts();
+            for (int i = 0; i < _itemShells.Length; i++)
+            {
+                if (i < _boundItems.Length)
+                {
+                    _itemShells[i].Row?.EnableInClassList("is-hidden", false);
+                    BindItemShell(_itemShells[i], _boundItems[i]);
+                }
+                else
+                {
+                    _itemShells[i].Row?.EnableInClassList("is-hidden", true);
+                }
+            }
         }
 
         private void ApplySummaryCounts()
@@ -642,9 +688,9 @@ namespace NutriMind.App.UI
             int closingSoon = 0;
             int completed = 0;
 
-            for (int i = 0; i < PreviewFixtures.Length; i++)
+            for (int i = 0; i < _boundItems.Length; i++)
             {
-                QuizListPreviewItem item = PreviewFixtures[i];
+                QuizListPreviewItem item = _boundItems[i];
                 if (item.Status == QuizListPreviewStatus.Available)
                 {
                     available++;

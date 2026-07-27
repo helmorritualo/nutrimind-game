@@ -80,6 +80,12 @@ namespace NutriMind.Tests.EditMode
                 Assert.That(root.Database.IsOpen, Is.True);
                 Assert.That(root.Database.SchemaVersion, Is.EqualTo(1));
                 string firstInstall = root.InstallationRepository.GetOrCreateDeviceId().Value;
+                Assert.That(root.InstallationIdGenerator, Is.InstanceOf<SystemIdGenerator>());
+                Assert.That(root.IdGenerator, Is.InstanceOf<DeterministicMockIdGenerator>());
+                Assert.That(
+                    root.InstallationIdGenerator.NewUuid(),
+                    Is.Not.EqualTo(root.IdGenerator.NewUuid()),
+                    "Installation IDs must not share the Mock mutation sequence.");
 
                 root.Dispose();
                 TryDelete(dbPath);
@@ -100,6 +106,7 @@ namespace NutriMind.Tests.EditMode
                 Assert.That(recomposed.AnnouncementReadRepository, Is.Not.Null);
                 Assert.That(recomposed.IdempotentRequestRepository, Is.Not.Null);
                 Assert.That(recomposed.MockRuntimeState, Is.Not.Null);
+                Assert.That(recomposed.InstallationIdGenerator, Is.InstanceOf<SystemIdGenerator>());
 
                 string firstAfterRecompose =
                     recomposed.InstallationRepository.GetOrCreateDeviceId().Value;

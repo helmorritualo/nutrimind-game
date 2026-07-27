@@ -42,9 +42,9 @@ SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue
 
 Do not build all future mission scenes merely because their JSON content exists.
 
-### Implementation status (Prompt 1)
+### Implementation status (Prompt 2)
 
-App runtime foundation is complete for Editor and Development APK mock use: shared `IMockRuntimeState`, Development mock menu/controller, safe reset/recompose, persistent Mock Development auth token, full Bootstrap cache v1 restore, all persistence repositories composed, lossless sync outbox envelopes, deterministic Mock clock/IDs, cancellation-safe presenters, and sync concurrency gating. Four `SCN_App_*` scenes remain Build Settings 0–3. Prompt 2 wires remaining Main/QuizPortal route presenters.
+App Mock runtime wiring is in place for Editor use: Prompt 1 foundation plus Main/QuizPortal coordinators, AppShell runtime host, route presenters for all authenticated App panels, modal host, simulated mission launch (local progress + outbox only), `AuthenticatedStudentState`, `InstallationIdGenerator` separation, and corrected destructive-reset cancellation. Four `SCN_App_*` scenes remain Build Settings 0–3. This is not a claim that production HTTP, secure token store, or the playable mission scene is complete.
 
 ## 3. Canonical folder structure
 

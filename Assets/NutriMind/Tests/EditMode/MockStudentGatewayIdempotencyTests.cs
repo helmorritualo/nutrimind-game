@@ -147,6 +147,168 @@ namespace NutriMind.Tests.EditMode
             Assert.That(retryTask.Result.Value.Status, Is.EqualTo("used").IgnoreCase);
         }
 
+        // ──────────────────────────── UUID reuse / namespace isolation ───────────────
+
+        /// <summary>
+        /// A UUID used for a quiz submission must not conflict with the same UUID used
+        /// for a reward request. Each operation maintains its own idempotency namespace.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator QuizSubmit_UuidAlsoUsedForReward_NamespacesAreIndependent()
+        {
+            Task<MockStudentGateway> gatewayTask = CreateAuthenticatedGatewayAsync();
+            yield return Await(gatewayTask);
+            MockStudentGateway gateway = gatewayTask.Result;
+            const string sharedUuid = "uuid-cross-op-001";
+
+            Task<AppResult<QuizResult>> quizTask =
+                gateway.SubmitQuizAttemptAsync(CreateQuizRequest(sharedUuid, "opt_a"));
+            yield return Await(quizTask);
+
+            Task<AppResult<RewardSummary>> rewardTask = gateway.UseRewardAsync(new UseRewardRequest
+            {
+                RewardCode = "mock_reward_story_badge",
+                RequestUuid = sharedUuid
+            });
+            yield return Await(rewardTask);
+
+            Assert.That(quizTask.Result.IsSuccess, Is.True,
+                "Quiz submit with shared UUID should succeed: " + quizTask.Result.Error?.Message);
+            Assert.That(rewardTask.Result.IsSuccess, Is.True,
+                "Reward use with the same UUID should succeed independently: " + rewardTask.Result.Error?.Message);
+            Assert.That(quizTask.Result.Value.ClientAttemptUuid, Is.EqualTo(sharedUuid));
+            Assert.That(rewardTask.Result.Value.RewardCode, Is.EqualTo("mock_reward_story_badge"));
+        }
+
+        /// <summary>
+        /// A UUID used for a reward request must not conflict with the same UUID used
+        /// for a quiz submission. Symmetric counterpart of the above test.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator RewardUse_UuidAlsoUsedForQuiz_NamespacesAreIndependent()
+        {
+            Task<MockStudentGateway> gatewayTask = CreateAuthenticatedGatewayAsync();
+            yield return Await(gatewayTask);
+            MockStudentGateway gateway = gatewayTask.Result;
+            const string sharedUuid = "uuid-cross-op-002";
+
+            Task<AppResult<RewardSummary>> rewardTask = gateway.UseRewardAsync(new UseRewardRequest
+            {
+                RewardCode = "mock_reward_story_badge",
+                RequestUuid = sharedUuid
+            });
+            yield return Await(rewardTask);
+
+            Task<AppResult<QuizResult>> quizTask =
+                gateway.SubmitQuizAttemptAsync(CreateQuizRequest(sharedUuid, "opt_a"));
+            yield return Await(quizTask);
+
+            Assert.That(rewardTask.Result.IsSuccess, Is.True,
+                "Reward use with shared UUID should succeed: " + rewardTask.Result.Error?.Message);
+            Assert.That(quizTask.Result.IsSuccess, Is.True,
+                "Quiz submit with the same UUID should succeed independently: " + quizTask.Result.Error?.Message);
+        }
+
+        /// <summary>
+        /// Three distinct quiz UUIDs must each produce independent, correctly committed results.
+        /// Verifies the idempotency store doesn't cross-contaminate between distinct keys.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator QuizSubmit_ThreeDistinctUuids_AllProduceIndependentResults()
+        {
+            Task<MockStudentGateway> gatewayTask = CreateAuthenticatedGatewayAsync();
+            yield return Await(gatewayTask);
+            MockStudentGateway gateway = gatewayTask.Result;
+
+            SubmitQuizAttemptRequest req1 = CreateQuizRequest("uuid-multi-001", "opt_a");
+            SubmitQuizAttemptRequest req2 = CreateQuizRequest("uuid-multi-002", "opt_b");
+            SubmitQuizAttemptRequest req3 = CreateQuizRequest("uuid-multi-003", "opt_c");
+
+            Task<AppResult<QuizResult>> t1 = gateway.SubmitQuizAttemptAsync(req1);
+            yield return Await(t1);
+            Task<AppResult<QuizResult>> t2 = gateway.SubmitQuizAttemptAsync(req2);
+            yield return Await(t2);
+            Task<AppResult<QuizResult>> t3 = gateway.SubmitQuizAttemptAsync(req3);
+            yield return Await(t3);
+
+            Assert.That(t1.Result.IsSuccess, Is.True);
+            Assert.That(t2.Result.IsSuccess, Is.True);
+            Assert.That(t3.Result.IsSuccess, Is.True);
+
+            Assert.That(t1.Result.Value.ClientAttemptUuid, Is.EqualTo("uuid-multi-001"));
+            Assert.That(t2.Result.Value.ClientAttemptUuid, Is.EqualTo("uuid-multi-002"));
+            Assert.That(t3.Result.Value.ClientAttemptUuid, Is.EqualTo("uuid-multi-003"));
+
+            // Each attempt ID must be unique (distinct server records).
+            Assert.That(t1.Result.Value.AttemptId, Is.Not.EqualTo(t2.Result.Value.AttemptId));
+            Assert.That(t2.Result.Value.AttemptId, Is.Not.EqualTo(t3.Result.Value.AttemptId));
+            Assert.That(t1.Result.Value.AttemptId, Is.Not.EqualTo(t3.Result.Value.AttemptId));
+        }
+
+        /// <summary>
+        /// Retrying an already-committed quiz UUID must return the original result even
+        /// after subsequent distinct quiz submissions have occurred.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator QuizSubmit_ReuseUuidAfterSubsequentSubmissions_StillReturnsSameResult()
+        {
+            Task<MockStudentGateway> gatewayTask = CreateAuthenticatedGatewayAsync();
+            yield return Await(gatewayTask);
+            MockStudentGateway gateway = gatewayTask.Result;
+            SubmitQuizAttemptRequest original = CreateQuizRequest("uuid-reuse-after-001", "opt_a");
+
+            // Commit the first submission.
+            Task<AppResult<QuizResult>> firstTask = gateway.SubmitQuizAttemptAsync(original);
+            yield return Await(firstTask);
+            Assert.That(firstTask.Result.IsSuccess, Is.True);
+            string firstAttemptId = firstTask.Result.Value.AttemptId;
+
+            // Interleave with unrelated submissions.
+            Task<AppResult<QuizResult>> otherTask = gateway.SubmitQuizAttemptAsync(
+                CreateQuizRequest("uuid-reuse-other-001", "opt_b"));
+            yield return Await(otherTask);
+            Assert.That(otherTask.Result.IsSuccess, Is.True);
+
+            // Retry the original UUID — must return the same committed result.
+            Task<AppResult<QuizResult>> retryTask = gateway.SubmitQuizAttemptAsync(original);
+            yield return Await(retryTask);
+
+            Assert.That(retryTask.Result.IsSuccess, Is.True);
+            Assert.That(retryTask.Result.Value.AttemptId, Is.EqualTo(firstAttemptId));
+            Assert.That(retryTask.Result.Value.ClientAttemptUuid, Is.EqualTo("uuid-reuse-after-001"));
+        }
+
+        /// <summary>
+        /// Two distinct reward UUIDs must produce independent server records.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator RewardUse_TwoDistinctUuids_ProduceIndependentServerRecords()
+        {
+            Task<MockStudentGateway> gatewayTask = CreateAuthenticatedGatewayAsync();
+            yield return Await(gatewayTask);
+            MockStudentGateway gateway = gatewayTask.Result;
+
+            Task<AppResult<RewardSummary>> r1 = gateway.UseRewardAsync(new UseRewardRequest
+            {
+                RewardCode = "mock_reward_story_badge",
+                RequestUuid = "uuid-reward-multi-001"
+            });
+            yield return Await(r1);
+
+            Task<AppResult<RewardSummary>> r2 = gateway.UseRewardAsync(new UseRewardRequest
+            {
+                RewardCode = "mock_reward_story_badge",
+                RequestUuid = "uuid-reward-multi-002"
+            });
+            yield return Await(r2);
+
+            Assert.That(r1.Result.IsSuccess, Is.True,
+                "First distinct reward UUID should succeed: " + r1.Result.Error?.Message);
+            Assert.That(r2.Result.IsSuccess, Is.True,
+                "Second distinct reward UUID should succeed: " + r2.Result.Error?.Message);
+            Assert.That(r1.Result.Value.RewardCode, Is.EqualTo(r2.Result.Value.RewardCode));
+        }
+
         [UnityTest]
         public IEnumerator SyncPush_SameUuidAndPayload_IsIdempotent()
         {
