@@ -134,7 +134,7 @@ namespace NutriMind.Tests.PlayMode
                 AppLifetime.Instance.ResourceCacheRepository.Get(ResourceCacheKeys.Bootstrap).Value,
                 Is.Not.Null);
 
-            // Prompt 1 token store is in-memory; keep the lifetime instance and toggle connectivity.
+            // Development Mock token store persists across toggle; keep the lifetime instance offline.
             AppLifetime.Instance.Connectivity.SetState(ConnectivityState.Offline);
             var startup = new AppStartupCoordinator(AppLifetime.Instance);
             var run = startup.RunAsync();
@@ -146,6 +146,9 @@ namespace NutriMind.Tests.PlayMode
             Assert.That(run.IsFaulted, Is.False);
             Assert.That(startup.State, Is.EqualTo(BootstrapPreviewState.OfflineEligible));
             Assert.That(startup.IsOfflineEligible, Is.True);
+            Assert.That(AppLifetime.Instance.LastBootstrap, Is.Not.Null);
+            Assert.That(AppLifetime.Instance.LastBootstrap.Profile, Is.Not.Null);
+            Assert.That(AppLifetime.Instance.OfflineEligible, Is.True);
 
             var continueTask = startup.ContinueOfflineAsync();
             while (!continueTask.IsCompleted)

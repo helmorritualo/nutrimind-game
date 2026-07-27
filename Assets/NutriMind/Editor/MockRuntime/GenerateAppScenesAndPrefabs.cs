@@ -257,6 +257,11 @@ namespace NutriMind.Editor.MockRuntime
             }
 
             EditorGUILayout.Space();
+            if (GUILayout.Button("Reset Mock Server State"))
+            {
+                MockRuntimeControls.ResetMockServer();
+            }
+
             if (GUILayout.Button("Reset Database…"))
             {
                 MockRuntimeControls.ResetDatabase();

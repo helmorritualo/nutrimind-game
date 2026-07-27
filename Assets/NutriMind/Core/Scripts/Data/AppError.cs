@@ -128,6 +128,9 @@ namespace NutriMind.Core.Data
         public const string SyncEventLimitExceeded = "SYNC_EVENT_LIMIT_EXCEEDED";
         public const string SyncEventTooOld = "SYNC_EVENT_TOO_OLD";
         public const string SyncEventTypeUnsupported = "SYNC_EVENT_TYPE_UNSUPPORTED";
+        public const string SyncPayloadInvalid = "SYNC_PAYLOAD_INVALID";
+        public const string SyncPayloadVersionUnsupported = "SYNC_PAYLOAD_VERSION_UNSUPPORTED";
+        public const string SyncInProgress = "SYNC_IN_PROGRESS";
         public const string ValidationFailed = "VALIDATION_FAILED";
         public const string RateLimited = "RATE_LIMITED";
         public const string ServerBusy = "SERVER_BUSY";
@@ -138,5 +141,7 @@ namespace NutriMind.Core.Data
         public const string ClientInternalError = "CLIENT_INTERNAL_ERROR";
         public const string ClientConfigurationError = "CLIENT_CONFIGURATION_ERROR";
         public const string FixtureLoadFailed = "FIXTURE_LOAD_FAILED";
+        public const string CachePayloadInvalid = "CACHE_PAYLOAD_INVALID";
+        public const string CacheSchemaUnsupported = "CACHE_SCHEMA_UNSUPPORTED";
     }
 }

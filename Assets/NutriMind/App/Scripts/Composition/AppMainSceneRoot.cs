@@ -137,16 +137,19 @@ namespace NutriMind.App.Composition
             _shellController?.SetPageTitle("Home", "Main");
         }
 
-        private async void OnQuizPortalRequested()
+        private void OnQuizPortalRequested()
         {
             if (!AppLifetime.HasInstance || AppLifetime.Instance.Router == null)
             {
                 return;
             }
 
-            await AppLifetime.Instance.Router.EnterQuizPortalAsync(
-                AppRouteContext.Empty.WithReturnToMainOnQuizBack(true),
-                AppLifetime.Instance.LifetimeToken);
+            TaskUtilities.ForgetSafely(
+                AppLifetime.Instance.Router.EnterQuizPortalAsync(
+                    AppRouteContext.Empty.WithReturnToMainOnQuizBack(true),
+                    AppLifetime.Instance.LifetimeToken),
+                AppLifetime.Instance.LifetimeToken,
+                "Main.EnterQuizPortal");
         }
 
         private void TeardownContent()

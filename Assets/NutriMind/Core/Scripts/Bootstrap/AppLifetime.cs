@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NutriMind.App.Composition;
@@ -28,7 +29,9 @@ namespace NutriMind.Core.Bootstrap
 
         private CancellationTokenSource _lifetimeCts;
         private AppCompositionRoot _compositionRoot;
+        private bool _composeStarted;
         private bool _isInitialized;
+        private readonly SemaphoreSlim _resetGate = new SemaphoreSlim(1, 1);
 
         public static AppLifetime Instance => _instance;
 
@@ -46,6 +49,8 @@ namespace NutriMind.Core.Bootstrap
 
         public IConnectivityService Connectivity => _compositionRoot?.Connectivity;
 
+        public IMockRuntimeState MockRuntimeState => _compositionRoot?.MockRuntimeState;
+
         public SyncCoordinator SyncCoordinator => _compositionRoot?.SyncCoordinator;
 
         public IAppSceneNavigator SceneNavigator => _compositionRoot?.SceneNavigator;
@@ -58,7 +63,21 @@ namespace NutriMind.Core.Bootstrap
 
         public IResourceCacheRepository ResourceCacheRepository => _compositionRoot?.ResourceCacheRepository;
 
+        public IMissionProgressRepository MissionProgressRepository =>
+            _compositionRoot?.MissionProgressRepository;
+
         public IOutboxRepository OutboxRepository => _compositionRoot?.OutboxRepository;
+
+        public IAnnouncementReadRepository AnnouncementReadRepository =>
+            _compositionRoot?.AnnouncementReadRepository;
+
+        public IIdempotentRequestRepository IdempotentRequestRepository =>
+            _compositionRoot?.IdempotentRequestRepository;
+
+        public ILocalProgressWriter LocalProgressWriter => _compositionRoot?.LocalProgressWriter;
+
+        public IOutboxPayloadSerializer OutboxPayloadSerializer =>
+            _compositionRoot?.OutboxPayloadSerializer;
 
         public IAppClock Clock => _compositionRoot?.Clock;
 
@@ -79,7 +98,9 @@ namespace NutriMind.Core.Bootstrap
 
         public AppError ConfigurationError { get; private set; }
 
-        public bool IsReady => _isInitialized && _compositionRoot != null;
+        public bool OfflineEligible { get; private set; }
+
+        public bool IsReady => _isInitialized && _compositionRoot != null && !_compositionRoot.IsDisposed;
 
         private void Awake()
         {
@@ -107,6 +128,13 @@ namespace NutriMind.Core.Bootstrap
 
             _lifetimeCts = new CancellationTokenSource();
             InitializeComposition();
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (_runtimeOptions.Mode == NutriMindRuntimeMode.Mock)
+            {
+                DevelopmentMockRuntimeController.EnsureOn(gameObject);
+            }
+#endif
         }
 
         private void OnDestroy()
@@ -119,15 +147,32 @@ namespace NutriMind.Core.Bootstrap
             DisposeLifetime();
         }
 
-        public void SetRuntimeOptions(NutriMindRuntimeOptions options)
+        /// <summary>
+        /// Applies startup options only before composition. Late calls are ignored.
+        /// Preferred owner: serialized options on PFB_AppLifetime.
+        /// </summary>
+        public void ConfigureBeforeCompose(NutriMindRuntimeOptions options)
         {
+            if (_composeStarted)
+            {
+                NutriMindLog.RuntimeWarning(
+                    "Ignoring ConfigureBeforeCompose after composition has started.");
+                return;
+            }
+
             if (options == null)
             {
                 return;
             }
 
             options.Clamp();
-            _runtimeOptions = options;
+            _runtimeOptions = options.Clone();
+        }
+
+        [Obsolete("Use ConfigureBeforeCompose before Awake/Compose. Late option changes are ignored.")]
+        public void SetRuntimeOptions(NutriMindRuntimeOptions options)
+        {
+            ConfigureBeforeCompose(options);
         }
 
         public void SetAuthenticated(StudentProfile profile, bool authenticated)
@@ -151,12 +196,18 @@ namespace NutriMind.Core.Bootstrap
             InstallationDeviceId = string.IsNullOrWhiteSpace(deviceId) ? null : deviceId.Trim();
         }
 
+        public void SetOfflineEligible(bool offlineEligible)
+        {
+            OfflineEligible = offlineEligible;
+        }
+
         public async Task ClearAuthenticationAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             IsAuthenticated = false;
             CurrentProfile = null;
             LastBootstrap = null;
+            OfflineEligible = false;
 
             if (TokenStore != null)
             {
@@ -181,10 +232,253 @@ namespace NutriMind.Core.Bootstrap
             }
         }
 
+        public Task<AppResult> ResetMockServerAsync(CancellationToken cancellationToken = default)
+        {
+            return RunResetExclusiveAsync(() =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (MockRuntimeState == null)
+                {
+                    return Task.FromResult(AppResult.Failure(
+                        AppErrorCodes.ClientConfigurationError,
+                        "Mock runtime state is not available."));
+                }
+
+                MockRuntimeState.ResetServerState();
+                NutriMindLog.Runtime("Mock server state reset.");
+                return Task.FromResult(AppResult.Success());
+            }, cancellationToken);
+        }
+
+        public Task<AppResult> ResetLocalDatabaseAsync(CancellationToken cancellationToken = default)
+        {
+            return RunResetExclusiveAsync(async () =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await CancelActiveOperationsAsync().ConfigureAwait(false);
+
+                string path = Database != null
+                    ? Database.DatabaseFilePath
+                    : NutriMindDatabase.GetDefaultDatabasePath();
+
+                DisposeCompositionOnly();
+                TryDeleteDatabaseFiles(path);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                DevelopmentMockAuthTokenStore.DeletePersistedFile();
+#endif
+                IsAuthenticated = false;
+                CurrentProfile = null;
+                LastBootstrap = null;
+                LastClientConfiguration = null;
+                InstallationDeviceId = null;
+                OfflineEligible = false;
+
+                RecreateLifetimeCts();
+                AppResult recompose = RecomposeInternal();
+                if (recompose.IsFailure)
+                {
+                    return recompose;
+                }
+
+                // Intentional DB wipe → new installation UUID.
+                if (InstallationRepository != null)
+                {
+                    AppResult<string> regenerated =
+                        InstallationRepository.RegenerateDeviceIdForFullInstallReset();
+                    if (regenerated.IsSuccess)
+                    {
+                        InstallationDeviceId = regenerated.Value;
+                    }
+                }
+
+                await LoadBootstrapSceneAsync(cancellationToken).ConfigureAwait(false);
+                NutriMindLog.Sqlite("Local database reset and recomposed.");
+                return AppResult.Success();
+            }, cancellationToken);
+        }
+
+        public Task<AppResult> FullInstallationResetAsync(CancellationToken cancellationToken = default)
+        {
+            return RunResetExclusiveAsync(async () =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await CancelActiveOperationsAsync().ConfigureAwait(false);
+
+                string path = Database != null
+                    ? Database.DatabaseFilePath
+                    : NutriMindDatabase.GetDefaultDatabasePath();
+
+                DisposeCompositionOnly();
+                TryDeleteDatabaseFiles(path);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                DevelopmentMockAuthTokenStore.DeletePersistedFile();
+#endif
+                IsAuthenticated = false;
+                CurrentProfile = null;
+                LastBootstrap = null;
+                LastClientConfiguration = null;
+                InstallationDeviceId = null;
+                OfflineEligible = false;
+                ConfigurationError = null;
+
+                RecreateLifetimeCts();
+                AppResult recompose = RecomposeInternal();
+                if (recompose.IsFailure)
+                {
+                    return recompose;
+                }
+
+                MockRuntimeState?.ResetServerState();
+                Router?.ClearStacks();
+
+                if (InstallationRepository != null)
+                {
+                    AppResult<string> regenerated =
+                        InstallationRepository.RegenerateDeviceIdForFullInstallReset();
+                    if (regenerated.IsSuccess)
+                    {
+                        InstallationDeviceId = regenerated.Value;
+                    }
+                }
+
+                await LoadBootstrapSceneAsync(cancellationToken).ConfigureAwait(false);
+                NutriMindLog.Runtime("Full installation reset completed.");
+                return AppResult.Success();
+            }, cancellationToken);
+        }
+
+        public Task<AppResult> RecomposeAsync(CancellationToken cancellationToken = default)
+        {
+            return RunResetExclusiveAsync(async () =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await CancelActiveOperationsAsync().ConfigureAwait(false);
+                DisposeCompositionOnly();
+                RecreateLifetimeCts();
+                AppResult result = RecomposeInternal();
+                await Task.CompletedTask.ConfigureAwait(false);
+                return result;
+            }, cancellationToken);
+        }
+
+        private async Task<AppResult> RunResetExclusiveAsync(
+            Func<Task<AppResult>> action,
+            CancellationToken cancellationToken)
+        {
+            await _resetGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                return await action().ConfigureAwait(false);
+            }
+            finally
+            {
+                _resetGate.Release();
+            }
+        }
+
+        private async Task CancelActiveOperationsAsync()
+        {
+            try
+            {
+                _lifetimeCts?.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore
+            }
+
+            await Task.Yield();
+        }
+
+        private void RecreateLifetimeCts()
+        {
+            try
+            {
+                _lifetimeCts?.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore
+            }
+
+            _lifetimeCts = new CancellationTokenSource();
+        }
+
+        private void DisposeCompositionOnly()
+        {
+            _compositionRoot?.Dispose();
+            _compositionRoot = null;
+            _isInitialized = false;
+        }
+
+        private AppResult RecomposeInternal()
+        {
+            try
+            {
+                _composeStarted = true;
+                _compositionRoot = new AppCompositionRoot(_runtimeOptions);
+                AppResult compose = _compositionRoot.Compose();
+                if (compose.IsFailure)
+                {
+                    ConfigurationError = compose.Error;
+                    NutriMindLog.RuntimeError(
+                        "Recompose failed: " + compose.Error.Code + " — " + compose.Error.Message);
+                    _isInitialized = true;
+                    return compose;
+                }
+
+                ConfigurationError = _compositionRoot.ComposeError;
+                _isInitialized = true;
+                NutriMindLog.Runtime("AppLifetime recomposed. mode=" + _runtimeOptions.Mode + ".");
+                return AppResult.Success();
+            }
+            catch (Exception exception)
+            {
+                ConfigurationError = AppError.FromException(exception);
+                _isInitialized = true;
+                NutriMindLog.RuntimeError("AppLifetime recompose threw: " + exception.GetType().Name);
+                return AppResult.Failure(ConfigurationError);
+            }
+        }
+
+        private async Task LoadBootstrapSceneAsync(CancellationToken cancellationToken)
+        {
+            await UnityMainThread.SwitchToMainAsync(cancellationToken).ConfigureAwait(false);
+            if (SceneNavigator != null)
+            {
+                await SceneNavigator.LoadAsync(AppSceneId.Bootstrap, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        private static void TryDeleteDatabaseFiles(string path)
+        {
+            TryDelete(path);
+            TryDelete(path + "-wal");
+            TryDelete(path + "-shm");
+        }
+
+        private static void TryDelete(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            catch (Exception exception)
+            {
+                NutriMindLog.SqliteWarning("Could not delete " + path + ": " + exception.GetType().Name);
+            }
+        }
+
         private void InitializeComposition()
         {
             try
             {
+                _composeStarted = true;
                 _compositionRoot = new AppCompositionRoot(_runtimeOptions);
                 AppResult compose = _compositionRoot.Compose();
                 if (compose.IsFailure)
@@ -230,6 +524,8 @@ namespace NutriMind.Core.Bootstrap
             _compositionRoot?.Dispose();
             _compositionRoot = null;
             _isInitialized = false;
+            _composeStarted = false;
+            _resetGate.Dispose();
         }
     }
 }

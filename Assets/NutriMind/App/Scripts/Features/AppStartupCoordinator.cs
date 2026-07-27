@@ -264,26 +264,26 @@ namespace NutriMind.App.Features
 
             if (hasToken && offlineEligible && hasBootstrapCache)
             {
-                _offlineEligible = true;
-                if (session != null)
+                AppResult<BootstrapSnapshot> restored = BootstrapCacheMapper.Deserialize(
+                    cache.Value.PayloadJson,
+                    cache.Value.SchemaVersion);
+                if (restored.IsFailure)
                 {
-                    _lifetime.SetAuthenticated(
-                        new StudentProfile
-                        {
-                            Id = session.StudentId,
-                            DisplayName = session.DisplayName,
-                            GradeId = session.GradeId,
-                            Section = new StudentSection
-                            {
-                                Id = session.SectionId,
-                                Name = session.SectionName,
-                                GradeId = session.GradeId
-                            },
-                            IsActive = true
-                        },
-                        authenticated: true);
+                    _lastError = restored.Error ?? AppError.Api(
+                        AppErrorCodes.CachePayloadInvalid,
+                        "Cached Bootstrap payload is invalid or unsupported.",
+                        409,
+                        isRetryable: true);
+                    NutriMindLog.StartupWarning(
+                        "Offline Bootstrap cache restore failed: " + _lastError.Code);
+                    SetState(BootstrapPreviewState.RecoverableError);
+                    return;
                 }
 
+                _offlineEligible = true;
+                _lifetime.SetOfflineEligible(true);
+                _lifetime.SetBootstrap(restored.Value);
+                _lifetime.SetAuthenticated(restored.Value.Profile, authenticated: true);
                 SetState(BootstrapPreviewState.OfflineEligible);
                 return;
             }
@@ -329,29 +329,48 @@ namespace NutriMind.App.Features
 
             _lifetime.SessionRepository.UpsertSession(session);
 
-            // Marker cache entry — payload is not a transport secret and excludes the access token.
+            AppResult<string> cacheJson = BootstrapCacheMapper.Serialize(snapshot, now);
+            if (cacheJson.IsFailure)
+            {
+                NutriMindLog.StartupWarning(
+                    "Bootstrap cache serialization failed: " + cacheJson.Error.Code);
+                return;
+            }
+
             _lifetime.ResourceCacheRepository.Upsert(new ResourceCacheRecord
             {
                 CacheKey = ResourceCacheKeys.Bootstrap,
-                PayloadJson = "{\"cached\":true,\"student_id\":\"" + EscapeJson(profile.Id) + "\"}",
-                SchemaVersion = 1,
+                PayloadJson = cacheJson.Value,
+                SchemaVersion = BootstrapCacheMapper.SupportedSchemaVersion,
                 ServerRevision = snapshot.Sync != null ? snapshot.Sync.Revision : (int?)null,
                 CachedUtc = now
             });
 
-            if (CachePolicy.AllowsCache(CachePolicy.Profile))
+            if (CachePolicy.AllowsCache(CachePolicy.Profile) && snapshot.Profile != null)
             {
-                _lifetime.ResourceCacheRepository.Upsert(new ResourceCacheRecord
+                AppResult<string> profileOnly = BootstrapCacheMapper.Serialize(
+                    new BootstrapSnapshot
+                    {
+                        Profile = snapshot.Profile,
+                        RequiredManifestVersion = snapshot.RequiredManifestVersion,
+                        Subjects = Array.Empty<SubjectSummary>(),
+                        Missions = Array.Empty<MissionSummary>(),
+                        Sync = snapshot.Sync
+                    },
+                    now);
+                if (profileOnly.IsSuccess)
                 {
-                    CacheKey = ResourceCacheKeys.Profile,
-                    PayloadJson =
-                        "{\"id\":\"" + EscapeJson(profile.Id) +
-                        "\",\"display_name\":\"" + EscapeJson(profile.DisplayName) + "\"}",
-                    SchemaVersion = 1,
-                    CachedUtc = now
-                });
+                    _lifetime.ResourceCacheRepository.Upsert(new ResourceCacheRecord
+                    {
+                        CacheKey = ResourceCacheKeys.Profile,
+                        PayloadJson = profileOnly.Value,
+                        SchemaVersion = BootstrapCacheMapper.SupportedSchemaVersion,
+                        CachedUtc = now
+                    });
+                }
             }
 
+            _lifetime.SetOfflineEligible(offlineEligible);
             await Task.CompletedTask;
         }
 
@@ -442,16 +461,6 @@ namespace NutriMind.App.Features
             }
 
             return 0;
-        }
-
-        private static string EscapeJson(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return value.Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
     }
 }

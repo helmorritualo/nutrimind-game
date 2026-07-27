@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using NutriMind.App.Features;
 using NutriMind.App.Routing;
 using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Utilities;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NutriMind.App.Presentation
@@ -62,7 +62,12 @@ namespace NutriMind.App.Presentation
             _cts.Dispose();
         }
 
-        private async void OnSubmitRequested()
+        private void OnSubmitRequested()
+        {
+            TaskUtilities.ForgetSafely(HandleSubmitAsync(), _cts.Token, "Login.Submit");
+        }
+
+        private async Task HandleSubmitAsync()
         {
             if (_disposed || _loginUseCase.IsSubmitting || _rateLimitRemaining > 0)
             {
@@ -79,9 +84,9 @@ namespace NutriMind.App.Presentation
                     Pin = _view.Pin,
                     DeviceName = _view.DeviceName
                 },
-                _cts.Token);
+                _cts.Token).ConfigureAwait(false);
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token);
+            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
             if (_disposed)
             {
                 return;
@@ -95,7 +100,8 @@ namespace NutriMind.App.Presentation
             {
                 _view.ClearStatus();
                 _lifetime.Router?.EnsureMainRoot();
-                await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token);
+                await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token)
+                    .ConfigureAwait(false);
                 return;
             }
 

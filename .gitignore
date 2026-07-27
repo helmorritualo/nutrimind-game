@@ -105,3 +105,9 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Cursor agent local state (machine-specific paths)
+.cursor/hooks/state/
+
+# Regenerated Visual Studio / IDE solution noise
+nutrimind-game.slnx

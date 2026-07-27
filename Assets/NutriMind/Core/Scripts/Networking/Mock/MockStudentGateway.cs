@@ -18,6 +18,7 @@ namespace NutriMind.Core.Networking
         private readonly IMockFixtureSource _fixtures;
         private readonly IAppClock _clock;
         private readonly MockServerState _state;
+        private readonly IMockRuntimeState _mockRuntime;
         private readonly object _seedGate = new object();
         private bool _seedAttempted;
         private AppError _seedError;
@@ -29,7 +30,8 @@ namespace NutriMind.Core.Networking
             IMockFixtureSource fixtures = null,
             IAppClock clock = null,
             IIdGenerator ids = null,
-            MockServerState state = null)
+            MockServerState state = null,
+            IMockRuntimeState mockRuntime = null)
         {
             _options = (options ?? NutriMindRuntimeOptions.CreateDefaults()).Clone();
             _options.Clamp();
@@ -40,6 +42,7 @@ namespace NutriMind.Core.Networking
             _fixtures = fixtures ?? new ResourcesMockFixtureSource(preloadAll: true);
             _clock = clock ?? new FixedMockClock();
             _state = state ?? new MockServerState();
+            _mockRuntime = mockRuntime;
 
             if (_fixtures is ResourcesMockFixtureSource resourceFixtures
                 && resourceFixtures.PreloadError != null)
@@ -48,7 +51,7 @@ namespace NutriMind.Core.Networking
                     "Mock fixture preload reported: " + resourceFixtures.PreloadError.Code);
             }
 
-            if (_options.StartOffline)
+            if (_options.StartOffline && _mockRuntime == null)
             {
                 _connectivity.SetState(ConnectivityState.Offline);
             }
@@ -56,7 +59,15 @@ namespace NutriMind.Core.Networking
 
         public MockServerState ServerState => _state;
 
+        public IMockRuntimeState MockRuntime => _mockRuntime;
+
         public NutriMindRuntimeOptions Options => _options;
+
+        /// <summary>
+        /// Live scenario from shared mock runtime state when composed; otherwise startup clone.
+        /// </summary>
+        private MockApiScenario ActiveScenario =>
+            _mockRuntime != null ? _mockRuntime.Scenario : _options.MockScenario;
 
         public async Task<AppResult<PingStatus>> PingAsync(CancellationToken cancellationToken = default)
         {
@@ -102,7 +113,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 async () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.RateLimitedLogin)
+                    if (ActiveScenario == MockApiScenario.RateLimitedLogin)
                     {
                         return AppResult<LoginResult>.Failure(AppError.Api(
                             AppErrorCodes.RateLimited,
@@ -188,7 +199,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<BootstrapSnapshot>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<BootstrapSnapshot>.Success(new BootstrapSnapshot
                         {
@@ -212,7 +223,7 @@ namespace NutriMind.Core.Networking
                     BootstrapSnapshot snapshot = MockFixtureMapper.ToBootstrap(loaded.Value);
                     snapshot.Profile = _state.Profile ?? snapshot.Profile;
                     snapshot.Sync = _state.SyncStatus ?? snapshot.Sync;
-                    if (_options.MockScenario == MockApiScenario.LockedMission
+                    if (ActiveScenario == MockApiScenario.LockedMission
                         && snapshot.Missions != null
                         && snapshot.Missions.Count > 0)
                     {
@@ -295,7 +306,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<SubjectSummary>>.Success(
                             Array.Empty<SubjectSummary>()));
@@ -323,7 +334,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<TermSummary>>.Success(
                             Array.Empty<TermSummary>()));
@@ -357,7 +368,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<IReadOnlyList<MissionSummary>>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<MissionSummary>>.Success(
                             Array.Empty<MissionSummary>()));
@@ -494,7 +505,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<QuizSummary>>.Success(
                             Array.Empty<QuizSummary>()));
@@ -599,7 +610,7 @@ namespace NutriMind.Core.Networking
                         normalized,
                         committed);
 
-                    if (_options.MockScenario == MockApiScenario.QuizSubmissionTimeout)
+                    if (ActiveScenario == MockApiScenario.QuizSubmissionTimeout)
                     {
                         return Task.FromResult(AppResult<QuizResult>.Failure(AppError.Network(
                             AppErrorCodes.NetworkTimeout,
@@ -627,7 +638,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<IReadOnlyList<QuizHistoryEntry>>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<QuizHistoryEntry>>.Success(
                             Array.Empty<QuizHistoryEntry>()));
@@ -709,7 +720,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<ProgressSummary>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<ProgressSummary>.Success(new ProgressSummary()));
                     }
@@ -733,7 +744,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<IReadOnlyList<RewardSummary>>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<RewardSummary>>.Success(
                             Array.Empty<RewardSummary>()));
@@ -797,7 +808,7 @@ namespace NutriMind.Core.Networking
                         normalized,
                         used);
 
-                    if (_options.MockScenario == MockApiScenario.RewardUseTimeout)
+                    if (ActiveScenario == MockApiScenario.RewardUseTimeout)
                     {
                         return Task.FromResult(AppResult<RewardSummary>.Failure(AppError.Network(
                             AppErrorCodes.NetworkTimeout,
@@ -818,7 +829,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<CertificateSummary>>.Success(
                             Array.Empty<CertificateSummary>()));
@@ -885,7 +896,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<IReadOnlyList<AnnouncementSummary>>.Success(
                             Array.Empty<AnnouncementSummary>()));
@@ -914,7 +925,7 @@ namespace NutriMind.Core.Networking
                 cancellationToken,
                 () =>
                 {
-                    if (_options.MockScenario == MockApiScenario.EmptyData)
+                    if (ActiveScenario == MockApiScenario.EmptyData)
                     {
                         return Task.FromResult(AppResult<LeaderboardPage>.Success(new LeaderboardPage
                         {
@@ -1001,7 +1012,7 @@ namespace NutriMind.Core.Networking
                         }
                     }
 
-                    if (_options.MockScenario == MockApiScenario.SyncConflict)
+                    if (ActiveScenario == MockApiScenario.SyncConflict)
                     {
                         return Task.FromResult(AppResult<SyncPushResult>.Failure(AppError.Api(
                             AppErrorCodes.StaleClientRevision,
@@ -1051,7 +1062,7 @@ namespace NutriMind.Core.Networking
                         return Task.FromResult(AppResult<ProgressMutationResult>.Failure(seedError));
                     }
 
-                    if (_options.MockScenario == MockApiScenario.LockedMission)
+                    if (ActiveScenario == MockApiScenario.LockedMission)
                     {
                         return Task.FromResult(AppResult<ProgressMutationResult>.Failure(AppError.Api(
                             AppErrorCodes.MissionLocked,
@@ -1121,7 +1132,7 @@ namespace NutriMind.Core.Networking
                     404));
             }
 
-            if (_options.MockScenario == MockApiScenario.LockedMission
+            if (ActiveScenario == MockApiScenario.LockedMission
                 && detail.Mission != null
                 && string.Equals(detail.Mission.Status, "locked", StringComparison.OrdinalIgnoreCase))
             {
@@ -1147,7 +1158,7 @@ namespace NutriMind.Core.Networking
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!_connectivity.IsOnline || _options.MockScenario == MockApiScenario.OfflineWithCache)
+            if (!_connectivity.IsOnline || ActiveScenario == MockApiScenario.OfflineWithCache)
             {
                 return AppResult<T>.Failure(AppError.Network(
                     AppErrorCodes.NetworkOffline,
@@ -1171,7 +1182,7 @@ namespace NutriMind.Core.Networking
 
             if (_options.LogGatewayOperations)
             {
-                NutriMindLog.MockGateway("operation=" + operation + " scenario=" + _options.MockScenario);
+                NutriMindLog.MockGateway("operation=" + operation + " scenario=" + ActiveScenario);
             }
 
             // Fixture text is preloaded; JsonUtility/domain mapping is safe off the main thread.
@@ -1180,7 +1191,7 @@ namespace NutriMind.Core.Networking
 
         private AppError EvaluateScenarioGate(string operation, bool requireAuth)
         {
-            switch (_options.MockScenario)
+            switch (ActiveScenario)
             {
                 case MockApiScenario.RecoverableServerErrors:
                     if (!string.Equals(operation, MockOperationNames.AuthLogin, StringComparison.Ordinal)
@@ -1231,7 +1242,7 @@ namespace NutriMind.Core.Networking
             int max = Math.Max(min, _options.MaximumMockLatencyMilliseconds);
             int mid = min + ((max - min) / 2);
 
-            switch (_options.MockScenario)
+            switch (ActiveScenario)
             {
                 case MockApiScenario.QuizSubmissionTimeout
                     when string.Equals(operation, MockOperationNames.QuizAttemptSubmit, StringComparison.Ordinal):
@@ -1326,7 +1337,7 @@ namespace NutriMind.Core.Networking
                 MockFixtureMapper.ToRewards(rewards.Value.items),
                 MockFixtureMapper.ToQuizHistory(history.Value.items));
 
-            if (_options.MockScenario == MockApiScenario.LockedMission)
+            if (ActiveScenario == MockApiScenario.LockedMission)
             {
                 _state.ApplyLockedMissionScenario();
             }

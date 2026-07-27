@@ -50,19 +50,23 @@ namespace NutriMind.Core.Sync
         private readonly ISyncPushGateway _gateway;
         private readonly IIdGenerator _idGenerator;
         private readonly IAppClock _clock;
+        private readonly IOutboxPayloadSerializer _payloadSerializer;
         private readonly object _gate = new object();
+        private readonly SemaphoreSlim _pushGate = new SemaphoreSlim(1, 1);
         private string _activeBatchUuid;
 
         public SyncCoordinator(
             IOutboxRepository outboxRepository,
             ISyncPushGateway gateway,
             IIdGenerator idGenerator,
-            IAppClock clock = null)
+            IAppClock clock = null,
+            IOutboxPayloadSerializer payloadSerializer = null)
         {
             _outboxRepository = outboxRepository ?? throw new ArgumentNullException(nameof(outboxRepository));
             _gateway = gateway ?? throw new ArgumentNullException(nameof(gateway));
             _idGenerator = idGenerator ?? throw new ArgumentNullException(nameof(idGenerator));
             _clock = clock ?? new SystemAppClock();
+            _payloadSerializer = payloadSerializer ?? new OutboxPayloadSerializer();
         }
 
         public string ActiveBatchUuid
@@ -82,6 +86,28 @@ namespace NutriMind.Core.Sync
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            if (!await _pushGate.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+            {
+                return AppResult<SyncPushResult>.Failure(
+                    AppErrorCodes.SyncInProgress,
+                    "A sync push is already in progress.",
+                    isRetryable: true);
+            }
+
+            try
+            {
+                return await PushPendingCoreAsync(configuration, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                _pushGate.Release();
+            }
+        }
+
+        private async Task<AppResult<SyncPushResult>> PushPendingCoreAsync(
+            ClientConfiguration configuration,
+            CancellationToken cancellationToken)
+        {
             ClientConfiguration config = configuration ?? new ClientConfiguration();
             int maxEvents = Math.Max(1, config.SyncMaxEventsPerBatch);
             int maxRequestBytes = Math.Max(1024, config.SyncMaxRequestBytes);
@@ -131,11 +157,16 @@ namespace NutriMind.Core.Sync
                     "Deferred oversized outbox event " + oversizedEvent.EventUuid + ".");
             }
 
+            batch = FilterInvalidPayloads(batch, attemptUtc);
+
             if (batch.Count == 0)
             {
-                return AppResult<SyncPushResult>.Failure(
-                    AppErrorCodes.SyncBatchTooLarge,
-                    "No outbox events fit within sync size limits.");
+                return AppResult<SyncPushResult>.Success(new SyncPushResult
+                {
+                    BatchUuid = null,
+                    ServerRevision = 0,
+                    Events = Array.Empty<SyncPushEventResult>()
+                });
             }
 
             string batchUuid = GetOrCreateBatchUuid();
@@ -169,6 +200,7 @@ namespace NutriMind.Core.Sync
             }
             catch (OperationCanceledException)
             {
+                RestorePending(eventUuids, attemptUtc, AppErrorCodes.NetworkTimeout);
                 throw;
             }
             catch (Exception exception)
@@ -244,6 +276,38 @@ namespace NutriMind.Core.Sync
             }
 
             return batch;
+        }
+
+        private List<SyncOutboxRecord> FilterInvalidPayloads(
+            List<SyncOutboxRecord> batch,
+            string attemptUtc)
+        {
+            var valid = new List<SyncOutboxRecord>(batch.Count);
+            foreach (SyncOutboxRecord row in batch)
+            {
+                AppResult<OutboxPayloadEnvelopeV1> parsed =
+                    _payloadSerializer.Deserialize(row.PayloadJson);
+                if (parsed.IsSuccess)
+                {
+                    valid.Add(row);
+                    continue;
+                }
+
+                string code = parsed.Error?.Code ?? AppErrorCodes.SyncPayloadInvalid;
+                string state = code == AppErrorCodes.SyncPayloadVersionUnsupported
+                    ? OutboxEventState.Deferred
+                    : OutboxEventState.Rejected;
+                _outboxRepository.ApplyPushResult(
+                    row.EventUuid,
+                    state,
+                    code,
+                    attemptUtc,
+                    serverRevision: null);
+                NutriMindLog.SyncWarning(
+                    "Preserved outbox event " + row.EventUuid + " as " + state + " (" + code + ").");
+            }
+
+            return valid;
         }
 
         private void ApplyEventResults(SyncPushResult result, string attemptUtc)

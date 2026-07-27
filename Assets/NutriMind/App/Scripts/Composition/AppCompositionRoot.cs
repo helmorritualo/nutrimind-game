@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using NutriMind.App.Routing;
 using NutriMind.Core.Data;
@@ -6,6 +9,8 @@ using NutriMind.Core.Networking;
 using NutriMind.Core.Persistence;
 using NutriMind.Core.Sync;
 using NutriMind.Core.Utilities;
+using NetworkSyncPushEvent = NutriMind.Core.Networking.SyncPushEvent;
+using LocalSyncPushEvent = NutriMind.Core.Sync.SyncPushEvent;
 
 namespace NutriMind.App.Composition
 {
@@ -38,11 +43,25 @@ namespace NutriMind.App.Composition
 
         public IResourceCacheRepository ResourceCacheRepository { get; private set; }
 
+        public IMissionProgressRepository MissionProgressRepository { get; private set; }
+
         public IOutboxRepository OutboxRepository { get; private set; }
+
+        public IAnnouncementReadRepository AnnouncementReadRepository { get; private set; }
+
+        public IIdempotentRequestRepository IdempotentRequestRepository { get; private set; }
+
+        public ILocalProgressWriter LocalProgressWriter { get; private set; }
+
+        public IOutboxPayloadSerializer OutboxPayloadSerializer { get; private set; }
 
         public IAuthTokenStore TokenStore { get; private set; }
 
         public IConnectivityService Connectivity { get; private set; }
+
+        public IMockRuntimeState MockRuntimeState { get; private set; }
+
+        public MockServerState MockServerState { get; private set; }
 
         public IStudentGateway Gateway { get; private set; }
 
@@ -56,14 +75,36 @@ namespace NutriMind.App.Composition
 
         public AppError ComposeError { get; private set; }
 
+        public bool IsDisposed => _disposed;
+
         public AppResult Compose()
         {
             DisposeOwned();
+            _disposed = false;
 
-            Clock = new SystemAppClock();
-            IdGenerator = new SystemIdGenerator();
-            TokenStore = new InMemoryMockAuthTokenStore();
+            if (_options.Mode == NutriMindRuntimeMode.Mock)
+            {
+                Clock = new FixedMockClock();
+                IdGenerator = new DeterministicMockIdGenerator();
+            }
+            else
+            {
+                Clock = new SystemAppClock();
+                IdGenerator = new SystemIdGenerator();
+            }
+
+            AppResult tokenResult = CreateTokenStore();
+            if (tokenResult.IsFailure)
+            {
+                ComposeError = tokenResult.Error;
+                return tokenResult;
+            }
+
             Connectivity = new MockConnectivityService(startOnline: !_options.StartOffline);
+            if (_options.StartOffline)
+            {
+                Connectivity.SetState(ConnectivityState.Offline);
+            }
 
             Database = new NutriMindDatabase(Clock);
             AppResult open = Database.Open();
@@ -87,7 +128,12 @@ namespace NutriMind.App.Composition
             InstallationRepository = new SqliteInstallationRepository(Database, IdGenerator, Clock);
             SessionRepository = new SqliteLocalSessionRepository(Database);
             ResourceCacheRepository = new SqliteResourceCacheRepository(Database);
+            MissionProgressRepository = new SqliteMissionProgressRepository(Database);
             OutboxRepository = new SqliteOutboxRepository(Database);
+            AnnouncementReadRepository = new SqliteAnnouncementReadRepository(Database);
+            IdempotentRequestRepository = new SqliteIdempotentRequestRepository(Database);
+            LocalProgressWriter = new LocalProgressWriter(Database, Clock);
+            OutboxPayloadSerializer = new OutboxPayloadSerializer();
 
             AppResult gatewayResult = CreateGateway();
             if (gatewayResult.IsFailure)
@@ -96,8 +142,13 @@ namespace NutriMind.App.Composition
                 return gatewayResult;
             }
 
-            SyncPushGateway = new StudentGatewaySyncPushAdapter(Gateway);
-            SyncCoordinator = new SyncCoordinator(OutboxRepository, SyncPushGateway, IdGenerator, Clock);
+            SyncPushGateway = new StudentGatewaySyncPushAdapter(Gateway, OutboxPayloadSerializer, OutboxRepository);
+            SyncCoordinator = new SyncCoordinator(
+                OutboxRepository,
+                SyncPushGateway,
+                IdGenerator,
+                Clock,
+                OutboxPayloadSerializer);
             SceneNavigator = new AppSceneNavigator();
             Router = new AppRouter(SceneNavigator);
             return AppResult.Success();
@@ -112,6 +163,38 @@ namespace NutriMind.App.Composition
 
             _disposed = true;
             DisposeOwned();
+        }
+
+        private AppResult CreateTokenStore()
+        {
+            switch (_options.Mode)
+            {
+                case NutriMindRuntimeMode.Mock:
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    TokenStore = new DevelopmentMockAuthTokenStore();
+                    NutriMindLog.Runtime("Wired DevelopmentMockAuthTokenStore (Mock Development).");
+                    return AppResult.Success();
+#else
+                    TokenStore = new InMemoryMockAuthTokenStore();
+                    NutriMindLog.RuntimeWarning(
+                        "Mock non-development build uses in-memory token store; offline cold restart is unavailable.");
+                    return AppResult.Success();
+#endif
+
+                case NutriMindRuntimeMode.DevelopmentServer:
+                case NutriMindRuntimeMode.ProductionServer:
+                    TokenStore = new UnconfiguredAuthTokenStore(_options.Mode);
+                    ComposeError = AppError.Configuration(
+                        _options.Mode + " secure token store is not configured for this client build.");
+                    NutriMindLog.RuntimeError(
+                        "CLIENT_CONFIGURATION_ERROR: " + _options.Mode + " has no secure token store.");
+                    // Surrounding services may still compose; auth calls fail clearly.
+                    return AppResult.Success();
+
+                default:
+                    TokenStore = new InMemoryMockAuthTokenStore();
+                    return AppResult.Failure(AppError.Configuration("Unknown NutriMindRuntimeMode."));
+            }
         }
 
         private AppResult CreateGateway()
@@ -141,7 +224,6 @@ namespace NutriMind.App.Composition
                         "CLIENT_CONFIGURATION_ERROR: DevelopmentServer mode has no HTTP gateway.");
                     ComposeError = AppError.Configuration(
                         "DevelopmentServer mode is not configured for this client build.");
-                    // Still wire surrounding services; gateway calls fail with CLIENT_CONFIGURATION_ERROR.
                     return AppResult.Success();
 
                 case NutriMindRuntimeMode.ProductionServer:
@@ -162,14 +244,22 @@ namespace NutriMind.App.Composition
 
         private AppResult CreateMockGateway()
         {
+            MockServerState = new MockServerState();
+            MockRuntimeState = new MockRuntimeState(
+                _options.MockScenario,
+                Connectivity,
+                MockServerState);
+
             Gateway = new MockStudentGateway(
                 _options,
                 Connectivity,
                 TokenStore,
                 fixtures: null,
                 clock: Clock,
-                ids: IdGenerator);
-            NutriMindLog.Runtime("Wired MockStudentGateway.");
+                ids: IdGenerator,
+                state: MockServerState,
+                mockRuntime: MockRuntimeState);
+            NutriMindLog.Runtime("Wired MockStudentGateway with shared IMockRuntimeState.");
             return AppResult.Success();
         }
 
@@ -196,9 +286,9 @@ namespace NutriMind.App.Composition
         {
             try
             {
-                if (System.IO.File.Exists(path))
+                if (File.Exists(path))
                 {
-                    System.IO.File.Delete(path);
+                    File.Delete(path);
                 }
             }
             catch (Exception exception)
@@ -214,7 +304,14 @@ namespace NutriMind.App.Composition
             SyncCoordinator = null;
             SyncPushGateway = null;
             Gateway = null;
+            MockRuntimeState = null;
+            MockServerState = null;
+            LocalProgressWriter = null;
+            OutboxPayloadSerializer = null;
+            IdempotentRequestRepository = null;
+            AnnouncementReadRepository = null;
             OutboxRepository = null;
+            MissionProgressRepository = null;
             ResourceCacheRepository = null;
             SessionRepository = null;
             InstallationRepository = null;
@@ -232,67 +329,211 @@ namespace NutriMind.App.Composition
     }
 
     /// <summary>
+    /// Explicit non-configured token store for DevelopmentServer/ProductionServer until a
+    /// platform-secure store exists. Not an insecure fallback.
+    /// </summary>
+    public sealed class UnconfiguredAuthTokenStore : IAuthTokenStore
+    {
+        private readonly NutriMindRuntimeMode _mode;
+
+        public UnconfiguredAuthTokenStore(NutriMindRuntimeMode mode)
+        {
+            _mode = mode;
+        }
+
+        public bool HasToken => false;
+
+        public Task<string> ReadAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<string>(null);
+        }
+
+        public Task WriteAsync(string token, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromException(new InvalidOperationException(
+                _mode + " secure token store is not configured."));
+        }
+
+        public Task ClearAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
     /// Adapts <see cref="IStudentGateway.PushSyncAsync"/> for <see cref="SyncCoordinator"/>.
+    /// Parses versioned outbox envelopes losslessly; malformed rows are deferred/rejected with
+    /// stable codes and preserved for inspection.
     /// </summary>
     public sealed class StudentGatewaySyncPushAdapter : ISyncPushGateway
     {
         private readonly IStudentGateway _gateway;
+        private readonly IOutboxPayloadSerializer _serializer;
+        private readonly IOutboxRepository _outboxRepository;
 
-        public StudentGatewaySyncPushAdapter(IStudentGateway gateway)
+        public StudentGatewaySyncPushAdapter(
+            IStudentGateway gateway,
+            IOutboxPayloadSerializer serializer = null,
+            IOutboxRepository outboxRepository = null)
         {
             _gateway = gateway ?? throw new ArgumentNullException(nameof(gateway));
+            _serializer = serializer ?? new OutboxPayloadSerializer();
+            _outboxRepository = outboxRepository;
         }
 
-        public Task<AppResult<SyncPushResult>> SyncPushBatchAsync(
+        public async Task<AppResult<SyncPushResult>> SyncPushBatchAsync(
             SyncPushBatchRequest request,
-            System.Threading.CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            AppResult<MappedBatch> mapped = MapEvents(request);
+            if (mapped.IsFailure)
+            {
+                return AppResult<SyncPushResult>.Failure(mapped.Error);
+            }
+
+            if (mapped.Value.NetworkEvents.Count == 0)
+            {
+                return AppResult<SyncPushResult>.Success(new SyncPushResult
+                {
+                    BatchUuid = request?.BatchUuid,
+                    ServerRevision = 0,
+                    Events = mapped.Value.LocalResults.ToArray()
+                });
+            }
+
             var networkRequest = new SyncPushRequest
             {
                 BatchUuid = request?.BatchUuid,
                 ClientId = "unity-client",
                 LastKnownServerRevision = 0,
-                Events = MapEvents(request)
+                Events = mapped.Value.NetworkEvents
             };
 
-            return _gateway.PushSyncAsync(networkRequest, cancellationToken);
+            AppResult<SyncPushResult> push =
+                await _gateway.PushSyncAsync(networkRequest, cancellationToken).ConfigureAwait(false);
+            if (push.IsFailure)
+            {
+                return push;
+            }
+
+            var combined = new List<SyncPushEventResult>();
+            if (mapped.Value.LocalResults.Count > 0)
+            {
+                combined.AddRange(mapped.Value.LocalResults);
+            }
+
+            if (push.Value?.Events != null)
+            {
+                combined.AddRange(push.Value.Events);
+            }
+
+            return AppResult<SyncPushResult>.Success(new SyncPushResult
+            {
+                BatchUuid = push.Value?.BatchUuid ?? request?.BatchUuid,
+                ServerRevision = push.Value?.ServerRevision ?? 0,
+                AcceptedCount = push.Value?.AcceptedCount ?? 0,
+                DuplicateCount = push.Value?.DuplicateCount ?? 0,
+                RejectedCount = (push.Value?.RejectedCount ?? 0) + mapped.Value.RejectedCount,
+                DeferredCount = (push.Value?.DeferredCount ?? 0) + mapped.Value.DeferredCount,
+                Events = combined
+            });
         }
 
-        private static System.Collections.Generic.IReadOnlyList<NutriMind.Core.Networking.SyncPushEvent> MapEvents(
-            SyncPushBatchRequest request)
+        private AppResult<MappedBatch> MapEvents(SyncPushBatchRequest request)
         {
+            var batch = new MappedBatch();
             if (request?.Events == null || request.Events.Count == 0)
             {
-                return Array.Empty<NutriMind.Core.Networking.SyncPushEvent>();
+                return AppResult<MappedBatch>.Success(batch);
             }
 
-            var mapped = new NutriMind.Core.Networking.SyncPushEvent[request.Events.Count];
+            string attemptUtc = DateTimeOffset.UtcNow.ToUniversalTime().ToString("o");
             for (int i = 0; i < request.Events.Count; i++)
             {
-                NutriMind.Core.Sync.SyncPushEvent source = request.Events[i];
-                DateTimeOffset createdAt = DateTimeOffset.UtcNow;
-                if (source != null
-                    && !string.IsNullOrWhiteSpace(source.ClientCreatedUtc)
-                    && DateTimeOffset.TryParse(source.ClientCreatedUtc, out DateTimeOffset parsed))
+                LocalSyncPushEvent source = request.Events[i];
+                if (source == null || string.IsNullOrWhiteSpace(source.EventUuid))
                 {
-                    createdAt = parsed;
+                    continue;
                 }
 
-                mapped[i] = new NutriMind.Core.Networking.SyncPushEvent
+                AppResult<OutboxPayloadEnvelopeV1> envelope =
+                    _serializer.Deserialize(source.PayloadJson);
+                if (envelope.IsFailure)
                 {
-                    EventUuid = source?.EventUuid,
-                    EventType = source?.EventType,
-                    GradeId = source?.GradeId,
-                    SubjectId = source?.SubjectId,
-                    TermId = source?.TermId,
-                    MissionId = source?.MissionId,
-                    AreaId = source?.AreaId,
-                    LocalSequence = source != null ? (int)source.LocalSequence : 0,
-                    ClientCreatedAt = createdAt
-                };
+                    string state = envelope.Error != null
+                                   && envelope.Error.Code == AppErrorCodes.SyncPayloadVersionUnsupported
+                        ? OutboxEventState.Deferred
+                        : OutboxEventState.Rejected;
+                    string code = envelope.Error?.Code ?? AppErrorCodes.SyncPayloadInvalid;
+                    MarkInvalid(source.EventUuid, state, code, attemptUtc);
+                    batch.LocalResults.Add(new SyncPushEventResult
+                    {
+                        EventUuid = source.EventUuid,
+                        Status = state,
+                        ErrorCode = code
+                    });
+                    if (state == OutboxEventState.Deferred)
+                    {
+                        batch.DeferredCount++;
+                    }
+                    else
+                    {
+                        batch.RejectedCount++;
+                    }
+
+                    continue;
+                }
+
+                AppResult<NetworkSyncPushEvent> mapped =
+                    _serializer.MapToNetworkEvent(source, envelope.Value);
+                if (mapped.IsFailure)
+                {
+                    string code = mapped.Error?.Code ?? AppErrorCodes.SyncPayloadInvalid;
+                    MarkInvalid(source.EventUuid, OutboxEventState.Deferred, code, attemptUtc);
+                    batch.LocalResults.Add(new SyncPushEventResult
+                    {
+                        EventUuid = source.EventUuid,
+                        Status = OutboxEventState.Deferred,
+                        ErrorCode = code
+                    });
+                    batch.DeferredCount++;
+                    continue;
+                }
+
+                batch.NetworkEvents.Add(mapped.Value);
             }
 
-            return mapped;
+            return AppResult<MappedBatch>.Success(batch);
+        }
+
+        private void MarkInvalid(string eventUuid, string state, string errorCode, string attemptUtc)
+        {
+            if (_outboxRepository == null)
+            {
+                return;
+            }
+
+            _outboxRepository.ApplyPushResult(
+                eventUuid,
+                state,
+                errorCode,
+                attemptUtc,
+                serverRevision: null);
+            NutriMindLog.SyncWarning(
+                "Preserved outbox event " + eventUuid + " as " + state + " (" + errorCode + ").");
+        }
+
+        private sealed class MappedBatch
+        {
+            public List<NetworkSyncPushEvent> NetworkEvents { get; } = new List<NetworkSyncPushEvent>();
+            public List<SyncPushEventResult> LocalResults { get; } = new List<SyncPushEventResult>();
+            public int DeferredCount { get; set; }
+            public int RejectedCount { get; set; }
         }
     }
 }

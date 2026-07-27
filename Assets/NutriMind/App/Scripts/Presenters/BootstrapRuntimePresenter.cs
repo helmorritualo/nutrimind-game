@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using NutriMind.App.Features;
 using NutriMind.App.Routing;
 using NutriMind.App.UI;
@@ -42,14 +43,14 @@ namespace NutriMind.App.Presentation
             _view.SetState(_startup.State);
         }
 
-        public async void Start()
+        public void Start()
         {
             if (_disposed)
             {
                 return;
             }
 
-            await _startup.RunAsync(_cts.Token);
+            TaskUtilities.ForgetSafely(HandleStartAsync(), _cts.Token, "Bootstrap.Start");
         }
 
         public void Dispose()
@@ -80,9 +81,18 @@ namespace NutriMind.App.Presentation
             _cts.Dispose();
         }
 
+        private async Task HandleStartAsync()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            await _startup.RunAsync(_cts.Token).ConfigureAwait(false);
+        }
+
         private void OnStateChanged(BootstrapPreviewState state)
         {
-            // May arrive via posted main-thread callback; still guard binding/disposal.
             UnityMainThread.Post(() =>
             {
                 if (_disposed || !_view.IsBound)
@@ -98,49 +108,65 @@ namespace NutriMind.App.Presentation
             });
         }
 
-        private async void OnRetryRequested()
+        private void OnRetryRequested()
         {
-            if (_disposed)
-            {
-                return;
-            }
-
-            await _startup.RunAsync(_cts.Token);
+            TaskUtilities.ForgetSafely(HandleRetryAsync(), _cts.Token, "Bootstrap.Retry");
         }
 
-        private async void OnContinueOfflineRequested()
+        private async Task HandleRetryAsync()
         {
             if (_disposed)
             {
                 return;
             }
 
-            await _startup.ContinueOfflineAsync(_cts.Token);
+            await _startup.RunAsync(_cts.Token).ConfigureAwait(false);
+        }
+
+        private void OnContinueOfflineRequested()
+        {
+            TaskUtilities.ForgetSafely(HandleContinueOfflineAsync(), _cts.Token, "Bootstrap.ContinueOffline");
+        }
+
+        private async Task HandleContinueOfflineAsync()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            await _startup.ContinueOfflineAsync(_cts.Token).ConfigureAwait(false);
             if (_startup.State == BootstrapPreviewState.Ready)
             {
-                await NavigateMainAsync();
+                await NavigateMainAsync().ConfigureAwait(false);
             }
         }
 
-        private async void OnOpenLoginRequested()
+        private void OnOpenLoginRequested()
+        {
+            TaskUtilities.ForgetSafely(HandleOpenLoginAsync(), _cts.Token, "Bootstrap.OpenLogin");
+        }
+
+        private async Task HandleOpenLoginAsync()
         {
             if (_disposed || _lifetime.SceneNavigator == null)
             {
                 return;
             }
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token);
+            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
             if (_disposed)
             {
                 return;
             }
 
-            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Authentication, _cts.Token);
+            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Authentication, _cts.Token)
+                .ConfigureAwait(false);
         }
 
-        private async void OnContinueToApplicationRequested()
+        private void OnContinueToApplicationRequested()
         {
-            await NavigateMainAsync();
+            TaskUtilities.ForgetSafely(NavigateMainAsync(), _cts.Token, "Bootstrap.ContinueMain");
         }
 
         private void OnUpdateApplicationRequested()
@@ -157,32 +183,32 @@ namespace NutriMind.App.Presentation
             }
 
             _autoContinueScheduled = true;
-            _view.Root?.schedule.Execute(async () =>
+            _view.Root?.schedule.Execute(() =>
             {
                 if (_disposed)
                 {
                     return;
                 }
 
-                await NavigateMainAsync();
+                TaskUtilities.ForgetSafely(NavigateMainAsync(), _cts.Token, "Bootstrap.AutoContinue");
             }).StartingIn(350);
         }
 
-        private async System.Threading.Tasks.Task NavigateMainAsync()
+        private async Task NavigateMainAsync()
         {
             if (_disposed || _lifetime.SceneNavigator == null)
             {
                 return;
             }
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token);
+            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
             if (_disposed)
             {
                 return;
             }
 
             _lifetime.Router?.EnsureMainRoot();
-            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token);
+            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token).ConfigureAwait(false);
         }
     }
 }

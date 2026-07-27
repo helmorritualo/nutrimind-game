@@ -2,7 +2,6 @@ using NutriMind.App.Features;
 using NutriMind.App.Presentation;
 using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
-using NutriMind.Core.Data;
 using NutriMind.Core.Utilities;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,15 +10,12 @@ namespace NutriMind.App.Composition
 {
     /// <summary>
     /// Bootstrap scene root. Owns the Bootstrap UIDocument and runtime presenter.
-    /// Creates <see cref="AppLifetime"/> when missing.
+    /// Creates <see cref="AppLifetime"/> when missing. Runtime options are owned by PFB_AppLifetime.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
     public sealed class AppBootstrapSceneRoot : MonoBehaviour
     {
-        [SerializeField]
-        private NutriMindRuntimeOptions _runtimeOptions;
-
         [SerializeField]
         private UIDocument _uiDocument;
 
@@ -55,31 +51,20 @@ namespace NutriMind.App.Composition
         {
             if (AppLifetime.HasInstance)
             {
-                if (_runtimeOptions != null)
-                {
-                    AppLifetime.Instance.SetRuntimeOptions(_runtimeOptions);
-                }
-
                 return;
             }
 
             if (_lifetimePrefab != null)
             {
-                AppLifetime instance = Instantiate(_lifetimePrefab);
-                if (_runtimeOptions != null)
-                {
-                    instance.SetRuntimeOptions(_runtimeOptions);
-                }
-
+                Instantiate(_lifetimePrefab);
                 return;
             }
 
+            // Prefer inactive construction so Awake/Compose sees any pre-configure call from tests.
             var go = new GameObject(AppLifetime.LifetimeObjectName);
-            AppLifetime lifetime = go.AddComponent<AppLifetime>();
-            if (_runtimeOptions != null)
-            {
-                lifetime.SetRuntimeOptions(_runtimeOptions);
-            }
+            go.SetActive(false);
+            go.AddComponent<AppLifetime>();
+            go.SetActive(true);
         }
 
         private void BindWhenReady()

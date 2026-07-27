@@ -37,7 +37,8 @@ namespace NutriMind.Tests.TestData
             IMockFixtureSource fixtures = null,
             int minimumLatencyMs = 0,
             int maximumLatencyMs = 0,
-            MockServerState state = null)
+            MockServerState state = null,
+            IMockRuntimeState mockRuntime = null)
         {
             NutriMindRuntimeOptions options = CreateFastOptions(
                 scenario,
@@ -45,14 +46,25 @@ namespace NutriMind.Tests.TestData
                 minimumLatencyMs,
                 maximumLatencyMs);
 
+            connectivity ??= new MockConnectivityService(!startOffline);
+            state ??= mockRuntime is MockRuntimeState concrete
+                ? concrete.ServerState
+                : new MockServerState();
+
+            if (mockRuntime == null)
+            {
+                mockRuntime = new MockRuntimeState(scenario, connectivity, state);
+            }
+
             return new MockStudentGateway(
                 options,
-                connectivity ?? new MockConnectivityService(!startOffline),
+                connectivity,
                 tokenStore ?? new InMemoryMockAuthTokenStore(),
                 fixtures,
                 clock: new FixedMockClock(),
                 ids: new DeterministicMockIdGenerator(),
-                state: state);
+                state: state,
+                mockRuntime: mockRuntime);
         }
     }
 }

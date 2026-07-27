@@ -44,7 +44,7 @@ Do not build all future mission scenes merely because their JSON content exists.
 
 ### Implementation status (Prompt 1)
 
-App runtime foundation is implemented on `feat/app-runtime-foundation-prompt1`: `AppLifetime`, composition root, scene navigator, scene-aware router, startup coordinator, Bootstrap/Login runtime presenters, `LoginPanelView`, four `SCN_App_*` scenes (Build Settings 0–3), `PFB_AppLifetime`, and Editor mock-runtime controls/generation. Static App UITK previews remain intact; Prompt 2 wires remaining Main/QuizPortal route presenters.
+App runtime foundation is complete for Editor and Development APK mock use: shared `IMockRuntimeState`, Development mock menu/controller, safe reset/recompose, persistent Mock Development auth token, full Bootstrap cache v1 restore, all persistence repositories composed, lossless sync outbox envelopes, deterministic Mock clock/IDs, cancellation-safe presenters, and sync concurrency gating. Four `SCN_App_*` scenes remain Build Settings 0–3. Prompt 2 wires remaining Main/QuizPortal route presenters.
 
 ## 3. Canonical folder structure
 

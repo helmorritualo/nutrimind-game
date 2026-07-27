@@ -1,10 +1,8 @@
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-using System;
-using System.IO;
+using System.Threading.Tasks;
+using NutriMind.App.Composition;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
-using NutriMind.Core.Networking;
-using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -14,85 +12,59 @@ using UnityEditor;
 namespace NutriMind.Editor.MockRuntime
 {
     /// <summary>
-    /// Editor / Development-build mock runtime controls. Must not ship in production UI.
+    /// Editor wrapper around <see cref="DevelopmentMockRuntimeController"/>.
     /// </summary>
     public static class MockRuntimeControls
     {
+        private static DevelopmentMockRuntimeController Controller =>
+            AppLifetime.HasInstance
+                ? AppLifetime.Instance.GetComponent<DevelopmentMockRuntimeController>()
+                : null;
+
         public static MockApiScenario SelectedScenario
         {
-            get
-            {
-                if (AppLifetime.HasInstance && AppLifetime.Instance.RuntimeOptions != null)
-                {
-                    return AppLifetime.Instance.RuntimeOptions.MockScenario;
-                }
-
-                return MockApiScenario.HappyPath;
-            }
+            get => Controller != null ? Controller.Scenario : MockApiScenario.HappyPath;
             set
             {
-                if (!AppLifetime.HasInstance || AppLifetime.Instance.RuntimeOptions == null)
+                if (Controller != null)
                 {
-                    return;
+                    Controller.Scenario = value;
                 }
-
-                AppLifetime.Instance.RuntimeOptions.MockScenario = value;
-                NutriMindLog.Runtime("Mock scenario set to " + value + ".");
             }
         }
 
         public static bool IsOnline
         {
-            get
-            {
-                return AppLifetime.HasInstance
-                       && AppLifetime.Instance.Connectivity != null
-                       && AppLifetime.Instance.Connectivity.IsOnline;
-            }
+            get => Controller != null && Controller.IsOnline;
             set
             {
-                if (!AppLifetime.HasInstance || AppLifetime.Instance.Connectivity == null)
+                if (Controller != null)
                 {
-                    return;
+                    Controller.IsOnline = value;
                 }
-
-                AppLifetime.Instance.Connectivity.SetState(
-                    value ? ConnectivityState.Online : ConnectivityState.Offline);
-                NutriMindLog.Runtime(value ? "Connectivity set Online." : "Connectivity set Offline.");
             }
         }
 
         public static string DatabasePath =>
-            AppLifetime.HasInstance && AppLifetime.Instance.Database != null
-                ? AppLifetime.Instance.Database.DatabaseFilePath
-                : NutriMindDatabase.GetDefaultDatabasePath();
+            Controller != null ? Controller.DatabasePath : "AppLifetime not ready";
 
-        public static int GetOutboxCount()
+        public static int GetOutboxCount() => Controller != null ? Controller.GetOutboxCount() : -1;
+
+        public static string[] GetKnownCacheKeys() =>
+            Controller != null
+                ? Controller.GetKnownCacheKeys()
+                : System.Array.Empty<string>();
+
+        public static void ResetMockServer()
         {
-            if (!AppLifetime.HasInstance || AppLifetime.Instance.OutboxRepository == null)
+            if (Controller == null)
             {
-                return -1;
+                return;
             }
 
-            AppResult<int> count = AppLifetime.Instance.OutboxRepository.CountByStates(
-                OutboxEventState.Pending,
-                OutboxEventState.Sending,
-                OutboxEventState.Deferred);
-            return count.IsSuccess ? count.Value : -1;
-        }
-
-        public static string[] GetKnownCacheKeys()
-        {
-            return new[]
-            {
-                ResourceCacheKeys.Bootstrap,
-                ResourceCacheKeys.Profile,
-                ResourceCacheKeys.Subjects,
-                ResourceCacheKeys.ProgressSummary,
-                ResourceCacheKeys.Rewards,
-                ResourceCacheKeys.Certificates,
-                ResourceCacheKeys.Announcements
-            };
+            TaskUtilities.ForgetSafely(
+                Controller.ResetMockServerAsync(),
+                logPrefix: "ResetMockServer");
         }
 
         public static void ResetDatabase(bool requireConfirmation = true)
@@ -108,23 +80,15 @@ namespace NutriMind.Editor.MockRuntime
                 return;
             }
 #endif
-            string path = DatabasePath;
-            try
+            if (Controller == null)
             {
-                if (AppLifetime.HasInstance)
-                {
-                    AppLifetime.Instance.Composition?.Dispose();
-                }
+                NutriMindLog.SqliteWarning("ResetDatabase ignored; DevelopmentMockRuntimeController missing.");
+                return;
+            }
 
-                TryDelete(path);
-                TryDelete(path + "-shm");
-                TryDelete(path + "-wal");
-                NutriMindLog.Sqlite("Database reset at " + path);
-            }
-            catch (Exception exception)
-            {
-                NutriMindLog.SqliteError("Database reset failed: " + exception.GetType().Name);
-            }
+            TaskUtilities.ForgetSafely(
+                Controller.ResetLocalDatabaseAsync(),
+                logPrefix: "ResetLocalDatabase");
         }
 
         public static void FullInstallationReset(bool requireConfirmation = true)
@@ -133,32 +97,22 @@ namespace NutriMind.Editor.MockRuntime
             if (requireConfirmation
                 && !EditorUtility.DisplayDialog(
                     "Full Installation Reset",
-                    "Delete the database and clear in-memory auth/session mock state?",
+                    "Delete the database, clear mock auth token, and recompose?",
                     "Full Reset",
                     "Cancel"))
             {
                 return;
             }
 #endif
-            ResetDatabase(requireConfirmation: false);
-            if (AppLifetime.HasInstance)
+            if (Controller == null)
             {
-                _ = AppLifetime.Instance.ClearAuthenticationAsync();
-                if (AppLifetime.Instance.InstallationRepository != null)
-                {
-                    AppLifetime.Instance.InstallationRepository.RegenerateDeviceIdForFullInstallReset();
-                }
+                NutriMindLog.RuntimeWarning("FullInstallationReset ignored; controller missing.");
+                return;
             }
 
-            NutriMindLog.Runtime("Full installation reset requested.");
-        }
-
-        private static void TryDelete(string path)
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            TaskUtilities.ForgetSafely(
+                Controller.FullInstallationResetAsync(),
+                logPrefix: "FullInstallationReset");
         }
     }
 }

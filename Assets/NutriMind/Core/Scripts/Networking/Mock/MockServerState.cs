@@ -161,6 +161,10 @@ namespace NutriMind.Core.Networking
             }
         }
 
+        /// <summary>
+        /// Clears mutation/idempotency caches. Preserves issued auth token so an active
+        /// mock session remains usable after ResetMockServer.
+        /// </summary>
         public void ResetMutations()
         {
             lock (_gate)
@@ -169,8 +173,8 @@ namespace NutriMind.Core.Networking
                 _timeoutCommittedKeys.Clear();
                 _quizResultsByAttemptId.Clear();
                 _quizResultsByClientUuid.Clear();
-                HasIssuedToken = false;
-                IssuedAccessToken = null;
+                _quizHistory.Clear();
+                _quizAttemptCounter = 1;
                 _seeded = false;
             }
         }
