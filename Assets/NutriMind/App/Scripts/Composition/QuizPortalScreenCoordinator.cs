@@ -35,10 +35,10 @@ namespace NutriMind.App.Composition
         private QuizRouteKey? _mountedRouteKey;
 
         // Retained across uncertain-submit so retry can use identical UUID + payload.
-        private PendingQuizSubmissionEnvelopeV1 _retainedPendingQuizSubmission;
+        private PendingQuizSubmissionEnvelopeV2 _retainedPendingQuizSubmission;
         private QuizAttemptSession _retainedAttemptSession;
 
-        public PendingQuizSubmissionEnvelopeV1 RetainedPendingQuizSubmission =>
+        public PendingQuizSubmissionEnvelopeV2 RetainedPendingQuizSubmission =>
             _retainedPendingQuizSubmission;
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace NutriMind.App.Composition
             _retainedAttemptSession = null;
         }
 
-        public void RetainPendingQuizSubmission(PendingQuizSubmissionEnvelopeV1 envelope)
+        public void RetainPendingQuizSubmission(PendingQuizSubmissionEnvelopeV2 envelope)
         {
             _retainedPendingQuizSubmission = envelope;
         }

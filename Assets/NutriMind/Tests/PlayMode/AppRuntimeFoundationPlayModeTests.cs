@@ -288,7 +288,7 @@ namespace NutriMind.Tests.PlayMode
             Assert.That(lifetime.IsReady, Is.True);
             Assert.That(lifetime.Database, Is.Not.Null);
             Assert.That(lifetime.Database.IsOpen, Is.True);
-            Assert.That(lifetime.Database.SchemaVersion, Is.EqualTo(1));
+            Assert.That(lifetime.Database.SchemaVersion, Is.EqualTo(2));
             Assert.That(lifetime.Gateway, Is.Not.Null);
             Assert.That(lifetime.Router, Is.Not.Null);
             Assert.That(lifetime.SceneNavigator, Is.Not.Null);

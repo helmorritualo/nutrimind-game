@@ -318,6 +318,11 @@ namespace NutriMind.App.Presentation
             {
                 _lifetime.LocalProgressWriter.LocalStateChanged += OnLocalStateChanged;
             }
+
+            if (_syncCoordinator != null)
+            {
+                _syncCoordinator.PushStateChanged += OnSyncPushStateChanged;
+            }
         }
 
         private void Unsubscribe()
@@ -345,6 +350,11 @@ namespace NutriMind.App.Presentation
             {
                 _lifetime.LocalProgressWriter.LocalStateChanged -= OnLocalStateChanged;
             }
+
+            if (_syncCoordinator != null)
+            {
+                _syncCoordinator.PushStateChanged -= OnSyncPushStateChanged;
+            }
         }
 
         private void OnStudentStateChanged()
@@ -368,6 +378,23 @@ namespace NutriMind.App.Presentation
         {
             if (_disposed)
             {
+                return;
+            }
+
+            _bannerDismissed = false;
+            RefreshSyncPresentation();
+        }
+
+        private void OnSyncPushStateChanged()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (_syncCoordinator != null && _syncCoordinator.IsPushInFlight)
+            {
+                _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
                 return;
             }
 
@@ -420,6 +447,7 @@ namespace NutriMind.App.Presentation
                 AppError error = result.Error;
                 if (error != null && error.Code == AppErrorCodes.SyncInProgress)
                 {
+                    // Another caller owns the active push; observe PushStateChanged for exit.
                     _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
                     return;
                 }
@@ -524,10 +552,16 @@ namespace NutriMind.App.Presentation
 
         private void ApplyOnlineSyncPresentation(SyncQueueSnapshot snapshot)
         {
-            if (snapshot.AttentionCount > 0)
+            if (_syncCoordinator != null && _syncCoordinator.IsPushInFlight)
             {
-                _shell?.SetSyncPending(snapshot.AttentionCount);
-                HideDismissedBannerIfNeeded();
+                _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
+                return;
+            }
+
+            // Rejected work must never be hidden by pending/deferred counts.
+            if (snapshot.Rejected > 0)
+            {
+                ApplyRejectedAttentionPresentation(snapshot);
                 return;
             }
 
@@ -537,13 +571,31 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            if (snapshot.Rejected > 0)
+            if (snapshot.AttentionCount > 0)
             {
-                ApplySyncErrorPresentation();
+                _shell?.SetSyncPending(snapshot.AttentionCount);
+                HideDismissedBannerIfNeeded();
                 return;
             }
 
             _shell?.SetConnectionPreview(AppShellConnectionPreview.Online);
+        }
+
+        private void ApplyRejectedAttentionPresentation(SyncQueueSnapshot snapshot)
+        {
+            _bannerDismissed = false;
+            _shell?.SetConnectionPreview(AppShellConnectionPreview.SyncError);
+            if (snapshot.AttentionCount > 0)
+            {
+                _shell?.ShowOfflineSyncBanner(
+                    OfflineSyncBannerPresets.SyncAttention(
+                        snapshot.AttentionCount,
+                        snapshot.Rejected));
+            }
+            else
+            {
+                _shell?.ShowOfflineSyncBanner(OfflineSyncBannerPresets.SyncError());
+            }
         }
 
         private void ApplySyncErrorPresentation()
@@ -829,6 +881,7 @@ namespace NutriMind.App.Presentation
             _moreCloseButton.AddToClassList("ds-btn");
             _moreCloseButton.AddToClassList("ds-btn--secondary");
             _moreCloseButton.AddToClassList("app-shell__more-hub-close");
+            _moreCloseButton.tooltip = "Close More menu";
             card.Add(_moreCloseButton);
 
             _moreHubRoot.Add(card);
@@ -890,13 +943,82 @@ namespace NutriMind.App.Presentation
 
         private void OnMoreHubKeyDown(KeyDownEvent evt)
         {
-            if (!IsMoreHubVisible || evt.keyCode != KeyCode.Escape)
+            if (!IsMoreHubVisible)
             {
                 return;
             }
 
-            evt.StopPropagation();
-            HideMoreHub();
+            if (evt.keyCode == KeyCode.Escape)
+            {
+                evt.StopPropagation();
+                HideMoreHub();
+                return;
+            }
+
+            if (evt.keyCode != KeyCode.Tab)
+            {
+                return;
+            }
+
+            List<VisualElement> focusables = GetMoreHubFocusables();
+            if (focusables.Count == 0)
+            {
+                return;
+            }
+
+            int currentIndex = focusables.IndexOf(evt.target as VisualElement);
+            if (currentIndex < 0)
+            {
+                for (int i = 0; i < focusables.Count; i++)
+                {
+                    if (focusables[i] == evt.target
+                        || (evt.target is VisualElement nested
+                            && focusables[i].Contains(nested)))
+                    {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (evt.shiftKey)
+            {
+                if (currentIndex <= 0)
+                {
+                    evt.StopPropagation();
+                    evt.PreventDefault();
+                    focusables[focusables.Count - 1].Focus();
+                }
+
+                return;
+            }
+
+            if (currentIndex < 0 || currentIndex >= focusables.Count - 1)
+            {
+                evt.StopPropagation();
+                evt.PreventDefault();
+                focusables[0].Focus();
+            }
+        }
+
+        private List<VisualElement> GetMoreHubFocusables()
+        {
+            var focusables = new List<VisualElement>();
+            if (_moreHubRoot == null)
+            {
+                return focusables;
+            }
+
+            _moreHubRoot.Query<Button>().ForEach(button =>
+            {
+                if (button != null
+                    && button.enabledSelf
+                    && button.style.display != DisplayStyle.None)
+                {
+                    focusables.Add(button);
+                }
+            });
+            return focusables;
         }
 
         private void OnMoreHubNavigationCancel(NavigationCancelEvent evt)

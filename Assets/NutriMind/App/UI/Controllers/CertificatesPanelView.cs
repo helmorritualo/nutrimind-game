@@ -14,7 +14,8 @@ namespace NutriMind.App.UI
         Loading = 1,
         Empty = 2,
         OfflineCached = 3,
-        RecoverableError = 4
+        RecoverableError = 4,
+        OfflineUnavailable = 5
     }
 
     /// <summary>
@@ -411,6 +412,12 @@ namespace NutriMind.App.UI
                 case CertificatesPreviewState.RecoverableError:
                     HideContent();
                     _dataStateView.SetState(DataStatePanelState.RecoverableError);
+                    ApplyRouteDataStateCopy(state);
+                    break;
+
+                case CertificatesPreviewState.OfflineUnavailable:
+                    HideContent();
+                    _dataStateView.SetState(DataStatePanelState.OfflineUnavailable);
                     ApplyRouteDataStateCopy(state);
                     break;
             }

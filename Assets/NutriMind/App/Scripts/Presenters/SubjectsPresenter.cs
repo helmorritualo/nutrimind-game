@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using NutriMind.App.Routing;
 using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 using UnityEngine;
 
@@ -64,6 +66,7 @@ namespace NutriMind.App.Presentation
             if (result.IsSuccess)
             {
                 BindSubjects(result.Value);
+                PersistSubjectsCache(result.Value);
                 _view.SetDataState(
                     _subjectMap.Count == 0
                         ? DataStatePanelState.Empty
@@ -77,18 +80,25 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            IReadOnlyList<SubjectSummary> cached = Lifetime.LastBootstrap?.Subjects;
-            if (cached != null && cached.Count > 0)
+            if (IsOffline(result.Error))
             {
-                BindSubjects(cached);
-                if (_subjectMap.Count > 0)
+                IReadOnlyList<SubjectSummary> cached = LoadSubjectsCache();
+                if (cached != null)
                 {
-                    _view.SetDataState(DataStatePanelState.OfflineCached);
+                    BindSubjects(cached);
+                    _view.SetDataState(
+                        _subjectMap.Count == 0
+                            ? DataStatePanelState.Empty
+                            : DataStatePanelState.OfflineCached);
                     return;
                 }
+
+                _view.Bind(Array.Empty<NutriMindSubject>());
+                _view.SetDataState(DataStatePanelState.OfflineUnavailable);
+                return;
             }
 
-            _view.Bind(System.Array.Empty<NutriMindSubject>());
+            _view.Bind(Array.Empty<NutriMindSubject>());
             _view.SetDataState(AppViewMappers.ErrorToDataState(result.Error));
         }
 
@@ -170,6 +180,37 @@ namespace NutriMind.App.Presentation
                 && (AppViewMappers.TryMapSubject(summary.Id, out subject)
                     || AppViewMappers.TryMapSubject(summary.Slug, out subject)
                     || AppViewMappers.TryMapSubject(summary.Name, out subject));
+        }
+
+        private void PersistSubjectsCache(IReadOnlyList<SubjectSummary> subjects)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveSubjects(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                subjects ?? Array.Empty<SubjectSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<SubjectSummary> LoadSubjectsCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<SubjectSummary>> cached = LearnerRouteCache.LoadSubjects(
+                Lifetime.ResourceCacheRepository,
+                studentId);
+            return cached.IsSuccess ? cached.Value : null;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NutriMind.App.Presentation;
 using NutriMind.App.Routing;
+using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
@@ -63,10 +64,12 @@ namespace NutriMind.Tests.EditMode
                 yield return Await(gatewayTask);
                 MockStudentGateway gateway = gatewayTask.Result;
 
+                const string studentId = "student-prompt2-a";
                 const string rewardCode = "mock_reward_story_badge";
                 const string uuid = "uuid-reward-prompt2-timeout";
-                var envelope = new PendingRewardUseEnvelopeV1
+                var envelope = new PendingRewardUseEnvelopeV2
                 {
+                    StudentId = studentId,
                     RewardCode = rewardCode,
                     RequestUuid = uuid
                 };
@@ -77,6 +80,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = uuid,
                     Operation = IdempotentOperations.UseReward,
+                    StudentId = studentId,
+                    EntityKey = rewardCode,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Sending,
                     CreatedUtc = now,
@@ -98,6 +103,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = uuid,
                     Operation = IdempotentOperations.UseReward,
+                    StudentId = studentId,
+                    EntityKey = rewardCode,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Uncertain,
                     CreatedUtc = now,
@@ -105,16 +112,17 @@ namespace NutriMind.Tests.EditMode
                 }).IsSuccess, Is.True);
 
                 AppResult<IdempotentRequestRecord> unresolved =
-                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, rewardCode);
+                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, studentId, rewardCode);
                 Assert.That(unresolved.IsSuccess, Is.True);
                 Assert.That(unresolved.Value, Is.Not.Null);
                 Assert.That(unresolved.Value.RequestUuid, Is.EqualTo(uuid));
                 Assert.That(unresolved.Value.State, Is.EqualTo(IdempotentRequestStates.Uncertain));
 
-                PendingRewardUseEnvelopeV1 restored =
+                PendingRewardUseEnvelopeV2 restored =
                     IdempotentMutationSerializers.DeserializeReward(unresolved.Value.NormalizedPayloadJson);
                 Assert.That(restored.RequestUuid, Is.EqualTo(uuid));
                 Assert.That(restored.RewardCode, Is.EqualTo(rewardCode));
+                Assert.That(restored.StudentId, Is.EqualTo(studentId));
                 Assert.That(
                     IdempotentMutationSerializers.SerializeReward(restored),
                     Is.EqualTo(normalized));
@@ -132,6 +140,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = uuid,
                     Operation = IdempotentOperations.UseReward,
+                    StudentId = studentId,
+                    EntityKey = rewardCode,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Completed,
                     ResultJson = retryTask.Result.Value.Status,
@@ -142,7 +152,7 @@ namespace NutriMind.Tests.EditMode
                 AppResult<IdempotentRequestRecord> completed = repo.Get(uuid);
                 Assert.That(completed.Value.State, Is.EqualTo(IdempotentRequestStates.Completed));
                 Assert.That(
-                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, rewardCode).Value,
+                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, studentId, rewardCode).Value,
                     Is.Null);
             }
         }
@@ -182,8 +192,9 @@ namespace NutriMind.Tests.EditMode
                     }
                 };
 
-                var envelope = new PendingQuizSubmissionEnvelopeV1
+                var envelope = new PendingQuizSubmissionEnvelopeV2
                 {
+                    StudentId = "student-prompt2-a",
                     QuizId = "quiz_fixture_001",
                     Submission = submission
                 };
@@ -194,6 +205,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = submission.ClientAttemptUuid,
                     Operation = IdempotentOperations.QuizSubmit,
+                    StudentId = envelope.StudentId,
+                    EntityKey = envelope.QuizId,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Sending,
                     CreatedUtc = now,
@@ -215,6 +228,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = submission.ClientAttemptUuid,
                     Operation = IdempotentOperations.QuizSubmit,
+                    StudentId = envelope.StudentId,
+                    EntityKey = envelope.QuizId,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Uncertain,
                     CreatedUtc = now,
@@ -223,13 +238,17 @@ namespace NutriMind.Tests.EditMode
 
                 // Simulate presenter/coordinator recreation from SQLite.
                 AppResult<IdempotentRequestRecord> unresolved =
-                    repo.FindLatestUnresolved(IdempotentOperations.QuizSubmit, envelope.QuizId);
+                    repo.FindLatestUnresolved(
+                        IdempotentOperations.QuizSubmit,
+                        envelope.StudentId,
+                        envelope.QuizId);
                 Assert.That(unresolved.IsSuccess, Is.True);
                 Assert.That(unresolved.Value, Is.Not.Null);
 
-                PendingQuizSubmissionEnvelopeV1 restored =
+                PendingQuizSubmissionEnvelopeV2 restored =
                     IdempotentMutationSerializers.DeserializeQuiz(unresolved.Value.NormalizedPayloadJson);
                 Assert.That(restored.QuizId, Is.EqualTo(envelope.QuizId));
+                Assert.That(restored.StudentId, Is.EqualTo(envelope.StudentId));
                 Assert.That(restored.Submission.ClientAttemptUuid, Is.EqualTo(submission.ClientAttemptUuid));
                 Assert.That(restored.Submission.StartedAt, Is.EqualTo(started));
                 Assert.That(restored.Submission.SubmittedAt, Is.EqualTo(submitted));
@@ -257,6 +276,8 @@ namespace NutriMind.Tests.EditMode
                 {
                     RequestUuid = submission.ClientAttemptUuid,
                     Operation = IdempotentOperations.QuizSubmit,
+                    StudentId = envelope.StudentId,
+                    EntityKey = envelope.QuizId,
                     NormalizedPayloadJson = normalized,
                     State = IdempotentRequestStates.Completed,
                     ResultJson = retryTask.Result.Value.AttemptId,
@@ -434,6 +455,132 @@ namespace NutriMind.Tests.EditMode
                 ClientCreatedUtc = now,
                 State = state
             }).IsSuccess, Is.True);
+        }
+
+        [Test]
+        public void ExactLookup_LearnerIsolationAndSubstringKeys_DoNotCollide()
+        {
+            using (var factory = new TestDatabaseFactory())
+            {
+                NutriMindDatabase database = factory.OpenDatabase();
+                var repo = new SqliteIdempotentRequestRepository(database);
+                string now = DateTimeOffset.UtcNow.ToString("o");
+
+                void UpsertReward(string studentId, string rewardCode, string uuid)
+                {
+                    var envelope = new PendingRewardUseEnvelopeV2
+                    {
+                        StudentId = studentId,
+                        RewardCode = rewardCode,
+                        RequestUuid = uuid
+                    };
+                    Assert.That(repo.Upsert(new IdempotentRequestRecord
+                    {
+                        RequestUuid = uuid,
+                        Operation = IdempotentOperations.UseReward,
+                        StudentId = studentId,
+                        EntityKey = rewardCode,
+                        NormalizedPayloadJson = IdempotentMutationSerializers.SerializeReward(envelope),
+                        State = IdempotentRequestStates.Uncertain,
+                        CreatedUtc = now,
+                        UpdatedUtc = now
+                    }).IsSuccess, Is.True);
+                }
+
+                UpsertReward("student-a", "badge", "uuid-a");
+                UpsertReward("student-a", "badge_extra", "uuid-a-extra");
+                UpsertReward("student-b", "badge", "uuid-b");
+
+                Assert.That(
+                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, "student-a", "badge")
+                        .Value.RequestUuid,
+                    Is.EqualTo("uuid-a"));
+                Assert.That(
+                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, "student-a", "badge_extra")
+                        .Value.RequestUuid,
+                    Is.EqualTo("uuid-a-extra"));
+                Assert.That(
+                    repo.FindLatestUnresolved(IdempotentOperations.UseReward, "student-b", "badge")
+                        .Value.RequestUuid,
+                    Is.EqualTo("uuid-b"));
+            }
+        }
+
+        [Test]
+        public void IdempotentTransitions_RejectIllegalTerminalAndChangedPayload()
+        {
+            using (var factory = new TestDatabaseFactory())
+            {
+                NutriMindDatabase database = factory.OpenDatabase();
+                var repo = new SqliteIdempotentRequestRepository(database);
+                string now = DateTimeOffset.UtcNow.ToString("o");
+                string payload =
+                    "{\"Version\":2,\"StudentId\":\"student-a\",\"RewardCode\":\"badge\",\"RequestUuid\":\"uuid-1\"}";
+                var record = new IdempotentRequestRecord
+                {
+                    RequestUuid = "uuid-1",
+                    Operation = IdempotentOperations.UseReward,
+                    StudentId = "student-a",
+                    EntityKey = "badge",
+                    NormalizedPayloadJson = payload,
+                    State = IdempotentRequestStates.Completed,
+                    CreatedUtc = now,
+                    UpdatedUtc = now
+                };
+                Assert.That(repo.Upsert(record).IsSuccess, Is.True);
+                Assert.That(
+                    IdempotentMutationTransitions.Transition(
+                        repo,
+                        record,
+                        IdempotentRequestStates.Sending,
+                        null,
+                        now).IsFailure,
+                    Is.True);
+                Assert.That(
+                    IdempotentMutationTransitions.ValidateImmutableIdentity(
+                        record,
+                        IdempotentOperations.UseReward,
+                        "student-a",
+                        "badge",
+                        "{\"Version\":2,\"StudentId\":\"student-a\",\"RewardCode\":\"other\",\"RequestUuid\":\"uuid-1\"}")
+                        .IsFailure,
+                    Is.True);
+            }
+        }
+
+        [Test]
+        public void LearnerRouteCache_AndProgressEmpty_Contracts()
+        {
+            using (var factory = new TestDatabaseFactory())
+            {
+                NutriMindDatabase database = factory.OpenDatabase();
+                var cache = new SqliteResourceCacheRepository(database);
+                string now = DateTimeOffset.UtcNow.ToString("o");
+                Assert.That(
+                    LearnerRouteCache.SaveProgress(
+                        cache,
+                        "student-a",
+                        new ProgressSummary { MissionsCompleted = 3 },
+                        now).IsSuccess,
+                    Is.True);
+                Assert.That(
+                    LearnerRouteCache.LoadProgress(cache, "student-a").Value.MissionsCompleted,
+                    Is.EqualTo(3));
+                Assert.That(LearnerRouteCache.LoadProgress(cache, "student-b").IsFailure, Is.True);
+                Assert.That(
+                    LearnerRouteCache.SaveProgress(cache, "student-a", new ProgressSummary(), now)
+                        .IsSuccess,
+                    Is.True);
+                Assert.That(
+                    LearnerRouteCache.LoadProgress(cache, "student-a").Value.MissionsCompleted,
+                    Is.EqualTo(0));
+            }
+
+            Assert.That(new ProgressPreviewSummary(0, 0, 0, 0, 0, 0).IsEmpty, Is.True);
+            Assert.That(new ProgressPreviewSummary(0, 0, 0, 0, 0, 2).IsEmpty, Is.False);
+            Assert.That(
+                OfflineSyncBannerPresets.SyncAttention(2, 1).Title,
+                Does.Contain("needs attention"));
         }
 
         private static async Task<MockStudentGateway> CreateAuthenticatedGatewayAsync(

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NutriMind.App.Presentation;
@@ -63,6 +64,7 @@ namespace NutriMind.App.Presentation
             if (result.IsSuccess)
             {
                 _cachedSummary = result.Value ?? new ProgressSummary();
+                PersistProgressCache(_cachedSummary);
                 ProgressPreviewSummary summary = AppViewMappers.MapProgressSummary(
                     _cachedSummary,
                     TryGetPendingOutboxCount());
@@ -74,19 +76,59 @@ namespace NutriMind.App.Presentation
             {
                 HandleUnauthorized();
             }
-            else if (IsOffline(result.Error) && _cachedSummary != null)
+            else if (IsOffline(result.Error))
             {
-                _view.SetSummary(AppViewMappers.MapProgressSummary(
-                    _cachedSummary,
-                    TryGetPendingOutboxCount()));
-                _view.SetDataState(DataStatePanelState.OfflineCached);
+                ProgressSummary cached = LoadProgressCache() ?? _cachedSummary;
+                if (cached != null)
+                {
+                    _cachedSummary = cached;
+                    _view.SetSummary(AppViewMappers.MapProgressSummary(
+                        cached,
+                        TryGetPendingOutboxCount()));
+                    _view.SetDataState(DataStatePanelState.OfflineCached);
+                }
+                else
+                {
+                    _view.SetDataState(DataStatePanelState.OfflineUnavailable);
+                }
             }
             else
             {
                 _view.SetDataState(AppViewMappers.ErrorToDataState(
                     result.Error,
-                    hasCachedData: _cachedSummary != null));
+                    hasCachedData: false));
             }
+        }
+
+        private void PersistProgressCache(ProgressSummary summary)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveProgress(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                summary ?? new ProgressSummary(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private ProgressSummary LoadProgressCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<ProgressSummary> cached = LearnerRouteCache.LoadProgress(
+                Lifetime.ResourceCacheRepository,
+                studentId);
+            return cached.IsSuccess ? cached.Value : null;
         }
 
         private void OnRetry()

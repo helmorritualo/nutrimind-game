@@ -269,6 +269,12 @@ namespace NutriMind.Core.Persistence
         [Column("operation")]
         public string Operation { get; set; }
 
+        [Column("student_id")]
+        public string StudentId { get; set; }
+
+        [Column("entity_key")]
+        public string EntityKey { get; set; }
+
         [Column("normalized_payload_json")]
         public string NormalizedPayloadJson { get; set; }
 

@@ -34,6 +34,9 @@ namespace NutriMind.App.Presentation
         private string _pendingClientUuid;
         private QuizAttemptSubmission _retainedSubmission;
         private IdempotentRequestRecord _pendingRecord;
+        private PendingQuizSubmissionEnvelopeV2 _pendingEnvelope;
+        private QuizResult _pendingServerResult;
+        private bool _finalizationPending;
         private bool _isSubmitting;
 
         public QuizAttemptPresenter(
@@ -138,6 +141,12 @@ namespace NutriMind.App.Presentation
 
         private bool RestorePendingSubmission()
         {
+            if (string.IsNullOrWhiteSpace(ResolveCurrentStudentId()))
+            {
+                ShowLocalIntegrityError();
+                return true;
+            }
+
             IIdempotentRequestRepository repository = Lifetime.IdempotentRequestRepository;
             if (repository == null)
             {
@@ -145,7 +154,7 @@ namespace NutriMind.App.Presentation
                 return true;
             }
 
-            PendingQuizSubmissionEnvelopeV1 retained =
+            PendingQuizSubmissionEnvelopeV2 retained =
                 _coordinator?.RetainedPendingQuizSubmission;
             if (IsEnvelopeForCurrentQuiz(retained))
             {
@@ -158,24 +167,11 @@ namespace NutriMind.App.Presentation
                 }
 
                 IdempotentRequestRecord record = stored.Value;
-                if (record == null)
+                if (record == null
+                    || !IsExactEnvelopeRecord(retained, record, ResolveCurrentStudentId()))
                 {
-                    string now = GetUtcNow();
-                    record = new IdempotentRequestRecord
-                    {
-                        RequestUuid = retained.Submission.ClientAttemptUuid,
-                        Operation = IdempotentOperations.QuizSubmit,
-                        NormalizedPayloadJson =
-                            IdempotentMutationSerializers.SerializeQuiz(retained),
-                        State = IdempotentRequestStates.Uncertain,
-                        CreatedUtc = now,
-                        UpdatedUtc = now
-                    };
-                    if (repository.Upsert(record).IsFailure)
-                    {
-                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
-                        return true;
-                    }
+                    ShowLocalIntegrityError();
+                    return true;
                 }
 
                 if (IdempotentRequestStates.IsUnresolved(record.State))
@@ -190,6 +186,7 @@ namespace NutriMind.App.Presentation
             AppResult<IdempotentRequestRecord> unresolved =
                 repository.FindLatestUnresolved(
                     IdempotentOperations.QuizSubmit,
+                    ResolveCurrentStudentId(),
                     _ctx.QuizId);
             if (unresolved.IsFailure)
             {
@@ -204,16 +201,15 @@ namespace NutriMind.App.Presentation
 
             try
             {
-                PendingQuizSubmissionEnvelopeV1 envelope =
+                PendingQuizSubmissionEnvelopeV2 envelope =
                     IdempotentMutationSerializers.DeserializeQuiz(
                         unresolved.Value.NormalizedPayloadJson);
-                if (!IsEnvelopeForCurrentQuiz(envelope)
-                    || !string.Equals(
-                        envelope.Submission.ClientAttemptUuid,
-                        unresolved.Value.RequestUuid,
-                        StringComparison.Ordinal))
+                if (!IsExactEnvelopeRecord(
+                        envelope,
+                        unresolved.Value,
+                        ResolveCurrentStudentId()))
                 {
-                    _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    ShowLocalIntegrityError();
                     return true;
                 }
 
@@ -231,21 +227,25 @@ namespace NutriMind.App.Presentation
         }
 
         private void ApplyPendingEnvelope(
-            PendingQuizSubmissionEnvelopeV1 envelope,
+            PendingQuizSubmissionEnvelopeV2 envelope,
             IdempotentRequestRecord record)
         {
             _pendingClientUuid = envelope.Submission.ClientAttemptUuid;
             _retainedSubmission = envelope.Submission;
             _pendingRecord = record;
+            _pendingEnvelope = envelope;
             _coordinator?.RetainPendingQuizSubmission(envelope);
             _view.SetPreviewState(QuizAttemptPreviewState.UncertainSubmission);
         }
 
-        private bool IsEnvelopeForCurrentQuiz(PendingQuizSubmissionEnvelopeV1 envelope)
+        private bool IsEnvelopeForCurrentQuiz(PendingQuizSubmissionEnvelopeV2 envelope)
         {
+            string currentStudentId = ResolveCurrentStudentId();
             return envelope != null
                 && envelope.Submission != null
                 && !string.IsNullOrWhiteSpace(envelope.Submission.ClientAttemptUuid)
+                && !string.IsNullOrWhiteSpace(currentStudentId)
+                && string.Equals(envelope.StudentId, currentStudentId, StringComparison.Ordinal)
                 && string.Equals(envelope.QuizId, _ctx.QuizId, StringComparison.Ordinal);
         }
 
@@ -272,8 +272,16 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            string currentStudentId = ResolveCurrentStudentId();
+            if (string.IsNullOrWhiteSpace(currentStudentId))
+            {
+                ShowLocalIntegrityError();
+                return;
+            }
+
             _isSubmitting = true;
             _view.SetPreviewState(QuizAttemptPreviewState.Submitting);
+            bool dispatched = false;
             try
             {
                 IIdempotentRequestRepository repository = Lifetime.IdempotentRequestRepository;
@@ -284,7 +292,7 @@ namespace NutriMind.App.Presentation
                 }
 
                 QuizAttemptSubmission submission = _retainedSubmission;
-                PendingQuizSubmissionEnvelopeV1 envelope;
+                PendingQuizSubmissionEnvelopeV2 envelope;
                 IdempotentRequestRecord record = _pendingRecord;
 
                 if (submission == null)
@@ -303,22 +311,38 @@ namespace NutriMind.App.Presentation
                     submission = AppViewMappers.MapPreviewSubmission(
                         _pendingClientUuid,
                         previewSubmission);
-                    envelope = new PendingQuizSubmissionEnvelopeV1
+                    envelope = new PendingQuizSubmissionEnvelopeV2
                     {
+                        StudentId = currentStudentId,
                         QuizId = _ctx.QuizId,
                         Submission = submission
                     };
-                    string now = GetUtcNow();
-                    record = new IdempotentRequestRecord
+                    string payload;
+                    try
                     {
-                        RequestUuid = submission.ClientAttemptUuid,
-                        Operation = IdempotentOperations.QuizSubmit,
-                        NormalizedPayloadJson =
-                            IdempotentMutationSerializers.SerializeQuiz(envelope),
-                        State = IdempotentRequestStates.Pending,
-                        CreatedUtc = now,
-                        UpdatedUtc = now
-                    };
+                        payload = IdempotentMutationSerializers.SerializeQuiz(envelope);
+                    }
+                    catch (Exception)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
+                    AppResult<IdempotentRequestRecord> created =
+                        IdempotentMutationTransitions.CreatePending(
+                            submission.ClientAttemptUuid,
+                            IdempotentOperations.QuizSubmit,
+                            currentStudentId,
+                            _ctx.QuizId,
+                            payload,
+                            GetUtcNow());
+                    if (created.IsFailure)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
+                    record = created.Value;
                     if (repository.Upsert(record).IsFailure)
                     {
                         _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
@@ -331,50 +355,40 @@ namespace NutriMind.App.Presentation
                 }
                 else
                 {
-                    envelope = new PendingQuizSubmissionEnvelopeV1
-                    {
-                        QuizId = _ctx.QuizId,
-                        Submission = submission
-                    };
+                    envelope = _pendingEnvelope;
                     if (record == null)
                     {
-                        AppResult<IdempotentRequestRecord> stored =
-                            repository.Get(submission.ClientAttemptUuid);
-                        record = stored.IsSuccess ? stored.Value : null;
-                    }
-
-                    if (record == null)
-                    {
-                        string now = GetUtcNow();
-                        record = new IdempotentRequestRecord
-                        {
-                            RequestUuid = submission.ClientAttemptUuid,
-                            Operation = IdempotentOperations.QuizSubmit,
-                            NormalizedPayloadJson =
-                                IdempotentMutationSerializers.SerializeQuiz(envelope),
-                            State = IdempotentRequestStates.Pending,
-                            CreatedUtc = now,
-                            UpdatedUtc = now
-                        };
-                        if (repository.Upsert(record).IsFailure)
+                        AppResult<IdempotentRequestRecord> unresolved =
+                            repository.FindLatestUnresolved(
+                                IdempotentOperations.QuizSubmit,
+                                currentStudentId,
+                                _ctx.QuizId);
+                        if (unresolved.IsFailure)
                         {
                             _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
                             return;
                         }
+
+                        record = unresolved.Value;
+                    }
+
+                    if (envelope == null
+                        || record == null
+                        || !IsExactEnvelopeRecord(envelope, record, currentStudentId))
+                    {
+                        ShowLocalIntegrityError();
+                        return;
                     }
                 }
 
-                if (SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Sending,
-                        null).IsFailure)
+                if (token.IsCancellationRequested || !TryBeginDispatch(repository, record))
                 {
                     _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
                     return;
                 }
 
                 _pendingRecord = record;
+                _pendingEnvelope = envelope;
                 _coordinator?.RetainPendingQuizSubmission(envelope);
 
                 var request = new SubmitQuizAttemptRequest
@@ -383,51 +397,50 @@ namespace NutriMind.App.Presentation
                     Submission = envelope.Submission
                 };
 
+                dispatched = true;
                 AppResult<QuizResult> result =
                     await Lifetime.Gateway.SubmitQuizAttemptAsync(request, token)
                         .ConfigureAwait(true);
 
                 if (token.IsCancellationRequested)
                 {
+                    HandlePostDispatchCancellation(repository, record, envelope);
                     return;
                 }
 
                 if (result.IsSuccess)
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Completed,
-                        SerializeQuizResult(result.Value));
-                    _retainedSubmission = null;
-                    _pendingRecord = null;
-                    _coordinator?.ReleaseAttemptSession();
-                    _coordinator?.ReleasePendingQuizSubmission();
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Completed,
+                            SerializeQuizResult(result.Value),
+                            GetUtcNow()).IsFailure)
+                    {
+                        _pendingServerResult = result.Value;
+                        _finalizationPending = true;
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
 
-                    string attemptId = result.Value?.AttemptId;
-                    AppRouteContext resultCtx = AppRouteContext.ForQuizResult(
-                            attemptId,
-                            _ctx.QuizId,
-                            _resolvedSubjectId,
-                            _resolvedTermId)
-                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack);
-                    TaskUtilities.ForgetSafely(
-                        Lifetime.Router?.NavigateAsync(
-                            AppRouteId.QuizResult,
-                            resultCtx,
-                            NavigationToken),
-                        NavigationToken,
-                        "QuizAttempt.ToResult");
+                    CompleteSuccess(result.Value);
                 }
                 else if (IsOffline(result.Error))
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Uncertain,
-                        null);
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Uncertain,
+                            null,
+                            GetUtcNow()).IsFailure)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
                     _retainedSubmission = submission;
                     _pendingRecord = record;
+                    _pendingEnvelope = envelope;
                     _coordinator?.RetainPendingQuizSubmission(envelope);
                     if (!Disposed)
                     {
@@ -436,13 +449,20 @@ namespace NutriMind.App.Presentation
                 }
                 else
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Rejected,
-                        SerializeErrorResult(result.Error));
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Rejected,
+                            SerializeErrorResult(result.Error),
+                            GetUtcNow()).IsFailure)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
                     _retainedSubmission = null;
                     _pendingRecord = null;
+                    _pendingEnvelope = null;
                     _coordinator?.ReleaseAttemptSession();
                     _coordinator?.ReleasePendingQuizSubmission();
                     if (IsUnauthorized(result.Error))
@@ -455,9 +475,19 @@ namespace NutriMind.App.Presentation
                     }
                 }
             }
+            catch (OperationCanceledException) when (dispatched)
+            {
+                HandlePostDispatchCancellation(
+                    Lifetime.IdempotentRequestRepository,
+                    _pendingRecord,
+                    _pendingEnvelope);
+            }
             finally
             {
-                _isSubmitting = false;
+                if (!_finalizationPending)
+                {
+                    _isSubmitting = false;
+                }
             }
         }
 
@@ -493,7 +523,18 @@ namespace NutriMind.App.Presentation
 
         private void OnRetryPendingSubmission()
         {
-            if (Disposed || _isSubmitting || _retainedSubmission == null)
+            if (Disposed)
+            {
+                return;
+            }
+
+            if (_finalizationPending)
+            {
+                RetryFinalization();
+                return;
+            }
+
+            if (_isSubmitting || _retainedSubmission == null)
             {
                 return;
             }
@@ -529,16 +570,158 @@ namespace NutriMind.App.Presentation
             _view.ShowReview();
         }
 
-        private AppResult SetRequestState(
+        private bool IsExactEnvelopeRecord(
+            PendingQuizSubmissionEnvelopeV2 envelope,
+            IdempotentRequestRecord record,
+            string currentStudentId)
+        {
+            if (!IsEnvelopeForCurrentQuiz(envelope)
+                || record == null
+                || !string.Equals(record.RequestUuid, envelope.Submission.ClientAttemptUuid, StringComparison.Ordinal)
+                || !string.Equals(record.StudentId, currentStudentId, StringComparison.Ordinal)
+                || !string.Equals(record.EntityKey, _ctx.QuizId, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            try
+            {
+                string payload = IdempotentMutationSerializers.SerializeQuiz(envelope);
+                return string.Equals(record.NormalizedPayloadJson, payload, StringComparison.Ordinal)
+                    && IdempotentMutationTransitions.ValidateImmutableIdentity(
+                        record,
+                        IdempotentOperations.QuizSubmit,
+                        currentStudentId,
+                        _ctx.QuizId,
+                        payload).IsSuccess;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private bool TryBeginDispatch(
+            IIdempotentRequestRepository repository,
+            IdempotentRequestRecord record)
+        {
+            if (record.State == IdempotentRequestStates.Sending
+                && IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Uncertain,
+                    null,
+                    GetUtcNow()).IsFailure)
+            {
+                return false;
+            }
+
+            return IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Sending,
+                    null,
+                    GetUtcNow())
+                .IsSuccess;
+        }
+
+        private void HandlePostDispatchCancellation(
             IIdempotentRequestRepository repository,
             IdempotentRequestRecord record,
-            string state,
-            string resultJson)
+            PendingQuizSubmissionEnvelopeV2 envelope)
         {
-            record.State = state;
-            record.ResultJson = resultJson;
-            record.UpdatedUtc = GetUtcNow();
-            return repository.Upsert(record);
+            if (record == null || envelope == null)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return;
+            }
+
+            _pendingRecord = record;
+            _pendingEnvelope = envelope;
+            _retainedSubmission = envelope.Submission;
+            _coordinator?.RetainPendingQuizSubmission(envelope);
+            if (record.State == IdempotentRequestStates.Sending
+                && IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Uncertain,
+                    null,
+                    GetUtcNow()).IsFailure)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return;
+            }
+
+            if (!Disposed)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.UncertainSubmission);
+            }
+        }
+
+        private void RetryFinalization()
+        {
+            if (!_finalizationPending || _pendingRecord == null)
+            {
+                return;
+            }
+
+            if (IdempotentMutationTransitions.Transition(
+                    Lifetime.IdempotentRequestRepository,
+                    _pendingRecord,
+                    IdempotentRequestStates.Completed,
+                    SerializeQuizResult(_pendingServerResult),
+                    GetUtcNow()).IsFailure)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return;
+            }
+
+            _finalizationPending = false;
+            _isSubmitting = false;
+            CompleteSuccess(_pendingServerResult);
+        }
+
+        private void CompleteSuccess(QuizResult result)
+        {
+            _retainedSubmission = null;
+            _pendingRecord = null;
+            _pendingEnvelope = null;
+            _pendingServerResult = null;
+            _finalizationPending = false;
+            _coordinator?.ReleaseAttemptSession();
+            _coordinator?.ReleasePendingQuizSubmission();
+
+            string attemptId = result?.AttemptId;
+            AppRouteContext resultCtx = AppRouteContext.ForQuizResult(
+                    attemptId,
+                    _ctx.QuizId,
+                    _resolvedSubjectId,
+                    _resolvedTermId)
+                .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack);
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.NavigateAsync(
+                    AppRouteId.QuizResult,
+                    resultCtx,
+                    NavigationToken),
+                NavigationToken,
+                "QuizAttempt.ToResult");
+        }
+
+        private string ResolveCurrentStudentId()
+        {
+            return Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+        }
+
+        private void ShowLocalIntegrityError()
+        {
+            _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+            if (!Disposed)
+            {
+                _shellRuntime?.ShowToast(
+                    "This submission could not be safely recovered. Please refresh and try again.",
+                    AppShellToastTone.Danger);
+            }
         }
 
         private string GetUtcNow()

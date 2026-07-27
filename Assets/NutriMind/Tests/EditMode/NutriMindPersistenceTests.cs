@@ -42,18 +42,18 @@ namespace NutriMind.Tests.EditMode
         }
 
         [Test]
-        public void Migration_FreshDb_AppliesSchemaVersionOne()
+        public void Migration_FreshDb_AppliesSchemaVersionTwo()
         {
-            Assert.That(_database.SchemaVersion, Is.EqualTo(1));
+            Assert.That(_database.SchemaVersion, Is.EqualTo(2));
             Assert.That(_database.IsOpen, Is.True);
         }
 
         [Test]
         public void Migration_Reopen_IsIdempotent()
         {
-            Assert.That(_database.SchemaVersion, Is.EqualTo(1));
+            Assert.That(_database.SchemaVersion, Is.EqualTo(2));
             _database = _factory.ReopenDatabase();
-            Assert.That(_database.SchemaVersion, Is.EqualTo(1));
+            Assert.That(_database.SchemaVersion, Is.EqualTo(2));
             Assert.That(_database.IsOpen, Is.True);
         }
 

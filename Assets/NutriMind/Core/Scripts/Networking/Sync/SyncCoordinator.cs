@@ -55,6 +55,8 @@ namespace NutriMind.Core.Sync
         private readonly SemaphoreSlim _pushGate = new SemaphoreSlim(1, 1);
         private string _activeBatchUuid;
 
+        public event Action PushStateChanged;
+
         public SyncCoordinator(
             IOutboxRepository outboxRepository,
             ISyncPushGateway gateway,
@@ -68,6 +70,8 @@ namespace NutriMind.Core.Sync
             _clock = clock ?? new SystemAppClock();
             _payloadSerializer = payloadSerializer ?? new OutboxPayloadSerializer();
         }
+
+        public bool IsPushInFlight => _pushGate.CurrentCount == 0;
 
         public string ActiveBatchUuid
         {
@@ -94,6 +98,7 @@ namespace NutriMind.Core.Sync
                     isRetryable: true);
             }
 
+            RaisePushStateChanged();
             try
             {
                 return await PushPendingCoreAsync(configuration, cancellationToken).ConfigureAwait(false);
@@ -101,6 +106,19 @@ namespace NutriMind.Core.Sync
             finally
             {
                 _pushGate.Release();
+                RaisePushStateChanged();
+            }
+        }
+
+        private void RaisePushStateChanged()
+        {
+            try
+            {
+                PushStateChanged?.Invoke();
+            }
+            catch (Exception)
+            {
+                // Listeners must not break sync.
             }
         }
 

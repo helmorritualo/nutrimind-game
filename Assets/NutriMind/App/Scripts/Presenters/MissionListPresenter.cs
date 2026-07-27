@@ -7,6 +7,7 @@ using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 
 namespace NutriMind.App.Presentation
@@ -80,6 +81,7 @@ namespace NutriMind.App.Presentation
             {
                 IReadOnlyList<MissionSummary> missions =
                     result.Value ?? Array.Empty<MissionSummary>();
+                PersistMissionsCache(missions);
                 BindMissions(
                     missions,
                     missions.Count == 0
@@ -194,6 +196,7 @@ namespace NutriMind.App.Presentation
             DataStatePanelState state)
         {
             _missionMap.Clear();
+            var ordered = new List<MissionSummary>();
             if (missions != null)
             {
                 for (int i = 0; i < missions.Count; i++)
@@ -204,13 +207,19 @@ namespace NutriMind.App.Presentation
                         continue;
                     }
 
+                    if (_missionMap.ContainsKey(mission.Id))
+                    {
+                        continue;
+                    }
+
                     _missionMap[mission.Id] = mission;
+                    ordered.Add(mission);
                 }
             }
 
-            var valid = new List<MissionSummary>(_missionMap.Values);
+            ordered.Sort(CompareMissionOrderThenId);
             MissionPreviewItem[] items = AppViewMappers.MapMissionSummaries(
-                valid,
+                ordered,
                 AppViewMappers.MapSubject(_ctx?.SubjectId),
                 AppViewMappers.MapTerm(_ctx?.TermId));
             _view.SetItems(items);
@@ -219,11 +228,35 @@ namespace NutriMind.App.Presentation
                 : state);
         }
 
+        private static int CompareMissionOrderThenId(MissionSummary left, MissionSummary right)
+        {
+            int order = (left?.Order ?? 0).CompareTo(right?.Order ?? 0);
+            if (order != 0)
+            {
+                return order;
+            }
+
+            return string.CompareOrdinal(left?.Id ?? string.Empty, right?.Id ?? string.Empty);
+        }
+
         private IReadOnlyList<MissionSummary> GetCachedMissions()
         {
-            if (_missionMap.Count > 0)
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (!string.IsNullOrWhiteSpace(studentId)
+                && !string.IsNullOrWhiteSpace(_ctx?.SubjectId)
+                && !string.IsNullOrWhiteSpace(_ctx?.TermId)
+                && Lifetime.ResourceCacheRepository != null)
             {
-                return new List<MissionSummary>(_missionMap.Values);
+                AppResult<IReadOnlyList<MissionSummary>> cached = LearnerRouteCache.LoadMissions(
+                    Lifetime.ResourceCacheRepository,
+                    studentId,
+                    _ctx.SubjectId,
+                    _ctx.TermId);
+                if (cached.IsSuccess && cached.Value != null)
+                {
+                    return cached.Value;
+                }
             }
 
             IReadOnlyList<MissionSummary> bootstrap = Lifetime.LastBootstrap?.Missions;
@@ -258,6 +291,27 @@ namespace NutriMind.App.Presentation
                     && AppViewMappers.TryMapTerm(_ctx.TermId, out NutriMindTerm routeTerm)
                     && missionTerm == routeTerm);
             return subjectMatches && termMatches;
+        }
+
+        private void PersistMissionsCache(IReadOnlyList<MissionSummary> missions)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId)
+                || string.IsNullOrWhiteSpace(_ctx?.SubjectId)
+                || string.IsNullOrWhiteSpace(_ctx?.TermId)
+                || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveMissions(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                _ctx.SubjectId,
+                _ctx.TermId,
+                missions ?? Array.Empty<MissionSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
         }
     }
 }

@@ -461,6 +461,19 @@ namespace NutriMind.Core.Persistence
                 return AppResult.Failure(AppErrorCodes.ValidationFailed, "request_uuid is required.");
             }
 
+            if (string.IsNullOrWhiteSpace(record.Operation)
+                || string.IsNullOrWhiteSpace(record.StudentId)
+                || string.IsNullOrWhiteSpace(record.EntityKey)
+                || string.IsNullOrWhiteSpace(record.NormalizedPayloadJson)
+                || string.IsNullOrWhiteSpace(record.State)
+                || string.IsNullOrWhiteSpace(record.CreatedUtc)
+                || string.IsNullOrWhiteSpace(record.UpdatedUtc))
+            {
+                return AppResult.Failure(
+                    AppErrorCodes.ValidationFailed,
+                    "idempotent_request requires operation, student_id, entity_key, payload, state, and timestamps.");
+            }
+
             try
             {
                 _database.ExecuteWithConnection(connection => connection.InsertOrReplace(record));
@@ -563,13 +576,23 @@ namespace NutriMind.Core.Persistence
             }
         }
 
-        public AppResult<IdempotentRequestRecord> FindLatestUnresolved(string operation, string entityKey)
+        public AppResult<IdempotentRequestRecord> FindLatestUnresolved(
+            string operation,
+            string studentId,
+            string entityKey)
         {
             if (string.IsNullOrWhiteSpace(operation))
             {
                 return AppResult<IdempotentRequestRecord>.Failure(
                     AppErrorCodes.ValidationFailed,
                     "operation is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(studentId))
+            {
+                return AppResult<IdempotentRequestRecord>.Failure(
+                    AppErrorCodes.ValidationFailed,
+                    "studentId is required.");
             }
 
             if (string.IsNullOrWhiteSpace(entityKey))
@@ -579,31 +602,35 @@ namespace NutriMind.Core.Persistence
                     "entityKey is required.");
             }
 
-            AppResult<IReadOnlyList<IdempotentRequestRecord>> listed =
-                GetByOperationAndStates(operation, IdempotentRequestStates.Unresolved);
-            if (listed.IsFailure)
+            string normalizedOperation = operation.Trim();
+            string normalizedStudentId = studentId.Trim();
+            string normalizedEntityKey = entityKey.Trim();
+
+            try
             {
-                return AppResult<IdempotentRequestRecord>.Failure(listed.Error);
-            }
+                IdempotentRequestRecord record = _database.ExecuteWithConnection(connection =>
+                {
+                    List<IdempotentRequestRecord> matches = connection.Query<IdempotentRequestRecord>(
+                        "SELECT * FROM idempotent_request "
+                        + "WHERE operation = ? AND student_id = ? AND entity_key = ? "
+                        + "AND state IN (?, ?, ?) "
+                        + "ORDER BY updated_utc DESC, created_utc DESC "
+                        + "LIMIT 1",
+                        normalizedOperation,
+                        normalizedStudentId,
+                        normalizedEntityKey,
+                        IdempotentRequestStates.Pending,
+                        IdempotentRequestStates.Sending,
+                        IdempotentRequestStates.Uncertain);
+                    return matches != null && matches.Count > 0 ? matches[0] : null;
+                });
 
-            string needle = entityKey.Trim();
-            IReadOnlyList<IdempotentRequestRecord> records =
-                listed.Value ?? Array.Empty<IdempotentRequestRecord>();
-            for (int i = 0; i < records.Count; i++)
+                return AppResult<IdempotentRequestRecord>.Success(record);
+            }
+            catch (Exception exception)
             {
-                IdempotentRequestRecord record = records[i];
-                if (record == null || string.IsNullOrEmpty(record.NormalizedPayloadJson))
-                {
-                    continue;
-                }
-
-                if (record.NormalizedPayloadJson.IndexOf(needle, StringComparison.Ordinal) >= 0)
-                {
-                    return AppResult<IdempotentRequestRecord>.Success(record);
-                }
+                return AppResult<IdempotentRequestRecord>.Failure(AppError.FromException(exception));
             }
-
-            return AppResult<IdempotentRequestRecord>.Success(null);
         }
 
         private static bool ContainsState(string[] states, string state)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,15 +8,15 @@ using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 
 namespace NutriMind.App.Presentation
 {
     /// <summary>
     /// Runtime presenter for the Quiz History route.
-    /// Fetches the learner's attempt history from the server.
-    /// Maps server QuizHistoryEntry records to QuizHistoryPreviewItems for the view.
-    /// Never caches results locally; history is always server-authoritative.
+    /// Fetches the learner's attempt history from the server and persists a learner-scoped
+    /// offline cache for declared cold-restart fallback.
     /// </summary>
     public sealed class QuizHistoryPresenter : RoutePresenterBase
     {
@@ -73,25 +74,13 @@ namespace NutriMind.App.Presentation
             if (result.IsSuccess)
             {
                 IReadOnlyList<QuizHistoryEntry> entries =
-                    result.Value ?? (IReadOnlyList<QuizHistoryEntry>)System.Array.Empty<QuizHistoryEntry>();
-
-                // Filter to the selected quiz if a QuizId is in context.
-                if (!string.IsNullOrEmpty(_ctx.QuizId))
-                {
-                    var filtered = new List<QuizHistoryEntry>();
-                    for (int i = 0; i < entries.Count; i++)
-                    {
-                        if (string.Equals(entries[i].QuizId, _ctx.QuizId, System.StringComparison.Ordinal))
-                        {
-                            filtered.Add(entries[i]);
-                        }
-                    }
-
-                    entries = filtered;
-                }
+                    result.Value ?? (IReadOnlyList<QuizHistoryEntry>)Array.Empty<QuizHistoryEntry>();
+                entries = FilterByQuizId(entries);
+                PersistQuizHistoryCache(entries);
 
                 if (entries.Count == 0)
                 {
+                    _view.SetItems(Array.Empty<QuizHistoryPreviewItem>());
                     _view.SetPreviewState(QuizHistoryPreviewState.Empty);
                 }
                 else
@@ -105,10 +94,93 @@ namespace NutriMind.App.Presentation
             {
                 HandleUnauthorized();
             }
+            else if (IsOffline(result.Error))
+            {
+                IReadOnlyList<QuizHistoryEntry> cached = LoadQuizHistoryCache();
+                if (cached != null)
+                {
+                    if (cached.Count == 0)
+                    {
+                        _view.SetItems(Array.Empty<QuizHistoryPreviewItem>());
+                        _view.SetPreviewState(QuizHistoryPreviewState.Empty);
+                    }
+                    else
+                    {
+                        _view.SetItems(AppViewMappers.MapQuizHistoryEntries(cached));
+                        _view.SetPreviewState(QuizHistoryPreviewState.OfflineCached);
+                    }
+                }
+                else
+                {
+                    _view.SetItems(Array.Empty<QuizHistoryPreviewItem>());
+                    _view.SetPreviewState(QuizHistoryPreviewState.OfflineUnavailable);
+                }
+            }
             else
             {
                 _view.SetPreviewState(QuizHistoryPreviewState.RecoverableError);
             }
+        }
+
+        private IReadOnlyList<QuizHistoryEntry> FilterByQuizId(IReadOnlyList<QuizHistoryEntry> entries)
+        {
+            if (string.IsNullOrEmpty(_ctx.QuizId) || entries == null)
+            {
+                return entries ?? Array.Empty<QuizHistoryEntry>();
+            }
+
+            var filtered = new List<QuizHistoryEntry>();
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (string.Equals(entries[i].QuizId, _ctx.QuizId, StringComparison.Ordinal))
+                {
+                    filtered.Add(entries[i]);
+                }
+            }
+
+            return filtered;
+        }
+
+        private string BuildQueryKey()
+        {
+            return (_ctx.SubjectId ?? string.Empty)
+                + "|"
+                + (_ctx.TermId ?? string.Empty)
+                + "|"
+                + (_ctx.QuizId ?? string.Empty);
+        }
+
+        private void PersistQuizHistoryCache(IReadOnlyList<QuizHistoryEntry> entries)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveQuizHistory(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                BuildQueryKey(),
+                entries ?? Array.Empty<QuizHistoryEntry>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<QuizHistoryEntry> LoadQuizHistoryCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<QuizHistoryEntry>> cached = LearnerRouteCache.LoadQuizHistory(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                BuildQueryKey());
+            return cached.IsSuccess ? cached.Value : null;
         }
 
         private void OnViewResultRequested(QuizHistoryPreviewSelection selection)
@@ -118,26 +190,28 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            string quizId = selection.Summary.Id;
-            string subjectId = !string.IsNullOrWhiteSpace(selection.Summary.SubjectId)
-                ? selection.Summary.SubjectId
-                : _ctx.SubjectId;
-            string termId = !string.IsNullOrWhiteSpace(selection.Summary.TermId)
-                ? selection.Summary.TermId
-                : _ctx.TermId;
-
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.PushAsync(
+                Lifetime.Router?.NavigateAsync(
                     AppRouteId.QuizResult,
                     AppRouteContext.ForQuizResult(
                             selection.AttemptId,
-                            quizId,
-                            subjectId,
-                            termId)
+                            _ctx.QuizId,
+                            _ctx.SubjectId,
+                            _ctx.TermId)
                         .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
                     NavigationToken),
                 NavigationToken,
                 "QuizHistory.ViewResult");
+        }
+
+        private void OnRetry()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "QuizHistory.Retry");
         }
 
         private void OnBack()
@@ -151,19 +225,6 @@ namespace NutriMind.App.Presentation
                 Lifetime.Router?.BackAsync(NavigationToken),
                 NavigationToken,
                 "QuizHistory.Back");
-        }
-
-        private void OnRetry()
-        {
-            if (Disposed)
-            {
-                return;
-            }
-
-            TaskUtilities.ForgetSafely(
-                FetchAsync(RequestToken),
-                RequestToken,
-                "QuizHistory.Retry");
         }
     }
 }

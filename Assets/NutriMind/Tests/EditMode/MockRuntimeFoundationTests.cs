@@ -78,7 +78,7 @@ namespace NutriMind.Tests.EditMode
                 var root = new AppCompositionRoot(options);
                 Assert.That(root.Compose().IsSuccess, Is.True);
                 Assert.That(root.Database.IsOpen, Is.True);
-                Assert.That(root.Database.SchemaVersion, Is.EqualTo(1));
+                Assert.That(root.Database.SchemaVersion, Is.EqualTo(2));
                 string firstInstall = root.InstallationRepository.GetOrCreateDeviceId().Value;
                 Assert.That(root.InstallationIdGenerator, Is.InstanceOf<SystemIdGenerator>());
                 Assert.That(root.IdGenerator, Is.InstanceOf<DeterministicMockIdGenerator>());
@@ -97,7 +97,7 @@ namespace NutriMind.Tests.EditMode
                 var recomposed = new AppCompositionRoot(options);
                 Assert.That(recomposed.Compose().IsSuccess, Is.True);
                 Assert.That(recomposed.Database.IsOpen, Is.True);
-                Assert.That(recomposed.Database.SchemaVersion, Is.EqualTo(1));
+                Assert.That(recomposed.Database.SchemaVersion, Is.EqualTo(2));
                 Assert.That(recomposed.Gateway, Is.Not.Null);
                 Assert.That(recomposed.Router, Is.Not.Null);
                 Assert.That(recomposed.SceneNavigator, Is.Not.Null);

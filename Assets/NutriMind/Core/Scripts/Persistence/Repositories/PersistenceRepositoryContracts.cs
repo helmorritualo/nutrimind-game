@@ -84,10 +84,13 @@ namespace NutriMind.Core.Persistence
             params string[] states);
 
         /// <summary>
-        /// Finds the newest unresolved request for an operation whose normalized payload
-        /// contains <paramref name="entityKey"/> (reward code or quiz id).
+        /// Finds the newest unresolved request for exact operation + student + entity identity.
+        /// Does not scan payload JSON.
         /// </summary>
-        AppResult<IdempotentRequestRecord> FindLatestUnresolved(string operation, string entityKey);
+        AppResult<IdempotentRequestRecord> FindLatestUnresolved(
+            string operation,
+            string studentId,
+            string entityKey);
     }
 
     /// <summary>

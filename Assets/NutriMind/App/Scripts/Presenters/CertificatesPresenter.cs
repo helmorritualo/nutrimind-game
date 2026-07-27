@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using NutriMind.App.Routing;
 using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 
 namespace NutriMind.App.Presentation
@@ -34,7 +36,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Certificates.Load");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Certificates.Load");
         }
 
         protected override void OnDispose()
@@ -58,10 +60,12 @@ namespace NutriMind.App.Presentation
             if (result.IsSuccess)
             {
                 IReadOnlyList<CertificateSummary> items =
-                    result.Value ?? (IReadOnlyList<CertificateSummary>)System.Array.Empty<CertificateSummary>();
+                    result.Value ?? (IReadOnlyList<CertificateSummary>)Array.Empty<CertificateSummary>();
+                PersistCertificatesCache(items);
 
                 if (items.Count == 0)
                 {
+                    _view.SetItems(Array.Empty<CertificatePreviewItem>());
                     _view.SetPreviewState(CertificatesPreviewState.Empty);
                 }
                 else
@@ -74,10 +78,63 @@ namespace NutriMind.App.Presentation
             {
                 HandleUnauthorized();
             }
+            else if (IsOffline(result.Error))
+            {
+                IReadOnlyList<CertificateSummary> cached = LoadCertificatesCache();
+                if (cached != null)
+                {
+                    if (cached.Count == 0)
+                    {
+                        _view.SetItems(Array.Empty<CertificatePreviewItem>());
+                        _view.SetPreviewState(CertificatesPreviewState.Empty);
+                    }
+                    else
+                    {
+                        _view.SetItems(AppViewMappers.MapCertificateSummaries(cached));
+                        _view.SetPreviewState(CertificatesPreviewState.OfflineCached);
+                    }
+                }
+                else
+                {
+                    _view.SetItems(Array.Empty<CertificatePreviewItem>());
+                    _view.SetPreviewState(CertificatesPreviewState.OfflineUnavailable);
+                }
+            }
             else
             {
                 _view.SetPreviewState(AppViewMappers.ErrorToCertificatesPreviewState(result.Error));
             }
+        }
+
+        private void PersistCertificatesCache(IReadOnlyList<CertificateSummary> items)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveCertificates(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                items ?? Array.Empty<CertificateSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<CertificateSummary> LoadCertificatesCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<CertificateSummary>> cached = LearnerRouteCache.LoadCertificates(
+                Lifetime.ResourceCacheRepository,
+                studentId);
+            return cached.IsSuccess ? cached.Value : null;
         }
 
         private void OnRetry()
@@ -87,7 +144,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Certificates.Retry");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Certificates.Retry");
         }
 
         private void OnBack()

@@ -236,7 +236,7 @@ namespace NutriMind.Core.Persistence
             return result;
         }
 
-        private static CachedMissionSummaryV1[] ToCachedMissions(IReadOnlyList<MissionSummary> missions)
+        public static CachedMissionSummaryV1[] ToCachedMissions(IReadOnlyList<MissionSummary> missions)
         {
             if (missions == null || missions.Count == 0)
             {
@@ -281,7 +281,7 @@ namespace NutriMind.Core.Persistence
             return result;
         }
 
-        private static IReadOnlyList<MissionSummary> ToDomainMissions(CachedMissionSummaryV1[] missions)
+        public static IReadOnlyList<MissionSummary> ToDomainMissions(CachedMissionSummaryV1[] missions)
         {
             if (missions == null || missions.Length == 0)
             {

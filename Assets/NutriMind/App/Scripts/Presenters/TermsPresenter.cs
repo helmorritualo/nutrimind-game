@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 using UnityEngine;
 
@@ -71,6 +73,7 @@ namespace NutriMind.App.Presentation
             if (result.IsSuccess)
             {
                 BindTerms(result.Value);
+                PersistTermsCache(result.Value);
                 _view.SetDataState(
                     _termMap.Count == 0
                         ? DataStatePanelState.Empty
@@ -86,16 +89,25 @@ namespace NutriMind.App.Presentation
 
             if (IsOffline(result.Error))
             {
-                IReadOnlyList<TermSummary> cached = GetBootstrapTerms();
-                if (cached.Count > 0)
+                IReadOnlyList<TermSummary> cached = LoadTermsCache();
+                if (cached == null || cached.Count == 0)
+                {
+                    cached = GetBootstrapTerms();
+                }
+
+                if (cached != null && cached.Count > 0)
                 {
                     BindTerms(cached);
                     _view.SetDataState(DataStatePanelState.OfflineCached);
                     return;
                 }
+
+                BindTerms(Array.Empty<TermSummary>());
+                _view.SetDataState(DataStatePanelState.OfflineUnavailable);
+                return;
             }
 
-            BindTerms(System.Array.Empty<TermSummary>());
+            BindTerms(Array.Empty<TermSummary>());
             _view.SetDataState(AppViewMappers.ErrorToDataState(result.Error));
         }
 
@@ -236,6 +248,45 @@ namespace NutriMind.App.Presentation
 
             return AppViewMappers.TryMapTerm(summary.Id, out term)
                 || AppViewMappers.TryMapTerm(summary.Name, out term);
+        }
+
+        private void PersistTermsCache(IReadOnlyList<TermSummary> terms)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            string subjectId = _ctx?.SubjectId;
+            if (string.IsNullOrWhiteSpace(studentId)
+                || string.IsNullOrWhiteSpace(subjectId)
+                || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveTerms(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                subjectId,
+                terms ?? Array.Empty<TermSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<TermSummary> LoadTermsCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            string subjectId = _ctx?.SubjectId;
+            if (string.IsNullOrWhiteSpace(studentId)
+                || string.IsNullOrWhiteSpace(subjectId)
+                || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<TermSummary>> cached = LearnerRouteCache.LoadTerms(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                subjectId);
+            return cached.IsSuccess ? cached.Value : null;
         }
     }
 }

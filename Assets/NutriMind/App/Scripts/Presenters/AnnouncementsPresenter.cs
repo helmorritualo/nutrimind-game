@@ -68,6 +68,7 @@ namespace NutriMind.App.Presentation
             {
                 IReadOnlyList<AnnouncementSummary> items =
                     result.Value ?? Array.Empty<AnnouncementSummary>();
+                PersistAnnouncementsCache(items);
 
                 if (items.Count == 0)
                 {
@@ -113,12 +114,88 @@ namespace NutriMind.App.Presentation
 
             if (IsOffline(result.Error))
             {
-                _view.SetItems(Array.Empty<AnnouncementPreviewItem>());
-                _view.SetPreviewState(AnnouncementsPreviewState.OfflineUnavailable);
+                IReadOnlyList<AnnouncementSummary> cached = LoadAnnouncementsCache();
+                if (cached != null)
+                {
+                    BindCachedAnnouncements(cached);
+                }
+                else
+                {
+                    _view.SetItems(Array.Empty<AnnouncementPreviewItem>());
+                    _view.SetPreviewState(AnnouncementsPreviewState.OfflineUnavailable);
+                }
+
                 return;
             }
 
             _view.SetPreviewState(AnnouncementsPreviewState.RecoverableError);
+        }
+
+        private void BindCachedAnnouncements(IReadOnlyList<AnnouncementSummary> items)
+        {
+            if (items.Count == 0)
+            {
+                _locallyReadIds.Clear();
+                _view.SetItems(Array.Empty<AnnouncementPreviewItem>());
+                _view.SetReadPresentationIds(Array.Empty<string>());
+                _view.SetPreviewState(AnnouncementsPreviewState.Empty);
+                RefreshUnreadBadge(0);
+                return;
+            }
+
+            AnnouncementPreviewItem[] preview = MapAnnouncements(items);
+            _view.SetItems(preview);
+            _locallyReadIds.Clear();
+            IAnnouncementReadRepository repo = Lifetime.AnnouncementReadRepository;
+            for (int i = 0; i < items.Count; i++)
+            {
+                string id = items[i]?.Id;
+                if (string.IsNullOrEmpty(id) || repo == null)
+                {
+                    continue;
+                }
+
+                AppResult<bool> isRead = repo.IsRead(id);
+                if (isRead.IsSuccess && isRead.Value)
+                {
+                    _locallyReadIds.Add(id);
+                }
+            }
+
+            _view.SetReadPresentationIds(_locallyReadIds);
+            _view.SetPreviewState(AnnouncementsPreviewState.OfflineCached);
+            RefreshUnreadBadge(CountEffectiveUnread(items, _locallyReadIds));
+        }
+
+        private void PersistAnnouncementsCache(IReadOnlyList<AnnouncementSummary> items)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveAnnouncements(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                items ?? Array.Empty<AnnouncementSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<AnnouncementSummary> LoadAnnouncementsCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<AnnouncementSummary>> cached = LearnerRouteCache.LoadAnnouncements(
+                Lifetime.ResourceCacheRepository,
+                studentId);
+            return cached.IsSuccess ? cached.Value : null;
         }
 
         private void OnSelectionChanged(AnnouncementPreviewSelection selection)

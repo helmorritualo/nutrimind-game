@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
         private static IEnumerable<IDatabaseMigration> CreateDefaultMigrations()
         {
             yield return new Migration001InitialSchema();
+            yield return new Migration002IdempotentIdentity();
         }
 
         private static string FormatUtc(DateTimeOffset utc)

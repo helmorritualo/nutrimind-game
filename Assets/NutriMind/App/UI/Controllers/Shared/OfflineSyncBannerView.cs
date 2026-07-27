@@ -138,6 +138,22 @@ namespace NutriMind.App.UI
                 showSpinner: false);
         }
 
+        public static OfflineSyncBannerConfiguration SyncAttention(int pendingCount, int rejectedCount)
+        {
+            int pending = Math.Max(0, pendingCount);
+            int rejected = Math.Max(0, rejectedCount);
+            string title = pending + " updates waiting • " + rejected + " needs attention";
+            return new OfflineSyncBannerConfiguration(
+                state: OfflineSyncBannerState.SyncError,
+                title: title,
+                message: "Some saved updates need attention before sync can finish.",
+                detail: "Your local progress remains on this device. Retry sync when your connection is stable.",
+                iconClass: "ds-icon--error",
+                actionLabel: "Retry Sync",
+                allowDismiss: true,
+                showSpinner: false);
+        }
+
         public static OfflineSyncBannerConfiguration BackOnline()
         {
             return new OfflineSyncBannerConfiguration(

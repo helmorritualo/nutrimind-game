@@ -28,6 +28,10 @@ namespace NutriMind.App.Presentation
         // Keeps the last fetched list so we can look up RewardCode by PresentationKey.
         private IReadOnlyList<RewardSummary> _lastFetchedRewards;
         private bool _useRewardInFlight;
+        private PendingRewardUseEnvelopeV2 _pendingEnvelope;
+        private IdempotentRequestRecord _pendingRecord;
+        private RewardSummary _pendingServerResult;
+        private bool _finalizationPending;
 
         public RewardsPresenter(AppLifetime lifetime, RewardsPanelView view, AppShellRuntimeController shellRuntime)
             : base(lifetime)
@@ -75,6 +79,7 @@ namespace NutriMind.App.Presentation
                 IReadOnlyList<RewardSummary> items = result.Value
                     ?? (IReadOnlyList<RewardSummary>)System.Array.Empty<RewardSummary>();
                 _lastFetchedRewards = items;
+                PersistRewardsCache(items);
 
                 if (items.Count == 0)
                 {
@@ -90,10 +95,64 @@ namespace NutriMind.App.Presentation
             {
                 HandleUnauthorized();
             }
+            else if (IsOffline(result.Error))
+            {
+                IReadOnlyList<RewardSummary> cached = LoadRewardsCache();
+                if (cached != null)
+                {
+                    _lastFetchedRewards = cached;
+                    if (cached.Count == 0)
+                    {
+                        _view.SetPreviewState(RewardsPreviewState.Empty);
+                    }
+                    else
+                    {
+                        _view.SetItems(AppViewMappers.MapRewardSummaries(cached));
+                        _view.SetPreviewState(RewardsPreviewState.OfflineCached);
+                    }
+                }
+                else
+                {
+                    _lastFetchedRewards = Array.Empty<RewardSummary>();
+                    _view.SetItems(Array.Empty<RewardsPreviewItem>());
+                    _view.SetPreviewState(RewardsPreviewState.OfflineUnavailable);
+                }
+            }
             else
             {
                 _view.SetPreviewState(AppViewMappers.ErrorToRewardsPreviewState(result.Error));
             }
+        }
+
+        private void PersistRewardsCache(IReadOnlyList<RewardSummary> items)
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return;
+            }
+
+            LearnerRouteCache.SaveRewards(
+                Lifetime.ResourceCacheRepository,
+                studentId,
+                items ?? Array.Empty<RewardSummary>(),
+                DateTimeOffset.UtcNow.ToString("o"));
+        }
+
+        private IReadOnlyList<RewardSummary> LoadRewardsCache()
+        {
+            string studentId = Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+            if (string.IsNullOrWhiteSpace(studentId) || Lifetime.ResourceCacheRepository == null)
+            {
+                return null;
+            }
+
+            AppResult<IReadOnlyList<RewardSummary>> cached = LearnerRouteCache.LoadRewards(
+                Lifetime.ResourceCacheRepository,
+                studentId);
+            return cached.IsSuccess ? cached.Value : null;
         }
 
         private void OnUseRewardSelected(RewardsPreviewSelection selection)
@@ -121,15 +180,22 @@ namespace NutriMind.App.Presentation
         {
             if (Disposed
                 || _useRewardInFlight
-                || token.IsCancellationRequested
                 || reward == null
                 || string.IsNullOrWhiteSpace(reward.RewardCode))
             {
                 return;
             }
 
+            string currentStudentId = ResolveCurrentStudentId();
+            if (string.IsNullOrWhiteSpace(currentStudentId))
+            {
+                ShowLocalIntegrityFailure();
+                return;
+            }
+
             _useRewardInFlight = true;
             _view.SetUseRewardEnabled(false);
+            bool dispatched = false;
             try
             {
                 IIdempotentRequestRepository repository = Lifetime.IdempotentRequestRepository;
@@ -142,6 +208,7 @@ namespace NutriMind.App.Presentation
                 AppResult<IdempotentRequestRecord> unresolved =
                     repository.FindLatestUnresolved(
                         IdempotentOperations.UseReward,
+                        currentStudentId,
                         reward.RewardCode);
                 if (unresolved.IsFailure)
                 {
@@ -150,32 +217,58 @@ namespace NutriMind.App.Presentation
                 }
 
                 IdempotentRequestRecord record = unresolved.Value;
-                PendingRewardUseEnvelopeV1 envelope;
+                PendingRewardUseEnvelopeV2 envelope;
                 if (record != null)
                 {
-                    envelope = RestoreRewardEnvelope(record, reward.RewardCode);
-                    record.NormalizedPayloadJson =
-                        IdempotentMutationSerializers.SerializeReward(envelope);
+                    if (!TryRestoreRewardEnvelope(
+                            record,
+                            currentStudentId,
+                            reward.RewardCode,
+                            out envelope))
+                    {
+                        ShowLocalIntegrityFailure();
+                        return;
+                    }
                 }
                 else
                 {
-                    string requestUuid = Guid.NewGuid().ToString();
-                    envelope = new PendingRewardUseEnvelopeV1
+                    if (token.IsCancellationRequested)
                     {
+                        return;
+                    }
+
+                    envelope = new PendingRewardUseEnvelopeV2
+                    {
+                        StudentId = currentStudentId,
                         RewardCode = reward.RewardCode,
-                        RequestUuid = requestUuid
+                        RequestUuid = Guid.NewGuid().ToString()
                     };
-                    string now = GetUtcNow();
-                    record = new IdempotentRequestRecord
+                    string payload;
+                    try
                     {
-                        RequestUuid = requestUuid,
-                        Operation = IdempotentOperations.UseReward,
-                        NormalizedPayloadJson =
-                            IdempotentMutationSerializers.SerializeReward(envelope),
-                        State = IdempotentRequestStates.Pending,
-                        CreatedUtc = now,
-                        UpdatedUtc = now
-                    };
+                        payload = IdempotentMutationSerializers.SerializeReward(envelope);
+                    }
+                    catch (Exception)
+                    {
+                        ShowLocalIntegrityFailure();
+                        return;
+                    }
+
+                    AppResult<IdempotentRequestRecord> created =
+                        IdempotentMutationTransitions.CreatePending(
+                            envelope.RequestUuid,
+                            IdempotentOperations.UseReward,
+                            currentStudentId,
+                            reward.RewardCode,
+                            payload,
+                            GetUtcNow());
+                    if (created.IsFailure)
+                    {
+                        ShowLocalIntegrityFailure();
+                        return;
+                    }
+
+                    record = created.Value;
                     if (repository.Upsert(record).IsFailure)
                     {
                         ShowLocalPersistenceFailure();
@@ -183,37 +276,52 @@ namespace NutriMind.App.Presentation
                     }
                 }
 
-                if (SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Sending,
-                        null).IsFailure)
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (!TryBeginDispatch(repository, record))
                 {
                     ShowLocalPersistenceFailure();
                     return;
                 }
 
+                _pendingEnvelope = envelope;
+                _pendingRecord = record;
                 var request = new UseRewardRequest
                 {
                     RewardCode = envelope.RewardCode,
                     RequestUuid = envelope.RequestUuid
                 };
 
+                dispatched = true;
                 AppResult<RewardSummary> result =
                     await Lifetime.Gateway.UseRewardAsync(request, token).ConfigureAwait(true);
 
                 if (token.IsCancellationRequested)
                 {
+                    HandlePostDispatchCancellation(repository, record, envelope);
                     return;
                 }
 
                 if (result.IsSuccess)
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Completed,
-                        SerializeRewardResult(result.Value));
+                    string resultJson = SerializeRewardResult(result.Value);
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Completed,
+                            resultJson,
+                            GetUtcNow()).IsFailure)
+                    {
+                        _pendingServerResult = result.Value;
+                        _finalizationPending = true;
+                        ShowLocalFinalizationFailure();
+                        return;
+                    }
+
+                    ClearPendingMutation();
                     if (!Disposed)
                     {
                         _shellRuntime?.ShowToast("Reward activated!", AppShellToastTone.Success);
@@ -225,11 +333,17 @@ namespace NutriMind.App.Presentation
                 }
                 else if (IsOffline(result.Error))
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Uncertain,
-                        null);
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Uncertain,
+                            null,
+                            GetUtcNow()).IsFailure)
+                    {
+                        ShowLocalPersistenceFailure();
+                        return;
+                    }
+
                     if (!Disposed)
                     {
                         _shellRuntime?.ShowToast(
@@ -239,11 +353,18 @@ namespace NutriMind.App.Presentation
                 }
                 else
                 {
-                    SetRequestState(
-                        repository,
-                        record,
-                        IdempotentRequestStates.Rejected,
-                        SerializeErrorResult(result.Error));
+                    if (IdempotentMutationTransitions.Transition(
+                            repository,
+                            record,
+                            IdempotentRequestStates.Rejected,
+                            SerializeErrorResult(result.Error),
+                            GetUtcNow()).IsFailure)
+                    {
+                        ShowLocalPersistenceFailure();
+                        return;
+                    }
+
+                    ClearPendingMutation();
                     if (IsUnauthorized(result.Error))
                     {
                         HandleUnauthorized();
@@ -256,52 +377,168 @@ namespace NutriMind.App.Presentation
                     }
                 }
             }
+            catch (OperationCanceledException) when (dispatched)
+            {
+                HandlePostDispatchCancellation(
+                    Lifetime.IdempotentRequestRepository,
+                    _pendingRecord,
+                    _pendingEnvelope);
+            }
             finally
             {
-                _useRewardInFlight = false;
-                if (!Disposed)
+                if (!_finalizationPending)
                 {
-                    _view.SetUseRewardEnabled(true);
+                    _useRewardInFlight = false;
+                    if (!Disposed)
+                    {
+                        _view.SetUseRewardEnabled(true);
+                    }
                 }
             }
         }
 
-        private PendingRewardUseEnvelopeV1 RestoreRewardEnvelope(
+        private bool TryRestoreRewardEnvelope(
             IdempotentRequestRecord record,
-            string rewardCode)
+            string currentStudentId,
+            string rewardCode,
+            out PendingRewardUseEnvelopeV2 envelope)
         {
+            envelope = null;
             try
             {
-                PendingRewardUseEnvelopeV1 restored =
+                PendingRewardUseEnvelopeV2 restored =
                     IdempotentMutationSerializers.DeserializeReward(record.NormalizedPayloadJson);
-                if (string.Equals(restored.RewardCode, rewardCode, StringComparison.Ordinal)
-                    && string.Equals(restored.RequestUuid, record.RequestUuid, StringComparison.Ordinal))
+                if (restored == null
+                    || !string.Equals(restored.RequestUuid, record.RequestUuid, StringComparison.Ordinal)
+                    || !string.Equals(restored.StudentId, currentStudentId, StringComparison.Ordinal)
+                    || !string.Equals(restored.RewardCode, rewardCode, StringComparison.Ordinal)
+                    || !string.Equals(record.StudentId, currentStudentId, StringComparison.Ordinal)
+                    || !string.Equals(record.EntityKey, rewardCode, StringComparison.Ordinal)
+                    || !string.Equals(
+                        record.NormalizedPayloadJson,
+                        IdempotentMutationSerializers.SerializeReward(restored),
+                        StringComparison.Ordinal))
                 {
-                    return restored;
+                    return false;
                 }
+
+                if (IdempotentMutationTransitions.ValidateImmutableIdentity(
+                        record,
+                        IdempotentOperations.UseReward,
+                        currentStudentId,
+                        rewardCode,
+                        record.NormalizedPayloadJson).IsFailure)
+                {
+                    return false;
+                }
+
+                envelope = restored;
+                return true;
             }
             catch (Exception)
             {
-                // Legacy records stored only reward_code; rebuild the versioned envelope.
+                return false;
             }
-
-            return new PendingRewardUseEnvelopeV1
-            {
-                RewardCode = rewardCode,
-                RequestUuid = record.RequestUuid
-            };
         }
 
-        private AppResult SetRequestState(
+        private bool TryBeginDispatch(
+            IIdempotentRequestRepository repository,
+            IdempotentRequestRecord record)
+        {
+            if (record.State == IdempotentRequestStates.Sending
+                && IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Uncertain,
+                    null,
+                    GetUtcNow()).IsFailure)
+            {
+                return false;
+            }
+
+            return IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Sending,
+                    null,
+                    GetUtcNow())
+                .IsSuccess;
+        }
+
+        private void HandlePostDispatchCancellation(
             IIdempotentRequestRepository repository,
             IdempotentRequestRecord record,
-            string state,
-            string resultJson)
+            PendingRewardUseEnvelopeV2 envelope)
         {
-            record.State = state;
-            record.ResultJson = resultJson;
-            record.UpdatedUtc = GetUtcNow();
-            return repository.Upsert(record);
+            if (record == null || envelope == null)
+            {
+                ShowLocalPersistenceFailure();
+                return;
+            }
+
+            _pendingRecord = record;
+            _pendingEnvelope = envelope;
+            if (record.State == IdempotentRequestStates.Sending
+                && IdempotentMutationTransitions.Transition(
+                    repository,
+                    record,
+                    IdempotentRequestStates.Uncertain,
+                    null,
+                    GetUtcNow()).IsFailure)
+            {
+                ShowLocalPersistenceFailure();
+                return;
+            }
+
+            if (!Disposed)
+            {
+                _shellRuntime?.ShowToast(
+                    "We could not confirm the result. Retry safely.",
+                    AppShellToastTone.Warning);
+            }
+        }
+
+        private void RetryFinalization()
+        {
+            if (!_finalizationPending || _pendingRecord == null)
+            {
+                return;
+            }
+
+            if (IdempotentMutationTransitions.Transition(
+                    Lifetime.IdempotentRequestRepository,
+                    _pendingRecord,
+                    IdempotentRequestStates.Completed,
+                    SerializeRewardResult(_pendingServerResult),
+                    GetUtcNow()).IsFailure)
+            {
+                ShowLocalFinalizationFailure();
+                return;
+            }
+
+            _finalizationPending = false;
+            ClearPendingMutation();
+            _useRewardInFlight = false;
+            if (!Disposed)
+            {
+                _view.SetUseRewardEnabled(true);
+                _shellRuntime?.ShowToast("Reward activated!", AppShellToastTone.Success);
+                TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Rewards.FinalizeRefresh");
+            }
+        }
+
+        private string ResolveCurrentStudentId()
+        {
+            return Lifetime.AuthenticatedStudentState?.Profile?.Id
+                ?? Lifetime.CurrentProfile?.Id;
+        }
+
+        private void ClearPendingMutation()
+        {
+            _pendingEnvelope = null;
+            _pendingRecord = null;
+            _pendingServerResult = null;
+            _finalizationPending = false;
         }
 
         private string GetUtcNow()
@@ -318,6 +555,26 @@ namespace NutriMind.App.Presentation
             {
                 _shellRuntime?.ShowToast(
                     "Could not save this request. Please try again.",
+                    AppShellToastTone.Danger);
+            }
+        }
+
+        private void ShowLocalIntegrityFailure()
+        {
+            if (!Disposed)
+            {
+                _shellRuntime?.ShowToast(
+                    "This request could not be safely recovered. Please refresh and try again.",
+                    AppShellToastTone.Danger);
+            }
+        }
+
+        private void ShowLocalFinalizationFailure()
+        {
+            if (!Disposed)
+            {
+                _shellRuntime?.ShowToast(
+                    "The reward was confirmed, but local storage could not finalize it. Retry safely.",
                     AppShellToastTone.Danger);
             }
         }
@@ -378,6 +635,12 @@ namespace NutriMind.App.Presentation
         {
             if (Disposed)
             {
+                return;
+            }
+
+            if (_finalizationPending)
+            {
+                RetryFinalization();
                 return;
             }
 

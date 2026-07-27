@@ -41,7 +41,8 @@ namespace NutriMind.App.UI
             && MissionsCompleted == 0
             && AreasCompleted == 0
             && ReviewRequiredCount == 0
-            && QuizAttempts == 0;
+            && QuizAttempts == 0
+            && (!PendingOutboxCount.HasValue || PendingOutboxCount.Value == 0);
     }
 
     /// <summary>

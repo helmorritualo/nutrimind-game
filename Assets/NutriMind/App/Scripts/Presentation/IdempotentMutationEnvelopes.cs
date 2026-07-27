@@ -22,6 +22,15 @@ namespace NutriMind.App.Presentation
     }
 
     [Serializable]
+    public sealed class PendingRewardUseEnvelopeV2
+    {
+        public int Version = 2;
+        public string StudentId;
+        public string RewardCode;
+        public string RequestUuid;
+    }
+
+    [Serializable]
     public sealed class PendingQuizSubmissionEnvelopeV1
     {
         public int Version = 1;
@@ -29,34 +38,53 @@ namespace NutriMind.App.Presentation
         public QuizAttemptSubmission Submission;
     }
 
+    [Serializable]
+    public sealed class PendingQuizSubmissionEnvelopeV2
+    {
+        public int Version = 2;
+        public string StudentId;
+        public string QuizId;
+        public QuizAttemptSubmission Submission;
+    }
+
     /// <summary>
     /// Deterministic serializers for versioned idempotent mutation envelopes.
+    /// Writes V2; reads V1 and V2 for safe recovery.
     /// </summary>
     public static class IdempotentMutationSerializers
     {
-        public static string SerializeReward(PendingRewardUseEnvelopeV1 envelope)
+        public static string SerializeReward(PendingRewardUseEnvelopeV2 envelope)
         {
             if (envelope == null)
             {
                 throw new ArgumentNullException(nameof(envelope));
             }
 
-            if (envelope.Version != 1)
+            if (envelope.Version != 2)
             {
                 throw new InvalidOperationException(
                     "Unsupported reward envelope version: " + envelope.Version);
             }
 
+            if (string.IsNullOrWhiteSpace(envelope.StudentId)
+                || string.IsNullOrWhiteSpace(envelope.RewardCode)
+                || string.IsNullOrWhiteSpace(envelope.RequestUuid))
+            {
+                throw new InvalidOperationException(
+                    "Reward envelope requires StudentId, RewardCode, and RequestUuid.");
+            }
+
             var dto = new RewardEnvelopeDto
             {
-                Version = 1,
-                RewardCode = envelope.RewardCode ?? string.Empty,
-                RequestUuid = envelope.RequestUuid ?? string.Empty
+                Version = 2,
+                StudentId = envelope.StudentId,
+                RewardCode = envelope.RewardCode,
+                RequestUuid = envelope.RequestUuid
             };
             return JsonUtility.ToJson(dto);
         }
 
-        public static PendingRewardUseEnvelopeV1 DeserializeReward(string json)
+        public static PendingRewardUseEnvelopeV2 DeserializeReward(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
             {
@@ -64,38 +92,54 @@ namespace NutriMind.App.Presentation
             }
 
             RewardEnvelopeDto dto = JsonUtility.FromJson<RewardEnvelopeDto>(json);
-            if (dto == null || dto.Version != 1)
+            if (dto == null || (dto.Version != 1 && dto.Version != 2))
             {
                 throw new InvalidOperationException(
                     "Unsupported or malformed reward envelope version.");
             }
 
-            return new PendingRewardUseEnvelopeV1
+            if (dto.Version == 2 && string.IsNullOrWhiteSpace(dto.StudentId))
             {
-                Version = 1,
+                throw new InvalidOperationException(
+                    "Reward envelope V2 requires StudentId.");
+            }
+
+            return new PendingRewardUseEnvelopeV2
+            {
+                Version = 2,
+                StudentId = dto.StudentId,
                 RewardCode = dto.RewardCode,
                 RequestUuid = dto.RequestUuid
             };
         }
 
-        public static string SerializeQuiz(PendingQuizSubmissionEnvelopeV1 envelope)
+        public static string SerializeQuiz(PendingQuizSubmissionEnvelopeV2 envelope)
         {
             if (envelope == null)
             {
                 throw new ArgumentNullException(nameof(envelope));
             }
 
-            if (envelope.Version != 1)
+            if (envelope.Version != 2)
             {
                 throw new InvalidOperationException(
                     "Unsupported quiz envelope version: " + envelope.Version);
+            }
+
+            if (string.IsNullOrWhiteSpace(envelope.StudentId)
+                || string.IsNullOrWhiteSpace(envelope.QuizId))
+            {
+                throw new InvalidOperationException(
+                    "Quiz envelope requires StudentId and QuizId.");
             }
 
             QuizAttemptSubmission submission = envelope.Submission
                 ?? throw new InvalidOperationException("Quiz envelope requires Submission.");
 
             var sb = new StringBuilder(512);
-            sb.Append("{\"Version\":1,\"QuizId\":");
+            sb.Append("{\"Version\":2,\"StudentId\":");
+            AppendJsonString(sb, envelope.StudentId);
+            sb.Append(",\"QuizId\":");
             AppendJsonString(sb, envelope.QuizId);
             sb.Append(",\"Submission\":{");
             sb.Append("\"ClientAttemptUuid\":");
@@ -138,7 +182,7 @@ namespace NutriMind.App.Presentation
             return sb.ToString();
         }
 
-        public static PendingQuizSubmissionEnvelopeV1 DeserializeQuiz(string json)
+        public static PendingQuizSubmissionEnvelopeV2 DeserializeQuiz(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
             {
@@ -146,10 +190,16 @@ namespace NutriMind.App.Presentation
             }
 
             QuizEnvelopeDto dto = JsonUtility.FromJson<QuizEnvelopeDto>(json);
-            if (dto == null || dto.Version != 1 || dto.Submission == null)
+            if (dto == null || (dto.Version != 1 && dto.Version != 2) || dto.Submission == null)
             {
                 throw new InvalidOperationException(
                     "Unsupported or malformed quiz envelope version.");
+            }
+
+            if (dto.Version == 2 && string.IsNullOrWhiteSpace(dto.StudentId))
+            {
+                throw new InvalidOperationException(
+                    "Quiz envelope V2 requires StudentId.");
             }
 
             var answers = new List<QuizAnswerSelection>();
@@ -171,9 +221,10 @@ namespace NutriMind.App.Presentation
                 }
             }
 
-            return new PendingQuizSubmissionEnvelopeV1
+            return new PendingQuizSubmissionEnvelopeV2
             {
-                Version = 1,
+                Version = 2,
+                StudentId = dto.StudentId,
                 QuizId = dto.QuizId,
                 Submission = new QuizAttemptSubmission
                 {
@@ -255,6 +306,7 @@ namespace NutriMind.App.Presentation
         private sealed class RewardEnvelopeDto
         {
             public int Version;
+            public string StudentId;
             public string RewardCode;
             public string RequestUuid;
         }
@@ -263,6 +315,7 @@ namespace NutriMind.App.Presentation
         private sealed class QuizEnvelopeDto
         {
             public int Version;
+            public string StudentId;
             public string QuizId;
             public QuizSubmissionDto Submission;
         }
