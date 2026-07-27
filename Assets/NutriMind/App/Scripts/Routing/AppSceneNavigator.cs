@@ -49,9 +49,10 @@ namespace NutriMind.App.Routing
                         "Failed to start LoadSceneAsync for '" + sceneName + "'.");
                 }
 
+                // Once LoadSceneAsync has started, finish it. Cancelling mid-swap leaves
+                // _currentScene stale while Unity already activated the new scene (blank UI).
                 while (!operation.isDone)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
                     await Task.Yield();
                 }
 

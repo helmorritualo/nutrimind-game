@@ -24,6 +24,7 @@ namespace NutriMind.App.Presentation
             _view = view;
             _shellRuntime = shellRuntime;
             _view.SignOutRequested += OnSignOutRequested;
+            _view.SettingsRequested += OnSettingsRequested;
             _view.BackRequested += OnBack;
         }
 
@@ -40,6 +41,7 @@ namespace NutriMind.App.Presentation
         protected override void OnDispose()
         {
             _view.SignOutRequested -= OnSignOutRequested;
+            _view.SettingsRequested -= OnSettingsRequested;
             _view.BackRequested -= OnBack;
         }
 
@@ -68,6 +70,22 @@ namespace NutriMind.App.Presentation
             _shellRuntime?.RequestSignOut();
         }
 
+        private void OnSettingsRequested()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.PushAsync(
+                    AppRouteId.Settings,
+                    AppRouteContext.Empty,
+                    NavigationToken),
+                NavigationToken,
+                "Profile.Settings");
+        }
+
         private void OnBack()
         {
             if (Disposed)
@@ -76,8 +94,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "Profile.Back");
         }
     }

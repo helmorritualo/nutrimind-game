@@ -132,6 +132,14 @@ namespace NutriMind.App.Composition
                 return;
             }
 
+            // Wait until AppShellController has resolved the content host.
+            // Otherwise ApplyCurrentRoute runs against a null region and panels stay blank.
+            if (_shellController == null || !_shellController.IsContentHostReady)
+            {
+                Invoke(nameof(BindWhenReady), 0.05f);
+                return;
+            }
+
             TeardownCoordinator();
             BuildCoordinator();
 
@@ -156,7 +164,8 @@ namespace NutriMind.App.Composition
                 lifetime.Connectivity,
                 lifetime.SyncCoordinator,
                 modalHost,
-                lifetime.LifetimeToken);
+                lifetime.LifetimeToken,
+                lifetime);
 
             _shellRuntime.SignOutConfirmed += OnSignOutConfirmed;
 

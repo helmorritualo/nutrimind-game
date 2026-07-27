@@ -23,6 +23,36 @@ namespace NutriMind.App.Presentation
             Cts = CancellationTokenSource.CreateLinkedTokenSource(lifetime.LifetimeToken);
         }
 
+        /// <summary>
+        /// Token for in-route work (loads, retries). Cancelled when this presenter is disposed.
+        /// Safe to read after dispose — returns a cancelled token instead of throwing.
+        /// </summary>
+        protected CancellationToken RequestToken
+        {
+            get
+            {
+                if (Disposed)
+                {
+                    return new CancellationToken(canceled: true);
+                }
+
+                try
+                {
+                    return Cts.Token;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return new CancellationToken(canceled: true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Token for navigation that must survive presenter teardown (scene changes).
+        /// Prefer this for EnterQuizPortal / ReturnToMain / Navigate that unloads the current scene.
+        /// </summary>
+        protected CancellationToken NavigationToken => Lifetime.LifetimeToken;
+
         public void Dispose()
         {
             if (Disposed)
@@ -42,7 +72,14 @@ namespace NutriMind.App.Presentation
                 // already disposed
             }
 
-            Cts.Dispose();
+            try
+            {
+                Cts.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // already disposed
+            }
         }
 
         /// <summary>

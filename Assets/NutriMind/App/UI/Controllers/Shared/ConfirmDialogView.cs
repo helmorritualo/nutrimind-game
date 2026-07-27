@@ -211,7 +211,8 @@ namespace NutriMind.App.UI
             "ds-icon--info",
             "ds-icon--lock",
             "ds-icon--refresh",
-            "ds-icon--close"
+            "ds-icon--close",
+            "ds-icon--gift"
         };
 
         private VisualElement _root;

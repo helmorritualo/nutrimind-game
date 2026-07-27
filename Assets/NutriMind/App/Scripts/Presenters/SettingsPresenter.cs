@@ -20,6 +20,9 @@ namespace NutriMind.App.Presentation
         {
             _view = view;
             _view.BackRequested += OnBack;
+            _view.SaveRequested += OnSaveRequested;
+            _view.RestoreDefaultsRequested += OnRestoreDefaultsRequested;
+            _view.ResetTutorialRequested += OnResetTutorialRequested;
         }
 
         public void Load()
@@ -35,6 +38,9 @@ namespace NutriMind.App.Presentation
         protected override void OnDispose()
         {
             _view.BackRequested -= OnBack;
+            _view.SaveRequested -= OnSaveRequested;
+            _view.RestoreDefaultsRequested -= OnRestoreDefaultsRequested;
+            _view.ResetTutorialRequested -= OnResetTutorialRequested;
         }
 
         private void ApplyState()
@@ -42,6 +48,31 @@ namespace NutriMind.App.Presentation
             // SettingsPanelView loads AppLocalSettings internally on bind.
             // Runtime only needs the view constructed; store is available for future save hooks.
             _ = Lifetime.LocalSettingsStore;
+        }
+
+        private void OnSaveRequested()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            _view.MarkPreviewSaved();
+        }
+
+        private void OnRestoreDefaultsRequested()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            _view.RestorePreviewDefaults();
+        }
+
+        private void OnResetTutorialRequested()
+        {
+            // Tutorial playback is deferred for this milestone.
         }
 
         private void OnBack()
@@ -52,8 +83,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "Settings.Back");
         }
     }

@@ -340,16 +340,30 @@
     padding: 18px 28px 14px 28px;
     position: relative;
     overflow: hidden;
+    align-items: stretch;
+    justify-content: flex-start;
 }
 
 .app-shell__content-instance {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    align-self: stretch;
+    overflow: hidden;
+}
+
+/* Instantiated panel roots must fill the TemplateContainer host. */
+.app-shell__content-instance > .app-screen-content {
     flex-grow: 1;
     flex-shrink: 1;
     width: 100%;
     height: 100%;
     min-width: 0;
     min-height: 0;
-    overflow: hidden;
 }
 
 /* ========== BOTTOM NAV ========== */
@@ -463,6 +477,212 @@
 
 .app-shell__modal-placeholder--hidden {
     display: none;
+}
+
+/* ========== MORE HUB (secondary destinations) ========== */
+.app-shell__more-hub {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 36px;
+}
+
+.app-shell__more-hub-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(28, 24, 20, 0.46);
+}
+
+.app-shell__more-hub-card {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    flex-grow: 0;
+    flex-shrink: 1;
+    /* Scale with device width: ~46% of shell, clamped for tablets. */
+    width: 46%;
+    min-width: 440px;
+    max-width: 680px;
+    max-height: 92%;
+    padding: 36px 36px 28px 36px;
+    background-color: var(--color-surface);
+    border-radius: 28px;
+    border-width: 2px;
+    border-color: var(--color-border-strong);
+}
+
+.app-shell__more-hub-header {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.app-shell__more-hub-header-icon-bg {
+    width: 64px;
+    height: 64px;
+    margin-right: 16px;
+    border-radius: 32px;
+    background-color: var(--color-primary-soft);
+    border-width: 2px;
+    border-color: rgba(76, 175, 80, 0.28);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.app-shell__more-hub-header-icon {
+    width: 32px;
+    height: 32px;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.app-shell__more-hub-header-copy {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.app-shell__more-hub-title {
+    font-size: 32px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.app-shell__more-hub-subtitle {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.app-shell__more-hub-list {
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.app-shell__more-hub-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 72px;
+    margin-bottom: 12px;
+    padding: 14px 18px;
+    background-color: var(--color-bg);
+    border-width: 2px;
+    border-color: var(--color-border);
+    border-radius: 18px;
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+}
+
+.app-shell__more-hub-item:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-soft);
+}
+
+.app-shell__more-hub-item-icon-bg {
+    width: 48px;
+    height: 48px;
+    margin-right: 14px;
+    border-radius: 14px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.app-shell__more-hub-item-icon {
+    width: 24px;
+    height: 24px;
+    -unity-background-image-tint-color: var(--color-primary);
+}
+
+.app-shell__more-hub-item-label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    color: var(--color-text-primary);
+}
+
+.app-shell__more-hub-item-chevron {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    -unity-background-image-tint-color: var(--color-text-secondary);
+}
+
+.app-shell__more-hub-close {
+    margin-top: 4px;
+    min-height: 56px;
+    height: 56px;
+    justify-content: center;
+    border-radius: 18px;
+    font-size: 18px;
+}
+
+.app-shell--compact .app-shell__more-hub {
+    padding: 20px 24px;
+}
+
+.app-shell--compact .app-shell__more-hub-card {
+    width: 58%;
+    min-width: 360px;
+    max-width: 560px;
+    padding: 28px 26px 22px 26px;
+}
+
+.app-shell--compact .app-shell__more-hub-title {
+    font-size: 28px;
+}
+
+.app-shell--compact .app-shell__more-hub-subtitle {
+    font-size: 16px;
+}
+
+.app-shell--compact .app-shell__more-hub-item {
+    min-height: 64px;
+    margin-bottom: 10px;
+}
+
+.app-shell--compact .app-shell__more-hub-item-label {
+    font-size: 18px;
+}
+
+.app-shell--narrow .app-shell__more-hub-card {
+    width: 92%;
+    min-width: 0;
+    max-width: 520px;
+    padding: 24px 20px 18px 20px;
+}
+
+.app-shell--narrow .app-shell__more-hub-header-icon-bg {
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+}
+
+.app-shell--narrow .app-shell__more-hub-item {
+    min-height: 60px;
+    padding: 12px 14px;
 }
 
 .app-shell__loading-layer {

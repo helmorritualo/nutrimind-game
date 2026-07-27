@@ -32,6 +32,7 @@ namespace NutriMind.App.Composition
         private TemplateContainer _activeInstance;
         private IDisposable _activePresenter;
         private IAppScreenView _activeView;
+        private AppRouteId? _mountedRouteId;
 
         // Retained across uncertain-submit so retry can use identical UUID + payload.
         private QuizAttemptSession _retainedAttemptSession;
@@ -125,6 +126,17 @@ namespace NutriMind.App.Composition
                 return;
             }
 
+            // EnterQuizPortal raises RouteChanged after scene OnEnable already applied the
+            // same route. Remounting mid-fetch hides content (Loading) then disposes the
+            // presenter before ShowContent runs — leaving a blank shell.
+            if (_mountedRouteId == entry.RouteId
+                && _activeInstance != null
+                && _activeInstance.parent != null)
+            {
+                ApplyShellChrome(entry.RouteId);
+                return;
+            }
+
             TeardownActive();
             BuildRouteContent(entry);
         }
@@ -135,7 +147,9 @@ namespace NutriMind.App.Composition
             if (contentRegion == null)
             {
                 NutriMindLog.RuntimeWarning(
-                    "QuizPortalScreenCoordinator: content region not available for route " + entry.RouteId);
+                    "QuizPortalScreenCoordinator: content region not available for route " + entry.RouteId
+                    + " — retrying shortly.");
+                ScheduleApplyCurrentRouteRetry();
                 return;
             }
 
@@ -145,33 +159,35 @@ namespace NutriMind.App.Composition
             {
                 case AppRouteId.QuizList:
                     BuildQuizList(contentRegion, entry.Context);
-                    UpdateShellChrome("Quiz Portal", "Quizzes");
+                    ApplyShellChrome(AppRouteId.QuizList);
                     break;
 
                 case AppRouteId.QuizDetail:
                     BuildQuizDetail(contentRegion, entry.Context);
-                    UpdateShellChrome("Quiz Details", null);
+                    ApplyShellChrome(AppRouteId.QuizDetail);
                     break;
 
                 case AppRouteId.QuizAttempt:
                     BuildQuizAttempt(contentRegion, entry.Context);
-                    UpdateShellChrome("Quiz", null);
+                    ApplyShellChrome(AppRouteId.QuizAttempt);
                     break;
 
                 case AppRouteId.QuizResult:
                     BuildQuizResult(contentRegion, entry.Context);
-                    UpdateShellChrome("Quiz Result", null);
+                    ApplyShellChrome(AppRouteId.QuizResult);
                     break;
 
                 case AppRouteId.QuizHistory:
                     BuildQuizHistory(contentRegion, entry.Context);
-                    UpdateShellChrome("Quiz History", null);
+                    ApplyShellChrome(AppRouteId.QuizHistory);
                     break;
 
                 default:
                     BuildPlaceholder(contentRegion, entry.RouteId.ToString());
                     break;
             }
+
+            _mountedRouteId = entry.RouteId;
         }
 
         private void BuildQuizList(VisualElement region, AppRouteContext ctx)
@@ -182,8 +198,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _quizListAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _quizListAsset);
             var view = new QuizListPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new QuizListPresenter(_lifetime, view);
@@ -199,8 +214,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _quizDetailAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _quizDetailAsset);
             var view = new QuizDetailPanelView(_activeInstance);
             _activeView = view;
             var presenter = new QuizDetailPresenter(_lifetime, view, ctx);
@@ -216,8 +230,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _quizAttemptAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _quizAttemptAsset);
             var view = new QuizAttemptPanelView(_activeInstance);
             _activeView = view;
             var presenter = new QuizAttemptPresenter(_lifetime, view, ctx, _shellRuntime, this);
@@ -233,8 +246,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _quizResultAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _quizResultAsset);
             var view = new QuizResultPanelView(_activeInstance);
             _activeView = view;
             var presenter = new QuizResultPresenter(_lifetime, view, ctx);
@@ -250,8 +262,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _quizHistoryAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _quizHistoryAsset);
             var view = new QuizHistoryPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new QuizHistoryPresenter(_lifetime, view, ctx);
@@ -259,8 +270,32 @@ namespace NutriMind.App.Composition
             presenter.LoadAsync();
         }
 
+
+        private static TemplateContainer MountPanel(
+            VisualElement region,
+            VisualTreeAsset asset)
+        {
+            if (region == null || asset == null)
+            {
+                return null;
+            }
+
+            TemplateContainer instance = asset.Instantiate();
+            instance.AddToClassList("app-shell__content-instance");
+            instance.style.flexGrow = 1;
+            instance.style.flexShrink = 1;
+            instance.style.width = Length.Percent(100);
+            instance.style.height = Length.Percent(100);
+            instance.style.minWidth = 0;
+            instance.style.minHeight = 0;
+            instance.style.alignSelf = Align.Stretch;
+            region.Add(instance);
+            return instance;
+        }
+
         private void TeardownActive()
         {
+            _mountedRouteId = null;
             _activePresenter?.Dispose();
             _activePresenter = null;
             _activeView?.Dispose();
@@ -271,6 +306,8 @@ namespace NutriMind.App.Composition
                 _activeInstance.RemoveFromHierarchy();
                 _activeInstance = null;
             }
+
+            _shellRuntime?.ModalHost?.Hide();
         }
 
         private static void BuildPlaceholder(VisualElement region, string routeName)
@@ -280,10 +317,45 @@ namespace NutriMind.App.Composition
             region.Add(label);
         }
 
+        private void ApplyShellChrome(AppRouteId routeId)
+        {
+            switch (routeId)
+            {
+                case AppRouteId.QuizList:
+                    UpdateShellChrome("Quiz Portal", "Quizzes");
+                    break;
+                case AppRouteId.QuizDetail:
+                    UpdateShellChrome("Quiz Details", null);
+                    break;
+                case AppRouteId.QuizAttempt:
+                    UpdateShellChrome("Quiz", null);
+                    break;
+                case AppRouteId.QuizResult:
+                    UpdateShellChrome("Quiz Result", null);
+                    break;
+                case AppRouteId.QuizHistory:
+                    UpdateShellChrome("Quiz History", null);
+                    break;
+            }
+        }
+
         private void UpdateShellChrome(string title, string context)
         {
+            // Keep Home nav visually inactive for Quiz Portal; title is owned by runtime.
+            _shellController?.SetPreviewRoute(AppShellPreviewRoute.Home);
             _shellController?.SetPageTitle(title, context);
             _shellController?.HideLoadingOverlay();
+        }
+
+        private void ScheduleApplyCurrentRouteRetry()
+        {
+            _shellController?.Schedule(() =>
+            {
+                if (!_disposed)
+                {
+                    ApplyCurrentRoute();
+                }
+            }, 50);
         }
     }
 

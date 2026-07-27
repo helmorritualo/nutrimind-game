@@ -32,6 +32,7 @@ namespace NutriMind.App.Presentation
             _view = view;
             _shellRuntime = shellRuntime;
             _view.UseRewardRequested += OnUseRewardSelected;
+            _view.ViewCertificatesRequested += OnViewCertificatesRequested;
             _view.BackToHomeRequested += OnBack;
             _view.RetryRequested += OnRetry;
         }
@@ -49,6 +50,7 @@ namespace NutriMind.App.Presentation
         protected override void OnDispose()
         {
             _view.UseRewardRequested -= OnUseRewardSelected;
+            _view.ViewCertificatesRequested -= OnViewCertificatesRequested;
             _view.BackToHomeRequested -= OnBack;
             _view.RetryRequested -= OnRetry;
         }
@@ -181,6 +183,22 @@ namespace NutriMind.App.Presentation
             return null;
         }
 
+        private void OnViewCertificatesRequested()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.PushAsync(
+                    AppRouteId.Certificates,
+                    AppRouteContext.Empty,
+                    NavigationToken),
+                NavigationToken,
+                "Rewards.Certificates");
+        }
+
         private void OnRetry()
         {
             if (Disposed)
@@ -188,7 +206,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Rewards.Retry");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Rewards.Retry");
         }
 
         private void OnBack()
@@ -199,8 +217,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "Rewards.Back");
         }
     }

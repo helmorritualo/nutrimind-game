@@ -93,8 +93,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.EnterQuizPortalAsync(cancellationToken: Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.EnterQuizPortalAsync(cancellationToken: NavigationToken),
+                NavigationToken,
                 "Progress.EnterQuizPortal");
         }
 

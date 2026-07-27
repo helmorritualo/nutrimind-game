@@ -152,6 +152,7 @@ namespace NutriMind.App.UI
         private bool _warnedMissingLoadingOverlayAsset;
         private TemplateContainer _offlineSyncBannerInstance;
         private OfflineSyncBannerView _offlineSyncBannerView;
+        private bool _runtimeOwnsPageTitle;
         private bool _warnedMissingOfflineSyncBannerAsset;
         private float _lastWidth = -1f;
         private AppShellPreviewRoute? _appliedRoute;
@@ -225,14 +226,15 @@ namespace NutriMind.App.UI
         }
 
         /// <summary>
-        /// Sets the serialized static preview route, active navigation, and default route title.
-        /// Does not raise <see cref="PreviewRouteRequested"/>; content-preview metadata uses
-        /// this method and emitting a request here would create a feedback loop.
+        /// Sets the active bottom-nav highlight for runtime or preview chrome.
+        /// Does not raise <see cref="PreviewRouteRequested"/> and does not overwrite
+        /// the page title/context already set by route coordinators.
         /// </summary>
         public void SetPreviewRoute(AppShellPreviewRoute route)
         {
             _previewRoute = route;
-            ApplyPreviewRoute(route, logSelection: false);
+            _appliedRoute = route;
+            SetActiveNavItem(GetNavButton(route));
         }
 
         /// <summary>
@@ -306,9 +308,13 @@ namespace NutriMind.App.UI
 
         /// <summary>
         /// Updates the top-bar page title and optional context label.
+        /// Marks the title as runtime-owned so serialized preview refresh cannot
+        /// overwrite it with "Preview shell" after a route coordinator has bound.
         /// </summary>
         public void SetPageTitle(string title, string context = null)
         {
+            _runtimeOwnsPageTitle = true;
+
             if (_pageTitle != null)
             {
                 _pageTitle.text = string.IsNullOrEmpty(title) ? string.Empty : title;
@@ -324,9 +330,17 @@ namespace NutriMind.App.UI
 
         /// <summary>
         /// Returns the content host for future screen insertion (presentation only).
+        /// Lazily resolves from the live UIDocument tree when the first bind pass
+        /// has not cached elements yet (common on scene-load race with scene roots).
         /// </summary>
         public VisualElement GetContentRegion()
         {
+            if (_contentRegion != null)
+            {
+                return _contentRegion;
+            }
+
+            EnsureShellQueries();
             return _contentRegion;
         }
 
@@ -335,7 +349,46 @@ namespace NutriMind.App.UI
         /// </summary>
         public VisualElement GetModalLayer()
         {
+            if (_modalLayer != null)
+            {
+                return _modalLayer;
+            }
+
+            EnsureShellQueries();
             return _modalLayer;
+        }
+
+        /// <summary>
+        /// True once the shell content host has been resolved from the live visual tree.
+        /// </summary>
+        public bool IsContentHostReady => GetContentRegion() != null;
+
+        private void EnsureShellQueries()
+        {
+            if (_uiDocument == null)
+            {
+                _uiDocument = GetComponent<UIDocument>();
+            }
+
+            if (_root == null && _uiDocument != null)
+            {
+                _root = _uiDocument.rootVisualElement?.Q<VisualElement>("app-shell-root");
+            }
+
+            if (_root == null)
+            {
+                return;
+            }
+
+            if (_contentRegion == null)
+            {
+                _contentRegion = _root.Q<VisualElement>("app-shell-content-region");
+            }
+
+            if (_modalLayer == null)
+            {
+                _modalLayer = _root.Q<VisualElement>("app-shell-modal-layer");
+            }
         }
 
         /// <summary>
@@ -344,6 +397,26 @@ namespace NutriMind.App.UI
         public VisualElement GetToastLayer()
         {
             return _toastLayer;
+        }
+
+        /// <summary>
+        /// Schedules work on the shell visual tree. Safe when the content host is still binding.
+        /// </summary>
+        public void Schedule(System.Action action, long delayMilliseconds = 50)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            EnsureShellQueries();
+            VisualElement host = _root;
+            if (host == null && _uiDocument != null)
+            {
+                host = _uiDocument.rootVisualElement;
+            }
+
+            host?.schedule.Execute(action).StartingIn(delayMilliseconds);
         }
 
         /// <summary>
@@ -567,8 +640,12 @@ namespace NutriMind.App.UI
             _loadingOverlayInstance.style.top = 0f;
             _loadingOverlayInstance.style.right = 0f;
             _loadingOverlayInstance.style.bottom = 0f;
+            // Wrapper must not steal hits while the overlay is hidden. The overlay root
+            // toggles its own pickingMode when shown/hidden.
+            _loadingOverlayInstance.pickingMode = PickingMode.Ignore;
 
             _loadingLayer.Add(_loadingOverlayInstance);
+            _loadingLayer.pickingMode = PickingMode.Ignore;
             _loadingOverlayView = new LoadingOverlayView(_loadingOverlayInstance);
             if (!_loadingOverlayView.IsBound)
             {
@@ -634,6 +711,7 @@ namespace NutriMind.App.UI
             _offlineSyncBannerInstance = _offlineSyncBannerAsset.CloneTree();
             _offlineSyncBannerInstance.style.width = Length.Percent(100);
             _offlineSyncBannerInstance.style.flexShrink = 0;
+            _offlineSyncBannerInstance.pickingMode = PickingMode.Ignore;
 
             _offlineBanner.Add(_offlineSyncBannerInstance);
             _offlineSyncBannerView = new OfflineSyncBannerView(_offlineSyncBannerInstance);
@@ -849,6 +927,8 @@ namespace NutriMind.App.UI
         private void SelectPreviewRoute(AppShellPreviewRoute route)
         {
             _previewRoute = route;
+            // User nav chrome is temporary until the route coordinator sets the real title.
+            _runtimeOwnsPageTitle = false;
             ApplyPreviewRoute(route, logSelection: true);
             PreviewRouteRequested?.Invoke(route);
         }
@@ -859,7 +939,22 @@ namespace NutriMind.App.UI
 
             Button active = GetNavButton(route);
             SetActiveNavItem(active);
-            SetPageTitle(GetRouteTitle(route), "Preview shell");
+
+            // Do not clobber runtime titles (e.g. "Quiz Portal") with "Preview shell"
+            // when Update()/late BindWhenReady re-applies the serialized preview enum.
+            if (!_runtimeOwnsPageTitle)
+            {
+                if (_pageTitle != null)
+                {
+                    _pageTitle.text = GetRouteTitle(route);
+                }
+
+                if (_pageContext != null)
+                {
+                    _pageContext.text = "Preview shell";
+                    _pageContext.style.display = DisplayStyle.Flex;
+                }
+            }
 
             if (logSelection)
             {

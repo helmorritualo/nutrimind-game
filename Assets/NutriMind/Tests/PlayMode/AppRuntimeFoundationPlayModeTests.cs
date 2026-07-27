@@ -315,5 +315,197 @@ namespace NutriMind.Tests.PlayMode
             Assert.That(SceneManager.GetActiveScene().name,
                 Is.EqualTo(AppSceneNavigator.BootstrapSceneName));
         }
+
+        [UnityTest]
+        [Timeout(120000)]
+        public IEnumerator RouteAccess_ProfileSettings_And_RewardsCertificates()
+        {
+            yield return PlayModeAppTestHelpers.LoadBootstrapScene();
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            yield return PlayModeAppTestHelpers.ForceZeroMockLatency();
+            yield return PlayModeAppTestHelpers.WaitForBootstrapAuthenticationRequiredAndOpenLogin();
+            yield return PlayModeAppTestHelpers.PerformMockLoginViaUseCase();
+            yield return PlayModeAppTestHelpers.WaitForScene(AppSceneNavigator.MainSceneName);
+
+            IAppRouter router = AppLifetime.Instance.Router;
+            Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.Home));
+            AssertNoPlaceholder();
+
+            yield return NavigateAndAssert(router.PushAsync(AppRouteId.Profile, AppRouteContext.Empty), AppRouteId.Profile);
+            yield return NavigateAndAssert(router.PushAsync(AppRouteId.Settings, AppRouteContext.Empty), AppRouteId.Settings);
+            yield return NavigateAndAssert(router.BackAsync(), AppRouteId.Profile);
+
+            yield return NavigateAndAssert(router.NavigateAsync(AppRouteId.Rewards, AppRouteContext.Empty), AppRouteId.Rewards);
+            yield return NavigateAndAssert(router.PushAsync(AppRouteId.Certificates, AppRouteContext.Empty), AppRouteId.Certificates);
+            yield return NavigateAndAssert(router.BackAsync(), AppRouteId.Rewards);
+        }
+
+        [UnityTest]
+        [Timeout(120000)]
+        public IEnumerator MoreHub_SecondaryDestinations_AreReachable()
+        {
+            yield return PlayModeAppTestHelpers.LoadBootstrapScene();
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            yield return PlayModeAppTestHelpers.ForceZeroMockLatency();
+            yield return PlayModeAppTestHelpers.WaitForBootstrapAuthenticationRequiredAndOpenLogin();
+            yield return PlayModeAppTestHelpers.PerformMockLoginViaUseCase();
+            yield return PlayModeAppTestHelpers.WaitForScene(AppSceneNavigator.MainSceneName);
+
+            IAppRouter router = AppLifetime.Instance.Router;
+            AppRouteId[] destinations =
+            {
+                AppRouteId.Profile,
+                AppRouteId.Settings,
+                AppRouteId.Certificates,
+                AppRouteId.Announcements,
+                AppRouteId.Leaderboard
+            };
+
+            for (int i = 0; i < destinations.Length; i++)
+            {
+                yield return NavigateAndAssert(
+                    router.NavigateAsync(AppRouteId.Home, AppRouteContext.Empty),
+                    AppRouteId.Home);
+                yield return NavigateAndAssert(
+                    router.PushAsync(destinations[i], AppRouteContext.Empty),
+                    destinations[i]);
+                yield return NavigateAndAssert(router.BackAsync(), AppRouteId.Home);
+            }
+        }
+
+        [UnityTest]
+        [Timeout(120000)]
+        public IEnumerator MountedRoutePanels_FillContentRegion()
+        {
+            yield return PlayModeAppTestHelpers.LoadBootstrapScene();
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            yield return PlayModeAppTestHelpers.ForceZeroMockLatency();
+            yield return PlayModeAppTestHelpers.WaitForBootstrapAuthenticationRequiredAndOpenLogin();
+            yield return PlayModeAppTestHelpers.PerformMockLoginViaUseCase();
+            yield return PlayModeAppTestHelpers.WaitForScene(AppSceneNavigator.MainSceneName);
+
+            yield return WaitForContentInstance();
+            AssertMountedPanelFillsContent();
+
+            IAppRouter router = AppLifetime.Instance.Router;
+            var enterQuiz = router.EnterQuizPortalAsync(
+                AppRouteContext.Empty.WithReturnToMainOnQuizBack(true));
+            while (!enterQuiz.IsCompleted)
+            {
+                yield return null;
+            }
+
+            yield return PlayModeAppTestHelpers.WaitForScene(AppSceneNavigator.QuizPortalSceneName);
+            yield return WaitForContentInstance();
+            AssertMountedPanelFillsContent();
+        }
+
+        private static IEnumerator NavigateAndAssert(System.Threading.Tasks.Task task, AppRouteId expected)
+        {
+            while (!task.IsCompleted)
+            {
+                yield return null;
+            }
+
+            Assert.That(task.IsFaulted, Is.False, task.Exception?.ToString());
+            Assert.That(AppLifetime.Instance.Router.CurrentRoute.RouteId, Is.EqualTo(expected));
+            AssertNoPlaceholder();
+            Assert.That(CountActiveRouteSurfaces(), Is.EqualTo(1));
+        }
+
+        private static void AssertNoPlaceholder()
+        {
+            UIDocument[] documents = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+            for (int i = 0; i < documents.Length; i++)
+            {
+                VisualElement root = documents[i] != null ? documents[i].rootVisualElement : null;
+                if (root == null)
+                {
+                    continue;
+                }
+
+                root.Query<Label>().ForEach(label =>
+                {
+                    if (label != null && !string.IsNullOrEmpty(label.text)
+                        && label.text.IndexOf("UXML asset not assigned", System.StringComparison.Ordinal) >= 0)
+                    {
+                        Assert.Fail("Placeholder visible: " + label.text);
+                    }
+                });
+            }
+        }
+
+        private static int CountActiveRouteSurfaces()
+        {
+            int count = 0;
+            UIDocument[] documents = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+            for (int i = 0; i < documents.Length; i++)
+            {
+                VisualElement root = documents[i] != null ? documents[i].rootVisualElement : null;
+                VisualElement region = root?.Q<VisualElement>("app-shell-content-region");
+                if (region == null)
+                {
+                    continue;
+                }
+
+                TemplateContainer instance = region.Q<TemplateContainer>(className: "app-shell__content-instance");
+                if (instance != null)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static IEnumerator WaitForContentInstance(float timeoutSeconds = 10f)
+        {
+            float start = Time.realtimeSinceStartup;
+            while (CountActiveRouteSurfaces() < 1)
+            {
+                if (Time.realtimeSinceStartup - start > timeoutSeconds)
+                {
+                    Assert.Fail("Timed out waiting for mounted app-shell__content-instance.");
+                }
+
+                yield return null;
+            }
+        }
+
+        private static void AssertMountedPanelFillsContent()
+        {
+            UIDocument[] documents = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+            bool found = false;
+            for (int i = 0; i < documents.Length; i++)
+            {
+                VisualElement root = documents[i] != null ? documents[i].rootVisualElement : null;
+                VisualElement region = root?.Q<VisualElement>("app-shell-content-region");
+                if (region == null)
+                {
+                    continue;
+                }
+
+                TemplateContainer instance = region.Q<TemplateContainer>(className: "app-shell__content-instance");
+                if (instance == null)
+                {
+                    continue;
+                }
+
+                found = true;
+                Assert.That(instance.ClassListContains("app-shell__content-instance"), Is.True);
+                Assert.That(instance.resolvedStyle.width, Is.GreaterThan(0f));
+                Assert.That(instance.resolvedStyle.height, Is.GreaterThan(0f));
+
+                float regionWidth = region.resolvedStyle.width;
+                float regionHeight = region.resolvedStyle.height;
+                if (regionWidth > 1f && regionHeight > 1f)
+                {
+                    Assert.That(instance.resolvedStyle.width, Is.GreaterThan(regionWidth * 0.85f));
+                    Assert.That(instance.resolvedStyle.height, Is.GreaterThan(regionHeight * 0.85f));
+                }
+            }
+
+            Assert.That(found, Is.True, "Expected a mounted app-shell__content-instance.");
+        }
     }
 }

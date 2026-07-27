@@ -28,6 +28,7 @@ namespace NutriMind.App.Presentation
             _view = view;
             _ctx = ctx;
             _view.BackToQuizPortalRequested += OnBack;
+            _view.ViewHistoryRequested += OnViewHistory;
             _view.RetryRequested += OnTryAgain;
         }
 
@@ -38,12 +39,13 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            FetchAsync(Cts.Token);
+            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "QuizResult.Load");
         }
 
         protected override void OnDispose()
         {
             _view.BackToQuizPortalRequested -= OnBack;
+            _view.ViewHistoryRequested -= OnViewHistory;
             _view.RetryRequested -= OnTryAgain;
         }
 
@@ -128,6 +130,22 @@ namespace NutriMind.App.Presentation
                     Cts.Token),
                 Cts.Token,
                 "QuizResult.TryAgain");
+        }
+
+        private void OnViewHistory()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.PushAsync(
+                    AppRouteId.QuizHistory,
+                    AppRouteContext.ForQuiz(_ctx.QuizId, _ctx.SubjectId, _ctx.TermId),
+                    Cts.Token),
+                Cts.Token,
+                "QuizResult.History");
         }
     }
 }

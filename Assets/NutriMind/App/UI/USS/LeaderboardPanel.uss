@@ -265,9 +265,10 @@
 
 .leaderboard-panel__summary-column {
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    flex-basis: 34%;
     flex-direction: column;
-    width: 34%;
+    width: auto;
     min-width: 0;
     margin-right: 26px;
 }
@@ -373,7 +374,7 @@
     flex-shrink: 1;
     flex-basis: 0;
     flex-direction: column;
-    width: 66%;
+    width: auto;
     min-width: 0;
     min-height: 620px;
     padding: 30px 32px;

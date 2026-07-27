@@ -28,6 +28,8 @@ namespace NutriMind.App.Presentation
             _view = view;
             _view.QuizDetailsRequested += OnQuizSelected;
             _view.QuizResultRequested += OnQuizHistoryRequested;
+            _view.RetryRequested += OnRetry;
+            _view.ReturnToMainRequested += OnReturnToMain;
         }
 
         public void LoadAsync()
@@ -37,13 +39,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            FetchAsync(Cts.Token);
-        }
-
-        protected override void OnDispose()
-        {
-            _view.QuizDetailsRequested -= OnQuizSelected;
-            _view.QuizResultRequested -= OnQuizHistoryRequested;
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "QuizList.Load");
         }
 
         private async Task FetchAsync(CancellationToken token)
@@ -102,8 +98,8 @@ namespace NutriMind.App.Presentation
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizDetail,
                     AppRouteContext.ForQuiz(item.Id, item.Subject.ToString(), item.Term.ToString()),
-                    Cts.Token),
-                Cts.Token,
+                    NavigationToken),
+                NavigationToken,
                 "QuizList.Detail");
         }
 
@@ -118,9 +114,32 @@ namespace NutriMind.App.Presentation
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizHistory,
                     AppRouteContext.ForQuiz(item.Id),
-                    Cts.Token),
-                Cts.Token,
+                    NavigationToken),
+                NavigationToken,
                 "QuizList.History");
+        }
+
+        private void OnRetry()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "QuizList.Retry");
+        }
+
+        private void OnReturnToMain()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.ReturnToMainAsync(NavigationToken),
+                NavigationToken,
+                "QuizList.ReturnToMain");
         }
     }
 }

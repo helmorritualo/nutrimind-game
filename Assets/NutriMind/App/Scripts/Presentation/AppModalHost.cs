@@ -24,6 +24,7 @@ namespace NutriMind.App.Presentation
         private Action _onSystemPrimary;
         private Action _onSystemSecondary;
         private Action _onSystemDismiss;
+        private VisualElement _focusRestoreTarget;
         private bool _busy;
         private bool _disposed;
 
@@ -35,6 +36,7 @@ namespace NutriMind.App.Presentation
             _modalLayer = modalLayer ?? throw new ArgumentNullException(nameof(modalLayer));
             _confirmAsset = confirmAsset;
             _systemAsset = systemAsset;
+            UpdateModalLayerPicking();
         }
 
         public bool IsModalVisible =>
@@ -58,12 +60,14 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            CaptureFocusTarget();
             HideSystemInternal();
             _onConfirm = onConfirm;
             _onCancel = onCancel;
             _busy = false;
             _confirmView.Show(configuration);
             SetConfirmBusy(false);
+            UpdateModalLayerPicking();
         }
 
         public void ShowSystem(
@@ -84,11 +88,13 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            CaptureFocusTarget();
             HideConfirmInternal();
             _onSystemPrimary = onPrimary;
             _onSystemSecondary = onSecondary;
             _onSystemDismiss = onDismiss;
             _systemView.Show(configuration);
+            UpdateModalLayerPicking();
         }
 
         public void SetConfirmBusy(bool busy)
@@ -106,6 +112,8 @@ namespace NutriMind.App.Presentation
             HideConfirmInternal();
             HideSystemInternal();
             _busy = false;
+            UpdateModalLayerPicking();
+            RestoreFocus();
         }
 
         public void Dispose()
@@ -119,6 +127,7 @@ namespace NutriMind.App.Presentation
             Hide();
             DetachConfirm();
             DetachSystem();
+            UpdateModalLayerPicking();
         }
 
         private void EnsureConfirmView()
@@ -134,6 +143,7 @@ namespace NutriMind.App.Presentation
             }
 
             _confirmInstance = _confirmAsset.Instantiate();
+            StretchOverlayInstance(_confirmInstance);
             _modalLayer.Add(_confirmInstance);
             _confirmView = new ConfirmDialogView(_confirmInstance);
             _confirmView.Confirmed += OnConfirmConfirmed;
@@ -153,11 +163,30 @@ namespace NutriMind.App.Presentation
             }
 
             _systemInstance = _systemAsset.Instantiate();
+            StretchOverlayInstance(_systemInstance);
             _modalLayer.Add(_systemInstance);
             _systemView = new SystemDialogView(_systemInstance);
             _systemView.PrimaryActionRequested += OnSystemPrimary;
             _systemView.SecondaryActionRequested += OnSystemSecondary;
             _systemView.Dismissed += OnSystemDismiss;
+        }
+
+        private static void StretchOverlayInstance(TemplateContainer instance)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            instance.style.position = Position.Absolute;
+            instance.style.left = 0;
+            instance.style.top = 0;
+            instance.style.right = 0;
+            instance.style.bottom = 0;
+            instance.style.width = Length.Percent(100);
+            instance.style.height = Length.Percent(100);
+            // Keep the wrapper non-blocking. Confirm/System roots own picking while visible.
+            instance.pickingMode = PickingMode.Ignore;
         }
 
         private void OnConfirmConfirmed()
@@ -169,6 +198,8 @@ namespace NutriMind.App.Presentation
 
             Action handler = _onConfirm;
             HideConfirmInternal();
+            UpdateModalLayerPicking();
+            RestoreFocus();
             handler?.Invoke();
         }
 
@@ -181,6 +212,8 @@ namespace NutriMind.App.Presentation
 
             Action handler = _onCancel;
             HideConfirmInternal();
+            UpdateModalLayerPicking();
+            RestoreFocus();
             handler?.Invoke();
         }
 
@@ -188,6 +221,8 @@ namespace NutriMind.App.Presentation
         {
             Action handler = _onSystemPrimary;
             HideSystemInternal();
+            UpdateModalLayerPicking();
+            RestoreFocus();
             handler?.Invoke();
         }
 
@@ -195,6 +230,8 @@ namespace NutriMind.App.Presentation
         {
             Action handler = _onSystemSecondary;
             HideSystemInternal();
+            UpdateModalLayerPicking();
+            RestoreFocus();
             handler?.Invoke();
         }
 
@@ -202,6 +239,8 @@ namespace NutriMind.App.Presentation
         {
             Action handler = _onSystemDismiss;
             HideSystemInternal();
+            UpdateModalLayerPicking();
+            RestoreFocus();
             handler?.Invoke();
         }
 
@@ -218,6 +257,62 @@ namespace NutriMind.App.Presentation
             _onSystemSecondary = null;
             _onSystemDismiss = null;
             _systemView?.Hide();
+        }
+
+        private void UpdateModalLayerPicking()
+        {
+            if (_modalLayer == null)
+            {
+                return;
+            }
+
+            if (IsModalVisible)
+            {
+                _modalLayer.pickingMode = PickingMode.Position;
+                _modalLayer.EnableInClassList("app-shell__modal-layer--empty", false);
+            }
+            else
+            {
+                // More hub may still own the layer; leave Position if a more-hub child is visible.
+                bool moreHubVisible = false;
+                for (int i = 0; i < _modalLayer.childCount; i++)
+                {
+                    VisualElement child = _modalLayer[i];
+                    if (child != null
+                        && child.name == "app-shell-more-hub"
+                        && child.style.display != DisplayStyle.None)
+                    {
+                        moreHubVisible = true;
+                        break;
+                    }
+                }
+
+                if (moreHubVisible)
+                {
+                    _modalLayer.pickingMode = PickingMode.Position;
+                    _modalLayer.EnableInClassList("app-shell__modal-layer--empty", false);
+                }
+                else
+                {
+                    _modalLayer.pickingMode = PickingMode.Ignore;
+                    _modalLayer.EnableInClassList("app-shell__modal-layer--empty", true);
+                }
+            }
+        }
+
+        private void CaptureFocusTarget()
+        {
+            _focusRestoreTarget = _modalLayer?.panel?.focusController?.focusedElement as VisualElement;
+        }
+
+        private void RestoreFocus()
+        {
+            if (_focusRestoreTarget != null && _focusRestoreTarget.panel != null)
+            {
+                _focusRestoreTarget.Focus();
+            }
+
+            _focusRestoreTarget = null;
         }
 
         private void DetachConfirm()

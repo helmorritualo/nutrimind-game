@@ -13,6 +13,7 @@ using NutriMind.Core.Utilities;
 using NutriMind.Tests.TestData;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 namespace NutriMind.Tests.EditMode
 {
@@ -492,6 +493,89 @@ namespace NutriMind.Tests.EditMode
             {
                 // ignore
             }
+        }
+
+        // ──────────────────────── Modal stretch / picking ────────────────────
+
+        [Test]
+        public void AppModalHost_ShowConfirm_StretchesWrapperAndBlocksPicking()
+        {
+            VisualTreeAsset confirmAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/NutriMind/App/UI/UXML/Shared/ConfirmDialog.uxml");
+            Assert.That(confirmAsset, Is.Not.Null, "ConfirmDialog.uxml must exist.");
+
+            var modalLayer = new VisualElement();
+            modalLayer.pickingMode = PickingMode.Ignore;
+
+            var host = new AppModalHost(modalLayer, confirmAsset, null);
+            Assert.That(modalLayer.pickingMode, Is.EqualTo(PickingMode.Ignore));
+
+            host.ShowConfirm(ConfirmDialogPresets.SignOut(), onConfirm: () => { }, onCancel: null);
+
+            Assert.That(host.IsModalVisible, Is.True);
+            Assert.That(modalLayer.pickingMode, Is.EqualTo(PickingMode.Position));
+
+            TemplateContainer wrapper = null;
+            for (int i = 0; i < modalLayer.childCount; i++)
+            {
+                if (modalLayer[i] is TemplateContainer container)
+                {
+                    wrapper = container;
+                    break;
+                }
+            }
+
+            Assert.That(wrapper, Is.Not.Null);
+            Assert.That(wrapper.style.position.value, Is.EqualTo(Position.Absolute));
+            Assert.That(wrapper.style.left.value.value, Is.EqualTo(0f));
+            Assert.That(wrapper.style.top.value.value, Is.EqualTo(0f));
+            Assert.That(wrapper.style.right.value.value, Is.EqualTo(0f));
+            Assert.That(wrapper.style.bottom.value.value, Is.EqualTo(0f));
+
+            host.Hide();
+            Assert.That(host.IsModalVisible, Is.False);
+            Assert.That(modalLayer.pickingMode, Is.EqualTo(PickingMode.Ignore));
+            host.Dispose();
+        }
+
+        [Test]
+        public void MoreBottomNav_DoesNotMapDirectlyToLeaderboard()
+        {
+            // Regression guard: More must open a hub, not NavigateAsync(Leaderboard).
+            string runtimePath = Path.Combine(
+                "Assets", "NutriMind", "App", "Scripts", "Presentation", "AppShellRuntimeController.cs");
+            string source = File.ReadAllText(runtimePath);
+            Assert.That(source, Does.Contain("ShowMoreHub"));
+            Assert.That(source, Does.Contain("AppRouteId.Profile"));
+            Assert.That(source, Does.Contain("AppRouteId.Settings"));
+            Assert.That(source, Does.Contain("AppRouteId.Certificates"));
+            Assert.That(source, Does.Contain("AppRouteId.Announcements"));
+            Assert.That(source, Does.Contain("AppRouteId.Leaderboard"));
+            Assert.That(source, Does.Not.Contain("case AppShellPreviewRoute.More:\r\n                    return AppRouteId.Leaderboard"));
+            Assert.That(source, Does.Not.Contain("case AppShellPreviewRoute.More:\n                    return AppRouteId.Leaderboard"));
+        }
+
+        [Test]
+        public void Coordinators_DeclareMountPanelHelper()
+        {
+            string main = File.ReadAllText(Path.Combine(
+                "Assets", "NutriMind", "App", "Scripts", "Composition", "MainScreenCoordinator.cs"));
+            string quiz = File.ReadAllText(Path.Combine(
+                "Assets", "NutriMind", "App", "Scripts", "Composition", "QuizPortalScreenCoordinator.cs"));
+
+            Assert.That(main, Does.Contain("app-shell__content-instance"));
+            Assert.That(main, Does.Contain("private static TemplateContainer MountPanel"));
+            Assert.That(quiz, Does.Contain("app-shell__content-instance"));
+            Assert.That(quiz, Does.Contain("private static TemplateContainer MountPanel"));
+            Assert.That(main, Does.Contain("SettingsRequested"));
+            Assert.That(
+                File.ReadAllText(Path.Combine(
+                    "Assets", "NutriMind", "App", "Scripts", "Presenters", "ProfilePresenter.cs")),
+                Does.Contain("SettingsRequested"));
+            Assert.That(
+                File.ReadAllText(Path.Combine(
+                    "Assets", "NutriMind", "App", "Scripts", "Presenters", "RewardsPresenter.cs")),
+                Does.Contain("ViewCertificatesRequested"));
         }
     }
 }

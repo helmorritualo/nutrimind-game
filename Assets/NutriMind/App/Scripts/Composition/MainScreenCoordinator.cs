@@ -122,7 +122,15 @@ namespace NutriMind.App.Composition
             if (contentRegion == null)
             {
                 NutriMindLog.RuntimeWarning(
-                    "MainScreenCoordinator: content region not available for route " + entry.RouteId);
+                    "MainScreenCoordinator: content region not available for route " + entry.RouteId
+                    + " — retrying shortly.");
+                _shellController?.Schedule(() =>
+                {
+                    if (!_disposed)
+                    {
+                        ApplyCurrentRoute();
+                    }
+                }, 50);
                 return;
             }
 
@@ -209,8 +217,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _homePanelAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _homePanelAsset);
             var view = new HomePanelView(_activeInstance);
             _activeView = view;
             var presenter = new HomePresenter(_lifetime, view);
@@ -226,8 +233,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _subjectSelectionAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _subjectSelectionAsset);
             var view = new SubjectSelectionPanelView(_activeInstance);
             _activeView = view;
             var presenter = new SubjectsPresenter(_lifetime, view);
@@ -243,8 +249,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _termSelectionAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _termSelectionAsset);
             var view = new TermSelectionPanelView(_activeInstance);
             _activeView = view;
             var presenter = new TermsPresenter(_lifetime, view, ctx);
@@ -260,8 +265,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _missionSelectionAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _missionSelectionAsset);
             var view = new MissionSelectionPanelView(_activeInstance);
             _activeView = view;
             var presenter = new MissionListPresenter(_lifetime, view, ctx);
@@ -277,8 +281,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _lockedMissionAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _lockedMissionAsset);
             var view = new LockedMissionPanelView(_activeInstance);
             _activeView = view;
             var presenter = new LockedMissionPresenter(_lifetime, view, ctx);
@@ -294,8 +297,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _missionDetailAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _missionDetailAsset);
             var view = new MissionDetailPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new MissionDetailPresenter(_lifetime, view, ctx, _shellRuntime);
@@ -311,8 +313,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _profileAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _profileAsset);
             var view = new ProfilePanelView(_activeInstance);
             _activeView = view;
             var presenter = new ProfilePresenter(_lifetime, view, _shellRuntime);
@@ -328,8 +329,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _settingsAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _settingsAsset);
             var view = new SettingsPanelView(_activeInstance);
             _activeView = view;
             var presenter = new SettingsPresenter(_lifetime, view);
@@ -345,8 +345,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _progressAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _progressAsset);
             var view = new ProgressPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new ProgressPresenter(_lifetime, view);
@@ -362,8 +361,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _rewardsAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _rewardsAsset);
             var view = new RewardsPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new RewardsPresenter(_lifetime, view, _shellRuntime);
@@ -379,8 +377,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _certificatesAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _certificatesAsset);
             var view = new CertificatesPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new CertificatesPresenter(_lifetime, view);
@@ -396,8 +393,7 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _announcementsAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _announcementsAsset);
             var view = new AnnouncementsPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new AnnouncementsPresenter(_lifetime, view, _shellRuntime);
@@ -413,13 +409,35 @@ namespace NutriMind.App.Composition
                 return;
             }
 
-            _activeInstance = _leaderboardAsset.Instantiate();
-            region.Add(_activeInstance);
+            _activeInstance = MountPanel(region, _leaderboardAsset);
             var view = new LeaderboardPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
             var presenter = new LeaderboardPresenter(_lifetime, view);
             _activePresenter = presenter;
             presenter.LoadAsync();
+        }
+
+
+        private static TemplateContainer MountPanel(
+            VisualElement region,
+            VisualTreeAsset asset)
+        {
+            if (region == null || asset == null)
+            {
+                return null;
+            }
+
+            TemplateContainer instance = asset.Instantiate();
+            instance.AddToClassList("app-shell__content-instance");
+            instance.style.flexGrow = 1;
+            instance.style.flexShrink = 1;
+            instance.style.width = Length.Percent(100);
+            instance.style.height = Length.Percent(100);
+            instance.style.minWidth = 0;
+            instance.style.minHeight = 0;
+            instance.style.alignSelf = Align.Stretch;
+            region.Add(instance);
+            return instance;
         }
 
         private void TeardownActive()
@@ -434,6 +452,8 @@ namespace NutriMind.App.Composition
                 _activeInstance.RemoveFromHierarchy();
                 _activeInstance = null;
             }
+
+            _shellRuntime?.ModalHost?.Hide();
         }
 
         private static void BuildPlaceholder(VisualElement region, string routeName)
@@ -450,8 +470,8 @@ namespace NutriMind.App.Composition
 
         private void UpdateShellChrome(string title, AppShellPreviewRoute activeNav)
         {
-            _shellController?.SetPageTitle(title);
             _shellController?.SetPreviewRoute(activeNav);
+            _shellController?.SetPageTitle(title);
             _shellController?.HideLoadingOverlay();
         }
     }

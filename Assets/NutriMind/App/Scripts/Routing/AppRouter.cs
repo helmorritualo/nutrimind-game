@@ -203,15 +203,34 @@ namespace NutriMind.App.Routing
                         "Cannot push QuizPortal route '" + routeId + "' onto the Main stack. Use EnterQuizPortalAsync.");
                 }
 
+                var entry = new AppRouteEntry(routeId, context);
+
+                // Bottom-nav / shell chrome may request Main routes while Quiz Portal is active.
+                // Leave Quiz Portal and land on the requested Main route instead of throwing.
                 if (isMain && _activeSceneStack == AppSceneId.QuizPortal)
                 {
-                    throw new InvalidOperationException(
-                        "Cannot push Main route '" + routeId + "' onto the QuizPortal stack. Use ReturnToMainAsync.");
+                    _quizStack.Clear();
+                    AppRouteEntry restore = _mainReturnRoute ?? new AppRouteEntry(AppRouteId.Home);
+                    _mainReturnRoute = null;
+
+                    if (replace)
+                    {
+                        _mainStack.Reset(entry);
+                    }
+                    else
+                    {
+                        _mainStack.Reset(restore);
+                        _mainStack.Push(entry);
+                    }
+
+                    _activeSceneStack = AppSceneId.Main;
+                    await _sceneNavigator.LoadAsync(AppSceneId.Main, cancellationToken).ConfigureAwait(false);
+                    RaiseRouteChanged();
+                    return;
                 }
 
                 AppSceneId targetScene = AppSceneNavigator.GetSceneForRoute(routeId);
                 AppRouteStack stack = isQuiz ? _quizStack : _mainStack;
-                var entry = new AppRouteEntry(routeId, context);
 
                 if (stack.IsEmpty)
                 {

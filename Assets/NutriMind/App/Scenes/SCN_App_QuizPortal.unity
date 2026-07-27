@@ -175,8 +175,8 @@ MonoBehaviour:
   _previewRoute: 0
   _connectionPreview: 0
   _showLoadingPreview: 0
-  _loadingOverlayAsset: {fileID: 0}
-  _offlineSyncBannerAsset: {fileID: 0}
+  _loadingOverlayAsset: {fileID: 9197481963319205126, guid: 9ee67f8fa4bc06843acfe9a58dbf1ad7, type: 3}
+  _offlineSyncBannerAsset: {fileID: 9197481963319205126, guid: 2ca97f21b3c6ffa41a6bcac2df0f2f84, type: 3}
 --- !u!114 &1775078884
 MonoBehaviour:
   m_ObjectHideFlags: 0

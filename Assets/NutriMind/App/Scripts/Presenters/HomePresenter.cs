@@ -82,19 +82,41 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            AuthenticatedStudentState state = Lifetime.AuthenticatedStudentState;
-            string missionId = state?.ActiveMission?.Id;
+            MissionSummary active = Lifetime.AuthenticatedStudentState?.ActiveMission;
+            string missionId = active?.Id;
+            string subjectId = active?.SubjectId;
+            string termId = active?.TermId;
 
-            if (string.IsNullOrWhiteSpace(missionId))
+            if (!string.IsNullOrWhiteSpace(missionId)
+                && !string.IsNullOrWhiteSpace(subjectId)
+                && !string.IsNullOrWhiteSpace(termId))
             {
                 TaskUtilities.ForgetSafely(
-                    Lifetime.Router?.NavigateAsync(AppRouteId.Subjects, AppRouteContext.Empty, Cts.Token),
-                    Cts.Token,
-                    "Home.ContinueNoMission");
+                    Lifetime.Router?.NavigateAsync(
+                        AppRouteId.MissionDetail,
+                        AppRouteContext.ForMission(missionId, subjectId, termId),
+                        NavigationToken),
+                    NavigationToken,
+                    "Home.ContinueMissionDetail");
                 return;
             }
 
-            NutriMindLog.Runtime("Home: mission launch requested for " + missionId + " (not yet wired to gameplay scene).");
+            if (!string.IsNullOrWhiteSpace(subjectId) && !string.IsNullOrWhiteSpace(termId))
+            {
+                TaskUtilities.ForgetSafely(
+                    Lifetime.Router?.NavigateAsync(
+                        AppRouteId.MissionList,
+                        AppRouteContext.ForTerm(subjectId, termId),
+                        NavigationToken),
+                    NavigationToken,
+                    "Home.ContinueMissionList");
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.NavigateAsync(AppRouteId.Subjects, AppRouteContext.Empty, NavigationToken),
+                NavigationToken,
+                "Home.ContinueSubjects");
         }
 
         private void OnQuizPortalRequested()
@@ -104,11 +126,12 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            // Must use NavigationToken — EnterQuizPortal unloads Main and disposes this presenter.
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.EnterQuizPortalAsync(
                     AppRouteContext.Empty.WithReturnToMainOnQuizBack(true),
-                    Cts.Token),
-                Cts.Token,
+                    NavigationToken),
+                NavigationToken,
                 "Home.QuizPortal");
         }
 
@@ -120,8 +143,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.PushAsync(AppRouteId.Announcements, AppRouteContext.Empty, Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.PushAsync(AppRouteId.Announcements, AppRouteContext.Empty, NavigationToken),
+                NavigationToken,
                 "Home.Announcements");
         }
     }

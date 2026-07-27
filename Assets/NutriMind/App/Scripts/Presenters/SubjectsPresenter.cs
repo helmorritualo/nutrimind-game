@@ -28,6 +28,7 @@ namespace NutriMind.App.Presentation
         {
             _view = view;
             _view.SubjectSelected += OnSubjectSelected;
+            _view.BackRequested += OnBack;
         }
 
         public void LoadAsync()
@@ -37,12 +38,13 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            FetchAsync(Cts.Token);
+            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Subjects.Load");
         }
 
         protected override void OnDispose()
         {
             _view.SubjectSelected -= OnSubjectSelected;
+            _view.BackRequested -= OnBack;
         }
 
         private async Task FetchAsync(CancellationToken token)
@@ -125,6 +127,19 @@ namespace NutriMind.App.Presentation
                     Cts.Token),
                 Cts.Token,
                 "Subjects.Select");
+        }
+
+        private void OnBack()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.NavigateAsync(AppRouteId.Home, AppRouteContext.Empty, Cts.Token),
+                Cts.Token,
+                "Subjects.Back");
         }
     }
 }
