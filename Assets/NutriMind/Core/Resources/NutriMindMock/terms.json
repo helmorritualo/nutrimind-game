@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "term_1",
+      "name": "Term 1",
+      "order": 1,
+      "is_active": true
+    },
+    {
+      "id": "term_2",
+      "name": "Term 2",
+      "order": 2,
+      "is_active": true
+    },
+    {
+      "id": "term_3",
+      "name": "Term 3",
+      "order": 3,
+      "is_active": true
+    },
+    {
+      "id": "term_4",
+      "name": "Term 4",
+      "order": 4,
+      "is_active": true
+    }
+  ]
+}

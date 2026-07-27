@@ -1,0 +1,16 @@
+{
+    "name": "NutriMind.Tests.TestData",
+    "rootNamespace": "NutriMind.Tests.TestData",
+    "references": [
+        "NutriMind"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

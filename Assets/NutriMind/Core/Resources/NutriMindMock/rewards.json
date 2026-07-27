@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "reward_code": "mock_reward_story_badge",
+      "title": "Story Explorer Badge",
+      "description": "Earned by starting the Festival Storybook Rescue.",
+      "supporting_text": "Mock reward — schema not frozen in OpenAPI.",
+      "status": "available",
+      "locked_reason": "",
+      "earned_at": "2026-07-19T04:15:00Z",
+      "used_at": ""
+    }
+  ]
+}

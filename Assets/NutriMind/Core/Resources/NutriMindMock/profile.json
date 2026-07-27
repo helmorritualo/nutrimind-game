@@ -1,0 +1,12 @@
+{
+  "id": "student_fixture_001",
+  "display_name": "Pathfinder",
+  "lrn_masked": "********9012",
+  "grade_id": "grade_5",
+  "is_active": true,
+  "section": {
+    "id": "section_g5_a",
+    "name": "Grade 5 A",
+    "grade_id": "grade_5"
+  }
+}

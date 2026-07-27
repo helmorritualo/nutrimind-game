@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "id": "quiz_fixture_001",
+      "title": "Story Elements Check",
+      "subject_id": "subject_literaquest",
+      "term_id": "term_1",
+      "status": "available",
+      "locked_reason": "",
+      "opens_at": "",
+      "closes_at": "",
+      "max_attempts": 1,
+      "attempts_used": 0,
+      "result_visibility": "immediate"
+    }
+  ]
+}

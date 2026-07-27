@@ -1,0 +1,26 @@
+{
+    "name": "NutriMind.Tests.EditMode",
+    "rootNamespace": "NutriMind.Tests.EditMode",
+    "references": [
+        "NutriMind",
+        "NutriMind.Tests.TestData",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Gilzoide.SqliteNet"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,30 @@
+{
+  "context": {
+    "scope": "section",
+    "scope_label": "Section",
+    "metric": "missions_completed",
+    "metric_label": "Missions completed",
+    "period_label": "This term",
+    "context_label": "Grade 5 A"
+  },
+  "entries": [
+    {
+      "rank": 1,
+      "privacy_safe_name": "Pathfinder",
+      "missions_completed": 0,
+      "is_current_student": true
+    },
+    {
+      "rank": 2,
+      "privacy_safe_name": "Learner B",
+      "missions_completed": 0,
+      "is_current_student": false
+    },
+    {
+      "rank": 3,
+      "privacy_safe_name": "Learner C",
+      "missions_completed": 0,
+      "is_current_student": false
+    }
+  ]
+}

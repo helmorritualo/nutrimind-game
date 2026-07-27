@@ -1,0 +1,51 @@
+{
+  "id": "quiz_fixture_001",
+  "title": "Story Elements Check",
+  "instructions": "Choose the best answer.",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "status": "available",
+  "locked_reason": "",
+  "opens_at": "",
+  "closes_at": "",
+  "max_attempts": 1,
+  "attempts_used": 0,
+  "result_visibility": "immediate",
+  "question_count": 2,
+  "questions": [
+    {
+      "id": "qq_001",
+      "type": "multiple_choice_single",
+      "prompt": "Who is the main character?",
+      "hint": "",
+      "points": 1,
+      "options": [
+        {
+          "key": "opt_a",
+          "text": "Farmer Lira"
+        },
+        {
+          "key": "opt_b",
+          "text": "The bridge"
+        }
+      ]
+    },
+    {
+      "id": "qq_002",
+      "type": "true_false",
+      "prompt": "The story happens during a festival.",
+      "hint": "",
+      "points": 1,
+      "options": [
+        {
+          "key": "true",
+          "text": "True"
+        },
+        {
+          "key": "false",
+          "text": "False"
+        }
+      ]
+    }
+  ]
+}

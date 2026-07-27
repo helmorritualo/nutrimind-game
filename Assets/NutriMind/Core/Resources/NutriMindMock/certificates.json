@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "mock_cert_festival_starter",
+      "title": "Festival Starter Certificate",
+      "type_label": "Mission Progress",
+      "status": "earned",
+      "eligibility_description": "Complete Area 1 of the Festival Storybook Rescue.",
+      "recognition_text": "Pathfinder completed the first story area.",
+      "locked_reason": "",
+      "issued_at": "2026-07-19T04:20:00Z",
+      "awarded_to_display_name": "Pathfinder"
+    }
+  ]
+}

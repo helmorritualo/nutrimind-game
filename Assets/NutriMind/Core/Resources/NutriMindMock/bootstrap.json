@@ -1,0 +1,68 @@
+{
+  "profile": {
+    "id": "student_fixture_001",
+    "display_name": "Pathfinder",
+    "lrn_masked": "********9012",
+    "grade_id": "grade_5",
+    "is_active": true,
+    "section": {
+      "id": "section_g5_a",
+      "name": "Grade 5 A",
+      "grade_id": "grade_5"
+    }
+  },
+  "required_manifest_version": "4.0",
+  "subjects": [
+    {
+      "id": "subject_literaquest",
+      "slug": "literaquest",
+      "name": "LiteraQuest",
+      "is_active": true
+    },
+    {
+      "id": "subject_pe_health",
+      "slug": "pe_health",
+      "name": "PE & Health",
+      "is_active": true
+    },
+    {
+      "id": "subject_science",
+      "slug": "science",
+      "name": "Science",
+      "is_active": true
+    }
+  ],
+  "missions": [
+    {
+      "id": "g5_lq_t1_m01",
+      "grade_id": "grade_5",
+      "subject_id": "subject_literaquest",
+      "term_id": "term_1",
+      "title": "The Festival Storybook Rescue",
+      "order": 1,
+      "status": "in_progress",
+      "locked_reason": "",
+      "availability_source": "classroom_publication",
+      "teacher_policy": "unlocked",
+      "area_count": 3,
+      "progress": {
+        "state": "in_progress",
+        "active_area_id": "g5_lq_t1_m01_a02",
+        "completed_area_count": 1,
+        "required_area_count": 3,
+        "collectible_count": 1,
+        "required_collectible_count": 3,
+        "completed_at": "",
+        "revision": 4
+      }
+    }
+  ],
+  "quiz_portal_available_count": 1,
+  "announcements_visible_count": 1,
+  "sync": {
+    "pending_server_actions": false,
+    "revision": 4,
+    "pending_outbox_count": 0,
+    "last_synced_at": "2026-07-27T03:55:00Z"
+  }
+}

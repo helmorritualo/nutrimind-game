@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "attempt_id": "attempt_fixture_001",
+      "quiz_id": "quiz_fixture_001",
+      "quiz_title": "Story Elements Check",
+      "subject_id": "subject_literaquest",
+      "term_id": "term_1",
+      "status": "scored",
+      "percentage": 100,
+      "passed": true,
+      "submitted_at": "2026-07-27T04:00:00Z",
+      "feedback_visible": true
+    }
+  ]
+}

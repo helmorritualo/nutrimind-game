@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "id": "subject_literaquest",
+      "slug": "literaquest",
+      "name": "LiteraQuest",
+      "is_active": true
+    },
+    {
+      "id": "subject_pe_health",
+      "slug": "pe_health",
+      "name": "PE & Health",
+      "is_active": true
+    },
+    {
+      "id": "subject_science",
+      "slug": "science",
+      "name": "Science",
+      "is_active": true
+    }
+  ]
+}

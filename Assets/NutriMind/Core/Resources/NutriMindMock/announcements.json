@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "mock_announcement_welcome",
+      "title": "Welcome, Pathfinder",
+      "summary": "Your Grade 5 classroom is ready.",
+      "body": "Mock announcement body for Prompt 2 Announcements panel. Schema is mock-only until OpenAPI item shapes freeze.",
+      "audience_label": "Grade 5 A",
+      "kind": "classroom",
+      "is_unread": true,
+      "published_at": "2026-07-26T08:00:00Z",
+      "expires_at": ""
+    }
+  ]
+}
