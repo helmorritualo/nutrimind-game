@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,10 +44,12 @@ namespace NutriMind.App.UI
         private VisualElement _subjectHexIcon;
         private Label _subjectTitle;
         private Label _subjectSubtitle;
+        private Label _countLabel;
         private Button _term1Card;
         private Button _term2Card;
         private Button _term3Card;
         private Label _term3Status;
+        private readonly HashSet<NutriMindTerm> _availableTerms = new();
         private bool _disposed;
         private float _lastWidth = -1f;
 
@@ -67,6 +70,8 @@ namespace NutriMind.App.UI
             }
 
             CacheElements();
+            _availableTerms.Add(NutriMindTerm.Term1);
+            _availableTerms.Add(NutriMindTerm.Term2);
             ApplyInitialSelection();
             RegisterCallbacks();
             ApplyResponsiveClasses(_root.resolvedStyle.width);
@@ -75,6 +80,7 @@ namespace NutriMind.App.UI
         public VisualElement Root => _root;
 
         public bool IsBound => _root != null && !_disposed;
+        public DataStatePanelState DataState { get; private set; } = DataStatePanelState.Content;
 
         public NutriMindSubject Subject { get; private set; } = NutriMindSubject.Science;
 
@@ -104,6 +110,85 @@ namespace NutriMind.App.UI
 
             ApplySubjectHex(subject);
             ApplySubjectIcon(subject);
+        }
+
+        /// <summary>
+        /// Shows only terms returned by the runtime source. An empty list clears all cards.
+        /// </summary>
+        public void SetTerms(IReadOnlyList<NutriMindTerm> terms)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            _availableTerms.Clear();
+            if (terms != null)
+            {
+                for (int i = 0; i < terms.Count; i++)
+                {
+                    NutriMindTerm term = terms[i];
+                    if (Enum.IsDefined(typeof(NutriMindTerm), term))
+                    {
+                        _availableTerms.Add(term);
+                    }
+                }
+            }
+
+            ApplyTermAvailability(_term1Card, NutriMindTerm.Term1);
+            ApplyTermAvailability(_term2Card, NutriMindTerm.Term2);
+            ApplyTermAvailability(_term3Card, NutriMindTerm.Term3);
+
+            if (!_availableTerms.Contains(SelectedTerm))
+            {
+                if (_availableTerms.Contains(NutriMindTerm.Term1))
+                {
+                    SelectedTerm = NutriMindTerm.Term1;
+                }
+                else if (_availableTerms.Contains(NutriMindTerm.Term2))
+                {
+                    SelectedTerm = NutriMindTerm.Term2;
+                }
+                else if (_availableTerms.Contains(NutriMindTerm.Term3))
+                {
+                    SelectedTerm = NutriMindTerm.Term3;
+                }
+            }
+
+            ApplySelectionClasses(SelectedTerm);
+            if (_countLabel != null)
+            {
+                int count = _availableTerms.Count;
+                _countLabel.text = count == 1 ? "1 Term" : $"{count} Terms";
+            }
+        }
+
+        public void SetDataState(DataStatePanelState state)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            DataState = state;
+            ApplyTermAvailability(_term1Card, NutriMindTerm.Term1);
+            ApplyTermAvailability(_term2Card, NutriMindTerm.Term2);
+            ApplyTermAvailability(_term3Card, NutriMindTerm.Term3);
+            if (_subjectSubtitle == null)
+            {
+                return;
+            }
+
+            _subjectSubtitle.text = state switch
+            {
+                DataStatePanelState.Empty => "No terms are currently available for this subject.",
+                DataStatePanelState.OfflineCached => "Showing terms derived from saved classroom missions.",
+                DataStatePanelState.OfflineUnavailable => "Terms are unavailable offline on this device.",
+                DataStatePanelState.PermissionOrLocked => "Your classroom does not currently allow term selection.",
+                DataStatePanelState.RecoverableError => "Terms could not be loaded. Try again.",
+                DataStatePanelState.Loading => "Loading available terms.",
+                _ => "Choose a term to continue your adventure."
+            };
         }
 
         /// <summary>
@@ -142,10 +227,12 @@ namespace NutriMind.App.UI
             _subjectHexIcon = null;
             _subjectTitle = null;
             _subjectSubtitle = null;
+            _countLabel = null;
             _term1Card = null;
             _term2Card = null;
             _term3Card = null;
             _term3Status = null;
+            _availableTerms.Clear();
             _lastWidth = -1f;
         }
 
@@ -172,6 +259,7 @@ namespace NutriMind.App.UI
             _subjectHexIcon = _root.Q<VisualElement>("subject-hex-icon");
             _subjectTitle = _root.Q<Label>("subject-title");
             _subjectSubtitle = _root.Q<Label>("subject-subtitle");
+            _countLabel = _root.Q<Label>(className: "term-selection__count-label");
             _term1Card = _root.Q<Button>("card-term-1");
             _term2Card = _root.Q<Button>("card-term-2");
             _term3Card = _root.Q<Button>("card-term-3");
@@ -218,18 +306,29 @@ namespace NutriMind.App.UI
 
         private void OnTerm3Clicked(ClickEvent evt)
         {
-            UnavailableTermRequested?.Invoke(NutriMindTerm.Term3);
+            HandleTerm(NutriMindTerm.Term3);
         }
 
         private void HandleAvailableTerm(NutriMindTerm term)
         {
+            HandleTerm(term);
+        }
+
+        private void HandleTerm(NutriMindTerm term)
+        {
+            if (!_availableTerms.Contains(term))
+            {
+                UnavailableTermRequested?.Invoke(term);
+                return;
+            }
+
             SelectTerm(term);
             OpenTermRequested?.Invoke(term);
         }
 
         private void SelectTerm(NutriMindTerm term)
         {
-            if (term == NutriMindTerm.Term3)
+            if (!_availableTerms.Contains(term))
             {
                 return;
             }
@@ -248,8 +347,24 @@ namespace NutriMind.App.UI
         {
             _term1Card?.EnableInClassList(SelectedClass, term == NutriMindTerm.Term1);
             _term2Card?.EnableInClassList(SelectedClass, term == NutriMindTerm.Term2);
-            _term3Card?.EnableInClassList(SelectedClass, false);
+            _term3Card?.EnableInClassList(
+                SelectedClass,
+                _availableTerms.Contains(NutriMindTerm.Term3) && term == NutriMindTerm.Term3);
             _ = LockedCardClass;
+        }
+
+        private void ApplyTermAvailability(VisualElement card, NutriMindTerm term)
+        {
+            if (card == null)
+            {
+                return;
+            }
+
+            bool available = _availableTerms.Contains(term);
+            bool interactive = DataState == DataStatePanelState.Content
+                || DataState == DataStatePanelState.OfflineCached;
+            card.SetEnabled(available && interactive);
+            card.style.display = available ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void ApplySubjectHex(NutriMindSubject subject)

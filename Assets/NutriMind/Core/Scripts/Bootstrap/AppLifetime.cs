@@ -34,6 +34,7 @@ namespace NutriMind.Core.Bootstrap
         private bool _composeStarted;
         private bool _isInitialized;
         private readonly SemaphoreSlim _resetGate = new SemaphoreSlim(1, 1);
+        private readonly UnauthorizedSingleFlightGate _unauthorizedGate = new UnauthorizedSingleFlightGate();
 
         public static AppLifetime Instance => _instance;
 
@@ -255,17 +256,21 @@ namespace NutriMind.Core.Bootstrap
             NutriMindLog.Auth("Authentication cleared. Local progress/outbox preserved.");
         }
 
-        public async Task HandleUnauthorizedAsync(CancellationToken cancellationToken = default)
+        public Task HandleUnauthorizedAsync(CancellationToken cancellationToken = default)
         {
-            await ClearAuthenticationAsync(cancellationToken).ConfigureAwait(false);
-            if (Router != null)
+            return _unauthorizedGate.ExecuteAsync(async () =>
             {
-                await Router.HandleUnauthorizedAsync(cancellationToken).ConfigureAwait(false);
-            }
-            else if (SceneNavigator != null)
-            {
-                await SceneNavigator.LoadAsync(AppSceneId.Authentication, cancellationToken).ConfigureAwait(false);
-            }
+                CancellationToken effective = LifetimeToken;
+                await ClearAuthenticationAsync(effective).ConfigureAwait(false);
+                if (Router != null)
+                {
+                    await Router.HandleUnauthorizedAsync(effective).ConfigureAwait(false);
+                }
+                else if (SceneNavigator != null)
+                {
+                    await SceneNavigator.LoadAsync(AppSceneId.Authentication, effective).ConfigureAwait(false);
+                }
+            }, cancellationToken);
         }
 
         public Task<AppResult> ResetMockServerAsync(CancellationToken cancellationToken = default)

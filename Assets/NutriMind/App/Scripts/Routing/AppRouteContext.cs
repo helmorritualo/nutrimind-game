@@ -16,6 +16,7 @@ namespace NutriMind.App.Routing
         public string CertificateId { get; private set; }
         public string LockReason { get; private set; }
         public bool ReturnToMainOnQuizBack { get; private set; }
+        public AppRouteOrigin Origin { get; private set; }
 
         public static AppRouteContext ForSubject(string subjectId, string subjectSlug = null)
         {
@@ -46,12 +47,18 @@ namespace NutriMind.App.Routing
             };
         }
 
-        public static AppRouteContext ForLockedMission(string missionId, string lockReason)
+        public static AppRouteContext ForLockedMission(
+            string missionId,
+            string lockReason,
+            string subjectId = null,
+            string termId = null)
         {
             return new AppRouteContext
             {
                 MissionId = Normalize(missionId),
-                LockReason = Normalize(lockReason)
+                LockReason = Normalize(lockReason),
+                SubjectId = Normalize(subjectId),
+                TermId = Normalize(termId)
             };
         }
 
@@ -65,45 +72,94 @@ namespace NutriMind.App.Routing
             };
         }
 
-        public static AppRouteContext ForQuizAttempt(string quizId, string attemptId = null)
+        public static AppRouteContext ForQuizAttempt(
+            string quizId,
+            string attemptId = null,
+            string subjectId = null,
+            string termId = null)
         {
             return new AppRouteContext
             {
                 QuizId = Normalize(quizId),
-                AttemptId = Normalize(attemptId)
+                AttemptId = Normalize(attemptId),
+                SubjectId = Normalize(subjectId),
+                TermId = Normalize(termId)
             };
         }
 
-        public static AppRouteContext ForQuizResult(string attemptId, string quizId = null)
+        public static AppRouteContext ForQuizResult(
+            string attemptId,
+            string quizId = null,
+            string subjectId = null,
+            string termId = null)
         {
             return new AppRouteContext
             {
                 AttemptId = Normalize(attemptId),
-                QuizId = Normalize(quizId)
+                QuizId = Normalize(quizId),
+                SubjectId = Normalize(subjectId),
+                TermId = Normalize(termId)
             };
         }
 
-        public static AppRouteContext ForCertificate(string certificateId)
+        public static AppRouteContext ForCertificate(
+            string certificateId,
+            AppRouteOrigin origin = AppRouteOrigin.None)
         {
             return new AppRouteContext
             {
-                CertificateId = Normalize(certificateId)
+                CertificateId = Normalize(certificateId),
+                Origin = origin
             };
+        }
+
+        public AppRouteContext WithOrigin(AppRouteOrigin origin)
+        {
+            return CopyWith(origin: origin);
         }
 
         public AppRouteContext WithReturnToMainOnQuizBack(bool value)
         {
+            return CopyWith(returnToMainOnQuizBack: value);
+        }
+
+        public AppRouteContext WithQuizIds(
+            string quizId = null,
+            string attemptId = null,
+            string subjectId = null,
+            string termId = null)
+        {
+            return CopyWith(
+                quizId: quizId ?? QuizId,
+                attemptId: attemptId ?? AttemptId,
+                subjectId: subjectId ?? SubjectId,
+                termId: termId ?? TermId);
+        }
+
+        private AppRouteContext CopyWith(
+            string subjectId = null,
+            string subjectSlug = null,
+            string termId = null,
+            string missionId = null,
+            string quizId = null,
+            string attemptId = null,
+            string certificateId = null,
+            string lockReason = null,
+            bool? returnToMainOnQuizBack = null,
+            AppRouteOrigin? origin = null)
+        {
             return new AppRouteContext
             {
-                SubjectId = SubjectId,
-                SubjectSlug = SubjectSlug,
-                TermId = TermId,
-                MissionId = MissionId,
-                QuizId = QuizId,
-                AttemptId = AttemptId,
-                CertificateId = CertificateId,
-                LockReason = LockReason,
-                ReturnToMainOnQuizBack = value
+                SubjectId = subjectId ?? SubjectId,
+                SubjectSlug = subjectSlug ?? SubjectSlug,
+                TermId = termId ?? TermId,
+                MissionId = missionId ?? MissionId,
+                QuizId = quizId ?? QuizId,
+                AttemptId = attemptId ?? AttemptId,
+                CertificateId = certificateId ?? CertificateId,
+                LockReason = lockReason ?? LockReason,
+                ReturnToMainOnQuizBack = returnToMainOnQuizBack ?? ReturnToMainOnQuizBack,
+                Origin = origin ?? Origin
             };
         }
 

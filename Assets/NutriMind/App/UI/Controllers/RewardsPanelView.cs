@@ -210,6 +210,7 @@ namespace NutriMind.App.UI
         private EventCallback<ClickEvent> _filterEmptyResetClicked;
         private EventCallback<ClickEvent> _viewCertificatesClicked;
         private EventCallback<GeometryChangedEvent> _geometryChanged;
+        private bool _useRewardEnabled = true;
         private bool _disposed;
         private float _lastWidth = -1f;
 
@@ -278,6 +279,20 @@ namespace NutriMind.App.UI
 
             RefreshOverviewMetrics();
             RebuildVisibleRewards(raiseFilterChanged: false);
+        }
+
+        public void SetUseRewardEnabled(bool enabled)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            _useRewardEnabled = enabled;
+            for (int i = 0; i < _cardBindings.Count; i++)
+            {
+                _cardBindings[i].UseButton?.SetEnabled(enabled);
+            }
         }
 
         public void SetFilter(RewardsPreviewFilter filter)
@@ -752,7 +767,7 @@ namespace NutriMind.App.UI
                 useButton.tooltip = offline
                     ? "Connect to use this reward."
                     : "Use this reward (preview intent only)";
-                useButton.SetEnabled(!offline);
+                useButton.SetEnabled(!offline && _useRewardEnabled);
 
                 var binding = new RewardCardBinding
                 {
@@ -772,6 +787,7 @@ namespace NutriMind.App.UI
         {
             if (_disposed
                 || binding?.Item == null
+                || !_useRewardEnabled
                 || PreviewState != RewardsPreviewState.Content
                 || binding.Item.Status != RewardsPreviewItemStatus.Available)
             {

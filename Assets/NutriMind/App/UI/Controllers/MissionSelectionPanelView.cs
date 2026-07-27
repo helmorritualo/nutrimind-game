@@ -5,6 +5,64 @@ using UnityEngine.UIElements;
 
 namespace NutriMind.App.UI
 {
+    public enum MissionPreviewPrimaryAction
+    {
+        Start = 0,
+        Continue = 1,
+        Review = 2,
+        Locked = 3
+    }
+
+    /// <summary>
+    /// Runtime-ready mission list item owned by the presentation layer.
+    /// </summary>
+    public sealed class MissionPreviewItem
+    {
+        public MissionPreviewItem(
+            string missionId,
+            string title,
+            int missionNumber,
+            NutriMindSubject subject,
+            NutriMindTerm term,
+            string status,
+            bool isLocked,
+            string lockReason,
+            int areasCompleted,
+            int areasRequired,
+            int collectiblesCompleted,
+            int collectiblesRequired,
+            MissionPreviewPrimaryAction primaryAction)
+        {
+            MissionId = missionId ?? string.Empty;
+            Title = title ?? string.Empty;
+            MissionNumber = missionNumber;
+            Subject = subject;
+            Term = term;
+            Status = status ?? string.Empty;
+            IsLocked = isLocked;
+            LockReason = lockReason ?? string.Empty;
+            AreasCompleted = Math.Max(0, areasCompleted);
+            AreasRequired = Math.Max(0, areasRequired);
+            CollectiblesCompleted = Math.Max(0, collectiblesCompleted);
+            CollectiblesRequired = Math.Max(0, collectiblesRequired);
+            PrimaryAction = primaryAction;
+        }
+
+        public string MissionId { get; }
+        public string Title { get; }
+        public int MissionNumber { get; }
+        public NutriMindSubject Subject { get; }
+        public NutriMindTerm Term { get; }
+        public string Status { get; }
+        public bool IsLocked { get; }
+        public string LockReason { get; }
+        public int AreasCompleted { get; }
+        public int AreasRequired { get; }
+        public int CollectiblesCompleted { get; }
+        public int CollectiblesRequired { get; }
+        public MissionPreviewPrimaryAction PrimaryAction { get; }
+    }
+
     public readonly struct MissionPreviewSelection
     {
         public MissionPreviewSelection(
@@ -35,8 +93,8 @@ namespace NutriMind.App.UI
     }
 
     /// <summary>
-    /// Presentation-only Mission Selection route view. Binds local preview fixtures
-    /// and raises user intent for the host to handle.
+    /// Mission Selection route view. Static UXML fixtures remain available for design
+    /// preview, while <see cref="SetItems"/> replaces them with runtime gateway data.
     /// </summary>
     public sealed class MissionSelectionPanelView : IAppScreenView
     {
@@ -155,6 +213,8 @@ namespace NutriMind.App.UI
                 true,
                 "Teacher Locked")
         };
+        private readonly Dictionary<string, MissionPreviewItem> _runtimeItems =
+            new(StringComparer.Ordinal);
 
         private VisualElement _root;
         private Button _backButton;
@@ -174,7 +234,6 @@ namespace NutriMind.App.UI
         private Label _detailDownloaded;
         private Button _primaryActionButton;
         private Label _primaryActionLabel;
-        private bool _warnedNonCanonicalContext;
         private bool _disposed;
         private float _lastWidth = -1f;
 
@@ -198,6 +257,9 @@ namespace NutriMind.App.UI
         public NutriMindSubject Subject { get; private set; } = CatalogSubject;
         public NutriMindTerm Term { get; private set; } = CatalogTerm;
         public int SelectedMissionNumber { get; private set; } = 2;
+        public string SelectedMissionId { get; private set; } = "g5_lq_t1_m02";
+        public int LoadedMissionCount => _missionData.Count;
+        public DataStatePanelState DataState { get; private set; } = DataStatePanelState.Content;
 
         public event Action BackRequested;
         public event Action<MissionPreviewSelection> MissionSelected;
@@ -206,10 +268,6 @@ namespace NutriMind.App.UI
         public event Action<MissionPreviewSelection> ReviewMissionRequested;
         public event Action<MissionPreviewSelection> LockedMissionRequested;
 
-        /// <summary>
-        /// Keeps the LiteraQuest Term 1 static preview catalog. Non-canonical contexts
-        /// log one warning per view instance and do not relabel or replace mission cards.
-        /// </summary>
         public void SetContext(NutriMindSubject subject, NutriMindTerm term)
         {
             if (!IsBound)
@@ -217,21 +275,101 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            Subject = CatalogSubject;
-            Term = CatalogTerm;
-
-            if ((subject != CatalogSubject || term != CatalogTerm) && !_warnedNonCanonicalContext)
-            {
-                Debug.LogWarning(
-                    $"[MissionSelectionPanelView] Requested {GetSubjectLabel(subject)} Term {(int)term}, " +
-                    "but this static preview contains only LiteraQuest Term 1. " +
-                    "Using the canonical preview catalog.");
-                _warnedNonCanonicalContext = true;
-            }
+            Subject = subject;
+            Term = term;
 
             if (_termHeading != null)
             {
-                _termHeading.text = $"Term {(int)CatalogTerm}: {GetTermTitle(CatalogSubject, CatalogTerm)}";
+                _termHeading.text = $"Term {(int)term}: {GetTermTitle(subject, term)}";
+            }
+        }
+
+        /// <summary>
+        /// Replaces all authored preview cards with runtime mission items.
+        /// Passing null or an empty list clears every old card and selection.
+        /// </summary>
+        public void SetItems(IReadOnlyList<MissionPreviewItem> items)
+        {
+            if (!IsBound || _missionList == null)
+            {
+                return;
+            }
+
+            UnregisterMissionCallbacks();
+            _missionList.Clear();
+            _missionData.Clear();
+            _runtimeItems.Clear();
+            SelectedMissionNumber = 0;
+            SelectedMissionId = string.Empty;
+
+            if (items != null)
+            {
+                var seenIds = new HashSet<string>(StringComparer.Ordinal);
+                for (int i = 0; i < items.Count; i++)
+                {
+                    MissionPreviewItem item = items[i];
+                    if (item == null
+                        || string.IsNullOrWhiteSpace(item.MissionId)
+                        || !seenIds.Add(item.MissionId))
+                    {
+                        continue;
+                    }
+
+                    string buttonName = "mission-runtime-item-" + i;
+                    MissionPreviewData data = CreateRuntimeData(item);
+                    Button button = CreateMissionButton(buttonName, data);
+                    _missionData[buttonName] = data;
+                    _runtimeItems[item.MissionId] = item;
+                    _missionList.Add(button);
+                    button.RegisterCallback<ClickEvent>(OnMissionClicked);
+                }
+            }
+
+            Button first = _missionList.Q<Button>(className: "mission-selection__item");
+            if (first != null)
+            {
+                SetDataState(DataStatePanelState.Content);
+                SelectMission(first, false);
+            }
+            else
+            {
+                ClearMissionDetail();
+                SetDataState(DataStatePanelState.Empty);
+            }
+        }
+
+        public void SetDataState(DataStatePanelState state)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            DataState = state;
+            switch (state)
+            {
+                case DataStatePanelState.Content:
+                case DataStatePanelState.OfflineCached:
+                    if (_missionData.Count == 0)
+                    {
+                        ClearMissionDetail();
+                    }
+                    break;
+                case DataStatePanelState.Loading:
+                    ApplyStateMessage("Loading missions", "Getting the latest classroom mission list.");
+                    break;
+                case DataStatePanelState.Empty:
+                    ApplyStateMessage("No missions available", "No missions were returned for this subject and term.");
+                    break;
+                case DataStatePanelState.OfflineUnavailable:
+                    ApplyStateMessage("Missions unavailable offline", "No saved mission list is available on this device.");
+                    break;
+                case DataStatePanelState.PermissionOrLocked:
+                    ApplyStateMessage("Missions unavailable", "Your classroom does not currently allow this mission list.");
+                    break;
+                default:
+                    ApplyStateMessage("Missions could not be loaded", "Try again when your connection is available.");
+                    break;
             }
         }
 
@@ -268,7 +406,8 @@ namespace NutriMind.App.UI
             _detailDownloaded = null;
             _primaryActionButton = null;
             _primaryActionLabel = null;
-            _warnedNonCanonicalContext = false;
+            _missionData.Clear();
+            _runtimeItems.Clear();
             _lastWidth = -1f;
         }
 
@@ -322,15 +461,22 @@ namespace NutriMind.App.UI
         {
             _backButton?.UnregisterCallback<ClickEvent>(OnBackClicked);
             _primaryActionButton?.UnregisterCallback<ClickEvent>(OnPrimaryActionClicked);
-            if (_missionList != null)
-            {
-                foreach (Button button in _missionList.Query<Button>(className: "mission-selection__item").ToList())
-                {
-                    button.UnregisterCallback<ClickEvent>(OnMissionClicked);
-                }
-            }
+            UnregisterMissionCallbacks();
 
             _root?.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+
+        private void UnregisterMissionCallbacks()
+        {
+            if (_missionList == null)
+            {
+                return;
+            }
+
+            foreach (Button button in _missionList.Query<Button>(className: "mission-selection__item").ToList())
+            {
+                button.UnregisterCallback<ClickEvent>(OnMissionClicked);
+            }
         }
 
         private void OnBackClicked(ClickEvent evt) => BackRequested?.Invoke();
@@ -345,6 +491,12 @@ namespace NutriMind.App.UI
 
         private void OnPrimaryActionClicked(ClickEvent evt)
         {
+            MissionPreviewData data = GetSelectedData();
+            if (string.IsNullOrWhiteSpace(data.MissionId))
+            {
+                return;
+            }
+
             MissionPreviewSelection selection = GetCurrentSelection();
             if (selection.IsLocked)
             {
@@ -352,16 +504,15 @@ namespace NutriMind.App.UI
                 return;
             }
 
-            MissionPreviewData data = GetSelectedData();
-            switch (data.PrimaryActionLabel)
+            switch (GetPrimaryAction(data))
             {
-                case "Start Mission":
+                case MissionPreviewPrimaryAction.Start:
                     StartMissionRequested?.Invoke(selection);
                     break;
-                case "Continue Mission":
+                case MissionPreviewPrimaryAction.Continue:
                     ContinueMissionRequested?.Invoke(selection);
                     break;
-                case "Review Mission":
+                case MissionPreviewPrimaryAction.Review:
                     ReviewMissionRequested?.Invoke(selection);
                     break;
                 default:
@@ -380,8 +531,9 @@ namespace NutriMind.App.UI
             _missionList?.Query<Button>(className: "mission-selection__item").ForEach(button =>
                 button.EnableInClassList(SelectedClass, button == selected));
 
-            bool changed = SelectedMissionNumber != data.MissionNumber;
+            bool changed = !string.Equals(SelectedMissionId, data.MissionId, StringComparison.Ordinal);
             SelectedMissionNumber = data.MissionNumber;
+            SelectedMissionId = data.MissionId;
             ApplyMissionData(data);
             if (notify && changed)
             {
@@ -395,24 +547,39 @@ namespace NutriMind.App.UI
         {
             foreach (MissionPreviewData data in _missionData.Values)
             {
-                if (data.MissionNumber == SelectedMissionNumber)
+                if (string.Equals(data.MissionId, SelectedMissionId, StringComparison.Ordinal))
                 {
                     return data;
                 }
             }
 
-            return _missionData["mission-item-2"];
+            foreach (MissionPreviewData data in _missionData.Values)
+            {
+                return data;
+            }
+
+            return default;
         }
 
-        private MissionPreviewSelection CreateSelection(MissionPreviewData data) =>
-            new(
+        private MissionPreviewSelection CreateSelection(MissionPreviewData data)
+        {
+            NutriMindSubject subject = Subject;
+            NutriMindTerm term = Term;
+            if (_runtimeItems.TryGetValue(data.MissionId ?? string.Empty, out MissionPreviewItem item))
+            {
+                subject = item.Subject;
+                term = item.Term;
+            }
+
+            return new MissionPreviewSelection(
                 data.MissionId,
-                CatalogSubject,
-                CatalogTerm,
+                subject,
+                term,
                 data.MissionNumber,
                 data.Title,
                 data.IsLocked,
                 data.LockReason);
+        }
 
         private void ApplyMissionData(MissionPreviewData data)
         {
@@ -437,6 +604,184 @@ namespace NutriMind.App.UI
             if (_detailDownloaded != null) _detailDownloaded.text = data.DownloadedText;
             if (_primaryActionLabel != null) _primaryActionLabel.text = data.PrimaryActionLabel;
             _primaryActionButton?.EnableInClassList(PrimaryActionLockedClass, data.IsLocked);
+            _primaryActionButton?.SetEnabled(!string.IsNullOrWhiteSpace(data.MissionId));
+        }
+
+        private void ClearMissionDetail()
+        {
+            SelectedMissionNumber = 0;
+            SelectedMissionId = string.Empty;
+            ApplyStateMessage(string.Empty, string.Empty);
+        }
+
+        private void ApplyStateMessage(string title, string message)
+        {
+            if (_detailTitle != null) _detailTitle.text = title ?? string.Empty;
+            if (_detailDescription != null) _detailDescription.text = message ?? string.Empty;
+            if (_detailLearningGoal != null) _detailLearningGoal.text = string.Empty;
+            if (_detailStatusLabel != null) _detailStatusLabel.text = string.Empty;
+            if (_detailAreasProgress != null) _detailAreasProgress.text = "0 / 0";
+            if (_detailCollectiblesProgress != null) _detailCollectiblesProgress.text = "0 / 0";
+            UpdateStatFill(_detailAreasFill, 0, 0);
+            UpdateStatFill(_detailCollectiblesFill, 0, 0);
+            if (_detailPrerequisite != null) _detailPrerequisite.text = string.Empty;
+            if (_detailClassroom != null) _detailClassroom.text = string.Empty;
+            if (_detailDownloaded != null) _detailDownloaded.text = string.Empty;
+            if (_primaryActionLabel != null) _primaryActionLabel.text = string.Empty;
+            _primaryActionButton?.SetEnabled(false);
+        }
+
+        private MissionPreviewPrimaryAction GetPrimaryAction(MissionPreviewData data)
+        {
+            if (_runtimeItems.TryGetValue(data.MissionId ?? string.Empty, out MissionPreviewItem item))
+            {
+                return item.PrimaryAction;
+            }
+
+            return data.PrimaryActionLabel switch
+            {
+                "Start Mission" => MissionPreviewPrimaryAction.Start,
+                "Continue Mission" => MissionPreviewPrimaryAction.Continue,
+                "Review Mission" => MissionPreviewPrimaryAction.Review,
+                _ => MissionPreviewPrimaryAction.Locked
+            };
+        }
+
+        private static MissionPreviewData CreateRuntimeData(MissionPreviewItem item)
+        {
+            string statusState = GetStatusState(item);
+            string statusLabel = GetStatusLabel(item, statusState);
+            string primaryActionLabel = item.PrimaryAction switch
+            {
+                MissionPreviewPrimaryAction.Start => "Start Mission",
+                MissionPreviewPrimaryAction.Continue => "Continue Mission",
+                MissionPreviewPrimaryAction.Review => "Review Mission",
+                _ => "Back to Missions"
+            };
+
+            return new MissionPreviewData(
+                item.MissionId,
+                item.MissionNumber,
+                item.Title,
+                string.Empty,
+                string.Empty,
+                item.AreasCompleted,
+                item.AreasRequired,
+                item.CollectiblesCompleted,
+                item.CollectiblesRequired,
+                statusLabel,
+                statusState,
+                item.LockReason,
+                string.Empty,
+                string.Empty,
+                primaryActionLabel,
+                item.IsLocked,
+                item.LockReason);
+        }
+
+        private static Button CreateMissionButton(string buttonName, MissionPreviewData data)
+        {
+            var button = new Button { name = buttonName, tooltip = data.Title };
+            button.AddToClassList("ds-card");
+            button.AddToClassList("mission-selection__item");
+            button.AddToClassList("mission-selection__item--" + data.StatusState);
+
+            var badge = new VisualElement();
+            badge.AddToClassList("mission-selection__item-badge");
+            badge.AddToClassList("mission-selection__item-badge--" + data.StatusState);
+            badge.pickingMode = PickingMode.Ignore;
+            if (data.IsLocked)
+            {
+                var lockIcon = new VisualElement();
+                lockIcon.AddToClassList("ds-icon");
+                lockIcon.AddToClassList("ds-icon--lock");
+                lockIcon.AddToClassList("mission-selection__item-badge-lock");
+                badge.Add(lockIcon);
+            }
+            else
+            {
+                var number = new Label(data.MissionNumber.ToString());
+                number.AddToClassList("mission-selection__item-badge-label");
+                number.pickingMode = PickingMode.Ignore;
+                badge.Add(number);
+            }
+
+            var title = new Label(data.Title);
+            title.AddToClassList("mission-selection__item-title");
+            title.EnableInClassList("mission-selection__item-title--locked", data.IsLocked);
+            title.pickingMode = PickingMode.Ignore;
+
+            var status = new VisualElement();
+            status.AddToClassList("mission-selection__item-status");
+            status.AddToClassList("mission-selection__item-status--" + data.StatusState);
+            status.pickingMode = PickingMode.Ignore;
+
+            var icon = new VisualElement();
+            icon.AddToClassList("ds-icon");
+            icon.AddToClassList(GetStatusIconClass(data.StatusState));
+            icon.AddToClassList("mission-selection__item-status-icon");
+            icon.pickingMode = PickingMode.Ignore;
+
+            var statusText = new Label(data.StatusLabel);
+            statusText.AddToClassList("mission-selection__item-status-label");
+            statusText.pickingMode = PickingMode.Ignore;
+
+            status.Add(icon);
+            status.Add(statusText);
+            button.Add(badge);
+            button.Add(title);
+            button.Add(status);
+            return button;
+        }
+
+        private static string GetStatusState(MissionPreviewItem item)
+        {
+            if (item.IsLocked)
+            {
+                return "locked";
+            }
+
+            string normalized = item.Status?.Trim().ToLowerInvariant() ?? string.Empty;
+            if (normalized == "completed" || normalized == "mission_completed")
+            {
+                return "completed";
+            }
+
+            if (normalized == "in_progress"
+                || normalized == "inprogress"
+                || normalized == "started"
+                || normalized == "review_required")
+            {
+                return "progress";
+            }
+
+            return "available";
+        }
+
+        private static string GetStatusLabel(MissionPreviewItem item, string statusState)
+        {
+            if (statusState == "locked")
+            {
+                return string.IsNullOrWhiteSpace(item.LockReason) ? "Locked" : item.LockReason;
+            }
+
+            return statusState switch
+            {
+                "completed" => "Completed",
+                "progress" => "In Progress",
+                _ => "Available"
+            };
+        }
+
+        private static string GetStatusIconClass(string statusState)
+        {
+            return statusState switch
+            {
+                "completed" => "ds-icon--check",
+                "locked" => "ds-icon--lock",
+                "progress" => "ds-icon--refresh",
+                _ => "ds-icon--play"
+            };
         }
 
         private static void UpdateStatFill(VisualElement fill, int completed, int total)

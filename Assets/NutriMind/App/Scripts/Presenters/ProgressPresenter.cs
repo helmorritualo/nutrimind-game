@@ -5,6 +5,7 @@ using NutriMind.App.Routing;
 using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
 
 namespace NutriMind.App.Presentation
@@ -12,12 +13,12 @@ namespace NutriMind.App.Presentation
     /// <summary>
     /// Runtime presenter for the Progress route.
     /// Fetches the learner's full progress summary from the server.
-    /// Progress panel is mainly static-fixture-driven; the presenter sets the correct
-    /// data state and wires navigation events.
+    /// Binds supported aggregate fields and exposes local pending-sync state.
     /// </summary>
     public sealed class ProgressPresenter : RoutePresenterBase
     {
         private readonly ProgressPanelView _view;
+        private ProgressSummary _cachedSummary;
 
         public ProgressPresenter(AppLifetime lifetime, ProgressPanelView view)
             : base(lifetime)
@@ -36,7 +37,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Progress.Load");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Progress.Load");
         }
 
         protected override void OnDispose()
@@ -61,17 +62,30 @@ namespace NutriMind.App.Presentation
 
             if (result.IsSuccess)
             {
-                // ProgressPanelView uses static fixtures for visual content; we surface
-                // the live data state so non-content overlays (loading, error) work correctly.
-                _view.SetDataState(DataStatePanelState.Content);
+                _cachedSummary = result.Value ?? new ProgressSummary();
+                ProgressPreviewSummary summary = AppViewMappers.MapProgressSummary(
+                    _cachedSummary,
+                    TryGetPendingOutboxCount());
+                _view.SetSummary(summary);
+                _view.SetDataState(
+                    summary.IsEmpty ? DataStatePanelState.Empty : DataStatePanelState.Content);
             }
             else if (IsUnauthorized(result.Error))
             {
                 HandleUnauthorized();
             }
+            else if (IsOffline(result.Error) && _cachedSummary != null)
+            {
+                _view.SetSummary(AppViewMappers.MapProgressSummary(
+                    _cachedSummary,
+                    TryGetPendingOutboxCount()));
+                _view.SetDataState(DataStatePanelState.OfflineCached);
+            }
             else
             {
-                _view.SetDataState(AppViewMappers.ErrorToDataState(result.Error));
+                _view.SetDataState(AppViewMappers.ErrorToDataState(
+                    result.Error,
+                    hasCachedData: _cachedSummary != null));
             }
         }
 
@@ -82,7 +96,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Progress.Retry");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Progress.Retry");
         }
 
         private void OnQuizPortalRequested()
@@ -106,8 +120,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.NavigateAsync(AppRouteId.Leaderboard, cancellationToken: Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.NavigateAsync(AppRouteId.Leaderboard, cancellationToken: NavigationToken),
+                NavigationToken,
                 "Progress.Leaderboard");
         }
 
@@ -126,9 +140,24 @@ namespace NutriMind.App.Presentation
                 AppViewMappers.TermToId(selection.Term));
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.NavigateAsync(AppRouteId.MissionList, ctx, Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.NavigateAsync(AppRouteId.MissionList, ctx, NavigationToken),
+                NavigationToken,
                 "Progress.MissionReview");
+        }
+
+        private int? TryGetPendingOutboxCount()
+        {
+            IOutboxRepository outbox = Lifetime.OutboxRepository;
+            if (outbox == null)
+            {
+                return null;
+            }
+
+            AppResult<int> count = outbox.CountByStates(
+                OutboxEventState.Pending,
+                OutboxEventState.Sending,
+                OutboxEventState.Deferred);
+            return count.IsSuccess ? count.Value : null;
         }
     }
 }

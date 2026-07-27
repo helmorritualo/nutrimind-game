@@ -10,6 +10,7 @@ using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
 using NutriMind.Core.Persistence;
 using NutriMind.Core.Utilities;
+using UnityEngine;
 
 namespace NutriMind.App.Presentation
 {
@@ -17,8 +18,8 @@ namespace NutriMind.App.Presentation
     /// Runtime presenter for the Quiz Attempt route.
     /// Loads quiz detail, binds the view, then intercepts the view's SubmitRequested event
     /// to map preview answers to production API format.
-    /// A stable clientAttemptUuid is generated once and persisted via IdempotentRequestRepository;
-    /// on timeout the submission is retained and reused on the next SubmitRequested.
+    /// A stable clientAttemptUuid and frozen submission are persisted before sending;
+    /// unresolved submissions are recovered and retried byte-for-byte.
     /// Quiz results are ALWAYS server-provided; scores are never recalculated locally.
     /// </summary>
     public sealed class QuizAttemptPresenter : RoutePresenterBase
@@ -28,8 +29,11 @@ namespace NutriMind.App.Presentation
         private readonly AppShellRuntimeController _shellRuntime;
         private readonly QuizPortalScreenCoordinator _coordinator;
 
+        private string _resolvedSubjectId;
+        private string _resolvedTermId;
         private string _pendingClientUuid;
         private QuizAttemptSubmission _retainedSubmission;
+        private IdempotentRequestRecord _pendingRecord;
         private bool _isSubmitting;
 
         public QuizAttemptPresenter(
@@ -41,12 +45,17 @@ namespace NutriMind.App.Presentation
             : base(lifetime)
         {
             _view = view;
-            _ctx = ctx;
+            _ctx = ctx ?? AppRouteContext.Empty;
             _shellRuntime = shellRuntime;
             _coordinator = coordinator;
+            _resolvedSubjectId = _ctx.SubjectId;
+            _resolvedTermId = _ctx.TermId;
 
             _view.SubmitRequested += OnSubmitRequested;
             _view.ExitRequested += OnExitRequested;
+            _view.CheckSubmissionStatusRequested += OnRetryPendingSubmission;
+            _view.BackToQuizPortalRequested += OnExitRequested;
+            _view.ReturnToReviewRequested += OnReturnToReviewRequested;
         }
 
         public void LoadAsync()
@@ -56,26 +65,24 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            // If an uncertain session exists for this quiz, use its retained submission.
-            QuizAttemptSession existing = _coordinator?.RetainedAttemptSession;
-            if (existing != null
-                && existing.QuizId == _ctx.QuizId
-                && !existing.IsSubmitted
-                && existing.HasUncertainSubmit)
+            if (RestorePendingSubmission())
             {
-                _pendingClientUuid = existing.ClientAttemptUuid;
-                _retainedSubmission = existing.BuildSubmission();
-                SetViewStateFromRetainedSession();
                 return;
             }
 
-            FetchAndBindAsync(Cts.Token);
+            TaskUtilities.ForgetSafely(
+                FetchAndBindAsync(RequestToken),
+                RequestToken,
+                "QuizAttempt.Load");
         }
 
         protected override void OnDispose()
         {
             _view.SubmitRequested -= OnSubmitRequested;
             _view.ExitRequested -= OnExitRequested;
+            _view.CheckSubmissionStatusRequested -= OnRetryPendingSubmission;
+            _view.BackToQuizPortalRequested -= OnExitRequested;
+            _view.ReturnToReviewRequested -= OnReturnToReviewRequested;
         }
 
         private async Task FetchAndBindAsync(CancellationToken token)
@@ -110,8 +117,11 @@ namespace NutriMind.App.Presentation
 
                 QuizDetailPreviewContent detail = AppViewMappers.MapQuizDetail(result.Value);
 
-                _pendingClientUuid = Guid.NewGuid().ToString();
+                _resolvedSubjectId = result.Value.SubjectId ?? _ctx.SubjectId;
+                _resolvedTermId = result.Value.TermId ?? _ctx.TermId;
+                _pendingClientUuid = null;
                 _retainedSubmission = null;
+                _pendingRecord = null;
                 _isSubmitting = false;
 
                 _view.SetQuizContext(summary, detail);
@@ -126,9 +136,117 @@ namespace NutriMind.App.Presentation
             }
         }
 
-        private void SetViewStateFromRetainedSession()
+        private bool RestorePendingSubmission()
         {
+            IIdempotentRequestRepository repository = Lifetime.IdempotentRequestRepository;
+            if (repository == null)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return true;
+            }
+
+            PendingQuizSubmissionEnvelopeV1 retained =
+                _coordinator?.RetainedPendingQuizSubmission;
+            if (IsEnvelopeForCurrentQuiz(retained))
+            {
+                AppResult<IdempotentRequestRecord> stored =
+                    repository.Get(retained.Submission.ClientAttemptUuid);
+                if (stored.IsFailure)
+                {
+                    _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    return true;
+                }
+
+                IdempotentRequestRecord record = stored.Value;
+                if (record == null)
+                {
+                    string now = GetUtcNow();
+                    record = new IdempotentRequestRecord
+                    {
+                        RequestUuid = retained.Submission.ClientAttemptUuid,
+                        Operation = IdempotentOperations.QuizSubmit,
+                        NormalizedPayloadJson =
+                            IdempotentMutationSerializers.SerializeQuiz(retained),
+                        State = IdempotentRequestStates.Uncertain,
+                        CreatedUtc = now,
+                        UpdatedUtc = now
+                    };
+                    if (repository.Upsert(record).IsFailure)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return true;
+                    }
+                }
+
+                if (IdempotentRequestStates.IsUnresolved(record.State))
+                {
+                    ApplyPendingEnvelope(retained, record);
+                    return true;
+                }
+
+                _coordinator?.ReleasePendingQuizSubmission();
+            }
+
+            AppResult<IdempotentRequestRecord> unresolved =
+                repository.FindLatestUnresolved(
+                    IdempotentOperations.QuizSubmit,
+                    _ctx.QuizId);
+            if (unresolved.IsFailure)
+            {
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return true;
+            }
+
+            if (unresolved.Value == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                PendingQuizSubmissionEnvelopeV1 envelope =
+                    IdempotentMutationSerializers.DeserializeQuiz(
+                        unresolved.Value.NormalizedPayloadJson);
+                if (!IsEnvelopeForCurrentQuiz(envelope)
+                    || !string.Equals(
+                        envelope.Submission.ClientAttemptUuid,
+                        unresolved.Value.RequestUuid,
+                        StringComparison.Ordinal))
+                {
+                    _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    return true;
+                }
+
+                ApplyPendingEnvelope(envelope, unresolved.Value);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                NutriMindLog.RuntimeWarning(
+                    "QuizAttemptPresenter could not restore pending submission: "
+                    + exception.GetType().Name);
+                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                return true;
+            }
+        }
+
+        private void ApplyPendingEnvelope(
+            PendingQuizSubmissionEnvelopeV1 envelope,
+            IdempotentRequestRecord record)
+        {
+            _pendingClientUuid = envelope.Submission.ClientAttemptUuid;
+            _retainedSubmission = envelope.Submission;
+            _pendingRecord = record;
+            _coordinator?.RetainPendingQuizSubmission(envelope);
             _view.SetPreviewState(QuizAttemptPreviewState.UncertainSubmission);
+        }
+
+        private bool IsEnvelopeForCurrentQuiz(PendingQuizSubmissionEnvelopeV1 envelope)
+        {
+            return envelope != null
+                && envelope.Submission != null
+                && !string.IsNullOrWhiteSpace(envelope.Submission.ClientAttemptUuid)
+                && string.Equals(envelope.QuizId, _ctx.QuizId, StringComparison.Ordinal);
         }
 
         private void OnSubmitRequested(QuizAttemptPreviewSubmission previewSubmission)
@@ -141,8 +259,8 @@ namespace NutriMind.App.Presentation
             _shellRuntime?.RequestSubmitQuiz(() =>
             {
                 TaskUtilities.ForgetSafely(
-                    SubmitAsync(previewSubmission, Cts.Token),
-                    Cts.Token,
+                    SubmitAsync(previewSubmission, RequestToken),
+                    RequestToken,
                     "QuizAttempt.Submit");
             });
         }
@@ -156,71 +274,190 @@ namespace NutriMind.App.Presentation
 
             _isSubmitting = true;
             _view.SetPreviewState(QuizAttemptPreviewState.Submitting);
-
-            // Use retained submission on retry to ensure the same UUID and payload.
-            QuizAttemptSubmission submission = _retainedSubmission
-                ?? AppViewMappers.MapPreviewSubmission(_pendingClientUuid, previewSubmission);
-
-            if (Lifetime.IdempotentRequestRepository != null)
+            try
             {
-                string now = System.DateTimeOffset.UtcNow.ToString("o");
-                Lifetime.IdempotentRequestRepository.Upsert(new IdempotentRequestRecord
+                IIdempotentRequestRepository repository = Lifetime.IdempotentRequestRepository;
+                if (repository == null)
                 {
-                    RequestUuid = submission.ClientAttemptUuid,
-                    Operation = "quiz_submit",
-                    NormalizedPayloadJson = _ctx.QuizId ?? string.Empty,
-                    State = "pending",
-                    CreatedUtc = now
-                });
+                    _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    return;
+                }
+
+                QuizAttemptSubmission submission = _retainedSubmission;
+                PendingQuizSubmissionEnvelopeV1 envelope;
+                IdempotentRequestRecord record = _pendingRecord;
+
+                if (submission == null)
+                {
+                    if (previewSubmission == null
+                        || !string.Equals(
+                            previewSubmission.QuizId,
+                            _ctx.QuizId,
+                            StringComparison.Ordinal))
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
+                    _pendingClientUuid = Guid.NewGuid().ToString();
+                    submission = AppViewMappers.MapPreviewSubmission(
+                        _pendingClientUuid,
+                        previewSubmission);
+                    envelope = new PendingQuizSubmissionEnvelopeV1
+                    {
+                        QuizId = _ctx.QuizId,
+                        Submission = submission
+                    };
+                    string now = GetUtcNow();
+                    record = new IdempotentRequestRecord
+                    {
+                        RequestUuid = submission.ClientAttemptUuid,
+                        Operation = IdempotentOperations.QuizSubmit,
+                        NormalizedPayloadJson =
+                            IdempotentMutationSerializers.SerializeQuiz(envelope),
+                        State = IdempotentRequestStates.Pending,
+                        CreatedUtc = now,
+                        UpdatedUtc = now
+                    };
+                    if (repository.Upsert(record).IsFailure)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                        return;
+                    }
+
+                    _retainedSubmission = submission;
+                    _pendingRecord = record;
+                    _coordinator?.RetainPendingQuizSubmission(envelope);
+                }
+                else
+                {
+                    envelope = new PendingQuizSubmissionEnvelopeV1
+                    {
+                        QuizId = _ctx.QuizId,
+                        Submission = submission
+                    };
+                    if (record == null)
+                    {
+                        AppResult<IdempotentRequestRecord> stored =
+                            repository.Get(submission.ClientAttemptUuid);
+                        record = stored.IsSuccess ? stored.Value : null;
+                    }
+
+                    if (record == null)
+                    {
+                        string now = GetUtcNow();
+                        record = new IdempotentRequestRecord
+                        {
+                            RequestUuid = submission.ClientAttemptUuid,
+                            Operation = IdempotentOperations.QuizSubmit,
+                            NormalizedPayloadJson =
+                                IdempotentMutationSerializers.SerializeQuiz(envelope),
+                            State = IdempotentRequestStates.Pending,
+                            CreatedUtc = now,
+                            UpdatedUtc = now
+                        };
+                        if (repository.Upsert(record).IsFailure)
+                        {
+                            _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                            return;
+                        }
+                    }
+                }
+
+                if (SetRequestState(
+                        repository,
+                        record,
+                        IdempotentRequestStates.Sending,
+                        null).IsFailure)
+                {
+                    _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    return;
+                }
+
+                _pendingRecord = record;
+                _coordinator?.RetainPendingQuizSubmission(envelope);
+
+                var request = new SubmitQuizAttemptRequest
+                {
+                    QuizId = envelope.QuizId,
+                    Submission = envelope.Submission
+                };
+
+                AppResult<QuizResult> result =
+                    await Lifetime.Gateway.SubmitQuizAttemptAsync(request, token)
+                        .ConfigureAwait(true);
+
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (result.IsSuccess)
+                {
+                    SetRequestState(
+                        repository,
+                        record,
+                        IdempotentRequestStates.Completed,
+                        SerializeQuizResult(result.Value));
+                    _retainedSubmission = null;
+                    _pendingRecord = null;
+                    _coordinator?.ReleaseAttemptSession();
+                    _coordinator?.ReleasePendingQuizSubmission();
+
+                    string attemptId = result.Value?.AttemptId;
+                    AppRouteContext resultCtx = AppRouteContext.ForQuizResult(
+                            attemptId,
+                            _ctx.QuizId,
+                            _resolvedSubjectId,
+                            _resolvedTermId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack);
+                    TaskUtilities.ForgetSafely(
+                        Lifetime.Router?.NavigateAsync(
+                            AppRouteId.QuizResult,
+                            resultCtx,
+                            NavigationToken),
+                        NavigationToken,
+                        "QuizAttempt.ToResult");
+                }
+                else if (IsOffline(result.Error))
+                {
+                    SetRequestState(
+                        repository,
+                        record,
+                        IdempotentRequestStates.Uncertain,
+                        null);
+                    _retainedSubmission = submission;
+                    _pendingRecord = record;
+                    _coordinator?.RetainPendingQuizSubmission(envelope);
+                    if (!Disposed)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.UncertainSubmission);
+                    }
+                }
+                else
+                {
+                    SetRequestState(
+                        repository,
+                        record,
+                        IdempotentRequestStates.Rejected,
+                        SerializeErrorResult(result.Error));
+                    _retainedSubmission = null;
+                    _pendingRecord = null;
+                    _coordinator?.ReleaseAttemptSession();
+                    _coordinator?.ReleasePendingQuizSubmission();
+                    if (IsUnauthorized(result.Error))
+                    {
+                        HandleUnauthorized();
+                    }
+                    else if (!Disposed)
+                    {
+                        _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                    }
+                }
             }
-
-            var request = new SubmitQuizAttemptRequest
+            finally
             {
-                QuizId = _ctx.QuizId,
-                Submission = submission
-            };
-
-            AppResult<QuizResult> result =
-                await Lifetime.Gateway.SubmitQuizAttemptAsync(request, token).ConfigureAwait(true);
-
-            if (Disposed || token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            _isSubmitting = false;
-
-            if (result.IsSuccess)
-            {
-                _retainedSubmission = null;
-                _coordinator?.ReleaseAttemptSession();
-
-                string attemptId = result.Value?.AttemptId;
-                AppRouteContext resultCtx = AppRouteContext.ForQuizResult(attemptId, _ctx.QuizId);
-                TaskUtilities.ForgetSafely(
-                    Lifetime.Router?.NavigateAsync(AppRouteId.QuizResult, resultCtx, token),
-                    token,
-                    "QuizAttempt.ToResult");
-            }
-            else if (result.Error != null && result.Error.IsNetworkError)
-            {
-                // Keep the submission for retry.
-                _retainedSubmission = submission;
-                QuizAttemptSession session = new QuizAttemptSession(_ctx.QuizId, submission.ClientAttemptUuid,
-                    new QuizDetail { Id = _ctx.QuizId });
-                session.BeginSubmit();
-                session.MarkUncertainSubmit();
-                _coordinator?.RetainAttemptSession(session);
-                _view.SetPreviewState(QuizAttemptPreviewState.UncertainSubmission);
-            }
-            else if (IsUnauthorized(result.Error))
-            {
-                _coordinator?.ReleaseAttemptSession();
-                HandleUnauthorized();
-            }
-            else
-            {
-                _view.SetPreviewState(QuizAttemptPreviewState.RecoverableError);
+                _isSubmitting = false;
             }
         }
 
@@ -231,15 +468,121 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            _shellRuntime?.RequestExitQuiz(() =>
+            if (_retainedSubmission != null)
             {
-                _coordinator?.ReleaseAttemptSession();
+                var configuration = new SystemDialogConfiguration(
+                    title: "Submission not confirmed",
+                    message: "The server may already have received this quiz submission.",
+                    primaryActionLabel: "Retry Safely",
+                    secondaryActionLabel: "Leave Safely",
+                    detail: "Retry uses the same request ID and answers. Leaving keeps the pending submission for recovery.",
+                    eyebrow: "Quiz Portal",
+                    iconClass: "ds-icon--warning",
+                    tone: SystemDialogTone.Warning,
+                    allowDismiss: false,
+                    dismissOnBackdrop: false);
+                _shellRuntime?.ModalHost?.ShowSystem(
+                    configuration,
+                    onPrimary: OnRetryPendingSubmission,
+                    onSecondary: NavigateBackSafely);
+                return;
+            }
 
-                TaskUtilities.ForgetSafely(
-                    Lifetime.Router?.BackAsync(Cts.Token),
-                    Cts.Token,
-                    "QuizAttempt.Exit");
+            _shellRuntime?.RequestExitQuiz(NavigateBackSafely);
+        }
+
+        private void OnRetryPendingSubmission()
+        {
+            if (Disposed || _isSubmitting || _retainedSubmission == null)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                SubmitAsync(null, RequestToken),
+                RequestToken,
+                "QuizAttempt.RetryPending");
+        }
+
+        private void NavigateBackSafely()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            TaskUtilities.ForgetSafely(
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
+                "QuizAttempt.Exit");
+        }
+
+        private void OnReturnToReviewRequested()
+        {
+            if (Disposed || _isSubmitting || _retainedSubmission != null)
+            {
+                return;
+            }
+
+            _pendingClientUuid = null;
+            _view.SetPreviewState(QuizAttemptPreviewState.Content);
+            _view.ShowReview();
+        }
+
+        private AppResult SetRequestState(
+            IIdempotentRequestRepository repository,
+            IdempotentRequestRecord record,
+            string state,
+            string resultJson)
+        {
+            record.State = state;
+            record.ResultJson = resultJson;
+            record.UpdatedUtc = GetUtcNow();
+            return repository.Upsert(record);
+        }
+
+        private string GetUtcNow()
+        {
+            DateTimeOffset now = Lifetime.Clock != null
+                ? Lifetime.Clock.UtcNow
+                : DateTimeOffset.UtcNow;
+            return now.ToUniversalTime().ToString("o");
+        }
+
+        private static string SerializeQuizResult(QuizResult result)
+        {
+            return JsonUtility.ToJson(new QuizMutationResultRecord
+            {
+                AttemptId = result?.AttemptId,
+                QuizId = result?.QuizId,
+                ClientAttemptUuid = result?.ClientAttemptUuid,
+                Status = result?.Status
             });
+        }
+
+        private static string SerializeErrorResult(AppError error)
+        {
+            return JsonUtility.ToJson(new MutationErrorRecord
+            {
+                Code = error?.Code,
+                HttpStatus = error?.HttpStatus ?? 0
+            });
+        }
+
+        [Serializable]
+        private sealed class QuizMutationResultRecord
+        {
+            public string AttemptId;
+            public string QuizId;
+            public string ClientAttemptUuid;
+            public string Status;
+        }
+
+        [Serializable]
+        private sealed class MutationErrorRecord
+        {
+            public string Code;
+            public int HttpStatus;
         }
     }
 }

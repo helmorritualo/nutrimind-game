@@ -12,8 +12,8 @@ namespace NutriMind.App.Composition
     /// <summary>
     /// Manages the Quiz Portal scene content region.
     /// Observes <see cref="IAppRouter.RouteChanged"/> for quiz-portal routes, swaps UXML content,
-    /// and constructs runtime presenters. Retains <see cref="QuizAttemptSession"/> across
-    /// uncertain-submit timeouts so the identical payload is retried.
+    /// and constructs runtime presenters. Retains the persisted quiz submission envelope
+    /// across uncertain-submit timeouts so the identical UUID and payload are retried.
     /// Does not own shell chrome, gateway, SQLite, or scene loading.
     /// </summary>
     public sealed class QuizPortalScreenCoordinator : IDisposable
@@ -32,10 +32,14 @@ namespace NutriMind.App.Composition
         private TemplateContainer _activeInstance;
         private IDisposable _activePresenter;
         private IAppScreenView _activeView;
-        private AppRouteId? _mountedRouteId;
+        private QuizRouteKey? _mountedRouteKey;
 
         // Retained across uncertain-submit so retry can use identical UUID + payload.
+        private PendingQuizSubmissionEnvelopeV1 _retainedPendingQuizSubmission;
         private QuizAttemptSession _retainedAttemptSession;
+
+        public PendingQuizSubmissionEnvelopeV1 RetainedPendingQuizSubmission =>
+            _retainedPendingQuizSubmission;
 
         /// <summary>
         /// Session retained after an uncertain-submit timeout so the presenter can retry
@@ -86,6 +90,7 @@ namespace NutriMind.App.Composition
             }
 
             TeardownActive();
+            _retainedPendingQuizSubmission = null;
             _retainedAttemptSession = null;
         }
 
@@ -114,6 +119,16 @@ namespace NutriMind.App.Composition
             _retainedAttemptSession = null;
         }
 
+        public void RetainPendingQuizSubmission(PendingQuizSubmissionEnvelopeV1 envelope)
+        {
+            _retainedPendingQuizSubmission = envelope;
+        }
+
+        public void ReleasePendingQuizSubmission()
+        {
+            _retainedPendingQuizSubmission = null;
+        }
+
         private void OnRouteChanged(AppRouteEntry entry)
         {
             if (_disposed)
@@ -129,7 +144,9 @@ namespace NutriMind.App.Composition
             // EnterQuizPortal raises RouteChanged after scene OnEnable already applied the
             // same route. Remounting mid-fetch hides content (Loading) then disposes the
             // presenter before ShowContent runs — leaving a blank shell.
-            if (_mountedRouteId == entry.RouteId
+            QuizRouteKey routeKey = QuizRouteKey.FromEntry(entry);
+            if (_mountedRouteKey.HasValue
+                && _mountedRouteKey.Value.Equals(routeKey)
                 && _activeInstance != null
                 && _activeInstance.parent != null)
             {
@@ -187,7 +204,7 @@ namespace NutriMind.App.Composition
                     break;
             }
 
-            _mountedRouteId = entry.RouteId;
+            _mountedRouteKey = QuizRouteKey.FromEntry(entry);
         }
 
         private void BuildQuizList(VisualElement region, AppRouteContext ctx)
@@ -201,7 +218,7 @@ namespace NutriMind.App.Composition
             _activeInstance = MountPanel(region, _quizListAsset);
             var view = new QuizListPanelView(_activeInstance, _dataStatePanelAsset);
             _activeView = view;
-            var presenter = new QuizListPresenter(_lifetime, view);
+            var presenter = new QuizListPresenter(_lifetime, view, ctx);
             _activePresenter = presenter;
             presenter.LoadAsync();
         }
@@ -295,7 +312,7 @@ namespace NutriMind.App.Composition
 
         private void TeardownActive()
         {
-            _mountedRouteId = null;
+            _mountedRouteKey = null;
             _activePresenter?.Dispose();
             _activePresenter = null;
             _activeView?.Dispose();
@@ -341,8 +358,7 @@ namespace NutriMind.App.Composition
 
         private void UpdateShellChrome(string title, string context)
         {
-            // Keep Home nav visually inactive for Quiz Portal; title is owned by runtime.
-            _shellController?.SetPreviewRoute(AppShellPreviewRoute.Home);
+            _shellController?.ClearActiveNavigation();
             _shellController?.SetPageTitle(title, context);
             _shellController?.HideLoadingOverlay();
         }

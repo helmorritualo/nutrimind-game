@@ -1,9 +1,49 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NutriMind.App.UI
 {
+    /// <summary>
+    /// Aggregate fields supported by the Progress gateway response.
+    /// No mission totals, subject totals, or quiz assignment counts are inferred.
+    /// </summary>
+    public sealed class ProgressPreviewSummary
+    {
+        public ProgressPreviewSummary(
+            int missionsStarted,
+            int missionsCompleted,
+            int areasCompleted,
+            int reviewRequiredCount,
+            int quizAttempts,
+            int? pendingOutboxCount)
+        {
+            MissionsStarted = Math.Max(0, missionsStarted);
+            MissionsCompleted = Math.Max(0, missionsCompleted);
+            AreasCompleted = Math.Max(0, areasCompleted);
+            ReviewRequiredCount = Math.Max(0, reviewRequiredCount);
+            QuizAttempts = Math.Max(0, quizAttempts);
+            PendingOutboxCount = pendingOutboxCount.HasValue
+                ? Math.Max(0, pendingOutboxCount.Value)
+                : null;
+        }
+
+        public int MissionsStarted { get; }
+        public int MissionsCompleted { get; }
+        public int AreasCompleted { get; }
+        public int ReviewRequiredCount { get; }
+        public int QuizAttempts { get; }
+        public int? PendingOutboxCount { get; }
+
+        public bool IsEmpty =>
+            MissionsStarted == 0
+            && MissionsCompleted == 0
+            && AreasCompleted == 0
+            && ReviewRequiredCount == 0
+            && QuizAttempts == 0;
+    }
+
     /// <summary>
     /// Presentation-only preview payload for a Progress mission review request.
     /// Not a production or domain model.
@@ -76,7 +116,18 @@ namespace NutriMind.App.UI
         private VisualElement _root;
         private ScrollView _scroll;
         private VisualElement _dataStateHost;
+        private Label _introMessage;
+        private Label _overallPercent;
         private ProgressBar _overallProgress;
+        private Label _overallMissions;
+        private Label _overallReviews;
+        private Label _overallAreas;
+        private VisualElement _subjectRow;
+        private VisualElement _termHeading;
+        private VisualElement _termRow;
+        private VisualElement _missionHeading;
+        private VisualElement _missionList;
+        private readonly List<Label> _quizMetricLabels = new();
         private Button _subjectLiteraQuest;
         private Button _subjectPeAndHealth;
         private Button _subjectScience;
@@ -132,6 +183,7 @@ namespace NutriMind.App.UI
         public NutriMindTerm SelectedTerm { get; private set; } = NutriMindTerm.Term1;
 
         public DataStatePanelState DataState { get; private set; } = DataStatePanelState.Content;
+        public ProgressPreviewSummary Summary { get; private set; }
 
         public event Action<NutriMindSubject> SubjectSelected;
         public event Action<NutriMindTerm> TermSelected;
@@ -155,6 +207,85 @@ namespace NutriMind.App.UI
             ApplySelectionVisuals();
             ApplyTermFixtures();
             ApplyMissionFixtures();
+        }
+
+        /// <summary>
+        /// Binds only aggregate fields supplied by <see cref="ProgressPreviewSummary"/>.
+        /// Unsupported percentages, subject totals, and quiz assignment counts are not inferred.
+        /// </summary>
+        public void SetSummary(ProgressPreviewSummary summary)
+        {
+            if (!IsBound || summary == null)
+            {
+                return;
+            }
+
+            Summary = summary;
+            if (_overallPercent != null)
+            {
+                _overallPercent.text = "—";
+                _overallPercent.style.display = DisplayStyle.None;
+            }
+
+            if (_overallProgress != null)
+            {
+                _overallProgress.value = 0f;
+                _overallProgress.style.display = DisplayStyle.None;
+            }
+
+            if (_overallMissions != null)
+            {
+                _overallMissions.text =
+                    $"{summary.MissionsCompleted} missions completed • {summary.MissionsStarted} missions started";
+            }
+
+            if (_overallReviews != null)
+            {
+                _overallReviews.text = FormatReviewCount(summary.ReviewRequiredCount);
+            }
+
+            if (_overallAreas != null)
+            {
+                _overallAreas.text =
+                    summary.AreasCompleted == 1 ? "1 area completed" : $"{summary.AreasCompleted} areas completed";
+            }
+
+            SetElementDisplay(_subjectRow, DisplayStyle.None);
+            SetElementDisplay(_termHeading, DisplayStyle.None);
+            SetElementDisplay(_termRow, DisplayStyle.None);
+            SetElementDisplay(_missionHeading, DisplayStyle.None);
+            SetElementDisplay(_missionList, DisplayStyle.None);
+
+            for (int i = 0; i < _quizMetricLabels.Count; i++)
+            {
+                Label label = _quizMetricLabels[i];
+                if (i == 0)
+                {
+                    label.text = summary.QuizAttempts == 1
+                        ? "1 quiz attempt"
+                        : $"{summary.QuizAttempts} quiz attempts";
+                    if (label.parent != null)
+                    {
+                        label.parent.style.display = DisplayStyle.Flex;
+                    }
+                }
+                else
+                {
+                    label.text = string.Empty;
+                    if (label.parent != null)
+                    {
+                        label.parent.style.display = DisplayStyle.None;
+                    }
+                }
+            }
+
+            if (_introMessage != null)
+            {
+                int pending = summary.PendingOutboxCount ?? 0;
+                _introMessage.text = pending > 0
+                    ? $"{pending} local progress change{(pending == 1 ? string.Empty : "s")} waiting to sync."
+                    : "Review your saved mission and Quiz Portal activity.";
+            }
         }
 
         public void SetDataState(DataStatePanelState state)
@@ -205,7 +336,19 @@ namespace NutriMind.App.UI
             _root = null;
             _scroll = null;
             _dataStateHost = null;
+            _introMessage = null;
+            _overallPercent = null;
             _overallProgress = null;
+            _overallMissions = null;
+            _overallReviews = null;
+            _overallAreas = null;
+            _subjectRow = null;
+            _termHeading = null;
+            _termRow = null;
+            _missionHeading = null;
+            _missionList = null;
+            _quizMetricLabels.Clear();
+            Summary = null;
             _subjectLiteraQuest = null;
             _subjectPeAndHealth = null;
             _subjectScience = null;
@@ -250,7 +393,20 @@ namespace NutriMind.App.UI
         {
             _scroll = _root.Q<ScrollView>("progress-scroll");
             _dataStateHost = _root.Q<VisualElement>("progress-data-state-host");
+            _introMessage = _root.Q<Label>("progress-intro-message");
+            _overallPercent = _root.Q<Label>("overall-percent");
             _overallProgress = _root.Q<ProgressBar>("overall-progress-bar");
+            _overallMissions = _root.Q<Label>("overall-missions");
+            _overallReviews = _root.Q<Label>("overall-reviews");
+            _overallAreas = _root.Q<Label>("overall-subjects");
+            _subjectRow = _root.Q<VisualElement>("progress-subject-row");
+            _termHeading = _root.Q<Label>("progress-term-heading");
+            _termRow = _root.Q<VisualElement>("progress-term-row");
+            _missionHeading = _root.Q<Label>("progress-mission-heading");
+            _missionList = _root.Q<VisualElement>("progress-mission-list");
+            _quizMetricLabels.Clear();
+            _quizMetricLabels.AddRange(
+                _root.Query<Label>(className: "progress-panel__quiz-metric-label").ToList());
 
             _subjectLiteraQuest = _root.Q<Button>("progress-subject-lq");
             _subjectPeAndHealth = _root.Q<Button>("progress-subject-peh");
@@ -655,6 +811,14 @@ namespace NutriMind.App.UI
             bool showReview = mission.ReviewRequired;
             row.ReviewBadge?.EnableInClassList(ReviewBadgeHiddenClass, !showReview);
             row.ReviewButton?.EnableInClassList(ReviewButtonHiddenClass, !showReview);
+        }
+
+        private static void SetElementDisplay(VisualElement element, DisplayStyle display)
+        {
+            if (element != null)
+            {
+                element.style.display = display;
+            }
         }
 
         private void ShowContent()

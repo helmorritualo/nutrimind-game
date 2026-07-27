@@ -82,10 +82,14 @@ namespace NutriMind.App.UI
             DateTimeOffset? closesAtUtc,
             int maxAttempts,
             int attemptsUsed,
-            QuizListPreviewResultVisibility resultVisibility)
+            QuizListPreviewResultVisibility resultVisibility,
+            string subjectId = null,
+            string termId = null)
         {
             Id = id;
             Title = title;
+            SubjectId = subjectId;
+            TermId = termId;
             Subject = subject;
             Term = term;
             Status = status;
@@ -99,6 +103,8 @@ namespace NutriMind.App.UI
 
         public string Id { get; }
         public string Title { get; }
+        public string SubjectId { get; }
+        public string TermId { get; }
         public NutriMindSubject Subject { get; }
         public NutriMindTerm Term { get; }
         public QuizListPreviewStatus Status { get; }
@@ -805,9 +811,9 @@ namespace NutriMind.App.UI
             }
 
             int visibleCount = 0;
-            for (int i = 0; i < PreviewFixtures.Length && i < _itemShells.Length; i++)
+            for (int i = 0; i < _boundItems.Length && i < _itemShells.Length; i++)
             {
-                bool matches = MatchesFilters(PreviewFixtures[i], filters);
+                bool matches = MatchesFilters(_boundItems[i], filters);
                 _itemShells[i].Row?.EnableInClassList(ItemHiddenClass, !matches);
                 if (matches)
                 {
@@ -916,12 +922,12 @@ namespace NutriMind.App.UI
             }
 
             int index = ResolveItemIndex(button);
-            if (index < 0 || index >= PreviewFixtures.Length)
+            if (index < 0 || index >= _boundItems.Length)
             {
                 return;
             }
 
-            QuizListPreviewItem item = PreviewFixtures[index];
+            QuizListPreviewItem item = _boundItems[index];
             if (item.Status == QuizListPreviewStatus.Completed)
             {
                 QuizResultRequested?.Invoke(item);

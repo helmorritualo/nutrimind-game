@@ -190,7 +190,11 @@ namespace NutriMind.App.Composition
 
                 case AppRouteId.Certificates:
                     BuildCertificates(contentRegion, entry.Context);
-                    UpdateShellChrome("Certificates", AppShellPreviewRoute.Rewards);
+                    UpdateShellChrome(
+                        "Certificates",
+                        entry.Context != null && entry.Context.Origin == AppRouteOrigin.More
+                            ? AppShellPreviewRoute.More
+                            : AppShellPreviewRoute.Rewards);
                     break;
 
                 case AppRouteId.Announcements:

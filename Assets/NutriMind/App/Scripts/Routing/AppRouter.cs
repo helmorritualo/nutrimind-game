@@ -147,6 +147,38 @@ namespace NutriMind.App.Routing
             }
         }
 
+        public async Task ResetQuizPortalToRootAsync(
+            AppRouteContext context = null,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!TryEnterNavigationGate())
+            {
+                return;
+            }
+
+            try
+            {
+                AppRouteContext rootContext = context ?? AppRouteContext.Empty;
+                if (_quizStack.TryGetCurrent(out AppRouteEntry current)
+                    && current.Context != null
+                    && current.Context.ReturnToMainOnQuizBack
+                    && (rootContext == null || !rootContext.ReturnToMainOnQuizBack))
+                {
+                    rootContext = (rootContext ?? AppRouteContext.Empty).WithReturnToMainOnQuizBack(true);
+                }
+
+                _quizStack.Reset(new AppRouteEntry(AppRouteId.QuizList, rootContext));
+                _activeSceneStack = AppSceneId.QuizPortal;
+                await _sceneNavigator.LoadAsync(AppSceneId.QuizPortal, cancellationToken).ConfigureAwait(false);
+                RaiseRouteChanged();
+            }
+            finally
+            {
+                ExitNavigationGate();
+            }
+        }
+
         public async Task HandleUnauthorizedAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -93,15 +93,87 @@ namespace NutriMind.Tests.EditMode
             await router.PushAsync(AppRouteId.QuizDetail);
             Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.QuizDetail));
 
-            InvalidOperationException cross = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await router.PushAsync(AppRouteId.Home));
-            Assert.That(cross.Message, Does.Contain("ReturnToMainAsync"));
-
             await router.ReturnToMainAsync();
             Assert.That(router.ActiveSceneStack, Is.EqualTo(AppSceneId.Main));
             Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.Progress));
             Assert.That(navigator.CurrentScene, Is.EqualTo(AppSceneId.Main));
             Assert.That(router.MainReturnRoute.HasValue, Is.False);
+        }
+
+        [Test]
+        public async Task AppRouter_MainRouteFromQuizPortal_LoadsRequestedMainRoute()
+        {
+            var navigator = new FakeAppSceneNavigator();
+            var router = new AppRouter(navigator);
+
+            await router.NavigateAsync(AppRouteId.Progress);
+            await router.EnterQuizPortalAsync();
+            await router.PushAsync(AppRouteId.QuizDetail);
+
+            await router.PushAsync(AppRouteId.Home);
+            Assert.That(router.ActiveSceneStack, Is.EqualTo(AppSceneId.Main));
+            Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.Home));
+            Assert.That(navigator.CurrentScene, Is.EqualTo(AppSceneId.Main));
+        }
+
+        [Test]
+        public async Task AppRouter_ResetQuizPortalToRoot_ClearsStackToSingleQuizList()
+        {
+            var navigator = new FakeAppSceneNavigator();
+            var router = new AppRouter(navigator);
+
+            await router.NavigateAsync(AppRouteId.Home);
+            await router.EnterQuizPortalAsync(
+                AppRouteContext.Empty.WithReturnToMainOnQuizBack(true));
+            await router.PushAsync(
+                AppRouteId.QuizDetail,
+                AppRouteContext.ForQuiz("quiz-a", "sci", "t1"));
+            await router.PushAsync(
+                AppRouteId.QuizAttempt,
+                AppRouteContext.ForQuizAttempt("quiz-a", null, "sci", "t1"));
+            await router.PushAsync(
+                AppRouteId.QuizResult,
+                AppRouteContext.ForQuizResult("attempt-1", "quiz-a", "sci", "t1"));
+
+            await router.ResetQuizPortalToRootAsync(
+                AppRouteContext.Empty.WithReturnToMainOnQuizBack(true));
+
+            Assert.That(router.ActiveSceneStack, Is.EqualTo(AppSceneId.QuizPortal));
+            Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.QuizList));
+            Assert.That(router.MainReturnRoute.HasValue, Is.True);
+            Assert.That(router.MainReturnRoute.Value.RouteId, Is.EqualTo(AppRouteId.Home));
+
+            await router.BackAsync();
+            Assert.That(router.ActiveSceneStack, Is.EqualTo(AppSceneId.Main));
+            Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.Home));
+        }
+
+        [Test]
+        public void QuizRouteKey_SameRouteDifferentContext_AreNotEqual()
+        {
+            var a = QuizRouteKey.FromEntry(new AppRouteEntry(
+                AppRouteId.QuizDetail,
+                AppRouteContext.ForQuiz("quiz-a")));
+            var b = QuizRouteKey.FromEntry(new AppRouteEntry(
+                AppRouteId.QuizDetail,
+                AppRouteContext.ForQuiz("quiz-b")));
+            var duplicate = QuizRouteKey.FromEntry(new AppRouteEntry(
+                AppRouteId.QuizDetail,
+                AppRouteContext.ForQuiz("quiz-a")));
+
+            Assert.That(a.Equals(b), Is.False);
+            Assert.That(a.Equals(duplicate), Is.True);
+        }
+
+        [Test]
+        public void AppRouteContext_CertificateOrigin_IsPreserved()
+        {
+            AppRouteContext rewards = AppRouteContext.ForCertificate(null, AppRouteOrigin.Rewards);
+            AppRouteContext more = AppRouteContext.Empty.WithOrigin(AppRouteOrigin.More);
+
+            Assert.That(rewards.Origin, Is.EqualTo(AppRouteOrigin.Rewards));
+            Assert.That(more.Origin, Is.EqualTo(AppRouteOrigin.More));
+            Assert.That(rewards.WithReturnToMainOnQuizBack(true).Origin, Is.EqualTo(AppRouteOrigin.Rewards));
         }
 
         [Test]

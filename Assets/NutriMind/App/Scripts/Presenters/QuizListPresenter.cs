@@ -20,12 +20,17 @@ namespace NutriMind.App.Presentation
     public sealed class QuizListPresenter : RoutePresenterBase
     {
         private readonly QuizListPanelView _view;
+        private readonly AppRouteContext _ctx;
         private QuizListPreviewItem[] _cachedItems;
 
-        public QuizListPresenter(AppLifetime lifetime, QuizListPanelView view)
+        public QuizListPresenter(
+            AppLifetime lifetime,
+            QuizListPanelView view,
+            AppRouteContext ctx = null)
             : base(lifetime)
         {
             _view = view;
+            _ctx = ctx ?? AppRouteContext.Empty;
             _view.QuizDetailsRequested += OnQuizSelected;
             _view.QuizResultRequested += OnQuizHistoryRequested;
             _view.RetryRequested += OnRetry;
@@ -97,7 +102,8 @@ namespace NutriMind.App.Presentation
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizDetail,
-                    AppRouteContext.ForQuiz(item.Id, item.Subject.ToString(), item.Term.ToString()),
+                    AppRouteContext.ForQuiz(item.Id, item.SubjectId, item.TermId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
                     NavigationToken),
                 NavigationToken,
                 "QuizList.Detail");
@@ -113,7 +119,8 @@ namespace NutriMind.App.Presentation
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizHistory,
-                    AppRouteContext.ForQuiz(item.Id),
+                    AppRouteContext.ForQuiz(item.Id, item.SubjectId, item.TermId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
                     NavigationToken),
                 NavigationToken,
                 "QuizList.History");

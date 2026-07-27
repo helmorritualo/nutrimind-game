@@ -7,12 +7,31 @@ using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
+using NutriMind.Core.Persistence;
 using NutriMind.Core.Sync;
 using NutriMind.Core.Utilities;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NutriMind.App.Presentation
 {
+    public readonly struct SyncQueueSnapshot
+    {
+        public SyncQueueSnapshot(int pending, int deferred, int sending, int rejected)
+        {
+            Pending = Math.Max(0, pending);
+            Deferred = Math.Max(0, deferred);
+            Sending = Math.Max(0, sending);
+            Rejected = Math.Max(0, rejected);
+        }
+
+        public int Pending { get; }
+        public int Deferred { get; }
+        public int Sending { get; }
+        public int Rejected { get; }
+        public int AttentionCount => Pending + Deferred;
+    }
+
     /// <summary>
     /// Runtime wrapper for <see cref="AppShellController"/>.
     /// Bridges shell navigation events to <see cref="IAppRouter"/>, observes
@@ -33,6 +52,11 @@ namespace NutriMind.App.Presentation
         private readonly CancellationToken _lifetimeToken;
 
         private VisualElement _moreHubRoot;
+        private Button _firstMoreDestination;
+        private Button _moreCloseButton;
+        private VisualElement _moreFocusRestoreTarget;
+        private bool _bannerDismissed;
+        private bool _syncUiInFlight;
         private bool _disposed;
 
         public AppShellRuntimeController(
@@ -57,6 +81,7 @@ namespace NutriMind.App.Presentation
             Subscribe();
             RefreshBadges();
             RefreshConnection();
+            RefreshSyncPresentation();
         }
 
         /// <summary>
@@ -65,13 +90,12 @@ namespace NutriMind.App.Presentation
         /// </summary>
         public event Action SignOutConfirmed;
 
-        /// <summary>
-        /// Raised when the manual sync banner action is tapped.
-        /// Owner triggers <see cref="SyncCoordinator.PushPendingAsync"/>.
-        /// </summary>
-        public event Action ManualSyncRequested;
-
         public AppModalHost ModalHost => _modalHost;
+
+        public bool IsMoreHubVisible =>
+            _moreHubRoot != null
+            && _moreHubRoot.style.display != DisplayStyle.None
+            && _moreHubRoot.pickingMode == PickingMode.Position;
 
         public void Dispose()
         {
@@ -81,8 +105,9 @@ namespace NutriMind.App.Presentation
             }
 
             _disposed = true;
-            HideMoreHub();
+            HideMoreHub(restoreFocus: false);
             Unsubscribe();
+            DisposeMoreHub();
             _modalHost?.Dispose();
         }
 
@@ -106,7 +131,7 @@ namespace NutriMind.App.Presentation
         /// </summary>
         public void RefreshConnection()
         {
-            if (_shell == null || _connectivity == null)
+            if (_disposed || _shell == null || _connectivity == null)
             {
                 return;
             }
@@ -119,24 +144,49 @@ namespace NutriMind.App.Presentation
         }
 
         /// <summary>
+        /// Recounts unresolved outbox rows and applies the runtime sync presentation.
+        /// Repository failures are contained and shown as a recoverable sync error.
+        /// </summary>
+        public void RefreshSyncPresentation()
+        {
+            if (_disposed || _shell == null)
+            {
+                return;
+            }
+
+            if (_connectivity != null && !_connectivity.IsOnline)
+            {
+                _shell.SetConnectionPreview(AppShellConnectionPreview.Offline);
+                return;
+            }
+
+            if (!TryReadSyncQueueSnapshot(out SyncQueueSnapshot snapshot))
+            {
+                ApplySyncErrorPresentation();
+                return;
+            }
+
+            ApplyOnlineSyncPresentation(snapshot);
+        }
+
+        /// <summary>
         /// Shows the sync-pending banner with the current pending outbox count.
         /// </summary>
         public void ShowSyncPendingBanner(int pendingCount)
         {
-            if (_shell == null)
+            if (_disposed || _shell == null)
             {
                 return;
             }
 
             if (pendingCount > 0)
             {
-                _shell.ShowOfflineSyncBanner(OfflineSyncBannerPresets.SyncPending(pendingCount));
-                _shell.SetConnectionPreview(AppShellConnectionPreview.SyncPending);
+                _bannerDismissed = false;
+                _shell.SetSyncPending(pendingCount);
             }
             else
             {
-                _shell.HideOfflineSyncBanner();
-                RefreshConnection();
+                RefreshSyncPresentation();
             }
         }
 
@@ -145,7 +195,12 @@ namespace NutriMind.App.Presentation
         /// </summary>
         public void ShowSyncErrorBanner()
         {
-            _shell?.ShowOfflineSyncBanner(OfflineSyncBannerPresets.SyncError());
+            if (_disposed)
+            {
+                return;
+            }
+
+            _bannerDismissed = false;
             _shell?.SetConnectionPreview(AppShellConnectionPreview.SyncError);
         }
 
@@ -245,11 +300,23 @@ namespace NutriMind.App.Presentation
                 _shell.PreviewRouteRequested += OnPreviewRouteRequested;
                 _shell.ProfileRequested += OnProfileRequested;
                 _shell.NotificationsRequested += OnNotificationsRequested;
+                _shell.OfflineSyncActionRequested += OnOfflineSyncActionRequested;
+                _shell.OfflineSyncDismissed += OnOfflineSyncDismissed;
             }
 
             if (_studentState != null)
             {
                 _studentState.Changed += OnStudentStateChanged;
+            }
+
+            if (_connectivity != null)
+            {
+                _connectivity.StateChanged += OnConnectivityStateChanged;
+            }
+
+            if (_lifetime?.LocalProgressWriter != null)
+            {
+                _lifetime.LocalProgressWriter.LocalStateChanged += OnLocalStateChanged;
             }
         }
 
@@ -260,17 +327,245 @@ namespace NutriMind.App.Presentation
                 _shell.PreviewRouteRequested -= OnPreviewRouteRequested;
                 _shell.ProfileRequested -= OnProfileRequested;
                 _shell.NotificationsRequested -= OnNotificationsRequested;
+                _shell.OfflineSyncActionRequested -= OnOfflineSyncActionRequested;
+                _shell.OfflineSyncDismissed -= OnOfflineSyncDismissed;
             }
 
             if (_studentState != null)
             {
                 _studentState.Changed -= OnStudentStateChanged;
             }
+
+            if (_connectivity != null)
+            {
+                _connectivity.StateChanged -= OnConnectivityStateChanged;
+            }
+
+            if (_lifetime?.LocalProgressWriter != null)
+            {
+                _lifetime.LocalProgressWriter.LocalStateChanged -= OnLocalStateChanged;
+            }
         }
 
         private void OnStudentStateChanged()
         {
             RefreshBadges();
+        }
+
+        private void OnConnectivityStateChanged(ConnectivityState state)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _bannerDismissed = false;
+            RefreshConnection();
+            RefreshSyncPresentation();
+        }
+
+        private void OnLocalStateChanged()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _bannerDismissed = false;
+            RefreshSyncPresentation();
+        }
+
+        private async void OnOfflineSyncActionRequested()
+        {
+            if (_disposed || _syncUiInFlight)
+            {
+                return;
+            }
+
+            if (_connectivity != null && !_connectivity.IsOnline)
+            {
+                ShowToast(
+                    "You are offline. Saved progress will sync after you reconnect.",
+                    AppShellToastTone.Warning);
+                return;
+            }
+
+            if (_syncCoordinator == null)
+            {
+                ApplySyncErrorPresentation();
+                return;
+            }
+
+            _syncUiInFlight = true;
+            _bannerDismissed = false;
+            _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
+
+            try
+            {
+                AppResult<SyncPushResult> result = await _syncCoordinator.PushPendingAsync(
+                    _lifetime?.LastClientConfiguration,
+                    _lifetimeToken);
+
+                if (_disposed)
+                {
+                    return;
+                }
+
+                if (result.IsSuccess)
+                {
+                    RefreshSyncPresentation();
+                    return;
+                }
+
+                AppError error = result.Error;
+                if (error != null && error.Code == AppErrorCodes.SyncInProgress)
+                {
+                    _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
+                    return;
+                }
+
+                if (IsNetworkFailure(error))
+                {
+                    if (_connectivity != null && !_connectivity.IsOnline)
+                    {
+                        _shell?.SetConnectionPreview(AppShellConnectionPreview.Offline);
+                    }
+                    else
+                    {
+                        RefreshSyncPresentation();
+                    }
+
+                    return;
+                }
+
+                ApplySyncErrorPresentation();
+            }
+            catch (OperationCanceledException)
+            {
+                if (!_disposed && !_lifetimeToken.IsCancellationRequested)
+                {
+                    RefreshSyncPresentation();
+                }
+            }
+            catch (Exception exception)
+            {
+                NutriMindLog.RuntimeError(
+                    "Manual sync callback failed: " + exception.GetType().Name);
+                if (!_disposed)
+                {
+                    ApplySyncErrorPresentation();
+                }
+            }
+            finally
+            {
+                _syncUiInFlight = false;
+            }
+        }
+
+        private void OnOfflineSyncDismissed()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _bannerDismissed = true;
+            _shell?.HideOfflineSyncBanner();
+        }
+
+        private bool TryReadSyncQueueSnapshot(out SyncQueueSnapshot snapshot)
+        {
+            snapshot = default;
+            IOutboxRepository repository = _lifetime?.OutboxRepository;
+            if (repository == null)
+            {
+                return true;
+            }
+
+            try
+            {
+                if (!TryCountOutboxState(repository, OutboxEventState.Pending, out int pending)
+                    || !TryCountOutboxState(repository, OutboxEventState.Deferred, out int deferred)
+                    || !TryCountOutboxState(repository, OutboxEventState.Sending, out int sending)
+                    || !TryCountOutboxState(repository, OutboxEventState.Rejected, out int rejected))
+                {
+                    return false;
+                }
+
+                snapshot = new SyncQueueSnapshot(pending, deferred, sending, rejected);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                NutriMindLog.SqliteWarning(
+                    "Failed to count sync queue states: " + exception.GetType().Name);
+                return false;
+            }
+        }
+
+        private static bool TryCountOutboxState(
+            IOutboxRepository repository,
+            string state,
+            out int count)
+        {
+            count = 0;
+            AppResult<int> result = repository.CountByStates(state);
+            if (result.IsFailure)
+            {
+                NutriMindLog.SqliteWarning(
+                    "Failed to count outbox state " + state + ": "
+                    + (result.Error?.Code ?? AppErrorCodes.ClientInternalError));
+                return false;
+            }
+
+            count = Math.Max(0, result.Value);
+            return true;
+        }
+
+        private void ApplyOnlineSyncPresentation(SyncQueueSnapshot snapshot)
+        {
+            if (snapshot.AttentionCount > 0)
+            {
+                _shell?.SetSyncPending(snapshot.AttentionCount);
+                HideDismissedBannerIfNeeded();
+                return;
+            }
+
+            if (snapshot.Sending > 0)
+            {
+                _shell?.SetConnectionPreview(AppShellConnectionPreview.Syncing);
+                return;
+            }
+
+            if (snapshot.Rejected > 0)
+            {
+                ApplySyncErrorPresentation();
+                return;
+            }
+
+            _shell?.SetConnectionPreview(AppShellConnectionPreview.Online);
+        }
+
+        private void ApplySyncErrorPresentation()
+        {
+            _shell?.SetConnectionPreview(AppShellConnectionPreview.SyncError);
+            HideDismissedBannerIfNeeded();
+        }
+
+        private void HideDismissedBannerIfNeeded()
+        {
+            if (_bannerDismissed)
+            {
+                _shell?.HideOfflineSyncBanner();
+            }
+        }
+
+        private static bool IsNetworkFailure(AppError error)
+        {
+            return error != null
+                && (error.IsNetworkError
+                    || error.Code == AppErrorCodes.NetworkOffline
+                    || error.Code == AppErrorCodes.NetworkTimeout);
         }
 
         private void OnPreviewRouteRequested(AppShellPreviewRoute route)
@@ -396,6 +691,11 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            if (_modalHost != null && _modalHost.IsModalVisible)
+            {
+                return;
+            }
+
             VisualElement modalLayer = _shell.GetModalLayer();
             if (modalLayer == null)
             {
@@ -403,20 +703,39 @@ namespace NutriMind.App.Presentation
             }
 
             _shell.SetPreviewRoute(AppShellPreviewRoute.More);
+            _moreFocusRestoreTarget = _shell.GetMoreNavButton();
             EnsureMoreHub(modalLayer);
             _moreHubRoot.pickingMode = PickingMode.Position;
             _moreHubRoot.style.display = DisplayStyle.Flex;
             modalLayer.pickingMode = PickingMode.Position;
             modalLayer.EnableInClassList("app-shell__modal-layer--empty", false);
+            (_firstMoreDestination ?? _moreCloseButton)?.Focus();
         }
 
         private void HideMoreHub()
         {
+            HideMoreHub(restoreFocus: true);
+        }
+
+        private void HideMoreHub(bool restoreFocus)
+        {
+            bool wasVisible = IsMoreHubVisible;
             if (_moreHubRoot != null)
             {
                 _moreHubRoot.style.display = DisplayStyle.None;
                 _moreHubRoot.pickingMode = PickingMode.Ignore;
             }
+
+            if (restoreFocus && wasVisible)
+            {
+                VisualElement focusTarget = _moreFocusRestoreTarget ?? _shell?.GetMoreNavButton();
+                if (focusTarget != null && focusTarget.panel != null)
+                {
+                    focusTarget.Focus();
+                }
+            }
+
+            _moreFocusRestoreTarget = null;
 
             if (_modalHost != null && _modalHost.IsModalVisible)
             {
@@ -452,6 +771,10 @@ namespace NutriMind.App.Presentation
             _moreHubRoot.style.height = Length.Percent(100);
             _moreHubRoot.style.display = DisplayStyle.None;
             _moreHubRoot.pickingMode = PickingMode.Ignore;
+            _moreHubRoot.RegisterCallback<KeyDownEvent>(
+                OnMoreHubKeyDown,
+                TrickleDown.TrickleDown);
+            _moreHubRoot.RegisterCallback<NavigationCancelEvent>(OnMoreHubNavigationCancel);
 
             var backdrop = new VisualElement();
             backdrop.AddToClassList("app-shell__more-hub-backdrop");
@@ -502,11 +825,11 @@ namespace NutriMind.App.Presentation
             AddMoreDestination(list, "Leaderboard", "ds-icon--leaderboard", AppRouteId.Leaderboard);
             card.Add(list);
 
-            var closeButton = new Button(() => HideMoreHub()) { text = "Close" };
-            closeButton.AddToClassList("ds-btn");
-            closeButton.AddToClassList("ds-btn--secondary");
-            closeButton.AddToClassList("app-shell__more-hub-close");
-            card.Add(closeButton);
+            _moreCloseButton = new Button(() => HideMoreHub()) { text = "Close" };
+            _moreCloseButton.AddToClassList("ds-btn");
+            _moreCloseButton.AddToClassList("ds-btn--secondary");
+            _moreCloseButton.AddToClassList("app-shell__more-hub-close");
+            card.Add(_moreCloseButton);
 
             _moreHubRoot.Add(card);
             modalLayer.Add(_moreHubRoot);
@@ -520,6 +843,10 @@ namespace NutriMind.App.Presentation
         {
             var button = new Button(() => OnMoreDestinationSelected(routeId));
             button.AddToClassList("app-shell__more-hub-item");
+            if (_firstMoreDestination == null)
+            {
+                _firstMoreDestination = button;
+            }
 
             var iconBg = new VisualElement();
             iconBg.AddToClassList("app-shell__more-hub-item-icon-bg");
@@ -552,10 +879,53 @@ namespace NutriMind.App.Presentation
         {
             HideMoreHub();
             _shell?.SetPreviewRoute(AppShellPreviewRoute.More);
+            AppRouteContext context = routeId == AppRouteId.Certificates
+                ? AppRouteContext.ForCertificate(null, AppRouteOrigin.More)
+                : AppRouteContext.Empty.WithOrigin(AppRouteOrigin.More);
             TaskUtilities.ForgetSafely(
-                _router.PushAsync(routeId, AppRouteContext.Empty, _lifetimeToken),
+                _router.PushAsync(routeId, context, _lifetimeToken),
                 _lifetimeToken,
                 "Shell.More." + routeId);
+        }
+
+        private void OnMoreHubKeyDown(KeyDownEvent evt)
+        {
+            if (!IsMoreHubVisible || evt.keyCode != KeyCode.Escape)
+            {
+                return;
+            }
+
+            evt.StopPropagation();
+            HideMoreHub();
+        }
+
+        private void OnMoreHubNavigationCancel(NavigationCancelEvent evt)
+        {
+            if (!IsMoreHubVisible)
+            {
+                return;
+            }
+
+            evt.StopPropagation();
+            HideMoreHub();
+        }
+
+        private void DisposeMoreHub()
+        {
+            if (_moreHubRoot != null)
+            {
+                _moreHubRoot.UnregisterCallback<KeyDownEvent>(
+                    OnMoreHubKeyDown,
+                    TrickleDown.TrickleDown);
+                _moreHubRoot.UnregisterCallback<NavigationCancelEvent>(
+                    OnMoreHubNavigationCancel);
+                _moreHubRoot.RemoveFromHierarchy();
+            }
+
+            _moreHubRoot = null;
+            _firstMoreDestination = null;
+            _moreCloseButton = null;
+            _moreFocusRestoreTarget = null;
         }
 
         private static AppRouteId MapPreviewRouteToRouteId(AppShellPreviewRoute route)

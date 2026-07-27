@@ -26,7 +26,7 @@ namespace NutriMind.App.Presentation
             : base(lifetime)
         {
             _view = view;
-            _ctx = ctx;
+            _ctx = ctx ?? AppRouteContext.Empty;
             _view.ViewResultRequested += OnViewResultRequested;
             _view.BackToQuizPortalRequested += OnBack;
             _view.RetryRequested += OnRetry;
@@ -39,7 +39,10 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "QuizHistory.Load");
+            TaskUtilities.ForgetSafely(
+                FetchAsync(RequestToken),
+                RequestToken,
+                "QuizHistory.Load");
         }
 
         protected override void OnDispose()
@@ -116,13 +119,24 @@ namespace NutriMind.App.Presentation
             }
 
             string quizId = selection.Summary.Id;
+            string subjectId = !string.IsNullOrWhiteSpace(selection.Summary.SubjectId)
+                ? selection.Summary.SubjectId
+                : _ctx.SubjectId;
+            string termId = !string.IsNullOrWhiteSpace(selection.Summary.TermId)
+                ? selection.Summary.TermId
+                : _ctx.TermId;
 
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizResult,
-                    AppRouteContext.ForQuizResult(selection.AttemptId, quizId),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForQuizResult(
+                            selection.AttemptId,
+                            quizId,
+                            subjectId,
+                            termId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
+                    NavigationToken),
+                NavigationToken,
                 "QuizHistory.ViewResult");
         }
 
@@ -134,8 +148,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "QuizHistory.Back");
         }
 
@@ -146,7 +160,10 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "QuizHistory.Retry");
+            TaskUtilities.ForgetSafely(
+                FetchAsync(RequestToken),
+                RequestToken,
+                "QuizHistory.Retry");
         }
     }
 }

@@ -21,12 +21,18 @@ namespace NutriMind.App.Presentation
     {
         private readonly QuizResultPanelView _view;
         private readonly AppRouteContext _ctx;
+        private string _resolvedQuizId;
+        private string _resolvedSubjectId;
+        private string _resolvedTermId;
 
         public QuizResultPresenter(AppLifetime lifetime, QuizResultPanelView view, AppRouteContext ctx)
             : base(lifetime)
         {
             _view = view;
-            _ctx = ctx;
+            _ctx = ctx ?? AppRouteContext.Empty;
+            _resolvedQuizId = _ctx.QuizId;
+            _resolvedSubjectId = _ctx.SubjectId;
+            _resolvedTermId = _ctx.TermId;
             _view.BackToQuizPortalRequested += OnBack;
             _view.ViewHistoryRequested += OnViewHistory;
             _view.RetryRequested += OnTryAgain;
@@ -39,7 +45,10 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "QuizResult.Load");
+            TaskUtilities.ForgetSafely(
+                FetchAsync(RequestToken),
+                RequestToken,
+                "QuizResult.Load");
         }
 
         protected override void OnDispose()
@@ -98,6 +107,13 @@ namespace NutriMind.App.Presentation
                 ? AppViewMappers.MapQuizDetail(detailResult.Value)
                 : null;
 
+            _resolvedQuizId = result.Value.QuizId ?? _ctx.QuizId;
+            if (detailResult.IsSuccess)
+            {
+                _resolvedSubjectId = detailResult.Value.SubjectId;
+                _resolvedTermId = detailResult.Value.TermId;
+            }
+
             QuizResultPreviewContent previewResult = AppViewMappers.MapQuizResult(result.Value);
 
             _view.SetResultContext(summary, detail, previewResult);
@@ -110,9 +126,16 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            AppRouteContext rootContext = AppRouteContext.ForQuiz(
+                    null,
+                    _resolvedSubjectId,
+                    _resolvedTermId)
+                .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack);
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.NavigateAsync(AppRouteId.QuizList, AppRouteContext.Empty, Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.ResetQuizPortalToRootAsync(
+                    rootContext,
+                    NavigationToken),
+                NavigationToken,
                 "QuizResult.Back");
         }
 
@@ -126,9 +149,13 @@ namespace NutriMind.App.Presentation
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.QuizAttempt,
-                    AppRouteContext.ForQuiz(_ctx.QuizId),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForQuiz(
+                            _resolvedQuizId,
+                            _resolvedSubjectId,
+                            _resolvedTermId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
+                    NavigationToken),
+                NavigationToken,
                 "QuizResult.TryAgain");
         }
 
@@ -142,9 +169,13 @@ namespace NutriMind.App.Presentation
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.PushAsync(
                     AppRouteId.QuizHistory,
-                    AppRouteContext.ForQuiz(_ctx.QuizId, _ctx.SubjectId, _ctx.TermId),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForQuiz(
+                            _resolvedQuizId,
+                            _resolvedSubjectId,
+                            _resolvedTermId)
+                        .WithReturnToMainOnQuizBack(_ctx.ReturnToMainOnQuizBack),
+                    NavigationToken),
+                NavigationToken,
                 "QuizResult.History");
         }
     }

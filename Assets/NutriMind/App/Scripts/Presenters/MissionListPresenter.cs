@@ -13,14 +13,14 @@ namespace NutriMind.App.Presentation
 {
     /// <summary>
     /// Runtime presenter for Mission List.
-    /// Uses SetContext + existing selection events. Preview catalog provides card visuals;
-    /// navigation uses stable mission IDs from MissionPreviewSelection.
+    /// Binds gateway or bootstrap-cached missions and routes using stable mission IDs.
     /// </summary>
     public sealed class MissionListPresenter : RoutePresenterBase
     {
         private readonly MissionSelectionPanelView _view;
         private readonly AppRouteContext _ctx;
-        private IReadOnlyList<MissionSummary> _serverMissions;
+        private readonly Dictionary<string, MissionSummary> _missionMap =
+            new(StringComparer.Ordinal);
 
         public MissionListPresenter(AppLifetime lifetime, MissionSelectionPanelView view, AppRouteContext ctx)
             : base(lifetime)
@@ -45,7 +45,7 @@ namespace NutriMind.App.Presentation
             NutriMindSubject subject = AppViewMappers.MapSubject(_ctx?.SubjectId);
             NutriMindTerm term = AppViewMappers.MapTerm(_ctx?.TermId);
             _view.SetContext(subject, term);
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "MissionList.Load");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "MissionList.Load");
         }
 
         protected override void OnDispose()
@@ -60,6 +60,8 @@ namespace NutriMind.App.Presentation
 
         private async Task FetchAsync(CancellationToken token)
         {
+            _view.SetItems(Array.Empty<MissionPreviewItem>());
+            _view.SetDataState(DataStatePanelState.Loading);
             var request = new GetMissionsRequest
             {
                 SubjectId = _ctx?.SubjectId,
@@ -76,14 +78,40 @@ namespace NutriMind.App.Presentation
 
             if (result.IsSuccess)
             {
-                _serverMissions = result.Value ?? Array.Empty<MissionSummary>();
+                IReadOnlyList<MissionSummary> missions =
+                    result.Value ?? Array.Empty<MissionSummary>();
+                BindMissions(
+                    missions,
+                    missions.Count == 0
+                        ? DataStatePanelState.Empty
+                        : DataStatePanelState.Content);
                 return;
             }
 
             if (IsUnauthorized(result.Error))
             {
                 HandleUnauthorized();
+                return;
             }
+
+            if (IsOffline(result.Error))
+            {
+                IReadOnlyList<MissionSummary> cached = GetCachedMissions();
+                if (cached.Count > 0)
+                {
+                    BindMissions(cached, DataStatePanelState.OfflineCached);
+                }
+                else
+                {
+                    BindMissions(Array.Empty<MissionSummary>(), DataStatePanelState.OfflineUnavailable);
+                }
+
+                return;
+            }
+
+            BindMissions(
+                Array.Empty<MissionSummary>(),
+                AppViewMappers.ErrorToDataState(result.Error));
         }
 
         private void OnMissionSelected(MissionPreviewSelection selection)
@@ -104,12 +132,20 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            if (!_missionMap.TryGetValue(selection.MissionId, out MissionSummary mission))
+            {
+                return;
+            }
+
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.MissionDetail,
-                    AppRouteContext.ForMission(selection.MissionId, _ctx?.SubjectId, _ctx?.TermId),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForMission(
+                        mission.Id,
+                        mission.SubjectId ?? _ctx?.SubjectId,
+                        mission.TermId ?? _ctx?.TermId),
+                    NavigationToken),
+                NavigationToken,
                 "MissionList.Detail");
         }
 
@@ -120,16 +156,23 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            string reason = !string.IsNullOrWhiteSpace(selection.LockReason)
-                ? selection.LockReason
+            _missionMap.TryGetValue(selection.MissionId, out MissionSummary mission);
+            string reason = !string.IsNullOrWhiteSpace(mission?.LockedReason)
+                ? mission.LockedReason
+                : !string.IsNullOrWhiteSpace(selection.LockReason)
+                    ? selection.LockReason
                 : "teacher";
 
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.LockedMission,
-                    AppRouteContext.ForLockedMission(selection.MissionId, reason),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForLockedMission(
+                        selection.MissionId,
+                        reason,
+                        mission?.SubjectId ?? _ctx?.SubjectId,
+                        mission?.TermId ?? _ctx?.TermId),
+                    NavigationToken),
+                NavigationToken,
                 "MissionList.Locked");
         }
 
@@ -141,9 +184,80 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "MissionList.Back");
+        }
+
+        private void BindMissions(
+            IReadOnlyList<MissionSummary> missions,
+            DataStatePanelState state)
+        {
+            _missionMap.Clear();
+            if (missions != null)
+            {
+                for (int i = 0; i < missions.Count; i++)
+                {
+                    MissionSummary mission = missions[i];
+                    if (mission == null || string.IsNullOrWhiteSpace(mission.Id))
+                    {
+                        continue;
+                    }
+
+                    _missionMap[mission.Id] = mission;
+                }
+            }
+
+            var valid = new List<MissionSummary>(_missionMap.Values);
+            MissionPreviewItem[] items = AppViewMappers.MapMissionSummaries(
+                valid,
+                AppViewMappers.MapSubject(_ctx?.SubjectId),
+                AppViewMappers.MapTerm(_ctx?.TermId));
+            _view.SetItems(items);
+            _view.SetDataState(items.Length == 0 && state == DataStatePanelState.Content
+                ? DataStatePanelState.Empty
+                : state);
+        }
+
+        private IReadOnlyList<MissionSummary> GetCachedMissions()
+        {
+            if (_missionMap.Count > 0)
+            {
+                return new List<MissionSummary>(_missionMap.Values);
+            }
+
+            IReadOnlyList<MissionSummary> bootstrap = Lifetime.LastBootstrap?.Missions;
+            if (bootstrap == null || bootstrap.Count == 0)
+            {
+                return Array.Empty<MissionSummary>();
+            }
+
+            var matches = new List<MissionSummary>();
+            for (int i = 0; i < bootstrap.Count; i++)
+            {
+                MissionSummary mission = bootstrap[i];
+                if (mission != null && MatchesContext(mission))
+                {
+                    matches.Add(mission);
+                }
+            }
+
+            return matches;
+        }
+
+        private bool MatchesContext(MissionSummary mission)
+        {
+            bool subjectMatches = string.IsNullOrWhiteSpace(_ctx?.SubjectId)
+                || string.Equals(mission.SubjectId, _ctx.SubjectId, StringComparison.OrdinalIgnoreCase)
+                || (AppViewMappers.TryMapSubject(mission.SubjectId, out NutriMindSubject missionSubject)
+                    && AppViewMappers.TryMapSubject(_ctx.SubjectId, out NutriMindSubject routeSubject)
+                    && missionSubject == routeSubject);
+            bool termMatches = string.IsNullOrWhiteSpace(_ctx?.TermId)
+                || string.Equals(mission.TermId, _ctx.TermId, StringComparison.OrdinalIgnoreCase)
+                || (AppViewMappers.TryMapTerm(mission.TermId, out NutriMindTerm missionTerm)
+                    && AppViewMappers.TryMapTerm(_ctx.TermId, out NutriMindTerm routeTerm)
+                    && missionTerm == routeTerm);
+            return subjectMatches && termMatches;
         }
     }
 }

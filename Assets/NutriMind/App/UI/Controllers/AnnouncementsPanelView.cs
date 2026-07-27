@@ -14,7 +14,8 @@ namespace NutriMind.App.UI
         Loading = 1,
         Empty = 2,
         OfflineCached = 3,
-        RecoverableError = 4
+        RecoverableError = 4,
+        OfflineUnavailable = 5
     }
 
     /// <summary>
@@ -338,6 +339,25 @@ namespace NutriMind.App.UI
         public int UnreadCount =>
             AnnouncementsPreviewCatalog.CountUnread(_loadedItems, _readPresentationIds);
 
+        public bool IsPresentationUnread(string presentationId)
+        {
+            if (!IsBound || string.IsNullOrWhiteSpace(presentationId))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _loadedItems.Count; i++)
+            {
+                AnnouncementPreviewItem item = _loadedItems[i];
+                if (string.Equals(item.PresentationId, presentationId, StringComparison.Ordinal))
+                {
+                    return IsUnread(item);
+                }
+            }
+
+            return false;
+        }
+
         public AnnouncementPreviewItem SelectedItem
         {
             get
@@ -534,6 +554,12 @@ namespace NutriMind.App.UI
                 case AnnouncementsPreviewState.RecoverableError:
                     HideContent();
                     _dataStateView.SetState(DataStatePanelState.RecoverableError);
+                    ApplyRouteDataStateCopy(state);
+                    break;
+
+                case AnnouncementsPreviewState.OfflineUnavailable:
+                    HideContent();
+                    _dataStateView.SetState(DataStatePanelState.OfflineUnavailable);
                     ApplyRouteDataStateCopy(state);
                     break;
             }
@@ -1407,6 +1433,17 @@ namespace NutriMind.App.UI
                             "Try Again",
                             "Back"));
                     break;
+
+                case AnnouncementsPreviewState.OfflineUnavailable:
+                    _dataStateView.Configure(
+                        new DataStatePanelConfiguration(
+                            "Announcements are unavailable offline",
+                            "This screen does not have a saved announcement cache.",
+                            "Reconnect to load current classroom announcements. Local read state was not changed.",
+                            "ds-icon--wifi",
+                            "Try Again",
+                            "Back"));
+                    break;
             }
         }
 
@@ -1416,7 +1453,8 @@ namespace NutriMind.App.UI
             {
                 BackRequested?.Invoke();
             }
-            else if (PreviewState == AnnouncementsPreviewState.RecoverableError)
+            else if (PreviewState == AnnouncementsPreviewState.RecoverableError
+                || PreviewState == AnnouncementsPreviewState.OfflineUnavailable)
             {
                 RetryRequested?.Invoke();
             }
@@ -1424,7 +1462,8 @@ namespace NutriMind.App.UI
 
         private void OnDataStateSecondaryAction()
         {
-            if (PreviewState == AnnouncementsPreviewState.RecoverableError)
+            if (PreviewState == AnnouncementsPreviewState.RecoverableError
+                || PreviewState == AnnouncementsPreviewState.OfflineUnavailable)
             {
                 BackRequested?.Invoke();
             }

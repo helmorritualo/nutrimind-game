@@ -27,6 +27,7 @@ namespace NutriMind.App.UI
         Online,
         Offline,
         SyncPending,
+        Syncing,
         SyncError
     }
 
@@ -153,6 +154,9 @@ namespace NutriMind.App.UI
         private TemplateContainer _offlineSyncBannerInstance;
         private OfflineSyncBannerView _offlineSyncBannerView;
         private bool _runtimeOwnsPageTitle;
+        private bool _runtimeOwnsConnectionPresentation;
+        private int _runtimeSyncPendingCount;
+        private bool _navigationCleared;
         private bool _warnedMissingOfflineSyncBannerAsset;
         private float _lastWidth = -1f;
         private AppShellPreviewRoute? _appliedRoute;
@@ -176,6 +180,21 @@ namespace NutriMind.App.UI
         /// </summary>
         public event Action NotificationsRequested;
 
+        /// <summary>
+        /// Raised when the learner requests the action shown by the offline/sync banner.
+        /// </summary>
+        public event Action OfflineSyncActionRequested;
+
+        /// <summary>
+        /// Raised when the learner dismisses a dismissible offline/sync banner.
+        /// </summary>
+        public event Action OfflineSyncDismissed;
+
+        /// <summary>
+        /// Raised when the learner requests cancellation from the shared loading overlay.
+        /// </summary>
+        public event Action LoadingCancelRequested;
+
         private void OnEnable()
         {
             _uiDocument = GetComponent<UIDocument>();
@@ -194,6 +213,9 @@ namespace NutriMind.App.UI
             PreviewRouteRequested = null;
             ProfileRequested = null;
             NotificationsRequested = null;
+            OfflineSyncActionRequested = null;
+            OfflineSyncDismissed = null;
+            LoadingCancelRequested = null;
         }
 
         private void OnValidate()
@@ -232,18 +254,56 @@ namespace NutriMind.App.UI
         /// </summary>
         public void SetPreviewRoute(AppShellPreviewRoute route)
         {
+            _navigationCleared = false;
             _previewRoute = route;
             _appliedRoute = route;
             SetActiveNavItem(GetNavButton(route));
         }
 
         /// <summary>
-        /// Sets the static connection/sync chrome preview.
+        /// Sets or clears the active bottom-navigation item without changing the page title.
+        /// </summary>
+        public void SetActiveNavigation(AppShellPreviewRoute? route)
+        {
+            if (!route.HasValue)
+            {
+                ClearActiveNavigation();
+                return;
+            }
+
+            SetPreviewRoute(route.Value);
+        }
+
+        /// <summary>
+        /// Clears every active bottom-navigation style without selecting a fallback item.
+        /// </summary>
+        public void ClearActiveNavigation()
+        {
+            _navigationCleared = true;
+            _appliedRoute = _previewRoute;
+            SetActiveNavItem(null);
+        }
+
+        /// <summary>
+        /// Sets runtime-owned connection/sync chrome. Serialized preview refreshes no longer
+        /// overwrite the presentation after this method is called.
         /// </summary>
         public void SetConnectionPreview(AppShellConnectionPreview state)
         {
+            _runtimeOwnsConnectionPresentation = true;
             _connectionPreview = state;
-            ApplyConnectionPreview(state);
+            ApplyRuntimeConnection(state);
+        }
+
+        /// <summary>
+        /// Shows runtime-owned sync-pending chrome using the real unresolved queue count.
+        /// </summary>
+        public void SetSyncPending(int pendingCount)
+        {
+            _runtimeOwnsConnectionPresentation = true;
+            _runtimeSyncPendingCount = Math.Max(0, pendingCount);
+            _connectionPreview = AppShellConnectionPreview.SyncPending;
+            ApplyRuntimeConnection(AppShellConnectionPreview.SyncPending);
         }
 
         /// <summary>
@@ -356,6 +416,20 @@ namespace NutriMind.App.UI
 
             EnsureShellQueries();
             return _modalLayer;
+        }
+
+        /// <summary>
+        /// Returns the More bottom-navigation button for focus restoration.
+        /// </summary>
+        public Button GetMoreNavButton()
+        {
+            EnsureShellQueries();
+            if (_navMore == null && _root != null)
+            {
+                _navMore = _root.Q<Button>("nav-more");
+            }
+
+            return _navMore;
         }
 
         /// <summary>
@@ -677,7 +751,8 @@ namespace NutriMind.App.UI
 
         private void OnLoadingOverlayCancelRequested()
         {
-            Debug.Log("[AppShellController] Shared loading overlay cancel requested (preview only).");
+            Debug.Log("[AppShellController] Shared loading overlay cancel requested.");
+            LoadingCancelRequested?.Invoke();
         }
 
         /// <summary>
@@ -730,7 +805,14 @@ namespace NutriMind.App.UI
             // Force connection preview once after banner bind so an already-matching
             // _appliedConnection does not skip the initial shared-banner render.
             _appliedConnection = null;
-            ApplyConnectionPreview(_connectionPreview);
+            if (_runtimeOwnsConnectionPresentation)
+            {
+                ApplyRuntimeConnection(_connectionPreview);
+            }
+            else
+            {
+                ApplyConnectionPreview(_connectionPreview);
+            }
         }
 
         private void UnbindOfflineSyncBanner()
@@ -752,12 +834,14 @@ namespace NutriMind.App.UI
 
         private void OnOfflineSyncBannerActionRequested()
         {
-            Debug.Log("[AppShellController] Offline/sync banner action requested (preview only).");
+            Debug.Log("[AppShellController] Offline/sync banner action requested.");
+            OfflineSyncActionRequested?.Invoke();
         }
 
         private void OnOfflineSyncBannerDismissed()
         {
-            Debug.Log("[AppShellController] Offline/sync banner dismissed (preview only).");
+            Debug.Log("[AppShellController] Offline/sync banner dismissed.");
+            OfflineSyncDismissed?.Invoke();
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -782,12 +866,21 @@ namespace NutriMind.App.UI
 
         private void ApplySerializedPreviewState(bool force = false)
         {
-            if (force || _appliedRoute != _previewRoute)
+            if (_navigationCleared)
+            {
+                if (force || _appliedRoute != _previewRoute)
+                {
+                    _appliedRoute = _previewRoute;
+                    SetActiveNavItem(null);
+                }
+            }
+            else if (force || _appliedRoute != _previewRoute)
             {
                 ApplyPreviewRoute(_previewRoute, logSelection: false);
             }
 
-            if (force || _appliedConnection != _connectionPreview)
+            if (!_runtimeOwnsConnectionPresentation
+                && (force || _appliedConnection != _connectionPreview))
             {
                 ApplyConnectionPreview(_connectionPreview);
             }
@@ -926,6 +1019,7 @@ namespace NutriMind.App.UI
 
         private void SelectPreviewRoute(AppShellPreviewRoute route)
         {
+            _navigationCleared = false;
             _previewRoute = route;
             // User nav chrome is temporary until the route coordinator sets the real title.
             _runtimeOwnsPageTitle = false;
@@ -1021,6 +1115,16 @@ namespace NutriMind.App.UI
 
         private void ApplyConnectionPreview(AppShellConnectionPreview state)
         {
+            ApplyConnectionPresentation(state, pendingCount: 3);
+        }
+
+        private void ApplyRuntimeConnection(AppShellConnectionPreview state)
+        {
+            ApplyConnectionPresentation(state, _runtimeSyncPendingCount);
+        }
+
+        private void ApplyConnectionPresentation(AppShellConnectionPreview state, int pendingCount)
+        {
             _appliedConnection = state;
 
             ClearClassList(_connectionHost, ConnectionStateClasses);
@@ -1055,10 +1159,24 @@ namespace NutriMind.App.UI
                     SetIconClass(_connectionIcon, IconSyncClass);
                     if (_connectionLabel != null)
                     {
-                        _connectionLabel.text = "3 updates waiting";
+                        _connectionLabel.text = pendingCount == 1
+                            ? "1 update waiting"
+                            : $"{Math.Max(0, pendingCount)} updates waiting";
                     }
 
-                    _offlineSyncBannerView?.Show(OfflineSyncBannerPresets.SyncPending(3));
+                    _offlineSyncBannerView?.Show(
+                        OfflineSyncBannerPresets.SyncPending(Math.Max(0, pendingCount)));
+                    break;
+
+                case AppShellConnectionPreview.Syncing:
+                    _connectionHost?.AddToClassList(ConnectionSyncPendingClass);
+                    SetIconClass(_connectionIcon, IconSyncClass);
+                    if (_connectionLabel != null)
+                    {
+                        _connectionLabel.text = "Syncing progress";
+                    }
+
+                    _offlineSyncBannerView?.Show(OfflineSyncBannerPresets.Syncing());
                     break;
 
                 case AppShellConnectionPreview.SyncError:

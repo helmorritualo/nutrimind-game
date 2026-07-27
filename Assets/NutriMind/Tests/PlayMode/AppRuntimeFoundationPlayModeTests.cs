@@ -400,6 +400,148 @@ namespace NutriMind.Tests.PlayMode
             AssertMountedPanelFillsContent();
         }
 
+        [UnityTest]
+        [Timeout(120000)]
+        public IEnumerator RealControlPath_ProfileSettings_RewardsCertificates_AndMoreHub()
+        {
+            yield return PlayModeAppTestHelpers.LoadBootstrapScene();
+            yield return PlayModeAppTestHelpers.WaitForAppLifetime();
+            yield return PlayModeAppTestHelpers.ForceZeroMockLatency();
+            yield return PlayModeAppTestHelpers.WaitForBootstrapAuthenticationRequiredAndOpenLogin();
+            yield return PlayModeAppTestHelpers.PerformMockLoginViaUseCase();
+            yield return PlayModeAppTestHelpers.WaitForScene(AppSceneNavigator.MainSceneName);
+            yield return WaitForContentInstance();
+
+            IAppRouter router = AppLifetime.Instance.Router;
+            Assert.That(router.CurrentRoute.RouteId, Is.EqualTo(AppRouteId.Home));
+
+            Button profileButton = FindShellButton("app-shell-profile");
+            Assert.That(profileButton, Is.Not.Null, "Shell profile control missing.");
+            ClickButton(profileButton);
+            yield return WaitForRoute(AppRouteId.Profile);
+
+            Button settingsButton = FindContentButton("settings-button");
+            Assert.That(settingsButton, Is.Not.Null, "Profile Settings button missing.");
+            ClickButton(settingsButton);
+            yield return WaitForRoute(AppRouteId.Settings);
+
+            yield return NavigateAndAssert(router.BackAsync(), AppRouteId.Profile);
+
+            Button rewardsNav = FindShellButton("nav-rewards");
+            Assert.That(rewardsNav, Is.Not.Null, "Rewards bottom nav missing.");
+            ClickButton(rewardsNav);
+            yield return WaitForRoute(AppRouteId.Rewards);
+
+            Button certificatesButton = FindContentButton("rewards-view-certificates-button");
+            Assert.That(certificatesButton, Is.Not.Null, "View Certificates button missing.");
+            ClickButton(certificatesButton);
+            yield return WaitForRoute(AppRouteId.Certificates);
+            Assert.That(CountActiveRouteSurfaces(), Is.EqualTo(1));
+            AssertNoPlaceholder();
+
+            yield return NavigateAndAssert(router.BackAsync(), AppRouteId.Rewards);
+
+            Button moreNav = FindShellButton("nav-more");
+            Assert.That(moreNav, Is.Not.Null, "More bottom nav missing.");
+            ClickButton(moreNav);
+            yield return null;
+            yield return null;
+
+            VisualElement moreHub = FindMoreHub();
+            Assert.That(moreHub, Is.Not.Null, "More hub should be visible after More tap.");
+            Assert.That(moreHub.resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex));
+
+            Button destination = moreHub.Q<Button>(className: "app-shell__more-hub-item");
+            Assert.That(destination, Is.Not.Null, "More hub destination missing.");
+            ClickButton(destination);
+
+            float start = Time.realtimeSinceStartup;
+            while (router.CurrentRoute.RouteId == AppRouteId.Rewards
+                   && Time.realtimeSinceStartup - start < 10f)
+            {
+                yield return null;
+            }
+
+            Assert.That(router.CurrentRoute.RouteId, Is.Not.EqualTo(AppRouteId.Rewards));
+            Assert.That(CountActiveRouteSurfaces(), Is.EqualTo(1));
+            AssertNoPlaceholder();
+
+            VisualElement hubAfter = FindMoreHub();
+            if (hubAfter != null)
+            {
+                Assert.That(hubAfter.resolvedStyle.display, Is.EqualTo(DisplayStyle.None));
+            }
+
+            VisualElement modalLayer = FindShellRoot()?.Q<VisualElement>("app-shell-modal-layer");
+            if (modalLayer != null)
+            {
+                Assert.That(modalLayer.pickingMode, Is.EqualTo(PickingMode.Ignore));
+            }
+        }
+
+        private static IEnumerator WaitForRoute(AppRouteId expected, float timeoutSeconds = 10f)
+        {
+            float start = Time.realtimeSinceStartup;
+            while (AppLifetime.Instance.Router.CurrentRoute.RouteId != expected)
+            {
+                if (Time.realtimeSinceStartup - start > timeoutSeconds)
+                {
+                    Assert.Fail(
+                        "Timed out waiting for route "
+                        + expected
+                        + "; current="
+                        + AppLifetime.Instance.Router.CurrentRoute.RouteId);
+                }
+
+                yield return null;
+            }
+
+            AssertNoPlaceholder();
+            Assert.That(CountActiveRouteSurfaces(), Is.EqualTo(1));
+        }
+
+        private static VisualElement FindShellRoot()
+        {
+            UIDocument[] documents = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+            for (int i = 0; i < documents.Length; i++)
+            {
+                VisualElement root = documents[i] != null ? documents[i].rootVisualElement : null;
+                if (root != null && root.Q<VisualElement>("app-shell-content-region") != null)
+                {
+                    return root;
+                }
+            }
+
+            return null;
+        }
+
+        private static Button FindShellButton(string name)
+        {
+            return FindShellRoot()?.Q<Button>(name);
+        }
+
+        private static Button FindContentButton(string name)
+        {
+            VisualElement root = FindShellRoot();
+            VisualElement region = root?.Q<VisualElement>("app-shell-content-region");
+            return region?.Q<Button>(name);
+        }
+
+        private static VisualElement FindMoreHub()
+        {
+            return FindShellRoot()?.Q<VisualElement>("app-shell-more-hub");
+        }
+
+        private static void ClickButton(Button button)
+        {
+            Assert.That(button, Is.Not.Null);
+            using (var evt = ClickEvent.GetPooled())
+            {
+                evt.target = button;
+                button.SendEvent(evt);
+            }
+        }
+
         private static IEnumerator NavigateAndAssert(System.Threading.Tasks.Task task, AppRouteId expected)
         {
             while (!task.IsCompleted)

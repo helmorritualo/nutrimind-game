@@ -341,6 +341,8 @@ namespace NutriMind.Tests.EditMode
             QuizListPreviewItem item = AppViewMappers.MapQuizSummaryToPreviewItem(quiz);
             Assert.That(item.Id, Is.EqualTo("q-001"));
             Assert.That(item.Title, Is.EqualTo("Test Quiz"));
+            Assert.That(item.SubjectId, Is.EqualTo("peh"));
+            Assert.That(item.TermId, Is.EqualTo("t2"));
             Assert.That(item.Subject, Is.EqualTo(NutriMindSubject.PeAndHealth));
             Assert.That(item.Term, Is.EqualTo(NutriMindTerm.Term2));
             Assert.That(item.Status, Is.EqualTo(QuizListPreviewStatus.Available));
@@ -433,6 +435,171 @@ namespace NutriMind.Tests.EditMode
             Assert.That(mapped.CorrectCount, Is.EqualTo(4));
             Assert.That(mapped.FeedbackVisible, Is.True);
             Assert.That(mapped.Answers.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TryMapSubject_UnknownIdentifier_DoesNotCollapseIntoKnownSubject()
+        {
+            bool mapped = AppViewMappers.TryMapSubject(
+                "subject_unknown_curriculum",
+                out NutriMindSubject subject);
+
+            Assert.That(mapped, Is.False);
+            Assert.That(subject, Is.EqualTo(default(NutriMindSubject)));
+        }
+
+        [Test]
+        public void MapMissionSummaryToPreviewItem_PreservesRuntimeIdentityAndProgress()
+        {
+            var summary = new MissionSummary
+            {
+                Id = "g5_lq_t1_m07",
+                SubjectId = "subject_literaquest",
+                TermId = "term_1",
+                Title = "Runtime Mission",
+                Order = 7,
+                Status = "in_progress",
+                Progress = new MissionProgressSummary
+                {
+                    State = "in_progress",
+                    CompletedAreaCount = 2,
+                    RequiredAreaCount = 3,
+                    CollectibleCount = 1,
+                    RequiredCollectibleCount = 3
+                }
+            };
+
+            MissionPreviewItem item = AppViewMappers.MapMissionSummaryToPreviewItem(
+                summary,
+                NutriMindSubject.Science,
+                NutriMindTerm.Term3);
+
+            Assert.That(item.MissionId, Is.EqualTo("g5_lq_t1_m07"));
+            Assert.That(item.MissionNumber, Is.EqualTo(7));
+            Assert.That(item.Subject, Is.EqualTo(NutriMindSubject.LiteraQuest));
+            Assert.That(item.Term, Is.EqualTo(NutriMindTerm.Term1));
+            Assert.That(item.AreasCompleted, Is.EqualTo(2));
+            Assert.That(item.AreasRequired, Is.EqualTo(3));
+            Assert.That(item.CollectiblesCompleted, Is.EqualTo(1));
+            Assert.That(item.PrimaryAction, Is.EqualTo(MissionPreviewPrimaryAction.Continue));
+        }
+
+        [Test]
+        public void MissionSelectionSetItems_ReplacesAndClearsPreviewCards()
+        {
+            VisualTreeAsset asset = UnityEditor.AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/NutriMind/App/UI/UXML/MissionSelectionPanel.uxml");
+            Assert.That(asset, Is.Not.Null);
+
+            TemplateContainer root = asset.CloneTree();
+            var view = new MissionSelectionPanelView(root);
+            view.SetItems(new[]
+            {
+                new MissionPreviewItem(
+                    "runtime_mission",
+                    "Runtime Mission",
+                    9,
+                    NutriMindSubject.Science,
+                    NutriMindTerm.Term2,
+                    "available",
+                    false,
+                    string.Empty,
+                    0,
+                    3,
+                    0,
+                    3,
+                    MissionPreviewPrimaryAction.Start)
+            });
+
+            Assert.That(view.LoadedMissionCount, Is.EqualTo(1));
+            Assert.That(
+                root.Q<VisualElement>("mission-list")
+                    .Query<Button>(className: "mission-selection__item").ToList().Count,
+                Is.EqualTo(1));
+            Assert.That(view.SelectedMissionId, Is.EqualTo("runtime_mission"));
+
+            view.SetItems(Array.Empty<MissionPreviewItem>());
+
+            Assert.That(view.LoadedMissionCount, Is.Zero);
+            Assert.That(
+                root.Q<VisualElement>("mission-list")
+                    .Query<Button>(className: "mission-selection__item").ToList().Count,
+                Is.Zero);
+            Assert.That(view.SelectedMissionId, Is.Empty);
+            view.Dispose();
+        }
+
+        [Test]
+        public void ProgressSummaryMapperAndView_BindOnlySupportedAggregateFields()
+        {
+            var summary = new ProgressSummary
+            {
+                MissionsStarted = 8,
+                MissionsCompleted = 5,
+                AreasCompleted = 12,
+                ReviewRequiredCount = 2,
+                QuizAttempts = 4
+            };
+            ProgressPreviewSummary preview = AppViewMappers.MapProgressSummary(summary, 3);
+
+            Assert.That(preview.MissionsStarted, Is.EqualTo(8));
+            Assert.That(preview.MissionsCompleted, Is.EqualTo(5));
+            Assert.That(preview.AreasCompleted, Is.EqualTo(12));
+            Assert.That(preview.ReviewRequiredCount, Is.EqualTo(2));
+            Assert.That(preview.QuizAttempts, Is.EqualTo(4));
+            Assert.That(preview.PendingOutboxCount, Is.EqualTo(3));
+
+            VisualTreeAsset asset = UnityEditor.AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/NutriMind/App/UI/UXML/ProgressPanel.uxml");
+            TemplateContainer root = asset.CloneTree();
+            var view = new ProgressPanelView(root);
+            view.SetSummary(preview);
+
+            Assert.That(root.Q<Label>("overall-missions").text, Does.Contain("5"));
+            Assert.That(root.Q<Label>("overall-missions").text, Does.Contain("8"));
+            Assert.That(root.Q<Label>("overall-reviews").text, Does.Contain("2"));
+            Assert.That(root.Q<Label>("overall-subjects").text, Does.Contain("12"));
+            view.Dispose();
+        }
+
+        [Test]
+        public void SubjectAndTermViews_RepresentSuccessfulEmptyData()
+        {
+            VisualTreeAsset subjectsAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/NutriMind/App/UI/UXML/SubjectSelectionPanel.uxml");
+            var subjectsView = new SubjectSelectionPanelView(subjectsAsset.CloneTree());
+            subjectsView.Bind(Array.Empty<NutriMindSubject>());
+            subjectsView.SetDataState(DataStatePanelState.Empty);
+            Assert.That(subjectsView.DataState, Is.EqualTo(DataStatePanelState.Empty));
+
+            VisualTreeAsset termsAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/NutriMind/App/UI/UXML/TermSelectionPanel.uxml");
+            TemplateContainer termRoot = termsAsset.CloneTree();
+            var termsView = new TermSelectionPanelView(termRoot);
+            termsView.SetTerms(Array.Empty<NutriMindTerm>());
+            termsView.SetDataState(DataStatePanelState.Empty);
+            Assert.That(termsView.DataState, Is.EqualTo(DataStatePanelState.Empty));
+            Assert.That(termRoot.Q<Button>("card-term-1").resolvedStyle.display, Is.EqualTo(DisplayStyle.None));
+
+            subjectsView.Dispose();
+            termsView.Dispose();
+        }
+
+        [Test]
+        public void EffectiveAnnouncementUnread_RequiresServerUnreadAndNoLocalOverride()
+        {
+            var serverRead = new AnnouncementSummary { Id = "server-read", IsUnread = false };
+            var serverUnread = new AnnouncementSummary { Id = "server-unread", IsUnread = true };
+
+            Assert.That(
+                AppViewMappers.IsAnnouncementEffectivelyUnread(serverRead, locallyMarkedRead: false),
+                Is.False);
+            Assert.That(
+                AppViewMappers.IsAnnouncementEffectivelyUnread(serverUnread, locallyMarkedRead: true),
+                Is.False);
+            Assert.That(
+                AppViewMappers.IsAnnouncementEffectivelyUnread(serverUnread, locallyMarkedRead: false),
+                Is.True);
         }
 
         // ──────────────────────── Helpers ────────────────────────────────────
@@ -567,7 +734,6 @@ namespace NutriMind.Tests.EditMode
             Assert.That(main, Does.Contain("private static TemplateContainer MountPanel"));
             Assert.That(quiz, Does.Contain("app-shell__content-instance"));
             Assert.That(quiz, Does.Contain("private static TemplateContainer MountPanel"));
-            Assert.That(main, Does.Contain("SettingsRequested"));
             Assert.That(
                 File.ReadAllText(Path.Combine(
                     "Assets", "NutriMind", "App", "Scripts", "Presenters", "ProfilePresenter.cs")),
@@ -576,6 +742,46 @@ namespace NutriMind.Tests.EditMode
                 File.ReadAllText(Path.Combine(
                     "Assets", "NutriMind", "App", "Scripts", "Presenters", "RewardsPresenter.cs")),
                 Does.Contain("ViewCertificatesRequested"));
+        }
+
+        [Test]
+        public void PartDPresenters_DeclarePersistentIdempotencyAndNavigationContracts()
+        {
+            string presenters = Path.Combine(
+                "Assets", "NutriMind", "App", "Scripts", "Presenters");
+            string composition = Path.Combine(
+                "Assets", "NutriMind", "App", "Scripts", "Composition");
+
+            string rewards = File.ReadAllText(Path.Combine(presenters, "RewardsPresenter.cs"));
+            Assert.That(rewards, Does.Contain("FindLatestUnresolved"));
+            Assert.That(rewards, Does.Contain("IdempotentOperations.UseReward"));
+            Assert.That(rewards, Does.Contain("IdempotentRequestStates.Sending"));
+            Assert.That(rewards, Does.Contain("IdempotentRequestStates.Uncertain"));
+            Assert.That(rewards, Does.Contain("IdempotentRequestStates.Completed"));
+            Assert.That(rewards, Does.Contain("IdempotentRequestStates.Rejected"));
+            Assert.That(rewards, Does.Contain("AppRouteOrigin.Rewards"));
+
+            string attempt = File.ReadAllText(Path.Combine(presenters, "QuizAttemptPresenter.cs"));
+            Assert.That(attempt, Does.Contain("SerializeQuiz"));
+            Assert.That(attempt, Does.Contain("DeserializeQuiz"));
+            Assert.That(attempt, Does.Contain("RetainPendingQuizSubmission"));
+            Assert.That(attempt, Does.Contain("ReleasePendingQuizSubmission"));
+            Assert.That(attempt, Does.Contain("IdempotentRequestStates.Sending"));
+            Assert.That(attempt, Does.Contain("IdempotentRequestStates.Uncertain"));
+            Assert.That(attempt, Does.Not.Contain("new QuizDetail { Id = _ctx.QuizId }"));
+
+            string coordinator = File.ReadAllText(
+                Path.Combine(composition, "QuizPortalScreenCoordinator.cs"));
+            Assert.That(coordinator, Does.Contain("QuizRouteKey? _mountedRouteKey"));
+            Assert.That(coordinator, Does.Contain("QuizRouteKey.FromEntry(entry)"));
+            Assert.That(coordinator, Does.Contain("ClearActiveNavigation"));
+
+            string result = File.ReadAllText(Path.Combine(presenters, "QuizResultPresenter.cs"));
+            Assert.That(result, Does.Contain("ResetQuizPortalToRootAsync"));
+
+            string main = File.ReadAllText(Path.Combine(composition, "MainScreenCoordinator.cs"));
+            Assert.That(main, Does.Contain("entry.Context.Origin"));
+            Assert.That(main, Does.Contain("AppRouteOrigin.More"));
         }
     }
 }

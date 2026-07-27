@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -37,6 +38,8 @@ namespace NutriMind.App.UI
         private VisualElement _root;
 
         private Button _backButton;
+        private Label _introMessage;
+        private Label _countLabel;
 
         private VisualElement _literaQuestCard;
         private VisualElement _peAndHealthCard;
@@ -52,6 +55,7 @@ namespace NutriMind.App.UI
         private Label _peAndHealthMissionLabel;
         private Label _scienceProgressLabel;
         private Label _scienceMissionLabel;
+        private readonly HashSet<NutriMindSubject> _availableSubjects = new();
 
         private bool _disposed;
         private float _lastWidth = -1f;
@@ -98,6 +102,8 @@ namespace NutriMind.App.UI
 
             CacheElements();
             ApplyStaticPreviewContent();
+            _availableSubjects.Add(NutriMindSubject.LiteraQuest);
+            _availableSubjects.Add(NutriMindSubject.Science);
             ApplyInitialSelection();
             RegisterCallbacks();
             ApplyResponsiveClasses(_root.resolvedStyle.width);
@@ -106,6 +112,7 @@ namespace NutriMind.App.UI
         public VisualElement Root => _root;
 
         public bool IsBound => _root != null && !_disposed;
+        public DataStatePanelState DataState { get; private set; } = DataStatePanelState.Content;
 
         /// <summary>
         /// Currently selected available subject. LiteraQuest by default,
@@ -118,36 +125,80 @@ namespace NutriMind.App.UI
         /// Binds the runtime subject list. Subjects not in the list are disabled.
         /// Subjects not in the canonical set (LiteraQuest, PEHealth, Science) are ignored.
         /// </summary>
-        public void Bind(System.Collections.Generic.IReadOnlyList<NutriMindSubject> availableSubjects)
+        public void Bind(IReadOnlyList<NutriMindSubject> availableSubjects)
         {
-            if (_disposed || _root == null || availableSubjects == null)
+            if (_disposed || _root == null)
             {
                 return;
             }
 
-            bool hasLq = false;
-            bool hasPeh = false;
-            bool hasSci = false;
-            for (int i = 0; i < availableSubjects.Count; i++)
+            _availableSubjects.Clear();
+            if (availableSubjects != null)
             {
-                NutriMindSubject subject = availableSubjects[i];
-                if (subject == NutriMindSubject.LiteraQuest)
+                for (int i = 0; i < availableSubjects.Count; i++)
                 {
-                    hasLq = true;
-                }
-                else if (subject == NutriMindSubject.PeAndHealth)
-                {
-                    hasPeh = true;
-                }
-                else if (subject == NutriMindSubject.Science)
-                {
-                    hasSci = true;
+                    NutriMindSubject subject = availableSubjects[i];
+                    if (Enum.IsDefined(typeof(NutriMindSubject), subject))
+                    {
+                        _availableSubjects.Add(subject);
+                    }
                 }
             }
 
-            _literaQuestCard?.SetEnabled(hasLq);
-            _peAndHealthCard?.SetEnabled(hasPeh);
-            _scienceCard?.SetEnabled(hasSci);
+            ApplySubjectAvailability(_literaQuestCard, NutriMindSubject.LiteraQuest);
+            ApplySubjectAvailability(_peAndHealthCard, NutriMindSubject.PeAndHealth);
+            ApplySubjectAvailability(_scienceCard, NutriMindSubject.Science);
+
+            if (!_availableSubjects.Contains(SelectedSubject))
+            {
+                if (_availableSubjects.Contains(NutriMindSubject.LiteraQuest))
+                {
+                    SelectedSubject = NutriMindSubject.LiteraQuest;
+                }
+                else if (_availableSubjects.Contains(NutriMindSubject.PeAndHealth))
+                {
+                    SelectedSubject = NutriMindSubject.PeAndHealth;
+                }
+                else if (_availableSubjects.Contains(NutriMindSubject.Science))
+                {
+                    SelectedSubject = NutriMindSubject.Science;
+                }
+            }
+
+            ApplySelectionClasses();
+            if (_countLabel != null)
+            {
+                int count = _availableSubjects.Count;
+                _countLabel.text = count == 1 ? "1 Subject" : $"{count} Subjects";
+            }
+        }
+
+        public void SetDataState(DataStatePanelState state)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            DataState = state;
+            ApplySubjectAvailability(_literaQuestCard, NutriMindSubject.LiteraQuest);
+            ApplySubjectAvailability(_peAndHealthCard, NutriMindSubject.PeAndHealth);
+            ApplySubjectAvailability(_scienceCard, NutriMindSubject.Science);
+            if (_introMessage == null)
+            {
+                return;
+            }
+
+            _introMessage.text = state switch
+            {
+                DataStatePanelState.Empty => "No subjects are currently available for this learner.",
+                DataStatePanelState.OfflineCached => "Showing subjects saved from the latest classroom update.",
+                DataStatePanelState.OfflineUnavailable => "Subjects are unavailable offline on this device.",
+                DataStatePanelState.PermissionOrLocked => "Your classroom does not currently allow subject selection.",
+                DataStatePanelState.RecoverableError => "Subjects could not be loaded. Try again.",
+                DataStatePanelState.Loading => "Loading your available subjects.",
+                _ => "Explore your Grade 5 subjects and continue where you left off."
+            };
         }
 
         public void Dispose()
@@ -167,6 +218,8 @@ namespace NutriMind.App.UI
 
             _root = null;
             _backButton = null;
+            _introMessage = null;
+            _countLabel = null;
             _literaQuestCard = null;
             _peAndHealthCard = null;
             _scienceCard = null;
@@ -179,6 +232,7 @@ namespace NutriMind.App.UI
             _peAndHealthMissionLabel = null;
             _scienceProgressLabel = null;
             _scienceMissionLabel = null;
+            _availableSubjects.Clear();
             _lastWidth = -1f;
         }
 
@@ -201,6 +255,8 @@ namespace NutriMind.App.UI
         private void CacheElements()
         {
             _backButton = _root.Q<Button>("back-button");
+            _introMessage = _root.Q<Label>("subject-selection-intro-message");
+            _countLabel = _root.Q<Label>(className: "subject-selection__count-label");
 
             _literaQuestCard = _root.Q<VisualElement>("card-literaquest");
             _peAndHealthCard = _root.Q<VisualElement>("card-pe-health");
@@ -265,9 +321,11 @@ namespace NutriMind.App.UI
             _backButton?.RegisterCallback<ClickEvent>(OnBackClicked);
 
             _literaQuestCard?.RegisterCallback<ClickEvent>(OnLiteraQuestCardClicked);
+            _peAndHealthCard?.RegisterCallback<ClickEvent>(OnPeAndHealthCardClicked);
             _scienceCard?.RegisterCallback<ClickEvent>(OnScienceCardClicked);
 
             _literaQuestCard?.RegisterCallback<KeyDownEvent>(OnLiteraQuestCardKeyDown);
+            _peAndHealthCard?.RegisterCallback<KeyDownEvent>(OnPeAndHealthCardKeyDown);
             _scienceCard?.RegisterCallback<KeyDownEvent>(OnScienceCardKeyDown);
 
             _literaQuestContinueButton?.RegisterCallback<ClickEvent>(
@@ -285,9 +343,11 @@ namespace NutriMind.App.UI
             _backButton?.UnregisterCallback<ClickEvent>(OnBackClicked);
 
             _literaQuestCard?.UnregisterCallback<ClickEvent>(OnLiteraQuestCardClicked);
+            _peAndHealthCard?.UnregisterCallback<ClickEvent>(OnPeAndHealthCardClicked);
             _scienceCard?.UnregisterCallback<ClickEvent>(OnScienceCardClicked);
 
             _literaQuestCard?.UnregisterCallback<KeyDownEvent>(OnLiteraQuestCardKeyDown);
+            _peAndHealthCard?.UnregisterCallback<KeyDownEvent>(OnPeAndHealthCardKeyDown);
             _scienceCard?.UnregisterCallback<KeyDownEvent>(OnScienceCardKeyDown);
 
             _literaQuestContinueButton?.UnregisterCallback<ClickEvent>(
@@ -315,6 +375,11 @@ namespace NutriMind.App.UI
             SelectSubject(NutriMindSubject.Science);
         }
 
+        private void OnPeAndHealthCardClicked(ClickEvent evt)
+        {
+            SelectSubject(NutriMindSubject.PeAndHealth);
+        }
+
         private void OnLiteraQuestCardKeyDown(KeyDownEvent evt)
         {
             if (IsActivationKey(evt))
@@ -330,6 +395,15 @@ namespace NutriMind.App.UI
             {
                 evt.StopPropagation();
                 SelectSubject(NutriMindSubject.Science);
+            }
+        }
+
+        private void OnPeAndHealthCardKeyDown(KeyDownEvent evt)
+        {
+            if (IsActivationKey(evt))
+            {
+                evt.StopPropagation();
+                SelectSubject(NutriMindSubject.PeAndHealth);
             }
         }
 
@@ -357,7 +431,15 @@ namespace NutriMind.App.UI
         private void OnPeAndHealthUnavailableClicked(ClickEvent evt)
         {
             evt.StopPropagation();
-            UnavailableSubjectRequested?.Invoke(NutriMindSubject.PeAndHealth);
+            if (_availableSubjects.Contains(NutriMindSubject.PeAndHealth))
+            {
+                SelectSubject(NutriMindSubject.PeAndHealth);
+                ContinueSubjectRequested?.Invoke(NutriMindSubject.PeAndHealth);
+            }
+            else
+            {
+                UnavailableSubjectRequested?.Invoke(NutriMindSubject.PeAndHealth);
+            }
         }
 
         /// <summary>
@@ -367,7 +449,7 @@ namespace NutriMind.App.UI
         /// </summary>
         private void SelectSubject(NutriMindSubject subject)
         {
-            if (subject == NutriMindSubject.PeAndHealth)
+            if (!_availableSubjects.Contains(subject))
             {
                 return;
             }
@@ -378,14 +460,39 @@ namespace NutriMind.App.UI
             }
 
             SelectedSubject = subject;
-
-            _literaQuestCard?.EnableInClassList(
-                SelectedClass, subject == NutriMindSubject.LiteraQuest);
-            _peAndHealthCard?.EnableInClassList(SelectedClass, false);
-            _scienceCard?.EnableInClassList(
-                SelectedClass, subject == NutriMindSubject.Science);
+            ApplySelectionClasses();
 
             SubjectSelected?.Invoke(subject);
+        }
+
+        private void ApplySubjectAvailability(VisualElement card, NutriMindSubject subject)
+        {
+            if (card == null)
+            {
+                return;
+            }
+
+            bool available = _availableSubjects.Contains(subject);
+            bool interactive = DataState == DataStatePanelState.Content
+                || DataState == DataStatePanelState.OfflineCached;
+            card.SetEnabled(available && interactive);
+            card.style.display = available ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private void ApplySelectionClasses()
+        {
+            _literaQuestCard?.EnableInClassList(
+                SelectedClass,
+                _availableSubjects.Contains(NutriMindSubject.LiteraQuest)
+                && SelectedSubject == NutriMindSubject.LiteraQuest);
+            _peAndHealthCard?.EnableInClassList(
+                SelectedClass,
+                _availableSubjects.Contains(NutriMindSubject.PeAndHealth)
+                && SelectedSubject == NutriMindSubject.PeAndHealth);
+            _scienceCard?.EnableInClassList(
+                SelectedClass,
+                _availableSubjects.Contains(NutriMindSubject.Science)
+                && SelectedSubject == NutriMindSubject.Science);
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)

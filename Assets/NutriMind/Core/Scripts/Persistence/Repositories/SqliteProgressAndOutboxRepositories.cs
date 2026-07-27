@@ -513,5 +513,127 @@ namespace NutriMind.Core.Persistence
                 return AppResult.Failure(AppError.FromException(exception));
             }
         }
+
+        public AppResult<IReadOnlyList<IdempotentRequestRecord>> GetByOperationAndStates(
+            string operation,
+            params string[] states)
+        {
+            if (string.IsNullOrWhiteSpace(operation))
+            {
+                return AppResult<IReadOnlyList<IdempotentRequestRecord>>.Failure(
+                    AppErrorCodes.ValidationFailed,
+                    "operation is required.");
+            }
+
+            if (states == null || states.Length == 0)
+            {
+                return AppResult<IReadOnlyList<IdempotentRequestRecord>>.Success(
+                    Array.Empty<IdempotentRequestRecord>());
+            }
+
+            try
+            {
+                IReadOnlyList<IdempotentRequestRecord> records = _database.ExecuteWithConnection(connection =>
+                {
+                    List<IdempotentRequestRecord> all = connection.Query<IdempotentRequestRecord>(
+                        "SELECT * FROM idempotent_request WHERE operation = ?",
+                        operation);
+                    var filtered = new List<IdempotentRequestRecord>();
+                    for (int i = 0; i < all.Count; i++)
+                    {
+                        IdempotentRequestRecord record = all[i];
+                        if (record == null || !ContainsState(states, record.State))
+                        {
+                            continue;
+                        }
+
+                        filtered.Add(record);
+                    }
+
+                    filtered.Sort(CompareUpdatedThenCreatedDesc);
+                    return filtered;
+                });
+
+                return AppResult<IReadOnlyList<IdempotentRequestRecord>>.Success(records);
+            }
+            catch (Exception exception)
+            {
+                return AppResult<IReadOnlyList<IdempotentRequestRecord>>.Failure(
+                    AppError.FromException(exception));
+            }
+        }
+
+        public AppResult<IdempotentRequestRecord> FindLatestUnresolved(string operation, string entityKey)
+        {
+            if (string.IsNullOrWhiteSpace(operation))
+            {
+                return AppResult<IdempotentRequestRecord>.Failure(
+                    AppErrorCodes.ValidationFailed,
+                    "operation is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entityKey))
+            {
+                return AppResult<IdempotentRequestRecord>.Failure(
+                    AppErrorCodes.ValidationFailed,
+                    "entityKey is required.");
+            }
+
+            AppResult<IReadOnlyList<IdempotentRequestRecord>> listed =
+                GetByOperationAndStates(operation, IdempotentRequestStates.Unresolved);
+            if (listed.IsFailure)
+            {
+                return AppResult<IdempotentRequestRecord>.Failure(listed.Error);
+            }
+
+            string needle = entityKey.Trim();
+            IReadOnlyList<IdempotentRequestRecord> records =
+                listed.Value ?? Array.Empty<IdempotentRequestRecord>();
+            for (int i = 0; i < records.Count; i++)
+            {
+                IdempotentRequestRecord record = records[i];
+                if (record == null || string.IsNullOrEmpty(record.NormalizedPayloadJson))
+                {
+                    continue;
+                }
+
+                if (record.NormalizedPayloadJson.IndexOf(needle, StringComparison.Ordinal) >= 0)
+                {
+                    return AppResult<IdempotentRequestRecord>.Success(record);
+                }
+            }
+
+            return AppResult<IdempotentRequestRecord>.Success(null);
+        }
+
+        private static bool ContainsState(string[] states, string state)
+        {
+            for (int i = 0; i < states.Length; i++)
+            {
+                if (string.Equals(states[i], state, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static int CompareUpdatedThenCreatedDesc(
+            IdempotentRequestRecord left,
+            IdempotentRequestRecord right)
+        {
+            int updated = string.CompareOrdinal(
+                right?.UpdatedUtc ?? string.Empty,
+                left?.UpdatedUtc ?? string.Empty);
+            if (updated != 0)
+            {
+                return updated;
+            }
+
+            return string.CompareOrdinal(
+                right?.CreatedUtc ?? string.Empty,
+                left?.CreatedUtc ?? string.Empty);
+        }
     }
 }

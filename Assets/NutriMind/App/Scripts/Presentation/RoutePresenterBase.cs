@@ -112,8 +112,8 @@ namespace NutriMind.App.Presentation
         protected void HandleUnauthorized()
         {
             TaskUtilities.ForgetSafely(
-                Lifetime.HandleUnauthorizedAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.HandleUnauthorizedAsync(NavigationToken),
+                NavigationToken,
                 "Presenter.Unauthorized");
         }
 

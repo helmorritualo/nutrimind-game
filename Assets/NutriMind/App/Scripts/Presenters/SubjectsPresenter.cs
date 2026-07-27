@@ -7,6 +7,7 @@ using NutriMind.App.UI;
 using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Utilities;
+using UnityEngine;
 
 namespace NutriMind.App.Presentation
 {
@@ -27,7 +28,7 @@ namespace NutriMind.App.Presentation
             : base(lifetime)
         {
             _view = view;
-            _view.SubjectSelected += OnSubjectSelected;
+            _view.ContinueSubjectRequested += OnSubjectSelected;
             _view.BackRequested += OnBack;
         }
 
@@ -38,17 +39,18 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Subjects.Load");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Subjects.Load");
         }
 
         protected override void OnDispose()
         {
-            _view.SubjectSelected -= OnSubjectSelected;
+            _view.ContinueSubjectRequested -= OnSubjectSelected;
             _view.BackRequested -= OnBack;
         }
 
         private async Task FetchAsync(CancellationToken token)
         {
+            _view.SetDataState(DataStatePanelState.Loading);
             AppResult<System.Collections.Generic.IReadOnlyList<SubjectSummary>> result =
                 await Lifetime.Gateway.GetSubjectsAsync(token).ConfigureAwait(true);
 
@@ -59,54 +61,35 @@ namespace NutriMind.App.Presentation
 
             _subjectMap.Clear();
 
-            if (result.IsSuccess && result.Value != null)
+            if (result.IsSuccess)
             {
-                for (int i = 0; i < result.Value.Count; i++)
-                {
-                    SubjectSummary s = result.Value[i];
-                    NutriMindSubject mapped = AppViewMappers.MapSubject(s.Id);
-                    if (!_subjectMap.ContainsKey(mapped))
-                    {
-                        _subjectMap[mapped] = s;
-                    }
-                }
+                BindSubjects(result.Value);
+                _view.SetDataState(
+                    _subjectMap.Count == 0
+                        ? DataStatePanelState.Empty
+                        : DataStatePanelState.Content);
+                return;
             }
-            else if (IsUnauthorized(result.Error))
+
+            if (IsUnauthorized(result.Error))
             {
                 HandleUnauthorized();
                 return;
             }
 
-            // Fall back to canonical three subjects from bootstrap subjects if server call fails.
-            FillDefaultSubjectsIfEmpty();
-            _view.Bind(new List<NutriMindSubject>(_subjectMap.Keys));
-        }
-
-        private void FillDefaultSubjectsIfEmpty()
-        {
-            if (!_subjectMap.ContainsKey(NutriMindSubject.LiteraQuest))
+            IReadOnlyList<SubjectSummary> cached = Lifetime.LastBootstrap?.Subjects;
+            if (cached != null && cached.Count > 0)
             {
-                _subjectMap[NutriMindSubject.LiteraQuest] = new SubjectSummary
+                BindSubjects(cached);
+                if (_subjectMap.Count > 0)
                 {
-                    Id = "lq", Slug = "lq", Name = "LiteraQuest"
-                };
+                    _view.SetDataState(DataStatePanelState.OfflineCached);
+                    return;
+                }
             }
 
-            if (!_subjectMap.ContainsKey(NutriMindSubject.PeAndHealth))
-            {
-                _subjectMap[NutriMindSubject.PeAndHealth] = new SubjectSummary
-                {
-                    Id = "peh", Slug = "peh", Name = "PE & Health"
-                };
-            }
-
-            if (!_subjectMap.ContainsKey(NutriMindSubject.Science))
-            {
-                _subjectMap[NutriMindSubject.Science] = new SubjectSummary
-                {
-                    Id = "sci", Slug = "sci", Name = "Science"
-                };
-            }
+            _view.Bind(System.Array.Empty<NutriMindSubject>());
+            _view.SetDataState(AppViewMappers.ErrorToDataState(result.Error));
         }
 
         private void OnSubjectSelected(NutriMindSubject subject)
@@ -116,16 +99,23 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            _subjectMap.TryGetValue(subject, out SubjectSummary summary);
-            string subjectId = summary?.Id ?? subject.ToString().ToLowerInvariant();
-            string subjectSlug = summary?.Slug ?? subjectId;
+            if (!_subjectMap.TryGetValue(subject, out SubjectSummary summary)
+                || string.IsNullOrWhiteSpace(summary?.Id))
+            {
+                return;
+            }
+
+            string subjectId = summary.Id;
+            string subjectSlug = string.IsNullOrWhiteSpace(summary.Slug)
+                ? subjectId
+                : summary.Slug;
 
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.Terms,
                     AppRouteContext.ForSubject(subjectId, subjectSlug),
-                    Cts.Token),
-                Cts.Token,
+                    NavigationToken),
+                NavigationToken,
                 "Subjects.Select");
         }
 
@@ -137,9 +127,49 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.NavigateAsync(AppRouteId.Home, AppRouteContext.Empty, Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.NavigateAsync(AppRouteId.Home, AppRouteContext.Empty, NavigationToken),
+                NavigationToken,
                 "Subjects.Back");
+        }
+
+        private void BindSubjects(IReadOnlyList<SubjectSummary> subjects)
+        {
+            _subjectMap.Clear();
+            if (subjects != null)
+            {
+                for (int i = 0; i < subjects.Count; i++)
+                {
+                    SubjectSummary summary = subjects[i];
+                    if (!TryMapSubject(summary, out NutriMindSubject mapped))
+                    {
+                        if (summary != null)
+                        {
+                            Debug.LogWarning(
+                                $"[SubjectsPresenter] Ignoring unknown subject '{summary.Id ?? summary.Slug ?? summary.Name}'.");
+                        }
+
+                        continue;
+                    }
+
+                    if (!_subjectMap.ContainsKey(mapped))
+                    {
+                        _subjectMap[mapped] = summary;
+                    }
+                }
+            }
+
+            _view.Bind(new List<NutriMindSubject>(_subjectMap.Keys));
+        }
+
+        private static bool TryMapSubject(
+            SubjectSummary summary,
+            out NutriMindSubject subject)
+        {
+            subject = default;
+            return summary != null
+                && (AppViewMappers.TryMapSubject(summary.Id, out subject)
+                    || AppViewMappers.TryMapSubject(summary.Slug, out subject)
+                    || AppViewMappers.TryMapSubject(summary.Name, out subject));
         }
     }
 }

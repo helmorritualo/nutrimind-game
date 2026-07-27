@@ -20,6 +20,7 @@ namespace NutriMind.App.Presentation
     {
         private readonly AnnouncementsPanelView _view;
         private readonly AppShellRuntimeController _shellRuntime;
+        private readonly HashSet<string> _locallyReadIds = new(StringComparer.Ordinal);
 
         public AnnouncementsPresenter(
             AppLifetime lifetime,
@@ -41,7 +42,7 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Announcements.Load");
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Announcements.Load");
         }
 
         protected override void OnDispose()
@@ -70,15 +71,18 @@ namespace NutriMind.App.Presentation
 
                 if (items.Count == 0)
                 {
+                    _locallyReadIds.Clear();
                     _view.SetItems(Array.Empty<AnnouncementPreviewItem>());
+                    _view.SetReadPresentationIds(Array.Empty<string>());
                     _view.SetPreviewState(AnnouncementsPreviewState.Empty);
+                    RefreshUnreadBadge(0);
                     return;
                 }
 
                 AnnouncementPreviewItem[] preview = MapAnnouncements(items);
                 _view.SetItems(preview);
 
-                var readIds = new List<string>();
+                _locallyReadIds.Clear();
                 IAnnouncementReadRepository repo = Lifetime.AnnouncementReadRepository;
                 for (int i = 0; i < items.Count; i++)
                 {
@@ -91,13 +95,13 @@ namespace NutriMind.App.Presentation
                     AppResult<bool> isRead = repo.IsRead(id);
                     if (isRead.IsSuccess && isRead.Value)
                     {
-                        readIds.Add(id);
+                        _locallyReadIds.Add(id);
                     }
                 }
 
-                _view.SetReadPresentationIds(readIds);
+                _view.SetReadPresentationIds(_locallyReadIds);
                 _view.SetPreviewState(AnnouncementsPreviewState.Content);
-                RefreshUnreadBadge(items.Count - readIds.Count);
+                RefreshUnreadBadge(CountEffectiveUnread(items, _locallyReadIds));
                 return;
             }
 
@@ -109,7 +113,8 @@ namespace NutriMind.App.Presentation
 
             if (IsOffline(result.Error))
             {
-                _view.SetPreviewState(AnnouncementsPreviewState.OfflineCached);
+                _view.SetItems(Array.Empty<AnnouncementPreviewItem>());
+                _view.SetPreviewState(AnnouncementsPreviewState.OfflineUnavailable);
                 return;
             }
 
@@ -123,18 +128,41 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
+            if (!_view.IsPresentationUnread(selection.PresentationId))
+            {
+                return;
+            }
+
             IAnnouncementReadRepository repo = Lifetime.AnnouncementReadRepository;
             if (repo == null)
             {
                 return;
             }
 
-            string readUtc = DateTimeOffset.UtcNow.ToUniversalTime().ToString("o");
-            repo.MarkRead(selection.PresentationId, readUtc);
+            AppResult<bool> existing = repo.IsRead(selection.PresentationId);
+            if (existing.IsFailure)
+            {
+                return;
+            }
 
-            int current = Lifetime.AuthenticatedStudentState?.AnnouncementVisibleCount ?? 0;
-            Lifetime.AuthenticatedStudentState?.SetAnnouncementVisibleCount(Math.Max(0, current - 1));
-            _shellRuntime?.RefreshBadges();
+            if (existing.Value)
+            {
+                _locallyReadIds.Add(selection.PresentationId);
+                _view.SetReadPresentationIds(_locallyReadIds);
+                RefreshUnreadBadge(_view.UnreadCount);
+                return;
+            }
+
+            string readUtc = DateTimeOffset.UtcNow.ToUniversalTime().ToString("o");
+            AppResult marked = repo.MarkRead(selection.PresentationId, readUtc);
+            if (marked.IsFailure)
+            {
+                return;
+            }
+
+            _locallyReadIds.Add(selection.PresentationId);
+            _view.SetReadPresentationIds(_locallyReadIds);
+            RefreshUnreadBadge(_view.UnreadCount);
         }
 
         private void OnRetry()
@@ -153,8 +181,8 @@ namespace NutriMind.App.Presentation
             }
 
             TaskUtilities.ForgetSafely(
-                Lifetime.Router?.BackAsync(Cts.Token),
-                Cts.Token,
+                Lifetime.Router?.BackAsync(NavigationToken),
+                NavigationToken,
                 "Announcements.Back");
         }
 
@@ -176,14 +204,42 @@ namespace NutriMind.App.Presentation
                     summary: item.Summary ?? string.Empty,
                     bodyPlainText: item.Body ?? item.Summary ?? string.Empty,
                     audienceLabel: item.AudienceLabel ?? string.Empty,
-                    publishedDateText: item.PublishedAt?.ToString("yyyy-MM-dd") ?? string.Empty,
-                    publicationWindowText: string.Empty,
+                    publishedDateText: item.PublishedAt?.ToString("yyyy-MM-dd") ?? "Date unavailable",
+                    publicationWindowText: item.ExpiresAt.HasValue
+                        ? "Visible until " + item.ExpiresAt.Value.ToString("yyyy-MM-dd")
+                        : "Currently visible",
                     initiallyUnread: item.IsUnread,
                     kind: MapKind(item.Kind),
                     iconClass: "ds-icon--bell");
             }
 
             return mapped;
+        }
+
+        private static int CountEffectiveUnread(
+            IReadOnlyList<AnnouncementSummary> items,
+            IReadOnlyCollection<string> locallyReadIds)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return 0;
+            }
+
+            var local = locallyReadIds == null
+                ? new HashSet<string>(StringComparer.Ordinal)
+                : new HashSet<string>(locallyReadIds, StringComparer.Ordinal);
+            int unread = 0;
+            for (int i = 0; i < items.Count; i++)
+            {
+                AnnouncementSummary item = items[i];
+                bool locallyRead = item != null && local.Contains(item.Id ?? string.Empty);
+                if (AppViewMappers.IsAnnouncementEffectivelyUnread(item, locallyRead))
+                {
+                    unread++;
+                }
+            }
+
+            return unread;
         }
 
         private static AnnouncementPreviewKind MapKind(string kind)

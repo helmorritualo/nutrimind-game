@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NutriMind.App.UI;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
+using UnityEngine;
 
 namespace NutriMind.App.Presentation
 {
@@ -17,44 +18,100 @@ namespace NutriMind.App.Presentation
 
         public static NutriMindSubject MapSubject(string subjectId)
         {
-            if (string.IsNullOrWhiteSpace(subjectId))
+            if (TryMapSubject(subjectId, out NutriMindSubject subject))
             {
-                return NutriMindSubject.LiteraQuest;
+                return subject;
             }
 
-            string lower = subjectId.ToLowerInvariant();
-            if (lower.Contains("peh") || lower.Contains("pe") || lower.Contains("health"))
+            if (!string.IsNullOrWhiteSpace(subjectId))
             {
-                return NutriMindSubject.PeAndHealth;
-            }
-
-            if (lower.Contains("sci"))
-            {
-                return NutriMindSubject.Science;
+                Debug.LogWarning($"[AppViewMappers] Unknown subject identifier '{subjectId}'.");
             }
 
             return NutriMindSubject.LiteraQuest;
         }
 
+        public static bool TryMapSubject(string subjectId, out NutriMindSubject subject)
+        {
+            subject = default;
+            switch (NormalizeIdentifier(subjectId))
+            {
+                case "lq":
+                case "literaquest":
+                case "subjectliteraquest":
+                    subject = NutriMindSubject.LiteraQuest;
+                    return true;
+                case "peh":
+                case "pehealth":
+                case "subjectpehealth":
+                    subject = NutriMindSubject.PeAndHealth;
+                    return true;
+                case "sci":
+                case "science":
+                case "subjectscience":
+                    subject = NutriMindSubject.Science;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public static NutriMindTerm MapTerm(string termId)
         {
-            if (string.IsNullOrWhiteSpace(termId))
+            if (TryMapTerm(termId, out NutriMindTerm term))
             {
-                return NutriMindTerm.Term1;
+                return term;
             }
 
-            string lower = termId.ToLowerInvariant();
-            if (lower.Contains("t2") || lower.Contains("term2") || lower.Contains("term_2"))
+            if (!string.IsNullOrWhiteSpace(termId))
             {
-                return NutriMindTerm.Term2;
-            }
-
-            if (lower.Contains("t3") || lower.Contains("term3") || lower.Contains("term_3"))
-            {
-                return NutriMindTerm.Term3;
+                Debug.LogWarning($"[AppViewMappers] Unknown term identifier '{termId}'.");
             }
 
             return NutriMindTerm.Term1;
+        }
+
+        public static bool TryMapTerm(string termId, out NutriMindTerm term)
+        {
+            term = default;
+            switch (NormalizeIdentifier(termId))
+            {
+                case "t1":
+                case "term1":
+                    term = NutriMindTerm.Term1;
+                    return true;
+                case "t2":
+                case "term2":
+                    term = NutriMindTerm.Term2;
+                    return true;
+                case "t3":
+                case "term3":
+                    term = NutriMindTerm.Term3;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static string NormalizeIdentifier(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var normalized = new char[value.Length];
+            int length = 0;
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (char.IsLetterOrDigit(c))
+                {
+                    normalized[length++] = char.ToLowerInvariant(c);
+                }
+            }
+
+            return new string(normalized, 0, length);
         }
 
         // ──────────────────────────── Subject/Term reverse ───────────────
@@ -85,6 +142,130 @@ namespace NutriMind.App.Presentation
             }
         }
 
+        // ──────────────────────────── Mission list ───────────────────────
+
+        public static MissionPreviewItem MapMissionSummaryToPreviewItem(
+            MissionSummary mission,
+            NutriMindSubject fallbackSubject,
+            NutriMindTerm fallbackTerm)
+        {
+            if (mission == null)
+            {
+                return null;
+            }
+
+            NutriMindSubject subject = TryMapSubject(mission.SubjectId, out NutriMindSubject mappedSubject)
+                ? mappedSubject
+                : fallbackSubject;
+            NutriMindTerm term = TryMapTerm(mission.TermId, out NutriMindTerm mappedTerm)
+                ? mappedTerm
+                : fallbackTerm;
+
+            MissionProgressSummary progress = mission.Progress;
+            string status = !string.IsNullOrWhiteSpace(progress?.State)
+                ? progress.State
+                : mission.Status;
+            string normalizedStatus = NormalizeIdentifier(status);
+            bool isLocked = NormalizeIdentifier(mission.Status) == "locked";
+            MissionPreviewPrimaryAction action;
+            if (isLocked)
+            {
+                action = MissionPreviewPrimaryAction.Locked;
+            }
+            else if (normalizedStatus == "completed" || normalizedStatus == "missioncompleted")
+            {
+                action = MissionPreviewPrimaryAction.Review;
+            }
+            else if (normalizedStatus == "inprogress"
+                || normalizedStatus == "started"
+                || normalizedStatus == "reviewrequired")
+            {
+                action = MissionPreviewPrimaryAction.Continue;
+            }
+            else
+            {
+                action = MissionPreviewPrimaryAction.Start;
+            }
+
+            int areasRequired = progress?.RequiredAreaCount ?? mission.AreaCount;
+            if (areasRequired <= 0)
+            {
+                areasRequired = mission.AreaCount > 0 ? mission.AreaCount : 3;
+            }
+
+            int collectiblesRequired = progress?.RequiredCollectibleCount ?? 3;
+            if (collectiblesRequired <= 0)
+            {
+                collectiblesRequired = 3;
+            }
+
+            return new MissionPreviewItem(
+                mission.Id,
+                string.IsNullOrWhiteSpace(mission.Title) ? "(Untitled mission)" : mission.Title,
+                mission.Order,
+                subject,
+                term,
+                status,
+                isLocked,
+                mission.LockedReason,
+                progress?.CompletedAreaCount ?? 0,
+                areasRequired,
+                progress?.CollectibleCount ?? 0,
+                collectiblesRequired,
+                action);
+        }
+
+        public static MissionPreviewItem[] MapMissionSummaries(
+            IReadOnlyList<MissionSummary> missions,
+            NutriMindSubject fallbackSubject,
+            NutriMindTerm fallbackTerm)
+        {
+            if (missions == null || missions.Count == 0)
+            {
+                return Array.Empty<MissionPreviewItem>();
+            }
+
+            var mapped = new List<MissionPreviewItem>(missions.Count);
+            for (int i = 0; i < missions.Count; i++)
+            {
+                MissionPreviewItem item = MapMissionSummaryToPreviewItem(
+                    missions[i],
+                    fallbackSubject,
+                    fallbackTerm);
+                if (item != null && !string.IsNullOrWhiteSpace(item.MissionId))
+                {
+                    mapped.Add(item);
+                }
+            }
+
+            return mapped.ToArray();
+        }
+
+        // ──────────────────────────── Progress ───────────────────────────
+
+        public static ProgressPreviewSummary MapProgressSummary(
+            ProgressSummary summary,
+            int? pendingOutboxCount = null)
+        {
+            summary ??= new ProgressSummary();
+            return new ProgressPreviewSummary(
+                summary.MissionsStarted,
+                summary.MissionsCompleted,
+                summary.AreasCompleted,
+                summary.ReviewRequiredCount,
+                summary.QuizAttempts,
+                pendingOutboxCount);
+        }
+
+        // ──────────────────────────── Announcements ──────────────────────
+
+        public static bool IsAnnouncementEffectivelyUnread(
+            AnnouncementSummary announcement,
+            bool locallyMarkedRead)
+        {
+            return announcement != null && announcement.IsUnread && !locallyMarkedRead;
+        }
+
         // ──────────────────────────── Quiz List ──────────────────────────
 
         public static QuizListPreviewItem MapQuizSummaryToPreviewItem(QuizSummary quiz)
@@ -105,7 +286,9 @@ namespace NutriMind.App.Presentation
                 closesAtUtc: quiz.ClosesAt,
                 maxAttempts: quiz.MaxAttempts,
                 attemptsUsed: quiz.AttemptsUsed,
-                resultVisibility: MapResultVisibility(quiz.ResultVisibility));
+                resultVisibility: MapResultVisibility(quiz.ResultVisibility),
+                subjectId: quiz.SubjectId,
+                termId: quiz.TermId);
         }
 
         public static QuizListPreviewItem[] MapQuizSummaries(IReadOnlyList<QuizSummary> quizzes)

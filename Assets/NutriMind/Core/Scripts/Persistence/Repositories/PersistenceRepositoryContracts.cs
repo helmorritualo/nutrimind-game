@@ -74,6 +74,20 @@ namespace NutriMind.Core.Persistence
         AppResult Upsert(IdempotentRequestRecord record);
         AppResult<IdempotentRequestRecord> Get(string requestUuid);
         AppResult Delete(string requestUuid);
+
+        /// <summary>
+        /// Returns records matching the operation whose state is in <paramref name="states"/>.
+        /// Ordered by updated_utc descending (nulls last), then created_utc descending.
+        /// </summary>
+        AppResult<IReadOnlyList<IdempotentRequestRecord>> GetByOperationAndStates(
+            string operation,
+            params string[] states);
+
+        /// <summary>
+        /// Finds the newest unresolved request for an operation whose normalized payload
+        /// contains <paramref name="entityKey"/> (reward code or quiz id).
+        /// </summary>
+        AppResult<IdempotentRequestRecord> FindLatestUnresolved(string operation, string entityKey);
     }
 
     /// <summary>

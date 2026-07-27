@@ -24,6 +24,14 @@ namespace NutriMind.App.Routing
 
         Task ReturnToMainAsync(CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Clears the Quiz Portal stack to a single QuizList entry, remains in QuizPortal,
+        /// and raises one RouteChanged. Preserves MainReturnRoute / ReturnToMainOnQuizBack policy.
+        /// </summary>
+        Task ResetQuizPortalToRootAsync(
+            AppRouteContext context = null,
+            CancellationToken cancellationToken = default);
+
         Task HandleUnauthorizedAsync(CancellationToken cancellationToken = default);
 
         void ClearStacks();

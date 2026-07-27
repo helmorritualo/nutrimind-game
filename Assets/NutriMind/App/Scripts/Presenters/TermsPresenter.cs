@@ -8,6 +8,7 @@ using NutriMind.Core.Bootstrap;
 using NutriMind.Core.Data;
 using NutriMind.Core.Networking;
 using NutriMind.Core.Utilities;
+using UnityEngine;
 
 namespace NutriMind.App.Presentation
 {
@@ -28,7 +29,7 @@ namespace NutriMind.App.Presentation
         {
             _view = view;
             _ctx = ctx;
-            _view.TermSelected += OnTermSelected;
+            _view.OpenTermRequested += OnTermSelected;
             _view.BackRequested += OnBack;
         }
 
@@ -39,18 +40,23 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            TaskUtilities.ForgetSafely(FetchAsync(Cts.Token), Cts.Token, "Terms.Load");
+            _view.SetSubject(AppViewMappers.MapSubject(_ctx?.SubjectId));
+            TaskUtilities.ForgetSafely(FetchAsync(RequestToken), RequestToken, "Terms.Load");
         }
 
         protected override void OnDispose()
         {
-            _view.TermSelected -= OnTermSelected;
+            _view.OpenTermRequested -= OnTermSelected;
             _view.BackRequested -= OnBack;
         }
 
         private async Task FetchAsync(CancellationToken token)
         {
-            var request = new GetTermsRequest { SubjectSlug = _ctx.SubjectSlug ?? _ctx.SubjectId };
+            _view.SetDataState(DataStatePanelState.Loading);
+            var request = new GetTermsRequest
+            {
+                SubjectSlug = _ctx?.SubjectSlug ?? _ctx?.SubjectId
+            };
 
             AppResult<IReadOnlyList<TermSummary>> result =
                 await Lifetime.Gateway.GetTermsAsync(request, token).ConfigureAwait(true);
@@ -62,45 +68,35 @@ namespace NutriMind.App.Presentation
 
             _termMap.Clear();
 
-            if (result.IsSuccess && result.Value != null)
+            if (result.IsSuccess)
             {
-                for (int i = 0; i < result.Value.Count; i++)
-                {
-                    TermSummary t = result.Value[i];
-                    NutriMindTerm mapped = AppViewMappers.MapTerm(t.Id);
-                    if (!_termMap.ContainsKey(mapped))
-                    {
-                        _termMap[mapped] = t;
-                    }
-                }
+                BindTerms(result.Value);
+                _view.SetDataState(
+                    _termMap.Count == 0
+                        ? DataStatePanelState.Empty
+                        : DataStatePanelState.Content);
+                return;
             }
-            else if (IsUnauthorized(result.Error))
+
+            if (IsUnauthorized(result.Error))
             {
                 HandleUnauthorized();
                 return;
             }
 
-            FillDefaultTermsIfEmpty();
-            NutriMindSubject subject = AppViewMappers.MapSubject(_ctx.SubjectId);
-            _view.SetSubject(subject);
-        }
-
-        private void FillDefaultTermsIfEmpty()
-        {
-            if (!_termMap.ContainsKey(NutriMindTerm.Term1))
+            if (IsOffline(result.Error))
             {
-                _termMap[NutriMindTerm.Term1] = new TermSummary { Id = "t1", Name = "Term 1" };
+                IReadOnlyList<TermSummary> cached = GetBootstrapTerms();
+                if (cached.Count > 0)
+                {
+                    BindTerms(cached);
+                    _view.SetDataState(DataStatePanelState.OfflineCached);
+                    return;
+                }
             }
 
-            if (!_termMap.ContainsKey(NutriMindTerm.Term2))
-            {
-                _termMap[NutriMindTerm.Term2] = new TermSummary { Id = "t2", Name = "Term 2" };
-            }
-
-            if (!_termMap.ContainsKey(NutriMindTerm.Term3))
-            {
-                _termMap[NutriMindTerm.Term3] = new TermSummary { Id = "t3", Name = "Term 3" };
-            }
+            BindTerms(System.Array.Empty<TermSummary>());
+            _view.SetDataState(AppViewMappers.ErrorToDataState(result.Error));
         }
 
         private void OnTermSelected(NutriMindTerm term)
@@ -110,15 +106,18 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            _termMap.TryGetValue(term, out TermSummary summary);
-            string termId = summary?.Id ?? term.ToString().ToLowerInvariant();
+            if (!_termMap.TryGetValue(term, out TermSummary summary)
+                || string.IsNullOrWhiteSpace(summary?.Id))
+            {
+                return;
+            }
 
             TaskUtilities.ForgetSafely(
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.MissionList,
-                    AppRouteContext.ForTerm(_ctx.SubjectId, termId, _ctx.SubjectSlug),
-                    Cts.Token),
-                Cts.Token,
+                    AppRouteContext.ForTerm(_ctx?.SubjectId, summary.Id, _ctx?.SubjectSlug),
+                    NavigationToken),
+                NavigationToken,
                 "Terms.Select");
         }
 
@@ -133,9 +132,110 @@ namespace NutriMind.App.Presentation
                 Lifetime.Router?.NavigateAsync(
                     AppRouteId.Subjects,
                     AppRouteContext.Empty,
-                    Cts.Token),
-                Cts.Token,
+                    NavigationToken),
+                NavigationToken,
                 "Terms.Back");
+        }
+
+        private void BindTerms(IReadOnlyList<TermSummary> terms)
+        {
+            _termMap.Clear();
+            if (terms != null)
+            {
+                for (int i = 0; i < terms.Count; i++)
+                {
+                    TermSummary summary = terms[i];
+                    if (!TryMapTerm(summary, out NutriMindTerm mapped))
+                    {
+                        if (summary != null)
+                        {
+                            Debug.LogWarning(
+                                $"[TermsPresenter] Ignoring unknown term '{summary.Id ?? summary.Name}'.");
+                        }
+
+                        continue;
+                    }
+
+                    if (!_termMap.ContainsKey(mapped))
+                    {
+                        _termMap[mapped] = summary;
+                    }
+                }
+            }
+
+            _view.SetTerms(new List<NutriMindTerm>(_termMap.Keys));
+        }
+
+        private IReadOnlyList<TermSummary> GetBootstrapTerms()
+        {
+            IReadOnlyList<MissionSummary> missions = Lifetime.LastBootstrap?.Missions;
+            if (missions == null || missions.Count == 0)
+            {
+                return System.Array.Empty<TermSummary>();
+            }
+
+            var terms = new Dictionary<NutriMindTerm, TermSummary>();
+            for (int i = 0; i < missions.Count; i++)
+            {
+                MissionSummary mission = missions[i];
+                if (mission == null || !MatchesSubject(mission.SubjectId))
+                {
+                    continue;
+                }
+
+                var summary = new TermSummary
+                {
+                    Id = mission.TermId,
+                    Name = mission.TermId,
+                    IsActive = true
+                };
+                if (TryMapTerm(summary, out NutriMindTerm term) && !terms.ContainsKey(term))
+                {
+                    summary.Order = (int)term;
+                    terms[term] = summary;
+                }
+            }
+
+            return new List<TermSummary>(terms.Values);
+        }
+
+        private bool MatchesSubject(string missionSubjectId)
+        {
+            if (string.IsNullOrWhiteSpace(_ctx?.SubjectId))
+            {
+                return true;
+            }
+
+            return string.Equals(
+                       missionSubjectId,
+                       _ctx.SubjectId,
+                       System.StringComparison.OrdinalIgnoreCase)
+                   || (AppViewMappers.TryMapSubject(
+                           missionSubjectId,
+                           out NutriMindSubject missionSubject)
+                       && AppViewMappers.TryMapSubject(
+                           _ctx.SubjectId,
+                           out NutriMindSubject routeSubject)
+                       && missionSubject == routeSubject);
+        }
+
+        private static bool TryMapTerm(TermSummary summary, out NutriMindTerm term)
+        {
+            term = default;
+            if (summary == null)
+            {
+                return false;
+            }
+
+            if (summary.Order >= (int)NutriMindTerm.Term1
+                && summary.Order <= (int)NutriMindTerm.Term3)
+            {
+                term = (NutriMindTerm)summary.Order;
+                return true;
+            }
+
+            return AppViewMappers.TryMapTerm(summary.Id, out term)
+                || AppViewMappers.TryMapTerm(summary.Name, out term);
         }
     }
 }
