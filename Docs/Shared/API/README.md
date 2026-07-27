@@ -16,3 +16,5 @@ Rebuild-specific rules:
 - completing Area 3 may complete the mission atomically;
 - static gameplay answer keys remain in Unity;
 - Quiz Portal scoring remains on the server.
+
+The simplified runtime uses Discover, Apply, and Master design roles while retaining the existing phase enum values. No endpoint is added for gameplay modals, area-complete screens, or learning summaries.

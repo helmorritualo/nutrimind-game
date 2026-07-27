@@ -1,5 +1,25 @@
 # NutriMind Unity Repository — AGENTS.md
 
+## Non-negotiable
+
+- One mission scene and exactly three logical areas.
+- Area 3 contains the integrated mastery challenge.
+- Static gameplay content comes from developer-editable per-mission JSON.
+- SQLite stores progress/outbox facts, not authored dialogue or answer keys.
+- Server handles classroom mission availability and gameplay tracking only.
+- Quiz Portal remains separate.
+- Gameplay UI uses UI Toolkit for complex/data-heavy panels, uGUI screen-space Canvas for HUD/feedback, and uGUI world-space Canvas for markers.
+- One gameplay UI coordinator controls the limited blocking overlays; ordinary HUD, subtitles, prompts, and feedback remain non-modal.
+- Current milestone: complete G5 LiteraQuest T1 M1; PEH and Science T1 M1 remain data/overview only.
+
+## Before changing code
+
+Read the shared contract, Unity requirements, static-content schema, current milestone, mission JSON, and API contract. Preserve stable IDs and content versions. Add validation and tests for every schema or persistence change.
+
+- Each mission owns one primary competency and at most one supporting competency.
+- Each area has one principal subject interaction and normally two or three scored checks, maximum four.
+- Follow `Docs/Shared/THREE_AREA_GAMEPLAY_LOOP_CONTRACT.md`.
+
 These rules apply to all AI agents and human contributors working in the Unity repository.
 
 Use one shared project structure. Do not create separate folders for agents, developers, experiments, or individual contributors.

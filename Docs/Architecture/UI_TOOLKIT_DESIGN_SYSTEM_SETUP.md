@@ -1,18 +1,26 @@
-# UI Toolkit Design-System Setup
+# UI Toolkit Design System Setup
 
-Use one pinned Unity 6-compatible UI Toolkit design-system version behind NutriMind-owned UXML/USS and presenter abstractions.
+Use the pinned Unity 6-compatible design-system package through NutriMind-owned adapters and theme files. Do not edit package assets directly.
 
-## Panel settings
-
-Create separate assets for application UI and gameplay data-heavy panels:
+Recommended gameplay assets:
 
 ```text
-PS_App.asset
-PS_GameplayModal.asset
+PS_GameplayOverlay.asset
+UIDocument_GameplayOverlay
+NutriMindGameplayOverlay.uxml
+NutriMindGameplayOverlay.uss
 ```
 
-Gameplay modal panels include mission introduction, dialogue/reading, question/answer, hint/review, detailed journal/guide, and learning summary. They must not own mission state; presenters bind view models from the gameplay application layer.
+The gameplay overlay supports only:
 
-Keep uGUI HUD and world-space Canvas styling in separate prefabs. Shared visual tokens may be mirrored intentionally, but do not create direct component dependencies between UI Toolkit and uGUI.
+- mission introduction;
+- evidence/reading state;
+- question state;
+- first-wrong hint state;
+- second-wrong explanation/acknowledgement state;
+- mission-complete result;
+- optional exit confirmation and pause.
 
-Validate keyboard, gamepad, mouse, and touch focus with the chosen Input System and one gameplay modal coordinator.
+Do not create separate UI Toolkit documents for learning clue, reminder, review, all-correct, investigation completion, healthy-choice completion, area completion, or learning summary. Those states are either handled by the reusable overlay, represented by non-modal uGUI feedback, or included in the mission-complete result.
+
+Presenters bind pure gameplay view models and never own mission state. Validate keyboard, gamepad, mouse, and touch focus with the Input System and one `GameplayUiCoordinator`.

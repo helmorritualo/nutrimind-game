@@ -1,34 +1,57 @@
-# Static Gameplay Content Schema
+# Gameplay Static Content Schema
 
-## Authority
+## Ownership
 
-`GAMEPLAY_CONTENT_CATALOG_V1.json` indexes one developer-editable JSON file per mission under `StaticGameplayContent/`.
+One developer-editable JSON file is packaged with Unity per mission. The server never returns this authored content.
 
-Static mission JSON owns learner-facing mission content:
+A mission pack contains:
 
-- premise and objective;
-- area story and dialogue;
-- learning clues;
+- stable mission, grade, subject, and term IDs;
+- title, curriculum block, premise, and objective;
+- competency contract;
+- one scene contract with exactly three logical areas;
+- dialogue and learning clues;
+- one principal subject activity per area;
 - question text, options, answer keys, hints, explanations, and feedback;
-- subject action and world result;
-- collectible definition.
+- world action/result and collectible definition;
+- progress-key declarations.
 
-The server never delivers or edits these fields.
+## Competency contract
 
-## Loading
+Required fields:
 
-1. Load the catalog packaged with the Unity build.
-2. Validate the selected mission file and its SHA-256/catalog entry.
-3. Require exactly three unique areas in order 1–3.
-4. Require unique question IDs and valid answer-key option IDs.
-5. Reject a mission pack that exceeds five scored questions in any area.
-6. Save the loaded content version with local progress so migrations can be handled explicitly.
+```text
+primary_competency_id
+primary_competency_summary
+supporting_competency_ids
+prerequisite_competency_ids
+review_competency_ids
+mastery_evidence
+mechanic_family
+```
 
-A developer may add or replace a mission JSON file, then update the catalog entry and content version. Stable mission, area, interaction, and question IDs must not be changed after learner progress exists.
+`primary_competency_id` must be unique to its owning mission. Reused learning in later missions must appear under prerequisite or review IDs rather than as a second owner.
 
-## SQLite boundary
+## Structural validation
 
-SQLite stores state, not duplicated authored content:
+1. Require exactly three areas in orders 1, 2, and 3.
+2. Require phases `discover_and_connect`, `practice_and_apply`, and `resolve_and_master` in that order.
+3. Require one collectible and checkpoint contract per area.
+4. Require unique interaction, question, option, and collectible IDs.
+5. Require valid answer-key option IDs.
+6. Recommend two or three scored checks and reject more than four scored checks in any area.
+7. Permit at most one additional `prediction_single_unscored` record in a Science area.
+8. Require at most two attempts for scored closed-answer questions and one attempt for unscored predictions.
+9. Require one principal world action and one visible world result per area.
+10. Require Area 3 to complete the mission without a separate final-challenge content object.
+
+## Versioning
+
+A developer may add or replace a mission JSON file, then update the catalog entry and content version. Stable mission, area, interaction, collectible, competency, and question IDs must not change after learner progress exists.
+
+## Runtime versus authored content
+
+SQLite stores stable IDs and learner outcomes only:
 
 ```text
 mission_state
@@ -39,38 +62,11 @@ review_state
 world_state
 collectible_state
 checkpoint_state
-content_version_used
-sync_outbox_event
+sync_outbox
 ```
 
-Do not copy dialogue, question text, option text, or answer keys into SQLite as authoritative content. Store stable IDs and outcomes.
-
-Commit the local state change and its duplicate-safe sync outbox event in one SQLite transaction.
+Do not copy dialogue, question text, option text, answer keys, or learning clues into SQLite as authoritative content.
 
 ## Question behavior
 
-Canonical types:
-
-```text
-multiple_choice_single
-multiple_choice_multiple
-true_false
-prediction_single_unscored
-```
-
-Scored closed-answer questions permit at most two attempts. The first incorrect attempt shows a focused hint. The second incorrect attempt reveals the correct concept, records review-required, and continues. Predictions are recorded but not graded.
-
-## Release status
-
-The package is technically complete and implementation-ready. Learner-facing curriculum content still requires review and approval by the project’s curriculum owner before production release.
-
-## Authoring status
-
-Each pack declares one of:
-
-```text
-milestone_authored_exact_content
-future_mission_structured_curriculum_draft
-```
-
-Both statuses are loadable. Neither bypasses the curriculum-owner production-release gate.
+Scored closed-answer questions permit at most two attempts. The first incorrect attempt shows a focused hint inside the active reusable overlay. The second reveals the correct concept, records review-required, and continues. Predictions are recorded but not graded. Review is surfaced through the objective/journal drawer and mission result, not a separate mandatory area-review modal.

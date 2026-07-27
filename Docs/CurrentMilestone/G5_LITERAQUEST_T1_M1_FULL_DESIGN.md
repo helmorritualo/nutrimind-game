@@ -5,72 +5,81 @@
 ```text
 Mission: g5_lq_t1_m01
 Scene: SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue
-Areas: Parade Meadow → Drumbeat Lane → Freedom Stage
+Environment theme: low-poly Storybook Village Festival
+Areas: Story Square → Banner Market Lane → Chronicle Courtyard
 Collectibles: three Story Fragments
 Static content: Docs/Data/StaticGameplayContent/g5_lq_t1_m01.json
 ```
 
-## Premise
+## Competency contract
 
-On the morning of Bayang Haraya’s Freedom and Friendship Festival, the opening chapter of the town storybook becomes incomplete. Events, captions, action words, and visual meaning are scattered across three connected festival zones. Farmer Lira asks the Pathfinder to restore one coherent chapter before the opening ceremony.
+Primary competency: identify character, setting, goal, and major events in a short narrative.
 
-## Area 1 — Parade Meadow
+Supporting competency: use one clear noun–pronoun reference in a caption.
 
-The learner reads the opening page, identifies character, setting, goal, and first event, then repairs noun/pronoun references on the parade board. The repaired board opens the banner route and reveals Story Fragment 1.
+Mastery evidence: the learner reconstructs a coherent beginning, event sequence, and suitable ending using observed story evidence.
 
-Required questions and exact answer keys are defined in the mission JSON. They assess Farmer Lira as guide, Parade Meadow as setting, the banner goal, first-event sequence, and the pronoun reference for “They.”
+Topics such as noun classifications, verb-forming suffixes, several verb categories, noun complements, main-idea instruction, and visual tone/mood are moved to later owning missions. They are not required new learning in Mission 1.
 
-## Area 2 — Drumbeat Lane
+## Environment and asset direction
 
-The learner repairs parade instructions using helping, linking, and transitive verbs, completes the role complement in a sentence, and replaces a misleading poster with a welcoming layout. The world action restores drum rhythm and lantern mood, revealing Story Fragment 2.
+Use a compact storybook village festival that can be greyboxed with ProBuilder and dressed with one consistent free modular village/nature asset family. The level layout owns traversal; imported demo scenes are not used as the mission map.
 
-## Area 3 — Freedom Stage
+Only mission-specific props require custom creation: damaged storybook, three Story Fragments, event markers, caption pieces, banners, and the restored chapter display.
 
-The learner arranges seven mission events, selects the main idea and title, and chooses a coherent hopeful ending. The three fragments are bound and placed in the Festival Chronicle. Stage restoration and mission completion commit atomically.
+## Area 1 — Story Square: Discover
 
-## Optimized runtime
+Meet Farmer Lira, inspect the illustrated opening, identify the character, setting, and goal, then place the correct opening caption with a clear pronoun reference. The storybook stand repairs, Story Fragment 1 appears, and the route opens.
 
-- one mission introduction only;
-- one continuous interaction chain per area;
-- five scored questions per area;
-- no separate “all correct” completion panel;
-- review panel only after required correction;
-- one collectible reveal and one checkpoint toast per area;
-- no area scene load;
-- integrated final challenge in Area 3.
+One main source, one caption-repair interaction, and three scored checks.
 
-## UI
+## Area 2 — Banner Market Lane: Apply
 
-UI Toolkit:
+Find three event clues placed along the market route, inspect them, and arrange them in chronological order. Confirm the sequence with three application checks, activate the corrected banner route, and collect Story Fragment 2.
 
-- introduction;
-- story/dialogue panel;
-- question-and-answer panel;
-- hint/explanation/review;
-- final learning summary.
+One clue hunt, one three-position sequencing interaction, and three scored checks.
 
-uGUI screen-space:
+## Area 3 — Chronicle Courtyard: Master
 
-- HUD (`Area x/3`, `Fragments x/3`);
-- objective and interaction prompts;
-- immediate feedback, collectible reveal, checkpoint toast, pause, transition.
+Use the first two fragments and the restored event path to assemble a short beginning–middle–ending chapter, choose the suitable ending, and present it at the Chronicle display. The courtyard celebration activates, Story Fragment 3 appears, and Area 3/mission completion commit atomically.
 
-uGUI world-space:
+One chapter-assembly interaction and three mastery checks.
 
-- Farmer Lira marker;
-- parade board, drum station, poster, event-card, fragment, and path markers.
+## Minimal gameplay UI
+
+Blocking UI:
+
+- mission introduction;
+- one reusable story/learning/question overlay;
+- pause;
+- mission-complete result;
+- optional exit confirmation.
+
+Non-modal UI:
+
+- objective and `Fragments x/3` HUD;
+- Farmer Lira subtitles;
+- interaction and direction markers;
+- short correct-answer feedback;
+- area-restored banner;
+- collectible reveal and checkpoint toast.
+
+There is no separate learning-clue, reminder, review, all-correct, area-complete, or final-learning-summary modal.
 
 ## Persistence
 
-Store stable IDs and outcomes in SQLite: mission/area state, required interactions, attempts, selected option IDs, correctness, review, world actions, fragments, checkpoint transforms, final world state, content version, and sync outbox events. Do not duplicate the authored story or answer keys into SQLite.
+Store learner-scoped stable IDs and outcomes in SQLite: mission/area state, required interactions, attempts, selected option IDs, correctness, review, world actions, fragments, checkpoint transforms, final world state, content version, and sync outbox events. Do not duplicate authored story or answer keys into SQLite.
 
 ## Acceptance
 
 - all static content loads from the mission JSON;
-- all question keys validate;
-- one scene and three areas;
-- hybrid UI input is conflict-free;
-- offline completion works;
+- competency metadata validates;
+- each area has one principal interaction and three scored checks;
+- one scene and three connected areas;
+- the full greybox exists before visual dressing;
+- Area 1 is completed as the first vertical slice;
+- hybrid UI input is conflict-free and only approved surfaces block movement;
+- exit/resume restores the latest checkpoint and world state;
 - Area 3 completion and mission completion are atomic;
-- synchronization is idempotent;
+- synchronization is learner-scoped and idempotent;
 - server availability never supplies static content.

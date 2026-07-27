@@ -554,5 +554,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g5_lq_t1_m04.primary",
+    "primary_competency_summary": "Informational text; topic, main idea, and supporting details; explanation and news report; author’s purpose; fact, opinion, and fact-based opinion; formal/informal tone; visual and multimedia meaning.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g5_lq_t1_m03.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Newsroom of True Pages and applies the mission learning focus.",
+    "mechanic_family": "story_artifact_manipulation"
+  }
 }

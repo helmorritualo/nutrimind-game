@@ -1,5 +1,7 @@
 # Three-Area Progress Contract
 
+The three logical design roles are Discover, Apply, and Master. Existing phase enum values remain unchanged for compatibility.
+
 ## Mission definition
 
 Every published static gameplay mission has exactly three areas.
@@ -71,3 +73,7 @@ The server validates IDs and state transitions. It does not re-score static Unit
 ## Static gameplay content boundary
 
 Sync and mission DTOs contain stable IDs, progress states, outcomes, revisions, and availability. They never contain static dialogue, question text, options, answer keys, hints, or world actions.
+
+## UI-state exclusion
+
+Canonical progress does not include learning-overlay state, hint-open state, reminder acknowledgement UI, area-complete banners, or learning-summary screens. Unity reports resolved question outcomes, review-required state, world action, collectible, checkpoint, area completion, and mission completion.

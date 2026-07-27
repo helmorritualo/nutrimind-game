@@ -39,7 +39,7 @@ World-space UI
 https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/world-space-ui.html
 ```
 
-The project uses UI Toolkit for application screens and complex/data-heavy gameplay panels. uGUI remains the selected system for lightweight gameplay HUD, animated feedback, and world-space Canvas markers. Both systems coexist through one input and modal-coordination boundary.
+The project uses UI Toolkit for application screens and the limited set of blocking gameplay overlays: mission introduction, the reusable learning-and-question overlay, pause, mission complete, and optional exit confirmation. uGUI remains the selected system for the lightweight gameplay HUD, subtitles, animated feedback, and world-space Canvas markers. Both systems coexist through one input and modal-coordination boundary.
 
 ## SQLite
 
@@ -57,3 +57,7 @@ https://github.com/sinanata/unity-ui-document-design-system
 ```
 
 The package may be used behind NutriMind-owned UXML/USS wrappers. Pin an exact version or commit, keep vendor files unmodified, and verify compatibility with the frozen Unity 6 version.
+
+## Environment prototype policy
+
+Mission environments are greyboxed first. A free modular asset family may dress the greybox after traversal and the core loop work. Vendor demo scenes must not define mission progression, and third-party assets remain isolated under a ThirdParty boundary with their license recorded.

@@ -558,5 +558,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g5_sci_t1_m04.primary",
+    "primary_competency_summary": "Applying investigation steps; classifying plants, animals, and microorganisms in tables.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g5_sci_t1_m03.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Living Things Sorting Forest and applies the mission learning focus.",
+    "mechanic_family": "guided_scientific_investigation"
+  }
 }

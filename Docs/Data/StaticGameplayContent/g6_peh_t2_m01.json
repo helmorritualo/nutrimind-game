@@ -557,5 +557,14 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_peh_t2_m01.primary",
+    "primary_competency_summary": "Concepts and benefits of preventing early pregnancy; goals, responsibility, and age-appropriate decision-making.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Choice Compass and applies the mission learning focus.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

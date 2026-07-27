@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "content_version": "1.0.0",
+  "content_version": "1.1.0",
   "mission_id": "g5_peh_t1_m01",
   "grade_id": "grade_5",
   "subject_id": "subject_pe_health",
@@ -105,37 +105,6 @@
           "first_wrong_hint": "Look for a body sensation.",
           "second_wrong_explanation": "Tight shoulders are a physical sign.",
           "correct_feedback": "Tight shoulders are a physical sign."
-        },
-        {
-          "id": "g5_peh_t1_m01_a01_q02",
-          "type": "multiple_choice_single",
-          "is_scored": true,
-          "prompt": "Which thought may show stress?",
-          "options": [
-            {
-              "id": "a",
-              "text": "“Everything will go wrong.”"
-            },
-            {
-              "id": "b",
-              "text": "“I will ask what time the program starts.”"
-            },
-            {
-              "id": "c",
-              "text": "“The banner is blue.”"
-            },
-            {
-              "id": "d",
-              "text": "“I brought my water bottle.”"
-            }
-          ],
-          "correct_option_ids": [
-            "a"
-          ],
-          "attempt_limit": 2,
-          "first_wrong_hint": "Look for the worried prediction.",
-          "second_wrong_explanation": "The repeated worst-case thought may be a stress sign.",
-          "correct_feedback": "The repeated worst-case thought may be a stress sign."
         },
         {
           "id": "g5_peh_t1_m01_a01_q03",
@@ -334,29 +303,6 @@
           "first_wrong_hint": "Use clear feelings and a specific request.",
           "second_wrong_explanation": "The statement explains the concern and asks for practical help.",
           "correct_feedback": "The statement explains the concern and asks for practical help."
-        },
-        {
-          "id": "g5_peh_t1_m01_a02_q04",
-          "type": "true_false",
-          "is_scored": true,
-          "prompt": "A coping plan can include both small steps and support from a trusted person.",
-          "options": [
-            {
-              "id": "true",
-              "text": "True"
-            },
-            {
-              "id": "false",
-              "text": "False"
-            }
-          ],
-          "correct_option_ids": [
-            "true"
-          ],
-          "attempt_limit": 2,
-          "first_wrong_hint": "Healthy coping can combine self-management and help-seeking.",
-          "second_wrong_explanation": "The statement is true.",
-          "correct_feedback": "The statement is true."
         }
       ],
       "world_action": "Arrange Maya’s tasks into three steps and walk with her to the event coordinator.",
@@ -500,29 +446,6 @@
           "first_wrong_hint": "A balanced plan uses more than one safe strategy.",
           "second_wrong_explanation": "The selected plan supports physical, emotional, and social well-being.",
           "correct_feedback": "The selected plan supports physical, emotional, and social well-being."
-        },
-        {
-          "id": "g5_peh_t1_m01_a03_q04",
-          "type": "true_false",
-          "is_scored": true,
-          "prompt": "Healthy coping means every person must use exactly the same strategy.",
-          "options": [
-            {
-              "id": "true",
-              "text": "True"
-            },
-            {
-              "id": "false",
-              "text": "False"
-            }
-          ],
-          "correct_option_ids": [
-            "false"
-          ],
-          "attempt_limit": 2,
-          "first_wrong_hint": "People may need different safe strategies.",
-          "second_wrong_explanation": "The statement is false; safe coping choices can differ by person and situation.",
-          "correct_feedback": "The statement is false; safe coping choices can differ by person and situation."
         }
       ],
       "world_action": "Assemble and apply the balanced coping plan at Rest Grove.",
@@ -546,5 +469,14 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "milestone_authored_exact_content"
+  "authoring_status": "milestone_authored_exact_content",
+  "competency_contract": {
+    "primary_competency_id": "peh_g5_t1_stress_and_coping",
+    "primary_competency_summary": "Recognize stress signals and apply healthy coping strategies.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner identifies relevant stress clues, chooses a safe coping response, performs it, and builds a balanced support plan.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

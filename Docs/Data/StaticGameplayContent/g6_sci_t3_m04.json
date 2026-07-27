@@ -558,5 +558,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_sci_t3_m04.primary",
+    "primary_competency_summary": "Interpreting PHIVOLCS alert-level information; actions before, during, and after volcanic activity.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_sci_t3_m03.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Alert Level Command Center and applies the mission learning focus.",
+    "mechanic_family": "guided_scientific_investigation"
+  }
 }

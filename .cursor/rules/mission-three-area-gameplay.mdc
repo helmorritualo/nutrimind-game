@@ -1,5 +1,4 @@
 ---
-description: NutriMind three-area static gameplay
-alwaysApply: true
+description: NutriMind simplified three-area static gameplay
 ---
-One mission scene contains exactly three areas. Use the optimized loop: explore, observe/read, interact, learn/answer, review only when required, apply the subject action, show world result, collect, checkpoint, unlock. Area 3 integrates the final challenge. Load authored content from per-mission JSON. Persist state and outbox in SQLite. Never send static answer keys to the server.
+One mission scene contains exactly three areas: Discover, Apply, Master. Use one primary competency per mission and at most one supporting competency. Each area has one principal subject interaction, one world action, one collectible, and one checkpoint. Use two or three scored checks by default, maximum four; Science may add one unscored prediction. Use only the approved blocking overlays: mission introduction, reusable learning/question overlay, pause, mission complete, and optional exit confirmation. Prefer subtitles, prompts, markers, feedback, collectible reveal, checkpoint toast, and world changes over modals. Area 3 integrates the final challenge. Load authored content from per-mission JSON. Persist learner-scoped state and outbox in SQLite. Never send static answer keys to the server.

@@ -8,6 +8,7 @@ Read with:
 
 ```text
 Docs/Shared/SHARED_PRODUCT_CONTRACT.md
+Docs/Shared/THREE_AREA_GAMEPLAY_LOOP_CONTRACT.md
 Docs/Shared/API/openapi.yaml
 Docs/Data/GAMEPLAY_CONTENT_MANIFEST_V5.json
 Docs/Data/GAMEPLAY_CONTENT_CATALOG_V1.json
@@ -110,9 +111,9 @@ Each mission scene contains exactly three logical open-world areas.
 
 ```text
 Mission Scene
-├── Area 1 — Discover and Connect
-├── Area 2 — Practice and Apply
-└── Area 3 — Resolve and Master
+├── Area 1 — Discover
+├── Area 2 — Apply
+└── Area 3 — Master
 ```
 
 There is no scene load between areas.
@@ -130,72 +131,88 @@ Area unlocks are represented through:
 
 The mission scene loads once and exits only when the player leaves or completes the mission.
 
-## 5. Three-area content model
+## 5. Three-area content and competency model
 
-### Area 1
+The original five-area plans are compressed into three substantial learning situations, not three areas filled with several miniature stations.
 
-Combines former Areas 1 and 2.
+Every mission declares:
+
+- one primary competency owned by the mission;
+- at most one supporting competency;
+- prerequisite and review competency IDs;
+- one mastery-evidence statement;
+- one principal mechanic family.
+
+### Area 1 — Discover
+
+Combines the introductory purpose of former Areas 1 and 2.
 
 Required shape:
 
-- mission introduction;
-- primary NPC/problem;
-- first observations or story clues;
-- one guided subject action;
-- no more than five scored questions;
+- one mission introduction;
+- one primary NPC, station, or problem;
+- two or three observable clues;
+- one guided subject interaction;
+- two or three scored checks by default, maximum four;
+- one world action and visible result;
 - first collectible;
 - checkpoint;
 - in-world unlock of Area 2.
 
-### Area 2
+### Area 2 — Apply
 
-Combines former Areas 3 and 4.
+Combines the application purpose of former Areas 3 and 4.
 
 Required shape:
 
-- application or comparison;
-- one subject-specific action;
-- no more than five scored questions;
-- review when required;
+- one related application or comparison situation;
+- one less-guided subject interaction;
+- two or three scored application checks by default, maximum four;
+- inline review state only when required;
+- one world action and visible result;
 - second collectible;
 - checkpoint;
 - in-world unlock of Area 3.
 
-### Area 3
+Area 2 must apply the same primary competency. It must not introduce an unrelated lesson merely to fill the area.
 
-Combines former Area 5 and final challenge.
+### Area 3 — Master
+
+Combines former Area 5 and the former final challenge.
 
 Required shape:
 
-- synthesis;
-- integrated mission challenge;
-- no more than five scored questions;
+- one integrated mastery situation;
+- use of evidence or items from Areas 1 and 2;
+- one mastery interaction;
+- up to three mastery checks by default, maximum four;
 - final subject action;
 - third collectible;
 - final world restoration;
-- mission completion.
+- mission completion in the same transaction as Area 3 completion.
 
 ### Required optimization
 
 Remove:
 
-- repeated mission introductions;
-- repeated scene loads;
+- repeated mission introductions and scene loads;
 - repeated NPC explanation of the same premise;
-- repeated tutorial panels;
+- repeated tutorial, reminder, review, all-correct, area-complete, and learning-summary modals;
 - one-question micro-stations;
-- duplicate question wording;
-- repeated Area Complete interruptions when one checkpoint toast is sufficient;
+- duplicate question wording or duplicate new-learning ownership;
+- manually carried quest inventory when automatic station transfer is sufficient;
 - a separate final-challenge loading sequence.
 
 Preserve:
 
 - required curriculum concepts;
-- subject-specific action;
-- feedback and review;
+- one clear subject-specific interaction per area;
+- feedback and review state;
 - world consequence;
 - three progress checkpoints;
 - three mission collectibles.
+
+The complete behavioral contract is `Docs/Shared/THREE_AREA_GAMEPLAY_LOOP_CONTRACT.md`.
 
 ## 6. Mission scene hierarchy
 
@@ -298,64 +315,56 @@ Important state must persist outside scene-only MonoBehaviours.
 
 ```text
 Explore
-→ interact with story source
-→ read/watch/observe clue
-→ solve story or language activity
-→ answer up to five questions
-→ first-wrong hint
-→ second-wrong explanation and review mark
-→ restore story world state
-→ collect Story Fragment
+→ inspect story evidence
+→ manipulate one story artifact
+→ resolve two or three short checks
+→ confirm the interpretation
+→ restore the story world
+→ collect a Story Fragment
 → checkpoint or mission completion
 ```
+
+Each area contains one main story source and one principal manipulation interaction such as arranging events, repairing a caption, matching dialogue, selecting evidence, or assembling a short narrative artifact.
 
 ### PE & Health
 
 ```text
 Explore
-→ observe a health situation
-→ identify clues
-→ learn an age-appropriate concept
-→ answer up to five questions
-→ choose a healthy/safe action
+→ observe one health or safety situation
+→ identify relevant clues
+→ resolve two or three situation checks
+→ choose a healthy or safe action
 → perform the action in the world
-→ observe wellness result
-→ collect Wellness Symbol
+→ observe the NPC/environment result
+→ collect a Wellness Symbol
 → checkpoint or mission completion
 ```
 
-Answering alone is not enough. The healthy action and visible result are required.
-
-Do not diagnose, prescribe, or replace professional guidance.
+Answering alone is not enough. The predefined healthy action and visible result are required. Do not diagnose, prescribe, or replace professional guidance.
 
 ### Science
 
 ```text
 Explore
 → observe
-→ record observation
-→ predict
-→ perform guided investigation
-→ record result
-→ answer evidence questions
-→ form conclusion
-→ apply scientific solution
-→ observe world result
-→ collect Science Evidence Token
+→ make one unscored prediction when appropriate
+→ perform one investigation
+→ record one result
+→ resolve two or three evidence checks
+→ form one conclusion
+→ apply the scientific solution
+→ observe the world result
+→ collect a Science Evidence Token
 → checkpoint or mission completion
 ```
 
-A prediction may be incorrect without being treated as a failed scored question.
-
-Grade 5 investigations are more guided and visual.
-
-Grade 6 may use variables, repeated trials, fair testing, precise measurement, and evidence-supported conclusions.
+A prediction may be incorrect without being treated as a failed scored question. Grade 5 investigations are guided, visual, and normally one principal action. Grade 6 may use variables, repeated trials, fair testing, precise measurement, and evidence-supported conclusions.
 
 ## 9. Question systems
 
 ### Static gameplay question engine
 
-Stored locally in Unity.
+Static gameplay questions are stored locally in Unity.
 
 Supported types:
 
@@ -363,25 +372,25 @@ Supported types:
 multiple_choice_single
 multiple_choice_multiple
 true_false
+prediction_single_unscored
 ```
 
 Default policy:
 
-- no more than five scored questions per area;
-- maximum two attempts per scored question;
-- first wrong answer gives a hint;
-- second wrong answer gives explanation/correct concept and marks review;
-- no life loss;
-- no mission restart;
-- review summary after the area when required.
+- two or three scored checks per area;
+- hard maximum of four scored checks per area;
+- one additional unscored Science prediction when appropriate;
+- maximum two attempts per scored closed-answer question;
+- first wrong answer changes the active learning overlay to a focused hint state;
+- second wrong answer changes the same overlay to an explanation/correct-concept state and records review-required;
+- no life loss, mission restart, or mandatory full quiz repetition;
+- review-required items appear in the optional objective/journal drawer and final mission result rather than a separate area-review modal.
 
-Use replaceable data assets.
-
-Do not hard-code final text or answer keys in controllers. Load them from the versioned per-mission JSON packs indexed by `GAMEPLAY_CONTENT_CATALOG_V1.json`.
+Use replaceable data assets. Do not hard-code final text or answer keys in controllers. Load them from the versioned per-mission JSON packs indexed by `GAMEPLAY_CONTENT_CATALOG_V1.json`.
 
 ### Quiz Portal client
 
-Server-managed application feature.
+Quiz Portal is a separate server-managed application feature.
 
 Unity receives:
 
@@ -393,84 +402,42 @@ Unity receives:
 - scored result after submission;
 - result history.
 
-The server scores Quiz Portal attempts.
-
-Static gameplay and Quiz Portal DTOs, storage, presenters, and services remain separate. Static gameplay answer keys never enter Student API DTOs.
+The server scores Quiz Portal attempts. Static gameplay and Quiz Portal DTOs, storage, presenters, and services remain separate. Static gameplay answer keys never enter Student API DTOs.
 
 ## 10. Hybrid UI architecture
 
 ### UI Toolkit application UI
 
-Use for:
+Use UI Toolkit for bootstrap, authentication, home, subject/term/mission browsing, profile, progress, rewards, certificates, announcements, leaderboards, settings, and Quiz Portal screens.
 
-- bootstrap and update state;
-- login;
-- home/dashboard;
-- subject and mission browsing;
-- profile;
-- progress;
-- rewards;
-- certificates;
-- announcements;
-- leaderboards;
-- settings;
-- Quiz Portal screens.
+Use the pinned design-system package through NutriMind-owned templates, tokens, adapters, and overrides. Do not edit package styles.
 
-Use:
+### Blocking gameplay overlays
 
-```text
-UIDocument
-PanelSettings
-UXML
-USS
-UI Builder
-NutriMind screen presenters/controllers
-```
+Use UI Toolkit for the small set of complex blocking gameplay surfaces:
 
-Use the Sinan Ata design system for tokens and reusable application components.
+- mission introduction;
+- one reusable learning-and-question overlay;
+- pause menu when implemented in the same framework;
+- mission-complete result;
+- optional exit confirmation.
 
-Do not edit package styles.
-
-Create NutriMind-owned overrides:
-
-```text
-Assets/NutriMind/AppUI/Theme/NutriMindTokens.uss
-Assets/NutriMind/AppUI/Theme/NutriMindOverrides.uss
-```
-
-Wrap package-specific class names behind NutriMind UXML templates and view factories where practical.
+The reusable learning overlay handles evidence, reading, question, answer choices, first-wrong hint, second-wrong explanation, and acknowledgement as states of one presenter. Do not create separate modal prefabs for learning clue, reminder, review, all-correct, investigation-complete, healthy-choice-complete, area-complete, and learning-summary states.
 
 ### uGUI gameplay UI
 
-Use for:
+Use uGUI screen-space Canvas for:
 
-- HUD;
-- objective tracker;
-- interaction prompts;
-- dialogue;
-- learning clue;
-- gameplay question;
-- feedback/hint/explanation;
-- review;
-- collectible reveal;
-- subject journal/guide;
-- pause;
-- checkpoint;
-- mission complete;
-- transition.
+- compact objective and `x/3` collectible HUD;
+- interaction prompts and controller hints;
+- subtitles and short NPC status;
+- correct-answer and area-restored feedback;
+- collectible reveal and checkpoint toast;
+- pause/loading/transition where animation requirements make uGUI preferable.
 
-Gameplay UI uses:
+Use uGUI world-space Canvas for NPC, object, station, path, collectible, and interaction markers.
 
-```text
-Canvas
-CanvasScaler
-GraphicRaycaster
-TextMeshPro
-EventSystem
-CanvasGroup
-```
-
-Gameplay scenes intentionally mix UI Toolkit panels and uGUI layers through the documented `GameplayUiCoordinator`; individual panels must not mix framework controls internally.
+One `GameplayUiCoordinator` is the sole blocking-overlay and input-gating authority. Player and camera input are blocked only while a blocking overlay is open. Non-modal subtitles, prompts, HUD, and feedback do not stop exploration.
 
 ## 11. Application scenes and screens
 

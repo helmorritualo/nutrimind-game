@@ -66,7 +66,7 @@ Never expose answer keys before submission.
 
 ## Static question engine
 
-Implement reusable local question logic with UI Toolkit question/review presenters and uGUI feedback/HUD presenters.
+Implement reusable local question logic with UI Toolkit one reusable learning/question overlay presenter and uGUI feedback/HUD presenters.
 
 Support all three question types and the two-attempt policy.
 

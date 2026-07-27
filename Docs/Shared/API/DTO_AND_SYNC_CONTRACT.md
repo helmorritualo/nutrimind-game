@@ -83,3 +83,7 @@ Network failure returns `sending` events to `pending`.
 ## Static gameplay content boundary
 
 Sync and mission DTOs contain stable IDs, progress states, outcomes, revisions, and availability. They never contain static dialogue, question text, options, answer keys, hints, or world actions.
+
+## Gameplay-loop semantics
+
+The stable phase values map to Discover, Apply, and Master. Sync payloads contain learning outcomes and world/progress facts, not gameplay overlay or modal presentation state. Competency IDs may be included in read models for reporting but static question content and answer keys remain excluded.

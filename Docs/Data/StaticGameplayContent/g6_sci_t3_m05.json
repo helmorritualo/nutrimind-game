@@ -558,5 +558,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_sci_t3_m05.primary",
+    "primary_competency_summary": "Philippine seasons and activities; Earth rotation; Sun–Earth–Moon model; seasons, star patterns, eclipses; constellations and cultural use.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_sci_t3_m04.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Seasonal Sky Observatory and applies the mission learning focus.",
+    "mechanic_family": "guided_scientific_investigation"
+  }
 }

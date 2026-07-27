@@ -558,5 +558,14 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_sci_t2_m01.primary",
+    "primary_competency_summary": "Producers, consumers, scavengers, decomposers; competition and predation.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Broken Food Web and applies the mission learning focus.",
+    "mechanic_family": "guided_scientific_investigation"
+  }
 }

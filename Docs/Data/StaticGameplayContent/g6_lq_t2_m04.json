@@ -554,5 +554,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_lq_t2_m04.primary",
+    "primary_competency_summary": "Persuasive text, propaganda techniques, author point of view, target audience, logic, tone, and visual influence.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_lq_t2_m03.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Persuasion Bazaar and applies the mission learning focus.",
+    "mechanic_family": "story_artifact_manipulation"
+  }
 }

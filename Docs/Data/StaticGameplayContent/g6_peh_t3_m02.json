@@ -557,5 +557,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_peh_t3_m02.primary",
+    "primary_competency_summary": "Healthful prevention and control of common communicable diseases.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_peh_t3_m01.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for Prevention Patrol and applies the mission learning focus.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

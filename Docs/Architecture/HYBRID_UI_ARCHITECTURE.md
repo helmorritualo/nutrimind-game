@@ -6,74 +6,59 @@ Use UI Toolkit for authentication, home, subject/term/mission browsing, profile,
 
 ## Gameplay scenes
 
-Gameplay scenes deliberately use both UI Toolkit and uGUI.
+Gameplay scenes use UI Toolkit only for complex blocking overlays and uGUI for moment-to-moment gameplay UI.
 
-### UI Toolkit — complex/data-heavy screen-space panels
+### UI Toolkit — limited blocking overlays
 
-Use `UIDocument` and gameplay-specific `PanelSettings` for:
+Use one gameplay `UIDocument` and gameplay-specific `PanelSettings` for:
 
-- mission introduction and objective details;
-- dialogue, reading, image/text evidence, and learning-clue panels;
-- question-and-answer panels, including long choices and multiple-answer state;
-- hint, explanation, and review panels;
-- Science Journal and detailed Wellness Guide views;
-- mission learning summary and data-rich results.
+- mission introduction;
+- the reusable learning-and-question overlay;
+- mission-complete result;
+- optional exit confirmation;
+- pause when it shares the same navigation/focus implementation.
 
-UI Toolkit presenters consume pure gameplay view models. Use UXML/USS, focus management, responsive layouts, and virtualized lists when content is long.
+The learning overlay has internal states for evidence/reading, question, first-wrong hint, second-wrong explanation, and acknowledgement. These are not separate modal stacks.
 
-### uGUI screen-space Canvas — immediate gameplay HUD and feedback
+### uGUI screen-space Canvas — HUD, subtitles, and feedback
 
 Use uGUI for:
 
-- area/collectible HUD;
-- compact objective tracker;
-- interaction prompt;
-- reticle and controller hints;
-- answer feedback toast where no full panel is needed;
-- collectible reveal, checkpoint toast, pause, loading/transition, and urgent system overlay;
+- current objective and `x/3` collectible HUD;
+- interaction prompt and controller hints;
+- subtitles and short NPC status;
+- concise correct-answer feedback;
+- area-restored banner;
+- collectible reveal and checkpoint toast;
+- loading/transition and urgent system overlay;
 - animation-heavy moment-to-moment feedback.
 
 ### uGUI world-space Canvas — in-world UI
 
-Use world-space Canvas for:
-
-- NPC, object, station, and path markers;
-- interaction anchors;
-- locked/unlocked indicators;
-- short NPC status or progress indicators;
-- collectible labels.
-
-Do not place the full question panel or long reading content in world space.
+Use world-space Canvas for NPC, object, station, path, collectible, and interaction markers. Do not place full questions or long reading content in world space.
 
 ## Scene hierarchy
 
 ```text
 _GAMEPLAY_UI
-├── UITK_GameplayPanels
-│   ├── UIDocument_GameplayModal
+├── UITK_GameplayOverlay
+│   ├── UIDocument_GameplayOverlay
 │   └── GameplayPanelSettings
-├── Canvas_HUD                 screen space, order 0
-├── Canvas_Feedback            screen space, order 100
-├── Canvas_System              screen space, order 500
-├── Canvas_Transition          screen space, order 1000
+├── Canvas_HUD
+├── Canvas_Subtitles
+├── Canvas_Feedback
+├── Canvas_System
+├── Canvas_Transition
 └── WorldSpaceUI
     ├── NPCMarkers
     ├── ObjectMarkers
+    ├── StationMarkers
     ├── PathMarkers
     └── InteractionAnchors
 ```
 
 ## Coordination
 
-Use one `GameplayUiCoordinator` as the sole modal authority.
+Use one `GameplayUiCoordinator` as the sole blocking-overlay authority. It opens only one blocking surface, gates player/camera input, coordinates focus, prevents raycast fall-through, and restores the prior input map on close.
 
-It must:
-
-- open only one blocking modal stack at a time;
-- gate player and camera input while UI Toolkit or blocking uGUI panels are open;
-- coordinate focus between UI Toolkit and the Input System UI module;
-- prevent pointer/raycast fall-through;
-- restore the prior input map and focus on close;
-- expose framework-neutral `IGameplayPanel`, `IGameplayHud`, `IWorldMarker`, and `IInputGate` interfaces.
-
-Do not make UI Toolkit presenters reference scene GameObjects directly. Do not make uGUI HUD scripts own mission state or Student API DTOs.
+Non-modal HUD, subtitles, prompts, and feedback must not unnecessarily block movement. UI presenters consume view models and do not own mission state or reference server DTOs directly.

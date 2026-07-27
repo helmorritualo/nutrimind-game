@@ -557,5 +557,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_peh_t2_m05.primary",
+    "primary_competency_summary": "Net/wall game concepts, sustained movement, emotional regulation, fair play, and term synthesis.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_peh_t2_m04.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for Net/Wall Resolve and applies the mission learning focus.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

@@ -36,3 +36,12 @@ The other 87 packs are complete, loadable, developer-editable structured drafts 
 ## Release gate
 
 All learner-facing content—including milestone content—must receive curriculum-owner review, age-appropriateness review, and classroom-material approval before production release. Stable IDs must be preserved after learner progress exists.
+
+## Simplified loop revision
+
+- Primary competency ownership fields present in all 90 mission packs.
+- Default scored-question target: two or three per area.
+- Maximum scored questions found: 4.
+- Exact milestone packs updated to the simplified loop.
+- Future draft packs remain subject to curriculum-owner review for duplicate learning and mechanic variation.
+- Blocking gameplay UI reduced to the approved minimal overlay set.

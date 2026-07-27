@@ -557,5 +557,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g6_peh_t1_m03.primary",
+    "primary_competency_summary": "Engaging in physical and other activities to improve holistic wellness; goal setting and self-monitoring.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g6_peh_t1_m02.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Personal Wellness Plan and applies the mission learning focus.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

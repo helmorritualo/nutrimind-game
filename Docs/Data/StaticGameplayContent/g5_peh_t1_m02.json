@@ -557,5 +557,16 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "future_mission_structured_curriculum_draft"
+  "authoring_status": "future_mission_structured_curriculum_draft",
+  "competency_contract": {
+    "primary_competency_id": "g5_peh_t1_m02.primary",
+    "primary_competency_summary": "Assertive behavior for bullying, harassment, discrimination, and violence; help-seeking and bystander safety.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [
+      "g5_peh_t1_m01.primary"
+    ],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner completes the Area 3 mastery interaction for The Brave Voice Bridge and applies the mission learning focus.",
+    "mechanic_family": "healthy_action_application"
+  }
 }

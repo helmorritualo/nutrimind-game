@@ -10,13 +10,13 @@ NutriMind is a Grade 5 and Grade 6 educational platform with a Laravel–Inertia
 
 Unity owns and loads developer-editable static JSON for:
 
-- mission premise, story, and objective;
+- mission premise, competency ownership, story, and objective;
 - dialogue and learning clues;
 - gameplay questions, options, answer keys, hints, explanations, and feedback;
 - NPCs, interactables, subject activities, world results, and collectibles;
 - local mission execution and immediate local scoring.
 
-SQLite stores learner state and a sync outbox. It does not become an authored-content database.
+SQLite stores learner-scoped state and a sync outbox. It does not become an authored-content database.
 
 ### Server owns classroom operations and tracking
 
@@ -26,10 +26,11 @@ For static gameplay, the server owns only:
 - mission publication and classroom mission lock/unlock policy;
 - prerequisite-aware mission availability returned to Unity;
 - canonical mission/area progress facts synchronized from Unity;
+- competency-aware progress summaries when competency metadata is included in the manifest;
 - Teacher progress views, reports, and audit history;
 - idempotent sync receipts and canonical revisions.
 
-A Teacher may view progress for assigned Students and lock or unlock missions for the Teacher’s own classroom. A Teacher does not edit static gameplay dialogue, questions, or answer keys through the server.
+A Teacher may view progress for assigned Students and lock or unlock missions for the Teacher’s own classroom. A Teacher does not edit static gameplay dialogue, questions, answer keys, environment objects, or subject activities through the server.
 
 Quiz Portal remains a separate server-managed system. Its authoring, assignment, delivery, answer protection, scoring, and results are not part of the static gameplay-content pipeline.
 
@@ -63,29 +64,57 @@ Mission IDs: `g<grade>_<subject>_t<term>_m<mission>`.
 Area IDs: `<mission_id>_a01` through `<mission_id>_a03`.
 Stable IDs never change after progress exists.
 
+## Competency ownership
+
+Each mission owns one primary competency and may include one supporting competency. Static mission content declares:
+
+```text
+primary_competency_id
+primary_competency_summary
+supporting_competency_ids
+prerequisite_competency_ids
+review_competency_ids
+mastery_evidence
+mechanic_family
+```
+
+Later missions may review or integrate an earlier competency but must not silently reintroduce it as new learning. Future curriculum-draft packs require curriculum-owner review of these fields before production release.
+
 ## Mission scene model
 
-Each mission is one Unity open-world scene containing three spatially distinct logical areas, three checkpoints, three collectibles, and one integrated final challenge in Area 3. Area transitions are world-state changes, not scene loads.
+Each mission is one Unity open-world scene containing three spatially distinct logical areas, three checkpoints, three collectibles, and one integrated mastery challenge in Area 3. Area transitions are world-state changes, not scene loads.
+
+The stable phase IDs are:
+
+```text
+discover_and_connect
+practice_and_apply
+resolve_and_master
+```
+
+Their design roles are Discover, Apply, and Master.
 
 ## Optimized core loop
 
-Mission introduction appears once. Each area then uses one continuous chain:
+Mission introduction appears once. The complete requirements are defined in `THREE_AREA_GAMEPLAY_LOOP_CONTRACT.md`.
 
 ```text
-Explore → Observe/Read → Interact → Learn → Answer → Apply subject action → See world result → Collect → Checkpoint → Unlock
+Area 1: Discover
+→ Area 2: Apply
+→ Area 3: Master and complete
 ```
 
-Only show a review panel when an incorrect answer requires review. Do not show a separate “all correct” completion panel before the collectible. Use a lightweight success state, one collectible reveal, and one checkpoint toast. Area 3 integrates synthesis and the final world action; there is no separate final-challenge scene or API.
+Each area uses one principal learning situation, one subject interaction, one world action, one collectible, and one checkpoint. Area 3 contains the former final challenge; there is no separate final-challenge scene or API.
 
 ### Subject identity
 
-- LiteraQuest: inspect text/visual evidence, answer, repair/arrange/publish, collect a Story Fragment.
-- PE & Health: observe a health situation, decide, apply a safe healthy action, observe the result, collect a Wellness Symbol.
-- Science: observe, make an unscored prediction, investigate, record evidence, answer, conclude, apply, collect a Science Evidence Token.
+- LiteraQuest: inspect story evidence, manipulate a story artifact, confirm understanding, restore the story world, collect a Story Fragment.
+- PE & Health: observe a health or safety situation, choose and perform a safe action, observe the consequence, collect a Wellness Symbol.
+- Science: observe, predict, investigate, record, conclude, apply, collect a Science Evidence Token.
 
 ## Question policy
 
-Maximum five scored questions per area. Scored closed-answer questions permit at most two attempts. First incorrect attempt gives a hint; second incorrect attempt reveals the correct concept, marks review-required, and continues. No lives, forced mission restart, or brute-force clicking.
+Use two or three scored checks per area by default and never exceed four. Science may add one unscored prediction. Scored closed-answer questions permit at most two attempts. The first incorrect attempt gives a focused inline hint; the second reveals the correct concept, marks review-required, and continues. No lives, forced mission restart, brute-force clicking, or mandatory area-quiz repetition.
 
 ## Progress and availability
 
@@ -108,19 +137,25 @@ A Teacher unlock does not complete prerequisites or fabricate progress. A Teache
 
 ## Offline model
 
-After successful authentication, installed and locally permitted missions may run offline using the last signed availability snapshot. Unity commits progress and an idempotent outbox event in one SQLite transaction, updates UI immediately, then synchronizes later. Server policy wins on reconciliation without deleting valid local evidence silently.
+After successful authentication, installed and locally permitted missions may run offline using the last signed availability snapshot. Unity commits progress and an idempotent outbox event in one learner-scoped SQLite transaction, updates UI immediately, then synchronizes later. Server policy wins on reconciliation without deleting valid local evidence silently.
 
-## UI contract
+## Minimal gameplay UI contract
 
-Application scenes use UI Toolkit. Gameplay scenes use a deliberate hybrid:
+Application scenes use UI Toolkit. Gameplay scenes use a deliberate hybrid.
 
-- UI Toolkit screen-space panels for complex/data-heavy content such as mission introduction, dialogue/reading, question-and-answer, hint/review, journal/guide detail, and learning summary;
-- uGUI screen-space Canvas for HUD, objectives, interaction prompts, toasts, pause, collectible feedback, and transitions;
-- uGUI world-space Canvas for NPC/object/path markers, interaction anchors, and status indicators.
+Blocking gameplay UI is limited to:
 
-One modal coordinator gates player/camera input and prevents simultaneous UI Toolkit and uGUI modal interaction.
+- mission introduction;
+- one reusable learning-and-question overlay;
+- pause;
+- mission complete;
+- optional exit confirmation.
+
+The learning overlay owns evidence, question, hint, explanation, and acknowledgement states. It is not split into separate learning, reminder, review, and completion modals.
+
+Use uGUI screen-space and world-space UI for the compact HUD, objectives, prompts, subtitles, markers, feedback, collectible reveal, checkpoint toast, and transitions. Prefer visible world changes over panels. One `GameplayUiCoordinator` gates player/camera input and prevents simultaneous blocking UI.
 
 ## API
 
 Canonical Student API prefix: `/api/v1/student`.
-`shared/API/openapi.yaml` is authoritative for transport. Static gameplay JSON is never returned by the Student API.
+`shared/API/openapi.yaml` is authoritative for transport. Static gameplay JSON is never returned by the Student API. UI modal states are not server progress states.

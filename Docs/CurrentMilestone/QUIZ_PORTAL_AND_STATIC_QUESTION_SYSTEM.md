@@ -24,7 +24,7 @@ true_false
 prediction_single_unscored
 ```
 
-Maximum five scored questions per area. First incorrect scored attempt shows a hint. Second incorrect attempt reveals the correct concept, marks review-required, and continues. A prediction is recorded but not graded.
+Use two or three scored checks per area by default and never exceed four. The first incorrect scored attempt changes the reusable learning overlay to a hint state. The second changes the same overlay to an explanation state, marks review-required, and continues without a separate review modal. A prediction is recorded but not graded.
 
 ## Quiz Portal
 

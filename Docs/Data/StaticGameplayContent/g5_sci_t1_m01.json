@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "content_version": "1.0.0",
+  "content_version": "1.1.0",
   "mission_id": "g5_sci_t1_m01",
   "grade_id": "grade_5",
   "subject_id": "subject_science",
@@ -442,37 +442,6 @@
           "correct_feedback": "The block is a solid."
         },
         {
-          "id": "g5_sci_t1_m01_a03_q02",
-          "type": "multiple_choice_single",
-          "is_scored": true,
-          "prompt": "How should the bottled water be classified?",
-          "options": [
-            {
-              "id": "a",
-              "text": "Liquid"
-            },
-            {
-              "id": "b",
-              "text": "Solid"
-            },
-            {
-              "id": "c",
-              "text": "Gas"
-            },
-            {
-              "id": "d",
-              "text": "Not matter"
-            }
-          ],
-          "correct_option_ids": [
-            "a"
-          ],
-          "attempt_limit": 2,
-          "first_wrong_hint": "It takes the shape of its container.",
-          "second_wrong_explanation": "The water is a liquid.",
-          "correct_feedback": "The water is a liquid."
-        },
-        {
           "id": "g5_sci_t1_m01_a03_q03",
           "type": "multiple_choice_single",
           "is_scored": true,
@@ -557,5 +526,14 @@
     }
   ],
   "release_status": "curriculum_owner_review_required_before_production_release",
-  "authoring_status": "milestone_authored_exact_content"
+  "authoring_status": "milestone_authored_exact_content",
+  "competency_contract": {
+    "primary_competency_id": "sci_g5_t1_matter_mass_space_states",
+    "primary_competency_summary": "Matter has mass and occupies space; solids, liquids, and gases are forms of matter.",
+    "supporting_competency_ids": [],
+    "prerequisite_competency_ids": [],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner uses observations from solid, liquid, and gas investigations to classify examples and justify that each has mass and occupies space.",
+    "mechanic_family": "guided_scientific_investigation"
+  }
 }

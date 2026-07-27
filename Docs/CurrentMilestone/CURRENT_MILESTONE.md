@@ -19,7 +19,7 @@ The LiteraQuest scene must prove:
 - UI Toolkit mission introduction, dialogue/reading, question, hint/review, and summary panels;
 - uGUI screen-space HUD, objective, feedback, collectible, checkpoint, pause, and transition UI;
 - uGUI world-space NPC/object/path markers;
-- one modal/input coordinator across both UI systems.
+- one gameplay UI coordinator across both UI systems with only the approved blocking overlays.
 
 ## Required gameplay/server slice
 
@@ -37,3 +37,7 @@ SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue
 ```
 
 PE & Health and Science Mission 1 remain scene-deferred.
+
+## Updated gameplay-loop constraint
+
+Implement the LiteraQuest M1 Storybook Village Festival greybox as Story Square, Banner Market Lane, and Chronicle Courtyard. Complete Area 1 first. Follow the shared three-area loop contract and do not add separate learning, reminder, review, area-complete, or learning-summary modals.
