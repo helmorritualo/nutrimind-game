@@ -2,6 +2,7 @@
   <Project Path="Unity.AI.Sound.csproj" />
   <Project Path="Unity.Timeline.csproj" />
   <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.csproj" />
+  <Project Path="Unity.InputSystem.csproj" />
   <Project Path="Unity.PlasticSCM.Editor.csproj" />
   <Project Path="Unity.AppUI.csproj" />
   <Project Path="Unity.AI.Toolkit.Asset.csproj" />
@@ -30,7 +31,6 @@
   <Project Path="Unity.InferenceEngine.Editor.Visualizer.csproj" />
   <Project Path="Unity.VisualScripting.Flow.Editor.csproj" />
   <Project Path="Unity.VisualStudio.Editor.csproj" />
-  <Project Path="Unity.InputSystem.csproj" />
   <Project Path="PPv2URPConverters.csproj" />
   <Project Path="Unity.InferenceEngine.csproj" />
   <Project Path="Unity.AI.Mesh.csproj" />
@@ -57,7 +57,7 @@
   <Project Path="Unity.TextMeshPro.csproj" />
   <Project Path="Unity.TextMeshPro.Editor.csproj" />
   <Project Path="Unity.AppUI.Navigation.Editor.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="NutriMind.csproj" />
   <Project Path="Unity.Burst.Editor.csproj" />
   <Project Path="Unity.AI.Image.csproj" />
   <Project Path="Unity.AI.Generators.UI.csproj" />
@@ -77,7 +77,9 @@
   <Project Path="Unity.AppUI.MVVM.csproj" />
   <Project Path="Unity.AI.Toolkit.GenerationObjectPicker.csproj" />
   <Project Path="Unity.AI.Assistant.API.Editor.csproj" />
+  <Project Path="Gilzoide.SqliteNet.csproj" />
   <Project Path="Unity.Multiplayer.Center.Common.csproj" />
+  <Project Path="NutriMind.Tests.EditMode.csproj" />
   <Project Path="Unity.AI.Generators.UI.AIDropdownIntegrations.csproj" />
   <Project Path="Unity.AppUI.Navigation.csproj" />
   <Project Path="Unity.InputSystem.ForUI.csproj" />
@@ -93,6 +95,7 @@
   <Project Path="UnityEditor.UI.Analytics.csproj" />
   <Project Path="Unity.AI.Assistant.Annotations.Editor.csproj" />
   <Project Path="Unity.AppUI.Editor.csproj" />
+  <Project Path="Gilzoide.SqliteNet.Editor.csproj" />
   <Project Path="Unity.AI.MCP.Runtime.csproj" />
   <Project Path="Unity.InputSystem.TestFramework.csproj" />
   <Project Path="Unity.ShaderGraph.Utilities.csproj" />
@@ -101,11 +104,14 @@
   <Project Path="Unity.AppUI.Redux.Editor.csproj" />
   <Project Path="Unity.AI.Pbr.Srp.csproj" />
   <Project Path="Unity.AppUI.Undo.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.CollabProxy.Editor.csproj" />
   <Project Path="Unity.AI.Toolkit.Async.csproj" />
   <Project Path="Unity.RenderPipeline.Universal.ShaderLibrary.csproj" />
   <Project Path="Unity.AI.Assistant.Bridge.Editor.csproj" />
   <Project Path="Unity.AI.Toolkit.Compliance.csproj" />
+  <Project Path="NutriMind.Tests.TestData.csproj" />
+  <Project Path="NutriMind.Editor.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Shaders.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
@@ -124,6 +130,7 @@
   <Project Path="Unity.Rendering.LightTransport.Editor.csproj" />
   <Project Path="Unity.Collections.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="NutriMind.Tests.PlayMode.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Config.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj" />
   <Project Path="Unity.RenderPipelines.Core.ShaderLibrary.csproj" />

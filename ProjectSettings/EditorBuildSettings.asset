@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/NutriMind/App/Scenes/SCN_App_Bootstrap.unity
+    guid: 913ac22d99640324aa7e3449751356aa
+  - enabled: 1
+    path: Assets/NutriMind/App/Scenes/SCN_App_Authentication.unity
+    guid: 3311f2014451a4044b8ebbf45df5f979
+  - enabled: 1
+    path: Assets/NutriMind/App/Scenes/SCN_App_Main.unity
+    guid: e4da43de189aa7042846149d0cea5575
+  - enabled: 1
+    path: Assets/NutriMind/App/Scenes/SCN_App_QuizPortal.unity
+    guid: 69616958cf906d14589745a3b424a35c
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

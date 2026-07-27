@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.gilzoide.sqlite-net": "https://github.com/gilzoide/unity-sqlite-net.git#1.3.2",
     "com.sinanata.designsystem": "https://github.com/sinanata/unity-ui-toolkit-design-system.git?path=/Assets/DesignSystem",
     "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.23",
     "com.unity.ai.assistant": "2.15.0-pre.2",
