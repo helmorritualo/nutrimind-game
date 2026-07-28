@@ -43,6 +43,8 @@ namespace NutriMind.Gameplay.UI
         private GameplaySafeAreaApplier _safeAreaApplier;
         private bool _disposed;
         private bool _inputEnabled = true;
+        private bool _interactionAvailable;
+        private bool _pauseAvailable = true;
         private float _lastWidth = -1f;
         private float _lastHeight = -1f;
         private string _currentInteractionIconClass = GameplayStudentHudViewModel.DefaultInteractionIconClass;
@@ -90,6 +92,7 @@ namespace NutriMind.Gameplay.UI
 
             if (_pauseButton != null)
             {
+                _pauseAvailable = sanitized.PauseAvailable;
                 _pauseButton.SetEnabled(sanitized.PauseAvailable);
                 _pauseButton.EnableInClassList(
                     "gameplay-student-hud__pause-button--unavailable",
@@ -190,6 +193,7 @@ namespace NutriMind.Gameplay.UI
 
             if (_interactionButton != null)
             {
+                _interactionAvailable = available;
                 _interactionButton.SetEnabled(available);
                 _interactionButton.style.display = available ? DisplayStyle.Flex : DisplayStyle.Flex;
             }
@@ -334,7 +338,17 @@ namespace NutriMind.Gameplay.UI
 
         private void OnInteractionClicked(ClickEvent evt)
         {
-            if (!_inputEnabled || _interactionButton == null || !_interactionButton.enabledSelf)
+            RaiseInteractionRequested();
+        }
+
+        private void OnPauseClicked(ClickEvent evt)
+        {
+            RaisePauseRequested();
+        }
+
+        internal void RaiseInteractionRequested()
+        {
+            if (!_inputEnabled || !_interactionAvailable)
             {
                 return;
             }
@@ -342,9 +356,9 @@ namespace NutriMind.Gameplay.UI
             InteractionRequested?.Invoke();
         }
 
-        private void OnPauseClicked(ClickEvent evt)
+        internal void RaisePauseRequested()
         {
-            if (!_inputEnabled || _pauseButton == null || !_pauseButton.enabledSelf)
+            if (!_inputEnabled || !_pauseAvailable)
             {
                 return;
             }

@@ -1,9 +1,46 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 using NutriMind.Gameplay.UI;
 using UnityEngine;
 
 namespace NutriMind.Gameplay.Runtime
 {
+    public sealed class MissionValidationReport
+    {
+        public readonly List<string> Errors = new List<string>();
+        public readonly List<string> Warnings = new List<string>();
+        public readonly List<string> ManualPlacementRequired = new List<string>();
+        public readonly List<string> Informational = new List<string>();
+
+        public bool IsValid => Errors.Count == 0 && ManualPlacementRequired.Count == 0;
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            AppendSection(builder, "Errors", Errors);
+            AppendSection(builder, "Warnings", Warnings);
+            AppendSection(builder, "Manual placement required", ManualPlacementRequired);
+            AppendSection(builder, "Informational checks", Informational);
+            return builder.ToString().Trim();
+        }
+
+        private static void AppendSection(StringBuilder builder, string title, List<string> items)
+        {
+            builder.AppendLine(title + ":");
+            if (items.Count == 0)
+            {
+                builder.AppendLine("  (none)");
+                return;
+            }
+
+            foreach (string item in items)
+            {
+                builder.AppendLine("  - " + item);
+            }
+        }
+    }
+
     public sealed class MissionSceneBindings : MonoBehaviour
     {
         [Header("Runtime")]
@@ -15,6 +52,7 @@ namespace NutriMind.Gameplay.Runtime
 
         [Header("Player")]
         [SerializeField] private GameplayPrototypePlayerController _player;
+        [SerializeField] private GameplayPrototypePlayerInputAdapter _playerInputAdapter;
         [SerializeField] private PlayerInteractionController _playerInteraction;
         [SerializeField] private Transform _playerSpawn;
 
@@ -47,6 +85,7 @@ namespace NutriMind.Gameplay.Runtime
         public GameplayStudentHudRuntimeController HudController => _hudController;
         public GameplayLearningOverlayController OverlayController => _overlayController;
         public GameplayPrototypePlayerController Player => _player;
+        public GameplayPrototypePlayerInputAdapter PlayerInputAdapter => _playerInputAdapter;
         public PlayerInteractionController PlayerInteraction => _playerInteraction;
         public Transform PlayerSpawn => _playerSpawn;
         public NpcGuideInteractable FarmerLira => _farmerLira;
@@ -71,63 +110,443 @@ namespace NutriMind.Gameplay.Runtime
 
         public bool TryValidate(out string error)
         {
-            var builder = new StringBuilder();
-            RequireReference(_missionJson, "Mission JSON", builder);
-            RequireReference(_missionController, "MissionPrototypeController", builder);
-            RequireReference(_uiCoordinator, "GameplayUiCoordinator", builder);
-            RequireReference(_hudController, "GameplayStudentHudRuntimeController", builder);
-            RequireReference(_overlayController, "GameplayLearningOverlayController", builder);
-            RequireReference(_player, "Player", builder);
-            RequireReference(_playerInteraction, "PlayerInteractionController", builder);
-            RequireReference(_playerSpawn, "Player spawn", builder);
-            RequireReference(_farmerLira, "Farmer Lira", builder);
-            RequireReference(_damagedStorybook, "Damaged storybook", builder);
-            RequireReference(_openingIllustrationClue, "Opening illustration clue", builder);
-            RequireReference(_survivingLinesClue, "Surviving lines clue", builder);
-            RequireReference(_captionBoard, "Caption board", builder);
-            RequireReference(_area1WorldState, "Area 1 world state", builder);
-            RequireReference(_fragment1, "Fragment 1", builder);
-            RequireReference(_gate1, "Gate 1", builder);
-            RequireReference(_checkpointA01, "Checkpoint A01", builder);
-            RequireReference(_mina, "Mina", builder);
-            RequireReference(_childrenGatherClue, "Children gather clue", builder);
-            RequireReference(_storybookOpenedClue, "Storybook opened clue", builder);
-            RequireReference(_captionRepairedClue, "Caption repaired clue", builder);
-            RequireReference(_sequenceBoard, "Sequence board", builder);
-            RequireReference(_area2WorldState, "Area 2 world state", builder);
-            RequireReference(_fragment2, "Fragment 2", builder);
-            RequireReference(_gate2, "Gate 2", builder);
-            RequireReference(_checkpointA02, "Checkpoint A02", builder);
+            MissionValidationReport report = Validate();
+            error = report.ToString();
+            return report.IsValid;
+        }
 
-            if (_fragment1 != null && _fragment1.gameObject.activeInHierarchy)
+        public MissionValidationReport Validate()
+        {
+            var report = new MissionValidationReport();
+            ValidateRequiredReferences(report);
+            ValidateStableIds(report);
+            ValidateColliders(report);
+            ValidateStartingStates(report);
+            ValidatePlacementSanity(report);
+            ValidatePlacementMarkers(report);
+            return report;
+        }
+
+        private void ValidateRequiredReferences(MissionValidationReport report)
+        {
+            Require(_missionJson, "Mission JSON", report);
+            Require(_missionController, "MissionPrototypeController", report);
+            Require(_uiCoordinator, "GameplayUiCoordinator", report);
+            Require(_hudController, "GameplayStudentHudRuntimeController", report);
+            Require(_overlayController, "GameplayLearningOverlayController", report);
+            Require(_player, "GameplayPrototypePlayerController", report);
+            if (_player == null && _playerInputAdapter == null)
             {
-                builder.AppendLine("Fragment 1 should start inactive/hidden.");
+                report.Errors.Add("Missing player adapter or GameplayPrototypePlayerController.");
             }
 
-            if (_fragment2 != null && _fragment2.gameObject.activeInHierarchy)
+            Require(_playerInteraction, "PlayerInteractionController", report);
+            Require(_playerSpawn, "Player spawn", report);
+            Require(_farmerLira, "Farmer Lira", report);
+            Require(_damagedStorybook, "Damaged storybook", report);
+            Require(_openingIllustrationClue, "Opening illustration clue", report);
+            Require(_survivingLinesClue, "Surviving lines clue", report);
+            Require(_captionBoard, "Caption board", report);
+            Require(_area1WorldState, "Area 1 world state", report);
+            Require(_fragment1, "Fragment 1", report);
+            Require(_gate1, "Gate 1", report);
+            Require(_checkpointA01, "Checkpoint A01", report);
+            Require(_area2Entry, "Area 2 entry", report);
+            Require(_mina, "Mina", report);
+            Require(_childrenGatherClue, "Children gather clue", report);
+            Require(_storybookOpenedClue, "Storybook opened clue", report);
+            Require(_captionRepairedClue, "Caption repaired clue", report);
+            Require(_sequenceBoard, "Sequence board", report);
+            Require(_area2WorldState, "Area 2 world state", report);
+            Require(_fragment2, "Fragment 2", report);
+            Require(_gate2, "Gate 2", report);
+            Require(_checkpointA02, "Checkpoint A02", report);
+        }
+
+        private void ValidateStableIds(MissionValidationReport report)
+        {
+            var interactionIds = new Dictionary<string, string>(StringComparer.Ordinal);
+            ValidateInteractableId(_farmerLira, "Farmer Lira", MissionContentIds.FarmerLiraNpc, interactionIds, report);
+            ValidateInteractableId(_damagedStorybook, "Damaged storybook", MissionContentIds.DamagedStorybook, interactionIds, report);
+            ValidateInteractableId(_captionBoard, "Caption board", MissionContentIds.CaptionRepairBoard, interactionIds, report);
+            ValidateInteractableId(_mina, "Mina", MissionContentIds.MinaNpc, interactionIds, report);
+            ValidateInteractableId(_sequenceBoard, "Sequence board", MissionContentIds.EventSequenceBoard, interactionIds, report);
+
+            var clueIds = new Dictionary<string, string>(StringComparer.Ordinal);
+            ValidateClueId(_openingIllustrationClue, "Opening illustration clue", MissionContentIds.ClueOpeningIllustration, clueIds, report);
+            ValidateClueId(_survivingLinesClue, "Surviving lines clue", MissionContentIds.ClueSurvivingLines, clueIds, report);
+            ValidateClueId(_childrenGatherClue, "Children gather clue", MissionContentIds.ClueChildrenGather, clueIds, report);
+            ValidateClueId(_storybookOpenedClue, "Storybook opened clue", MissionContentIds.ClueStorybookOpened, clueIds, report);
+            ValidateClueId(_captionRepairedClue, "Caption repaired clue", MissionContentIds.ClueCaptionRepaired, clueIds, report);
+
+            if (_fragment1 != null && _fragment1.CollectibleId != MissionContentIds.Fragment1)
             {
-                builder.AppendLine("Fragment 2 should start inactive/hidden.");
+                report.Errors.Add("Fragment 1 collectible id must be " + MissionContentIds.Fragment1);
             }
+
+            if (_fragment2 != null && _fragment2.CollectibleId != MissionContentIds.Fragment2)
+            {
+                report.Errors.Add("Fragment 2 collectible id must be " + MissionContentIds.Fragment2);
+            }
+
+            if (_gate1 != null && _gate1.GateId != MissionContentIds.Gate1)
+            {
+                report.Errors.Add("Gate 1 id must be " + MissionContentIds.Gate1);
+            }
+
+            if (_gate2 != null && _gate2.GateId != MissionContentIds.Gate2)
+            {
+                report.Errors.Add("Gate 2 id must be " + MissionContentIds.Gate2);
+            }
+
+            if (_checkpointA01 != null && _checkpointA01.CheckpointId != MissionContentIds.CheckpointA01)
+            {
+                report.Errors.Add("Checkpoint A01 id must be " + MissionContentIds.CheckpointA01);
+            }
+
+            if (_checkpointA02 != null && _checkpointA02.CheckpointId != MissionContentIds.CheckpointA02)
+            {
+                report.Errors.Add("Checkpoint A02 id must be " + MissionContentIds.CheckpointA02);
+            }
+        }
+
+        private void ValidateColliders(MissionValidationReport report)
+        {
+            ValidateInteractableTrigger(_farmerLira, "Farmer Lira", report);
+            ValidateInteractableTrigger(_damagedStorybook, "Damaged storybook", report);
+            ValidateInteractableTrigger(_openingIllustrationClue, "Opening illustration clue", report);
+            ValidateInteractableTrigger(_survivingLinesClue, "Surviving lines clue", report);
+            ValidateInteractableTrigger(_captionBoard, "Caption board", report);
+            ValidateInteractableTrigger(_mina, "Mina", report);
+            ValidateInteractableTrigger(_childrenGatherClue, "Children gather clue", report);
+            ValidateInteractableTrigger(_storybookOpenedClue, "Storybook opened clue", report);
+            ValidateInteractableTrigger(_captionRepairedClue, "Caption repaired clue", report);
+            ValidateInteractableTrigger(_sequenceBoard, "Sequence board", report);
+
+            ValidateFragmentTrigger(_fragment1, "Fragment 1", report);
+            ValidateFragmentTrigger(_fragment2, "Fragment 2", report);
+            ValidateTriggerCollider(_checkpointA01 != null ? _checkpointA01.GetComponent<Collider>() : null, "Checkpoint A01", report);
+            ValidateTriggerCollider(_checkpointA02 != null ? _checkpointA02.GetComponent<Collider>() : null, "Checkpoint A02", report);
+            ValidateTriggerCollider(_area2Entry != null ? _area2Entry.GetComponent<Collider>() : null, "Area 2 entry", report);
+
+            ValidateGateBlocker(_gate1, "Gate 1", report);
+            ValidateGateBlocker(_gate2, "Gate 2", report);
+        }
+
+        private void ValidateStartingStates(MissionValidationReport report)
+        {
+            ValidateFragmentStartState(_fragment1, "Fragment 1", report);
+            ValidateFragmentStartState(_fragment2, "Fragment 2", report);
 
             if (_gate1 != null && _gate1.State == AreaGateState.Unlocked)
             {
-                builder.AppendLine("Gate 1 should start locked.");
+                report.Errors.Add("Gate 1 should start locked.");
             }
 
             if (_gate2 != null && _gate2.State == AreaGateState.Unlocked)
             {
-                builder.AppendLine("Gate 2 should start locked.");
+                report.Errors.Add("Gate 2 should start locked.");
             }
 
-            error = builder.ToString().Trim();
-            return string.IsNullOrEmpty(error);
+            if (_overlayController != null && _overlayController.IsOpen)
+            {
+                report.Warnings.Add("Learning overlay should start hidden.");
+            }
+
+            report.Informational.Add("Starting-state checks completed for fragments, gates, and overlay.");
         }
 
-        private static void RequireReference(Object target, string label, StringBuilder builder)
+        private void ValidatePlacementSanity(MissionValidationReport report)
+        {
+            WarnIfAtParentOrigin(_farmerLira != null ? _farmerLira.transform : null, "Farmer Lira", report);
+            WarnIfAtParentOrigin(_mina != null ? _mina.transform : null, "Mina", report);
+            WarnIfAtParentOrigin(_storybookOpenedClue != null ? _storybookOpenedClue.transform : null, "Storybook opened clue", report);
+            WarnIfAtParentOrigin(_captionRepairedClue != null ? _captionRepairedClue.transform : null, "Caption repaired clue", report);
+            WarnIfAtParentOrigin(_sequenceBoard != null ? _sequenceBoard.transform : null, "Sequence board", report);
+            WarnIfAtParentOrigin(_checkpointA01 != null ? _checkpointA01.transform : null, "Checkpoint A01", report);
+            WarnIfAtParentOrigin(_checkpointA02 != null ? _checkpointA02.transform : null, "Checkpoint A02", report);
+
+            DetectIdenticalPositions(
+                new[]
+                {
+                    _childrenGatherClue != null ? _childrenGatherClue.transform : null,
+                    _storybookOpenedClue != null ? _storybookOpenedClue.transform : null,
+                    _captionRepairedClue != null ? _captionRepairedClue.transform : null
+                },
+                "Area 2 clues",
+                report);
+
+            if (_fragment1 != null && _damagedStorybook != null)
+            {
+                float distance = Vector3.Distance(_fragment1.transform.position, _damagedStorybook.transform.position);
+                if (distance > 8f)
+                {
+                    report.Warnings.Add("Fragment 1 is farther than 8 units from the storybook.");
+                }
+            }
+
+            if (_fragment2 != null && _sequenceBoard != null)
+            {
+                float distance = Vector3.Distance(_fragment2.transform.position, _sequenceBoard.transform.position);
+                if (distance > 10f)
+                {
+                    report.Warnings.Add("Fragment 2 is farther than 10 units from the sequence board.");
+                }
+            }
+
+            if (_area2Entry != null && _gate1 != null)
+            {
+                Vector3 entry = _area2Entry.transform.position;
+                Vector3 gate = _gate1.transform.position;
+                if (Vector3.Distance(entry, gate) < 0.5f)
+                {
+                    report.Warnings.Add("Area 2 entry trigger overlaps Gate 1.");
+                }
+            }
+        }
+
+        private void ValidatePlacementMarkers(MissionValidationReport report)
+        {
+            MissionPlacementRequired[] markers = FindObjectsByType<MissionPlacementRequired>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (MissionPlacementRequired marker in markers)
+            {
+                if (marker == null || marker.IsConfirmed)
+                {
+                    continue;
+                }
+
+                string message = string.IsNullOrWhiteSpace(marker.Instruction)
+                    ? marker.gameObject.name + " requires manual placement."
+                    : marker.Instruction;
+                report.ManualPlacementRequired.Add(message);
+            }
+        }
+
+        private static void Require(UnityEngine.Object target, string label, MissionValidationReport report)
         {
             if (target == null)
             {
-                builder.AppendLine("Missing reference: " + label);
+                report.Errors.Add("Missing reference: " + label);
+            }
+        }
+
+        private static void ValidateInteractableId(
+            WorldInteractableBase interactable,
+            string label,
+            string expectedId,
+            Dictionary<string, string> seen,
+            MissionValidationReport report)
+        {
+            if (interactable == null)
+            {
+                return;
+            }
+
+            string id = interactable.InteractionId;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                report.Errors.Add(label + " has an empty interaction id.");
+                return;
+            }
+
+            if (!string.Equals(id, expectedId, StringComparison.Ordinal))
+            {
+                report.Errors.Add(label + " interaction id must be " + expectedId);
+            }
+
+            if (seen.TryGetValue(id, out string existing))
+            {
+                report.Errors.Add("Duplicate interaction id '" + id + "' on " + label + " and " + existing);
+            }
+            else
+            {
+                seen.Add(id, label);
+            }
+        }
+
+        private static void ValidateClueId(
+            EvidenceClueInteractable clue,
+            string label,
+            string expectedId,
+            Dictionary<string, string> seen,
+            MissionValidationReport report)
+        {
+            if (clue == null)
+            {
+                return;
+            }
+
+            string id = clue.ClueId;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                report.Errors.Add(label + " has an empty clue id.");
+                return;
+            }
+
+            if (!string.Equals(id, expectedId, StringComparison.Ordinal))
+            {
+                report.Errors.Add(label + " clue id must be " + expectedId);
+            }
+
+            if (seen.TryGetValue(id, out string existing))
+            {
+                report.Errors.Add("Duplicate clue id '" + id + "' on " + label + " and " + existing);
+            }
+            else
+            {
+                seen.Add(id, label);
+            }
+        }
+
+        private static void ValidateInteractableTrigger(
+            WorldInteractableBase interactable,
+            string label,
+            MissionValidationReport report)
+        {
+            if (interactable == null)
+            {
+                return;
+            }
+
+            Collider[] colliders = interactable.GetComponentsInChildren<Collider>(true);
+            Collider trigger = null;
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                if (colliders[i] != null && colliders[i].isTrigger)
+                {
+                    trigger = colliders[i];
+                    break;
+                }
+            }
+
+            ValidateTriggerCollider(trigger, label, report);
+        }
+
+        private static void ValidateFragmentTrigger(
+            StoryFragmentCollectible fragment,
+            string label,
+            MissionValidationReport report)
+        {
+            if (fragment == null)
+            {
+                return;
+            }
+
+            ValidateTriggerCollider(fragment.TriggerCollider, label, report);
+        }
+
+        private static void ValidateTriggerCollider(Collider collider, string label, MissionValidationReport report)
+        {
+            if (collider == null)
+            {
+                report.Errors.Add(label + " is missing a trigger collider.");
+                return;
+            }
+
+            if (!collider.isTrigger)
+            {
+                report.Errors.Add(label + " collider must use isTrigger = true.");
+            }
+        }
+
+        private static void ValidateGateBlocker(AreaGateController gate, string label, MissionValidationReport report)
+        {
+            if (gate == null)
+            {
+                return;
+            }
+
+            Collider blocker = gate.GetComponentInChildren<Collider>();
+            if (blocker == null)
+            {
+                report.Errors.Add(label + " is missing a blocker collider.");
+                return;
+            }
+
+            if (blocker.isTrigger)
+            {
+                report.Errors.Add(label + " blocker must not be a trigger.");
+            }
+
+            if (blocker is BoxCollider box && (box.size.x <= 0.01f || box.size.y <= 0.01f || box.size.z <= 0.01f))
+            {
+                report.Errors.Add(label + " blocker dimensions are zero or near-zero.");
+            }
+        }
+
+        private static void ValidateFragmentStartState(
+            StoryFragmentCollectible fragment,
+            string label,
+            MissionValidationReport report)
+        {
+            if (fragment == null)
+            {
+                return;
+            }
+
+            if (!fragment.gameObject.activeSelf)
+            {
+                report.Errors.Add(label + " host must remain active while hidden.");
+            }
+
+            if (fragment.IsRevealed)
+            {
+                report.Errors.Add(label + " must start unrevealed.");
+            }
+
+            if (fragment.IsCollected)
+            {
+                report.Errors.Add(label + " must start uncollected.");
+            }
+
+            if (fragment.VisualRoot != null && fragment.VisualRoot.activeSelf)
+            {
+                report.Errors.Add(label + " visual root must start hidden.");
+            }
+
+            if (fragment.TriggerCollider != null && fragment.TriggerCollider.enabled)
+            {
+                report.Errors.Add(label + " trigger collider must start disabled.");
+            }
+        }
+
+        private static void WarnIfAtParentOrigin(Transform target, string label, MissionValidationReport report)
+        {
+            if (target == null || target.parent == null)
+            {
+                return;
+            }
+
+            if (target.localPosition.sqrMagnitude < 0.0001f)
+            {
+                report.Warnings.Add(label + " is at its parent origin and may need manual placement.");
+            }
+        }
+
+        private static void DetectIdenticalPositions(Transform[] targets, string groupLabel, MissionValidationReport report)
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (targets[i] == null)
+                {
+                    continue;
+                }
+
+                for (int j = i + 1; j < targets.Length; j++)
+                {
+                    if (targets[j] == null)
+                    {
+                        continue;
+                    }
+
+                    if (Vector3.Distance(targets[i].position, targets[j].position) < 0.05f)
+                    {
+                        report.Warnings.Add(groupLabel + " have identical or nearly identical positions.");
+                        return;
+                    }
+                }
             }
         }
     }

@@ -39,20 +39,17 @@ namespace NutriMind.Tests.EditMode.GameplayRuntime
         }
 
         [Test]
-        public void Fragment1UnlocksGate1_WhenMarked()
-        {
-            _store.MarkFragmentCollected(MissionContentIds.Fragment1);
-            _store.MarkGateUnlocked(MissionContentIds.Gate1);
-            Assert.That(_store.IsGateUnlocked(MissionContentIds.Gate1), Is.True);
-        }
-
-        [Test]
-        public void FragmentCount_RemainsClampedToThree()
+        public void FragmentCount_AcceptsOnlyAuthoredFragmentIds()
         {
             _store.MarkFragmentCollected(MissionContentIds.Fragment1);
             _store.MarkFragmentCollected(MissionContentIds.Fragment2);
+            _store.MarkFragmentCollected(MissionContentIds.Fragment3);
             _store.MarkFragmentCollected("extra_fragment");
-            Assert.That(_store.CollectedFragmentCount, Is.LessThanOrEqualTo(3));
+            _store.MarkFragmentCollected("another_unknown");
+
+            Assert.That(_store.CollectedFragmentCount, Is.EqualTo(3));
+            Assert.That(_store.IsFragmentCollected("extra_fragment"), Is.False);
+            Assert.That(_store.IsFragmentCollected(MissionContentIds.Fragment3), Is.True);
         }
     }
 }

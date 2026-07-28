@@ -55,6 +55,8 @@ namespace NutriMind.Gameplay.Runtime
                 return;
             }
 
+            IGameplayPlayerInput playerInput = ResolvePlayerInput(_bindings);
+
             if (_bindings.Player != null && _bindings.PlayerSpawn != null)
             {
                 _bindings.Player.TeleportTo(_bindings.PlayerSpawn);
@@ -66,13 +68,13 @@ namespace NutriMind.Gameplay.Runtime
                     this,
                     _bindings.Player.transform,
                     _bindings.Player.PlayerCamera.transform);
-                _bindings.HudController?.Initialize(_bindings.Player, _bindings.PlayerInteraction);
+                _bindings.HudController?.Initialize(playerInput, _bindings.PlayerInteraction);
             }
 
             _bindings.UiCoordinator?.Initialize(
                 _bindings.HudController,
                 _bindings.OverlayController,
-                _bindings.Player,
+                playerInput,
                 _bindings.PlayerInteraction);
 
             _bindings.Fragment1?.Initialize(this);
@@ -196,6 +198,14 @@ namespace NutriMind.Gameplay.Runtime
 
         public void HandleFragmentCollected(string fragmentId)
         {
+            if (!string.Equals(fragmentId, MissionContentIds.Fragment1, StringComparison.Ordinal)
+                && !string.Equals(fragmentId, MissionContentIds.Fragment2, StringComparison.Ordinal))
+            {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignoring unknown or unimplemented fragment id: " + fragmentId);
+                return;
+            }
+
             if (_progress.IsFragmentCollected(fragmentId))
             {
                 return;
@@ -228,8 +238,7 @@ namespace NutriMind.Gameplay.Runtime
         public void HandleAreaEntry(string areaId)
         {
             if (string.Equals(areaId, MissionContentIds.Area2Id, StringComparison.Ordinal)
-                && _progress.CurrentStep >= MissionObjectiveStep.Area1_Complete
-                && _progress.CurrentStep < MissionObjectiveStep.Area2_TalkToMina)
+                && _progress.CurrentStep == MissionObjectiveStep.Area1_Complete)
             {
                 EnterArea2();
             }
@@ -432,11 +441,19 @@ namespace NutriMind.Gameplay.Runtime
             _progress.CurrentStep = MissionObjectiveStep.Area1_Complete;
             _bindings.CheckpointA01?.SetActivated(true);
             UnlockGate(_bindings.Gate1, MissionContentIds.Gate1);
-            EnterArea2();
+
+            ApplyInteractionAvailability();
+            RefreshHud();
         }
 
         private void EnterArea2()
         {
+            if (_progress.CurrentAreaId == MissionContentIds.Area2Id
+                && _progress.CurrentStep >= MissionObjectiveStep.Area2_TalkToMina)
+            {
+                return;
+            }
+
             _progress.CurrentAreaId = MissionContentIds.Area2Id;
             if (_progress.CurrentStep < MissionObjectiveStep.Area2_TalkToMina)
             {
@@ -678,6 +695,21 @@ namespace NutriMind.Gameplay.Runtime
             }
 
             return false;
+        }
+
+        private static IGameplayPlayerInput ResolvePlayerInput(MissionSceneBindings bindings)
+        {
+            if (bindings == null)
+            {
+                return null;
+            }
+
+            if (bindings.PlayerInputAdapter != null)
+            {
+                return bindings.PlayerInputAdapter;
+            }
+
+            return bindings.Player;
         }
     }
 }

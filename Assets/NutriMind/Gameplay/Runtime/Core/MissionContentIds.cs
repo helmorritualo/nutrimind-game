@@ -24,6 +24,34 @@ namespace NutriMind.Gameplay.Runtime
         public const string Gate2 = "g5_lq_t1_m01_gate_a02_a03";
         public const string CheckpointA02 = "g5_lq_t1_m01_checkpoint_a02";
 
+        /// <summary>Authored Area 3 collectible ID. Areas 1–2 runtime never collects it.</summary>
+        public const string Fragment3 = "g5_lq_t1_m01_a03_collectible";
+
+        public static readonly string[] AuthoredFragmentIds =
+        {
+            Fragment1,
+            Fragment2,
+            Fragment3
+        };
+
+        public static bool IsAuthoredFragmentId(string fragmentId)
+        {
+            if (string.IsNullOrEmpty(fragmentId))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < AuthoredFragmentIds.Length; i++)
+            {
+                if (string.Equals(AuthoredFragmentIds[i], fragmentId, System.StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static readonly string[] Area1QuestionIds =
         {
             "g5_lq_t1_m01_a01_q01",

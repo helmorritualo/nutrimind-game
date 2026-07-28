@@ -13,10 +13,12 @@ namespace NutriMind.Gameplay.Runtime
         private static readonly Collider[] OverlapBuffer = new Collider[32];
         private IWorldInteractable _focusedTarget;
         private MissionPrototypeController _missionController;
+        private bool _interactionEnabled = true;
 
         public event Action<IWorldInteractable> FocusChanged;
 
         public IWorldInteractable FocusedTarget => _focusedTarget;
+        public bool InteractionEnabled => _interactionEnabled;
 
         public void Initialize(MissionPrototypeController missionController, Transform player, Transform camera)
         {
@@ -32,6 +34,15 @@ namespace NutriMind.Gameplay.Runtime
             }
         }
 
+        public void SetInteractionEnabled(bool enabled)
+        {
+            _interactionEnabled = enabled;
+            if (!enabled)
+            {
+                SetFocusedTarget(null);
+            }
+        }
+
         private void Update()
         {
             UpdateFocusedTarget();
@@ -39,6 +50,11 @@ namespace NutriMind.Gameplay.Runtime
 
         public void InteractWithFocusedTarget()
         {
+            if (!_interactionEnabled)
+            {
+                return;
+            }
+
             if (_focusedTarget == null || !_focusedTarget.CanInteract)
             {
                 return;
@@ -54,7 +70,7 @@ namespace NutriMind.Gameplay.Runtime
 
         private void UpdateFocusedTarget()
         {
-            if (_playerTransform == null)
+            if (!_interactionEnabled || _playerTransform == null)
             {
                 SetFocusedTarget(null);
                 return;

@@ -152,11 +152,25 @@ namespace NutriMind.Gameplay.UI
                 {
                     text = model.OptionLabels[index] ?? string.Empty
                 };
-                button.AddToClassList("ds-button");
-                button.AddToClassList("ds-button--secondary");
+                button.AddToClassList("ds-btn");
+                button.AddToClassList("ds-btn--secondary");
                 button.AddToClassList("gameplay-learning-overlay__option-button");
                 _optionsList.Add(button);
             }
+        }
+
+        public void Dispose()
+        {
+            PrimaryActionRequested = null;
+            SecondaryActionRequested = null;
+            ConfirmActionRequested = null;
+            ResetActionRequested = null;
+            OptionSelected = null;
+            SequenceCardSelected = null;
+            SequenceSlotSelected = null;
+            _optionsList?.Clear();
+            _sequenceCards?.Clear();
+            _sequenceSlots?.Clear();
         }
 
         private void RebuildSequence(GameplayLearningOverlayViewModel model, bool showSequence)
@@ -182,6 +196,8 @@ namespace NutriMind.Gameplay.UI
                     {
                         text = model.OptionLabels[index] ?? string.Empty
                     };
+                    card.AddToClassList("ds-btn");
+                    card.AddToClassList("ds-btn--secondary");
                     card.AddToClassList("gameplay-learning-overlay__sequence-card");
                     if (!string.IsNullOrEmpty(model.SelectedCardLabel)
                         && model.SelectedCardLabel == model.OptionLabels[index])
@@ -205,6 +221,8 @@ namespace NutriMind.Gameplay.UI
                     {
                         text = (model.SlotLabels[index] ?? string.Empty) + "\n" + slotValue
                     };
+                    slot.AddToClassList("ds-btn");
+                    slot.AddToClassList("ds-btn--ghost");
                     slot.AddToClassList("gameplay-learning-overlay__sequence-slot");
                     if (!string.IsNullOrEmpty(slotValue))
                     {

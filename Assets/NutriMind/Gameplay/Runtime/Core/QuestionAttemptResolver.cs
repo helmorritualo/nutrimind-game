@@ -27,6 +27,18 @@ namespace NutriMind.Gameplay.Runtime
                 return new AttemptResult();
             }
 
+            int attemptLimit = question.attempt_limit > 0 ? question.attempt_limit : 2;
+            if (outcome.AttemptCount >= attemptLimit)
+            {
+                return new AttemptResult
+                {
+                    IsCorrect = false,
+                    ShowExplanation = true,
+                    CanAdvance = false,
+                    FeedbackText = question.second_wrong_explanation ?? string.Empty
+                };
+            }
+
             bool isCorrect = Array.Exists(
                 question.correct_option_ids ?? Array.Empty<string>(),
                 id => string.Equals(id, selectedOptionId, StringComparison.Ordinal));
@@ -48,7 +60,7 @@ namespace NutriMind.Gameplay.Runtime
             }
 
             outcome.Result = QuestionResult.Incorrect;
-            if (outcome.AttemptCount < question.attempt_limit)
+            if (outcome.AttemptCount < attemptLimit)
             {
                 return new AttemptResult
                 {

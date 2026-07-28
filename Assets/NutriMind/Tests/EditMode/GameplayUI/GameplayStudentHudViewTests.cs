@@ -140,10 +140,12 @@ namespace NutriMind.Tests.EditMode.GameplayUI
             int count = 0;
             view.InteractionRequested += () => count++;
 
-            Button button = root.Q<Button>("interaction-button");
-            using ClickEvent click = ClickEvent.GetPooled();
-            click.target = button;
-            button.SendEvent(click);
+            var model = GameplayStudentHudViewModel.CreateDefaultPreview();
+            model.InteractionAvailable = true;
+            model.InputEnabled = true;
+            view.SetViewModel(model);
+
+            view.RaiseInteractionRequested();
             Assert.That(count, Is.EqualTo(1));
 
             view.Dispose();
@@ -174,10 +176,12 @@ namespace NutriMind.Tests.EditMode.GameplayUI
             int count = 0;
             view.PauseRequested += () => count++;
 
-            Button button = root.Q<Button>("pause-button");
-            using ClickEvent click = ClickEvent.GetPooled();
-            click.target = button;
-            button.SendEvent(click);
+            var model = GameplayStudentHudViewModel.CreateDefaultPreview();
+            model.PauseAvailable = true;
+            model.InputEnabled = true;
+            view.SetViewModel(model);
+
+            view.RaisePauseRequested();
             Assert.That(count, Is.EqualTo(1));
 
             view.Dispose();

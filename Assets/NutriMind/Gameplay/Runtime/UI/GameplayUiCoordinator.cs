@@ -1,4 +1,3 @@
-using System;
 using NutriMind.Gameplay.UI;
 using UnityEngine;
 
@@ -27,12 +26,15 @@ namespace NutriMind.Gameplay.Runtime
 
             if (_overlay != null)
             {
+                _overlay.OverlayOpened -= OnOverlayOpened;
+                _overlay.OverlayClosed -= OnOverlayClosed;
                 _overlay.OverlayOpened += OnOverlayOpened;
                 _overlay.OverlayClosed += OnOverlayClosed;
             }
 
             if (_interactionController != null)
             {
+                _interactionController.FocusChanged -= OnFocusChanged;
                 _interactionController.FocusChanged += OnFocusChanged;
             }
         }
@@ -76,6 +78,7 @@ namespace NutriMind.Gameplay.Runtime
         {
             _hud?.SetInputEnabled(enabled);
             _playerInput?.SetGameplayInputEnabled(enabled);
+            _interactionController?.SetInteractionEnabled(enabled);
             if (!enabled)
             {
                 _hud?.ResetTouchControls();

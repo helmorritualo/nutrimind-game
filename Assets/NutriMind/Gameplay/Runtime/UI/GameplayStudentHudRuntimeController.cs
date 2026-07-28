@@ -1,4 +1,3 @@
-using System;
 using NutriMind.Gameplay.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,8 +12,11 @@ namespace NutriMind.Gameplay.Runtime
         private GameplayStudentHudView _view;
         private IGameplayPlayerInput _playerInput;
         private PlayerInteractionController _interactionController;
+        private GameplayStudentHudViewModel _currentModel = CreateDefaultModel();
+        private bool _hasRuntimeModel;
 
         public GameplayStudentHudView View => _view;
+        public GameplayStudentHudViewModel CurrentModel => _currentModel;
 
         public void Initialize(IGameplayPlayerInput playerInput, PlayerInteractionController interactionController)
         {
@@ -56,19 +58,12 @@ namespace NutriMind.Gameplay.Runtime
             _view.InteractionRequested += OnInteractionRequested;
             _view.PauseRequested += OnPauseRequested;
 
-            var model = new GameplayStudentHudViewModel
+            if (!_hasRuntimeModel)
             {
-                MissionTitle = "The Festival Storybook Rescue",
-                AreaPhaseLabel = "Area 1 • Discover",
-                ObjectiveText = "Talk to Farmer Lira beside the damaged storybook.",
-                CollectedFragments = 0,
-                TotalFragments = 3,
-                InteractionAvailable = false,
-                PauseAvailable = false,
-                ShowLookHelper = true,
-                InputEnabled = true
-            };
-            _view.SetViewModel(model);
+                _currentModel = CreateDefaultModel();
+            }
+
+            _view.SetViewModel(_currentModel);
         }
 
         private void Unbind()
@@ -88,32 +83,70 @@ namespace NutriMind.Gameplay.Runtime
 
         public void SetObjective(string areaPhase, string missionTitle, string objective)
         {
-            _view?.SetObjective(areaPhase, missionTitle, objective);
+            _hasRuntimeModel = true;
+            _currentModel.AreaPhaseLabel = areaPhase ?? string.Empty;
+            _currentModel.MissionTitle = missionTitle ?? string.Empty;
+            _currentModel.ObjectiveText = objective ?? string.Empty;
+            ApplyCurrentModel();
         }
 
         public void SetFragmentProgress(int collected, int total)
         {
-            _view?.SetFragmentProgress(collected, total);
+            _hasRuntimeModel = true;
+            _currentModel.CollectedFragments = collected;
+            _currentModel.TotalFragments = total;
+            ApplyCurrentModel();
         }
 
         public void SetInteraction(string label, string iconClass, bool available)
         {
-            _view?.SetInteraction(label, iconClass, available);
+            _hasRuntimeModel = true;
+            _currentModel.InteractionLabel = label ?? string.Empty;
+            _currentModel.InteractionIconClass = string.IsNullOrEmpty(iconClass)
+                ? GameplayStudentHudViewModel.DefaultInteractionIconClass
+                : iconClass;
+            _currentModel.InteractionAvailable = available;
+            ApplyCurrentModel();
         }
 
         public void SetInputEnabled(bool enabled)
         {
-            _view?.SetInputEnabled(enabled);
+            _hasRuntimeModel = true;
+            _currentModel.InputEnabled = enabled;
+            ApplyCurrentModel();
         }
 
         public void SetLookHelperVisible(bool visible)
         {
-            _view?.SetLookHelperVisible(visible);
+            _hasRuntimeModel = true;
+            _currentModel.ShowLookHelper = visible;
+            ApplyCurrentModel();
         }
 
         public void ResetTouchControls()
         {
             _view?.ResetTouchControls();
+        }
+
+        private void ApplyCurrentModel()
+        {
+            _view?.SetViewModel(_currentModel);
+        }
+
+        private static GameplayStudentHudViewModel CreateDefaultModel()
+        {
+            return new GameplayStudentHudViewModel
+            {
+                MissionTitle = "The Festival Storybook Rescue",
+                AreaPhaseLabel = "Area 1 • Discover",
+                ObjectiveText = "Talk to Farmer Lira beside the damaged storybook.",
+                CollectedFragments = 0,
+                TotalFragments = 3,
+                InteractionAvailable = false,
+                PauseAvailable = false,
+                ShowLookHelper = true,
+                InputEnabled = true
+            };
         }
 
         private void OnMoveChanged(Vector2 move)

@@ -12,7 +12,6 @@ namespace NutriMind.Editor
 {
     public static class MissionPrototypeSetupUtility
     {
-        private const string MenuPath = "NutriMind/Gameplay/Mission 1/Validate and Wire Areas 1-2 Prototype";
         private const string ScenePath =
             "Assets/NutriMind/Missions/Grade5/LiteraQuest/G5_LQ_T1_M01/Scenes/SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue.unity";
         private const string MissionJsonPath =
@@ -22,28 +21,65 @@ namespace NutriMind.Editor
             "Assets/NutriMind/Gameplay/UI/UITK/Overlay/UXML/GameplayLearningOverlay.uxml";
         private const string PanelSettingsPath = "Assets/NutriMind/Gameplay/UI/Settings/PS_GameplayStudentHud.asset";
 
-        [MenuItem(MenuPath)]
-        public static void ValidateAndWirePrototype()
+        [MenuItem("NutriMind/Gameplay/Mission 1/Validate Areas 1-2 Prototype")]
+        public static void ValidatePrototype()
         {
-            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            Scene scene = OpenMissionScene();
             if (!scene.IsValid())
             {
-                Debug.LogError("[MissionPrototypeSetupUtility] Could not open mission scene.");
+                return;
+            }
+
+            MissionSceneBindings bindings = UnityEngine.Object.FindFirstObjectByType<MissionSceneBindings>();
+            if (bindings == null)
+            {
+                Debug.LogError("[MissionPrototypeSetupUtility] MissionSceneBindings is missing. Run Wire Missing Runtime Components first.");
+                return;
+            }
+
+            MissionValidationReport report = bindings.Validate();
+            if (report.IsValid)
+            {
+                Debug.Log("[MissionPrototypeSetupUtility] Validation passed.\n" + report);
+            }
+            else
+            {
+                Debug.LogWarning("[MissionPrototypeSetupUtility] Validation failed.\n" + report);
+            }
+        }
+
+        [MenuItem("NutriMind/Gameplay/Mission 1/Wire Missing Runtime Components")]
+        public static void WireMissingRuntimeComponents()
+        {
+            Scene scene = OpenMissionScene();
+            if (!scene.IsValid())
+            {
                 return;
             }
 
             EnsurePanelSettings();
-            Transform missionRuntime = EnsureRoot("_MISSION_RUNTIME");
-            Transform interactions = EnsureRoot("_INTERACTIONS");
-            Transform collectibles = EnsureRoot("_COLLECTIBLES");
-            Transform gameplayUi = EnsureRoot("_GAMEPLAY_UI");
-            Transform playerRoot = EnsureRoot("_PLAYER");
 
-            Transform area1 = EnsureChild(interactions, "A01_StorySquare");
-            Transform area2 = EnsureChild(interactions, "A02_BannerMarketLane");
+            Transform missionRuntime = FindOrCreateRoot("_MISSION_RUNTIME", out _);
+            Transform interactions = FindOrCreateRoot("_INTERACTIONS", out _);
+            Transform collectibles = FindOrCreateRoot("_COLLECTIBLES", out _);
+            Transform gameplayUi = FindOrCreateRoot("_GAMEPLAY_UI", out _);
+            Transform playerRoot = FindOrCreateRoot("_PLAYER", out _);
+
+            Transform area1 = FindOrCreateChild(interactions, "A01_StorySquare", out _);
+            Transform area2 = FindOrCreateChild(interactions, "A02_BannerMarketLane", out _);
             Transform areaRootA01 = FindDeep(scene, "AreaRoot_A01") ?? area1;
 
-            GameplayPrototypePlayerController player = EnsurePlayer(playerRoot, scene);
+            if (!TryResolveExistingPlayer(playerRoot, scene, out GameplayPrototypePlayerController player, out string playerError))
+            {
+                Debug.LogError(
+                    "[MissionPrototypeSetupUtility] " + playerError
+                    + " Use NutriMind/Gameplay/Mission 1/Create Fallback Prototype Player only if intentional.");
+                return;
+            }
+
+            GameplayPrototypePlayerInputAdapter adapter = GetOrAdd<GameplayPrototypePlayerInputAdapter>(player.gameObject);
+            adapter.Bind(player);
+
             MissionPrototypeController missionController = GetOrAdd<MissionPrototypeController>(missionRuntime.gameObject);
             GameplayUiCoordinator uiCoordinator = GetOrAdd<GameplayUiCoordinator>(missionRuntime.gameObject);
             MissionSceneBindings bindings = GetOrAdd<MissionSceneBindings>(missionRuntime.gameObject);
@@ -57,7 +93,8 @@ namespace NutriMind.Editor
                 MissionContentIds.FarmerLiraNpc,
                 "Talk",
                 "ds-icon--speak",
-                new Vector3(-2f, 0f, -2f));
+                new Vector3(-2f, 0f, -2f),
+                "Farmer Lira requires manual placement beside the damaged storybook.");
             StorybookInteractable storybook = EnsureStorybook(area1, areaRootA01);
             EvidenceClueInteractable openingClue = EnsureClue(
                 storybook.transform,
@@ -65,24 +102,37 @@ namespace NutriMind.Editor
                 MissionContentIds.ClueOpeningIllustration,
                 "Opening Illustration",
                 "Children gather near the large acacia tree in Story Square.",
-                FindExisting(scene, "CLUE_Opening_illustration"));
+                FindExisting(scene, "CLUE_Opening_illustration"),
+                null,
+                null);
             EvidenceClueInteractable survivingClue = EnsureClue(
                 storybook.transform,
                 "CluePoint02_SurvivingLines",
                 MissionContentIds.ClueSurvivingLines,
                 "Surviving Lines",
                 "They plan to carry a friendship banner to the Chronicle Courtyard.",
-                FindExisting(scene, "CLUE_Surviving_Lines"));
+                FindExisting(scene, "CLUE_Surviving_Lines"),
+                null,
+                null);
             CaptionRepairInteractable captionBoard = EnsureCaptionBoard(storybook.transform);
             WorldStateController area1World = storybook.GetComponent<WorldStateController>();
             StoryFragmentCollectible fragment1 = EnsureFragment(
                 collectibles,
                 "CollectibleSpawn_Fragment01",
                 MissionContentIds.Fragment1,
-                storybook.transform.position + new Vector3(0f, 1.25f, 0.5f));
+                storybook.transform.position + new Vector3(0f, 1.25f, 0.5f),
+                "Fragment 1 requires manual placement above or behind the repaired storybook.");
             AreaGateController gate1 = EnsureGate(area1, "NextAreaGate_A01_A02", MissionContentIds.Gate1, FindExisting(scene, "Gate"));
-            CheckpointTrigger checkpointA01 = EnsureCheckpoint(area1, "Checkpoint_A01", MissionContentIds.CheckpointA01);
-            AreaEntryTrigger area2Entry = EnsureAreaEntry(area2, "PlayerEntry_A02", MissionContentIds.Area2Id);
+            CheckpointTrigger checkpointA01 = EnsureCheckpoint(
+                area1,
+                "Checkpoint_A01",
+                MissionContentIds.CheckpointA01,
+                "Checkpoint A01 requires manual placement on the path to Gate 1.");
+            AreaEntryTrigger area2Entry = EnsureAreaEntry(
+                area2,
+                "PlayerEntry_A02",
+                MissionContentIds.Area2Id,
+                "PlayerEntry_A02 requires manual placement after Gate 1.");
 
             NpcGuideInteractable mina = EnsureNpc(
                 area2,
@@ -90,13 +140,17 @@ namespace NutriMind.Editor
                 MissionContentIds.MinaNpc,
                 "Talk",
                 "ds-icon--speak",
-                new Vector3(0f, 0f, 2f));
+                new Vector3(0f, 0f, 2f),
+                "Mina requires manual placement near the first market stall.");
             EvidenceClueInteractable clue1 = EnsureClue(
                 area2,
                 "CluePoint01_ChildrenGather",
                 MissionContentIds.ClueChildrenGather,
                 "Children Gather",
-                "The children gather at the acacia tree.");
+                "The children gather at the acacia tree.",
+                null,
+                new Vector3(0f, 0f, 2f),
+                "CluePoint01_ChildrenGather requires manual placement near the start of Banner Market Lane.");
             EvidenceClueInteractable clue2 = EnsureClue(
                 area2,
                 "CluePoint02_StorybookOpened",
@@ -104,7 +158,8 @@ namespace NutriMind.Editor
                 "Storybook Opened",
                 "Farmer Lira opens the damaged storybook.",
                 null,
-                new Vector3(0f, 0f, 10f));
+                new Vector3(0f, 0f, 10f),
+                "CluePoint02_StorybookOpened requires manual placement in the middle section of Banner Market Lane.");
             EvidenceClueInteractable clue3 = EnsureClue(
                 area2,
                 "CluePoint03_CaptionRepaired",
@@ -112,26 +167,41 @@ namespace NutriMind.Editor
                 "Caption Repaired",
                 "The Pathfinder repairs the missing opening caption.",
                 null,
-                new Vector3(0f, 0f, 20f));
+                new Vector3(0f, 0f, 20f),
+                "CluePoint03_CaptionRepaired requires manual placement later in Banner Market Lane.");
             EventSequenceBoardInteractable sequenceBoard = EnsureSequenceBoard(area2);
             Transform sequenceNode = sequenceBoard.transform;
-            Transform beforeCompletion = EnsureChild(sequenceNode, "BeforeCompletion");
-            Transform afterCompletion = EnsureChild(sequenceNode, "AfterCompletion");
-            afterCompletion.gameObject.SetActive(false);
+            Transform beforeCompletion = FindOrCreateChild(sequenceNode, "BeforeCompletion", out _);
+            Transform afterCompletion = FindOrCreateChild(sequenceNode, "AfterCompletion", out bool afterCreated);
+            if (afterCreated || !afterCompletion.gameObject.activeSelf)
+            {
+                afterCompletion.gameObject.SetActive(false);
+            }
+
             WorldStateController area2World = GetOrAdd<WorldStateController>(sequenceNode.gameObject);
             SerializedObject worldSo = new SerializedObject(area2World);
             Assign(worldSo, "_beforeStateRoot", beforeCompletion.gameObject);
             Assign(worldSo, "_afterStateRoot", afterCompletion.gameObject);
             worldSo.ApplyModifiedPropertiesWithoutUndo();
+
             StoryFragmentCollectible fragment2 = EnsureFragment(
                 collectibles,
                 "CollectibleSpawn_Fragment02",
                 MissionContentIds.Fragment2,
-                sequenceBoard.transform.position + new Vector3(0f, 1.5f, 1f));
+                sequenceBoard.transform.position + new Vector3(0f, 1.5f, 1f),
+                "Fragment 2 requires manual placement near the completed sequence board.");
             AreaGateController gate2 = EnsureGate(area2, "NextAreaGate_A02_A03", MissionContentIds.Gate2);
-            CheckpointTrigger checkpointA02 = EnsureCheckpoint(area2, "Checkpoint_A02", MissionContentIds.CheckpointA02);
+            CheckpointTrigger checkpointA02 = EnsureCheckpoint(
+                area2,
+                "Checkpoint_A02",
+                MissionContentIds.CheckpointA02,
+                "Checkpoint A02 requires manual placement before Gate 2.");
 
-            Transform playerSpawn = FindDeep(scene, "PlayerSpawnPoint") ?? EnsureChild(playerRoot, "PlayerEntry_A01");
+            Transform playerSpawn = FindDeep(scene, "PlayerSpawnPoint");
+            if (playerSpawn == null)
+            {
+                playerSpawn = FindOrCreateChild(playerRoot, "PlayerEntry_A01", out _);
+            }
             PlayerInteractionController interaction = GetOrAdd<PlayerInteractionController>(player.gameObject);
 
             SerializedObject so = new SerializedObject(bindings);
@@ -141,6 +211,7 @@ namespace NutriMind.Editor
             Assign(so, "_hudController", hud);
             Assign(so, "_overlayController", overlay);
             Assign(so, "_player", player);
+            Assign(so, "_playerInputAdapter", adapter);
             Assign(so, "_playerInteraction", interaction);
             Assign(so, "_playerSpawn", playerSpawn);
             Assign(so, "_farmerLira", farmerLira);
@@ -168,33 +239,128 @@ namespace NutriMind.Editor
             Assign(missionSo, "_bindings", bindings);
             missionSo.ApplyModifiedPropertiesWithoutUndo();
 
-            DisableLooseCamera(scene);
+            WarnAboutLooseCameras(scene);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
 
-            if (bindings.TryValidate(out string error))
+            MissionValidationReport report = bindings.Validate();
+            if (report.IsValid)
             {
-                Debug.Log("[MissionPrototypeSetupUtility] Scene wired and validated successfully.");
+                Debug.Log("[MissionPrototypeSetupUtility] Wired missing components. Validation passed.\n" + report);
             }
             else
             {
-                Debug.LogWarning("[MissionPrototypeSetupUtility] Scene wired with validation warnings:\n" + error);
+                Debug.LogWarning("[MissionPrototypeSetupUtility] Wired missing components with remaining issues.\n" + report);
             }
+        }
+
+        [MenuItem("NutriMind/Gameplay/Mission 1/Create Missing Placeholder Anchors")]
+        public static void CreateMissingPlaceholderAnchors()
+        {
+            WireMissingRuntimeComponents();
+            Debug.Log(
+                "[MissionPrototypeSetupUtility] Placeholder anchors use MissionPlacementRequired markers. "
+                + "Confirm placements in Scene view before claiming validation success.");
+        }
+
+        [MenuItem("NutriMind/Gameplay/Mission 1/Create Fallback Prototype Player")]
+        public static void CreateFallbackPrototypePlayer()
+        {
+            Scene scene = OpenMissionScene();
+            if (!scene.IsValid())
+            {
+                return;
+            }
+
+            Transform playerRoot = FindOrCreateRoot("_PLAYER", out _);
+            Transform existing = playerRoot.Find("PlayerRoot");
+            if (existing != null && existing.GetComponent<GameplayPrototypePlayerController>() != null)
+            {
+                Debug.LogWarning("[MissionPrototypeSetupUtility] Fallback prototype player already exists.");
+                return;
+            }
+
+            GameObject playerGo = existing != null ? existing.gameObject : new GameObject("PlayerRoot");
+            playerGo.tag = "Player";
+            playerGo.transform.SetParent(playerRoot, false);
+
+            Transform spawn = FindDeep(scene, "PlayerSpawnPoint");
+            if (spawn != null)
+            {
+                playerGo.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
+            }
+
+            CharacterController controller = GetOrAdd<CharacterController>(playerGo);
+            controller.height = 1.8f;
+            controller.radius = 0.35f;
+            controller.center = new Vector3(0f, 0.9f, 0f);
+
+            GameplayPrototypePlayerController player = GetOrAdd<GameplayPrototypePlayerController>(playerGo);
+            CreateFallbackVisual(playerGo.transform);
+            CreateFallbackCameraRig(playerGo.transform, player);
+            GetOrAdd<GameplayPrototypePlayerInputAdapter>(playerGo).Bind(player);
+            GetOrAdd<PlayerInteractionController>(playerGo);
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[MissionPrototypeSetupUtility] Created fallback prototype player.");
+        }
+
+        private static Scene OpenMissionScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            if (!scene.IsValid())
+            {
+                Debug.LogError("[MissionPrototypeSetupUtility] Could not open mission scene.");
+            }
+
+            return scene;
+        }
+
+        private static bool TryResolveExistingPlayer(
+            Transform playerRoot,
+            Scene scene,
+            out GameplayPrototypePlayerController player,
+            out string error)
+        {
+            player = UnityEngine.Object.FindFirstObjectByType<GameplayPrototypePlayerController>();
+            if (player == null)
+            {
+                Transform existingRoot = playerRoot != null ? playerRoot.Find("PlayerRoot") : null;
+                if (existingRoot != null)
+                {
+                    player = existingRoot.GetComponent<GameplayPrototypePlayerController>();
+                }
+            }
+
+            if (player == null)
+            {
+                error = "No compatible GameplayPrototypePlayerController was found in the scene.";
+                return false;
+            }
+
+            if (player.GetComponent<CharacterController>() == null)
+            {
+                error = "Existing player is missing CharacterController.";
+                return false;
+            }
+
+            error = null;
+            return true;
         }
 
         private static void EnsurePanelSettings()
         {
-            const string panelSettingsPath = "Assets/NutriMind/Gameplay/UI/Settings/PS_GameplayStudentHud.asset";
             if (!AssetDatabase.IsValidFolder("Assets/NutriMind/Gameplay/UI/Settings"))
             {
                 AssetDatabase.CreateFolder("Assets/NutriMind/Gameplay/UI", "Settings");
             }
 
-            PanelSettings panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(panelSettingsPath);
+            PanelSettings panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
             if (panelSettings == null)
             {
                 panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
-                AssetDatabase.CreateAsset(panelSettings, panelSettingsPath);
+                AssetDatabase.CreateAsset(panelSettings, PanelSettingsPath);
             }
 
             panelSettings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
@@ -207,227 +373,92 @@ namespace NutriMind.Editor
             EditorUtility.SetDirty(panelSettings);
         }
 
-        private static Transform EnsureRoot(string name)
+        private static Transform FindOrCreateRoot(string name, out bool created)
         {
             GameObject existing = GameObject.Find(name);
-            if (existing == null)
+            if (existing != null)
             {
-                existing = new GameObject(name);
+                created = false;
+                return existing.transform;
             }
 
-            return existing.transform;
+            created = true;
+            return new GameObject(name).transform;
         }
 
-        private static Transform EnsureChild(Transform parent, string name)
+        private static Transform FindOrCreateChild(Transform parent, string name, out bool created)
         {
             Transform child = parent.Find(name);
-            if (child == null)
+            if (child != null)
             {
-                child = new GameObject(name).transform;
-                child.SetParent(parent, false);
+                created = false;
+                return child;
             }
 
+            created = true;
+            child = new GameObject(name).transform;
+            child.SetParent(parent, false);
             return child;
         }
 
-        private static GameplayPrototypePlayerController EnsurePlayer(Transform parent, Scene scene)
+        private static void CreateFallbackVisual(Transform playerRoot)
         {
-            Transform spawn = FindDeep(scene, "PlayerSpawnPoint");
-            Transform existing = parent.Find("PlayerRoot");
-            GameObject playerGo;
-            if (existing != null)
+            Transform visual = playerRoot.Find("PlayerBody_Visual");
+            if (visual != null)
             {
-                playerGo = existing.gameObject;
+                return;
+            }
+
+            GameObject visualGo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            visualGo.name = "PlayerBody_Visual";
+            visualGo.transform.SetParent(playerRoot, false);
+            visualGo.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+            visualGo.transform.localScale = new Vector3(0.7f, 0.9f, 0.7f);
+            Collider primitiveCollider = visualGo.GetComponent<Collider>();
+            if (primitiveCollider != null)
+            {
+                UnityEngine.Object.DestroyImmediate(primitiveCollider);
+            }
+        }
+
+        private static void CreateFallbackCameraRig(Transform playerRoot, GameplayPrototypePlayerController player)
+        {
+            Transform pivot = FindOrCreateChild(playerRoot, "CameraPivot", out bool pivotCreated);
+            if (pivotCreated)
+            {
+                pivot.localPosition = new Vector3(0f, 1.5f, 0f);
+            }
+
+            Transform cameraTransform = pivot.Find("PlayerCamera");
+            Camera playerCamera;
+            if (cameraTransform == null)
+            {
+                GameObject camGo = new GameObject("PlayerCamera");
+                camGo.transform.SetParent(pivot, false);
+                camGo.transform.localPosition = new Vector3(0f, 0.2f, -3.75f);
+                playerCamera = camGo.AddComponent<Camera>();
+                camGo.AddComponent<AudioListener>();
+                cameraTransform = camGo.transform;
             }
             else
             {
-                playerGo = new GameObject("PlayerRoot");
-                playerGo.tag = "Player";
-                playerGo.transform.SetParent(parent, false);
-            }
-
-            if (spawn != null)
-            {
-                playerGo.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
-            }
-
-            EnsurePlayerVisual(playerGo.transform);
-
-            CharacterController controller = GetOrAdd<CharacterController>(playerGo);
-            controller.height = 1.8f;
-            controller.radius = 0.35f;
-            controller.center = new Vector3(0f, 0.9f, 0f);
-
-            GameplayPrototypePlayerController player = GetOrAdd<GameplayPrototypePlayerController>(playerGo);
-            EnsurePlayerCameraRig(playerGo.transform, player);
-            return player;
-        }
-
-        private static void EnsurePlayerCameraRig(Transform playerRoot, GameplayPrototypePlayerController player)
-        {
-            Transform pivot = playerRoot.Find("CameraPivot");
-            if (pivot == null)
-            {
-                GameObject pivotGo = new GameObject("CameraPivot");
-                pivotGo.transform.SetParent(playerRoot, false);
-                pivot = pivotGo.transform;
-            }
-
-            pivot.localPosition = new Vector3(0f, 1.5f, 0f);
-            pivot.localRotation = Quaternion.identity;
-
-            Camera playerCamera = null;
-            Transform cameraTransform = pivot.Find("PlayerCamera");
-            if (cameraTransform != null)
-            {
                 playerCamera = cameraTransform.GetComponent<Camera>();
-            }
-
-            var strayCameras = new List<Transform>();
-            for (int i = 0; i < playerRoot.childCount; i++)
-            {
-                Transform child = playerRoot.GetChild(i);
-                if (child == pivot || child.name == "PlayerBody_Visual")
-                {
-                    continue;
-                }
-
-                if (child.GetComponent<Camera>() != null || child.name == "PlayerCamera")
-                {
-                    strayCameras.Add(child);
-                }
-            }
-
-            foreach (Transform stray in strayCameras)
-            {
                 if (playerCamera == null)
                 {
-                    playerCamera = stray.GetComponent<Camera>();
-                    if (playerCamera == null)
-                    {
-                        playerCamera = stray.gameObject.AddComponent<Camera>();
-                    }
-
-                    cameraTransform = stray;
-                    stray.SetParent(pivot, false);
-                }
-                else
-                {
-                    UnityEngine.Object.DestroyImmediate(stray.gameObject);
+                    playerCamera = cameraTransform.gameObject.AddComponent<Camera>();
                 }
             }
 
-            if (playerCamera == null)
-            {
-                Camera sceneCamera = Camera.main;
-                GameObject camGo;
-                if (sceneCamera != null)
-                {
-                    camGo = sceneCamera.gameObject;
-                    camGo.transform.SetParent(pivot, false);
-                    playerCamera = sceneCamera;
-                }
-                else
-                {
-                    camGo = new GameObject("PlayerCamera");
-                    camGo.transform.SetParent(pivot, false);
-                    playerCamera = camGo.AddComponent<Camera>();
-                    camGo.AddComponent<AudioListener>();
-                }
-
-                cameraTransform = camGo.transform;
-            }
-
-            cameraTransform.localPosition = new Vector3(0f, 0.2f, -3.75f);
-            cameraTransform.localRotation = Quaternion.identity;
             playerCamera.tag = "MainCamera";
-
-            AudioListener[] listeners = playerRoot.GetComponentsInChildren<AudioListener>(true);
-            bool keptListener = false;
-            foreach (AudioListener listener in listeners)
-            {
-                if (!keptListener && listener.gameObject == playerCamera.gameObject)
-                {
-                    keptListener = true;
-                    continue;
-                }
-
-                UnityEngine.Object.DestroyImmediate(listener);
-            }
-
-            if (playerCamera.GetComponent<AudioListener>() == null)
-            {
-                playerCamera.gameObject.AddComponent<AudioListener>();
-            }
-
             SerializedObject so = new SerializedObject(player);
             Assign(so, "_cameraPivot", pivot);
             Assign(so, "_playerCamera", playerCamera);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void EnsurePlayerVisual(Transform playerRoot)
-        {
-            Transform visual = playerRoot.Find("PlayerBody_Visual");
-            if (visual != null && !IsCapsulePrimitive(visual.gameObject))
-            {
-                UnityEngine.Object.DestroyImmediate(visual.gameObject);
-                visual = null;
-            }
-
-            GameObject visualGo;
-            if (visual == null)
-            {
-                visualGo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                visualGo.name = "PlayerBody_Visual";
-                visualGo.transform.SetParent(playerRoot, false);
-                Collider primitiveCollider = visualGo.GetComponent<Collider>();
-                if (primitiveCollider != null)
-                {
-                    UnityEngine.Object.DestroyImmediate(primitiveCollider);
-                }
-            }
-            else
-            {
-                visualGo = visual.gameObject;
-            }
-
-            visualGo.transform.localPosition = new Vector3(0f, 0.9f, 0f);
-            visualGo.transform.localRotation = Quaternion.identity;
-            visualGo.transform.localScale = new Vector3(0.7f, 0.9f, 0.7f);
-            ApplyPlayerVisualMaterial(visualGo);
-        }
-
-        private static bool IsCapsulePrimitive(GameObject go)
-        {
-            MeshFilter filter = go.GetComponent<MeshFilter>();
-            return filter != null && filter.sharedMesh != null && filter.sharedMesh.name.Contains("Capsule");
-        }
-
-        private static void ApplyPlayerVisualMaterial(GameObject visualGo)
-        {
-            Renderer renderer = visualGo.GetComponent<Renderer>();
-            if (renderer == null)
-            {
-                return;
-            }
-
-            Shader litShader = Shader.Find("Universal Render Pipeline/Lit");
-            if (litShader == null)
-            {
-                return;
-            }
-
-            Material bodyMaterial = new Material(litShader)
-            {
-                color = new Color(0.22f, 0.55f, 0.95f, 1f)
-            };
-            renderer.sharedMaterial = bodyMaterial;
-        }
-
         private static GameplayStudentHudRuntimeController EnsureHud(Transform parent)
         {
-            Transform host = EnsureChild(parent, "UITK_StudentHud");
+            Transform host = FindOrCreateChild(parent, "UITK_StudentHud", out _);
             UIDocument document = GetOrAdd<UIDocument>(host.gameObject);
             document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudUxmlPath);
             document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
@@ -437,7 +468,7 @@ namespace NutriMind.Editor
 
         private static GameplayLearningOverlayController EnsureOverlay(Transform parent)
         {
-            Transform host = EnsureChild(parent, "UITK_LearningOverlay");
+            Transform host = FindOrCreateChild(parent, "UITK_LearningOverlay", out _);
             UIDocument document = GetOrAdd<UIDocument>(host.gameObject);
             document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(OverlayUxmlPath);
             document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
@@ -451,42 +482,66 @@ namespace NutriMind.Editor
             string interactionId,
             string label,
             string iconClass,
-            Vector3 localPosition)
+            Vector3 defaultLocalPosition,
+            string placementInstruction)
         {
-            Transform node = EnsureChild(parent, objectName);
-            node.localPosition = localPosition;
-            GameObject visual = EnsurePrimitiveChild(node, "NPC_Visual", PrimitiveType.Capsule, new Vector3(0f, 1f, 0f), new Vector3(0.6f, 1f, 0.6f));
-            visual.GetComponent<Renderer>().sharedMaterial.color = new Color(0.55f, 0.35f, 0.2f);
+            Transform node = FindOrCreateChild(parent, objectName, out bool created);
+            if (created)
+            {
+                node.localPosition = defaultLocalPosition;
+                EnsurePrimitiveChild(node, "NPC_Visual", PrimitiveType.Capsule, new Vector3(0f, 1f, 0f), new Vector3(0.6f, 1f, 0.6f), true);
+                MarkPlacementRequired(node.gameObject, placementInstruction);
+            }
+
             SphereCollider trigger = GetOrAdd<SphereCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.radius = 1.5f;
             trigger.center = new Vector3(0f, 1f, 0f);
-            Transform focus = EnsureChild(node, "FocusPoint");
-            focus.localPosition = new Vector3(0f, 1.5f, 0f);
+            Transform focus = FindOrCreateChild(node, "FocusPoint", out bool focusCreated);
+            if (focusCreated)
+            {
+                focus.localPosition = new Vector3(0f, 1.5f, 0f);
+            }
+
             return ConfigureInteractable<NpcGuideInteractable>(node.gameObject, interactionId, label, iconClass, focus, 2);
         }
 
         private static StorybookInteractable EnsureStorybook(Transform parent, Transform areaRoot)
         {
             Transform node = parent.Find("PrimaryInteraction_DamagedStorybook");
+            bool created = false;
             if (node == null)
             {
+                created = true;
                 node = new GameObject("PrimaryInteraction_DamagedStorybook").transform;
                 node.SetParent(parent, false);
                 if (areaRoot != null)
                 {
                     node.position = areaRoot.position + new Vector3(0f, 0f, 2f);
                 }
+
+                MarkPlacementRequired(node.gameObject, "Damaged storybook requires manual placement visible from spawn.");
             }
 
-            Transform before = EnsureChild(node, "BeforeRepair");
-            Transform after = EnsureChild(node, "AfterRepair");
-            after.gameObject.SetActive(false);
-            EnsurePrimitiveChild(before, "DamagedBookVisual", PrimitiveType.Cube, new Vector3(0f, 0.8f, 0f), new Vector3(1.2f, 0.2f, 0.9f));
-            EnsurePrimitiveChild(after, "RepairedBookVisual", PrimitiveType.Cube, new Vector3(0f, 0.8f, 0f), new Vector3(1.2f, 0.2f, 0.9f))
-                .GetComponent<Renderer>().sharedMaterial.color = new Color(0.75f, 0.55f, 0.2f);
-            Transform interactionPoint = EnsureChild(node, "InteractionPoint");
-            interactionPoint.localPosition = new Vector3(0f, 0f, 1.2f);
+            Transform before = FindOrCreateChild(node, "BeforeRepair", out _);
+            Transform after = FindOrCreateChild(node, "AfterRepair", out bool afterCreated);
+            if (afterCreated)
+            {
+                after.gameObject.SetActive(false);
+            }
+
+            if (created)
+            {
+                EnsurePrimitiveChild(before, "DamagedBookVisual", PrimitiveType.Cube, new Vector3(0f, 0.8f, 0f), new Vector3(1.2f, 0.2f, 0.9f), true);
+                EnsurePrimitiveChild(after, "RepairedBookVisual", PrimitiveType.Cube, new Vector3(0f, 0.8f, 0f), new Vector3(1.2f, 0.2f, 0.9f), true);
+            }
+
+            Transform interactionPoint = FindOrCreateChild(node, "InteractionPoint", out bool pointCreated);
+            if (pointCreated)
+            {
+                interactionPoint.localPosition = new Vector3(0f, 0f, 1.2f);
+            }
+
             BoxCollider trigger = GetOrAdd<BoxCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.size = new Vector3(2f, 2f, 2f);
@@ -515,9 +570,10 @@ namespace NutriMind.Editor
                 node = new GameObject("CaptionRepairBoard").transform;
                 node.SetParent(parent, false);
                 node.localPosition = new Vector3(1.2f, 1.1f, 0.8f);
+                EnsurePrimitiveChild(node, "BoardVisual", PrimitiveType.Cube, Vector3.zero, new Vector3(0.8f, 0.5f, 0.08f), true);
+                MarkPlacementRequired(node.gameObject, "Caption board requires manual placement beside the storybook.");
             }
 
-            EnsurePrimitiveChild(node, "BoardVisual", PrimitiveType.Cube, Vector3.zero, new Vector3(0.8f, 0.5f, 0.08f));
             SphereCollider trigger = GetOrAdd<SphereCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.radius = 1.2f;
@@ -536,32 +592,54 @@ namespace NutriMind.Editor
             string clueId,
             string title,
             string body,
-            GameObject existing = null,
-            Vector3? localPosition = null)
+            GameObject existing,
+            Vector3? defaultLocalPosition,
+            string placementInstruction)
         {
             Transform node;
+            bool created = false;
             if (existing != null)
             {
                 existing.name = objectName;
                 node = existing.transform;
-                node.SetParent(parent, true);
+                if (node.parent != parent)
+                {
+                    node.SetParent(parent, true);
+                }
             }
             else
             {
-                node = EnsureChild(parent, objectName);
-                if (localPosition.HasValue)
+                node = FindOrCreateChild(parent, objectName, out created);
+                if (created)
                 {
-                    node.localPosition = localPosition.Value;
-                }
+                    if (defaultLocalPosition.HasValue)
+                    {
+                        node.localPosition = defaultLocalPosition.Value;
+                    }
 
-                EnsurePrimitiveChild(node, "IllustratedClueVisual", PrimitiveType.Quad, new Vector3(0f, 1.2f, 0f), new Vector3(0.8f, 0.8f, 1f));
+                    EnsurePrimitiveChild(
+                        node,
+                        "IllustratedClueVisual",
+                        PrimitiveType.Quad,
+                        new Vector3(0f, 1.2f, 0f),
+                        new Vector3(0.8f, 0.8f, 1f),
+                        true);
+                    if (!string.IsNullOrEmpty(placementInstruction))
+                    {
+                        MarkPlacementRequired(node.gameObject, placementInstruction);
+                    }
+                }
             }
 
             SphereCollider trigger = GetOrAdd<SphereCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.radius = 1.5f;
-            Transform focus = EnsureChild(node, "InteractionPoint");
-            focus.localPosition = new Vector3(0f, 1.2f, 0f);
+            Transform focus = FindOrCreateChild(node, "InteractionPoint", out bool focusCreated);
+            if (focusCreated)
+            {
+                focus.localPosition = new Vector3(0f, 1.2f, 0f);
+            }
+
             EvidenceClueInteractable clue = ConfigureInteractable<EvidenceClueInteractable>(
                 node.gameObject,
                 clueId,
@@ -579,12 +657,19 @@ namespace NutriMind.Editor
 
         private static EventSequenceBoardInteractable EnsureSequenceBoard(Transform parent)
         {
-            Transform node = EnsureChild(parent, "PrimaryInteraction_EventSequenceBoard");
-            node.localPosition = new Vector3(0f, 0f, 28f);
-            EnsurePrimitiveChild(node, "BoardVisual", PrimitiveType.Cube, new Vector3(0f, 1f, 0f), new Vector3(3f, 1.2f, 0.2f));
-            EnsureChild(node, "EventSlot_Beginning").localPosition = new Vector3(-1.2f, 1f, 0f);
-            EnsureChild(node, "EventSlot_Middle").localPosition = new Vector3(0f, 1f, 0f);
-            EnsureChild(node, "EventSlot_End").localPosition = new Vector3(1.2f, 1f, 0f);
+            Transform node = FindOrCreateChild(parent, "PrimaryInteraction_EventSequenceBoard", out bool created);
+            if (created)
+            {
+                node.localPosition = new Vector3(0f, 0f, 28f);
+                EnsurePrimitiveChild(node, "BoardVisual", PrimitiveType.Cube, new Vector3(0f, 1f, 0f), new Vector3(3f, 1.2f, 0.2f), true);
+                FindOrCreateChild(node, "EventSlot_Beginning", out _).localPosition = new Vector3(-1.2f, 1f, 0f);
+                FindOrCreateChild(node, "EventSlot_Middle", out _).localPosition = new Vector3(0f, 1f, 0f);
+                FindOrCreateChild(node, "EventSlot_End", out _).localPosition = new Vector3(1.2f, 1f, 0f);
+                MarkPlacementRequired(
+                    node.gameObject,
+                    "Sequence board requires manual placement at the far end of Banner Market Lane.");
+            }
+
             BoxCollider trigger = GetOrAdd<BoxCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.size = new Vector3(3.5f, 2f, 2f);
@@ -598,38 +683,36 @@ namespace NutriMind.Editor
                 3);
         }
 
-        private static WorldStateController EnsureWorldState(GameObject host, string afterChildName)
-        {
-            WorldStateController controller = GetOrAdd<WorldStateController>(host);
-            Transform after = host.transform.Find(afterChildName);
-            if (after == null)
-            {
-                after = new GameObject(afterChildName).transform;
-                after.SetParent(host.transform, false);
-            }
-
-            after.gameObject.SetActive(false);
-            SerializedObject so = new SerializedObject(controller);
-            Assign(so, "_beforeStateRoot", host);
-            Assign(so, "_afterStateRoot", after.gameObject);
-            so.ApplyModifiedPropertiesWithoutUndo();
-            return controller;
-        }
-
         private static StoryFragmentCollectible EnsureFragment(
             Transform parent,
             string objectName,
             string collectibleId,
-            Vector3 worldPosition)
+            Vector3 defaultWorldPosition,
+            string placementInstruction)
         {
-            Transform node = EnsureChild(parent, objectName);
-            node.position = worldPosition;
-            GameObject visual = EnsurePrimitiveChild(node, "FragmentVisual", PrimitiveType.Sphere, Vector3.zero, Vector3.one * 0.5f);
-            visual.GetComponent<Renderer>().sharedMaterial.color = new Color(0.9f, 0.75f, 0.2f);
+            Transform node = FindOrCreateChild(parent, objectName, out bool created);
+            if (created)
+            {
+                node.position = defaultWorldPosition;
+                MarkPlacementRequired(node.gameObject, placementInstruction);
+            }
+
+            GameObject visual = EnsurePrimitiveChild(
+                node,
+                "FragmentVisual",
+                PrimitiveType.Sphere,
+                Vector3.zero,
+                Vector3.one * 0.5f,
+                created);
+            visual.SetActive(false);
+
             SphereCollider trigger = GetOrAdd<SphereCollider>(node.gameObject);
             trigger.isTrigger = true;
             trigger.radius = 1f;
-            node.gameObject.SetActive(false);
+            trigger.enabled = false;
+
+            node.gameObject.SetActive(true);
+
             StoryFragmentCollectible collectible = GetOrAdd<StoryFragmentCollectible>(node.gameObject);
             SerializedObject so = new SerializedObject(collectible);
             Assign(so, "_collectibleId", collectibleId);
@@ -645,20 +728,43 @@ namespace NutriMind.Editor
             string gateId,
             GameObject existing = null)
         {
-            Transform node = existing != null ? existing.transform : EnsureChild(parent, objectName);
-            if (existing == null)
+            Transform node;
+            bool created = false;
+            if (existing != null)
             {
-                node.SetParent(parent, false);
+                node = existing.transform;
+            }
+            else
+            {
+                node = FindOrCreateChild(parent, objectName, out created);
+                if (created)
+                {
+                    MarkPlacementRequired(node.gameObject, objectName + " requires manual placement at the area exit.");
+                }
             }
 
-            Transform locked = EnsureChild(node, "LockedVisual");
-            Transform unlocked = EnsureChild(node, "UnlockedVisual");
-            unlocked.gameObject.SetActive(false);
+            Transform locked = FindOrCreateChild(node, "LockedVisual", out _);
+            Transform unlocked = FindOrCreateChild(node, "UnlockedVisual", out bool unlockedCreated);
+            if (unlockedCreated)
+            {
+                unlocked.gameObject.SetActive(false);
+            }
+
             BoxCollider blocker = GetOrAdd<BoxCollider>(locked.gameObject);
             blocker.isTrigger = false;
-            blocker.size = new Vector3(4f, 3f, 0.5f);
-            blocker.center = new Vector3(0f, 1.5f, 0f);
-            EnsurePrimitiveChild(locked, "GateBlockerMesh", PrimitiveType.Cube, new Vector3(0f, 1.5f, 0f), new Vector3(4f, 3f, 0.5f));
+            if (created)
+            {
+                blocker.size = new Vector3(4f, 3f, 0.5f);
+                blocker.center = new Vector3(0f, 1.5f, 0f);
+                EnsurePrimitiveChild(
+                    locked,
+                    "GateBlockerMesh",
+                    PrimitiveType.Cube,
+                    new Vector3(0f, 1.5f, 0f),
+                    new Vector3(4f, 3f, 0.5f),
+                    true);
+            }
+
             AreaGateController gate = GetOrAdd<AreaGateController>(node.gameObject);
             SerializedObject so = new SerializedObject(gate);
             Assign(so, "_gateId", gateId);
@@ -669,13 +775,26 @@ namespace NutriMind.Editor
             return gate;
         }
 
-        private static CheckpointTrigger EnsureCheckpoint(Transform parent, string objectName, string checkpointId)
+        private static CheckpointTrigger EnsureCheckpoint(
+            Transform parent,
+            string objectName,
+            string checkpointId,
+            string placementInstruction)
         {
-            Transform node = EnsureChild(parent, objectName);
+            Transform node = FindOrCreateChild(parent, objectName, out bool created);
+            if (created)
+            {
+                MarkPlacementRequired(node.gameObject, placementInstruction);
+            }
+
             BoxCollider trigger = GetOrAdd<BoxCollider>(node.gameObject);
             trigger.isTrigger = true;
-            trigger.size = new Vector3(6f, 3f, 6f);
-            trigger.center = new Vector3(0f, 1.5f, 0f);
+            if (created)
+            {
+                trigger.size = new Vector3(6f, 3f, 6f);
+                trigger.center = new Vector3(0f, 1.5f, 0f);
+            }
+
             trigger.enabled = false;
             CheckpointTrigger checkpoint = GetOrAdd<CheckpointTrigger>(node.gameObject);
             SerializedObject so = new SerializedObject(checkpoint);
@@ -685,18 +804,38 @@ namespace NutriMind.Editor
             return checkpoint;
         }
 
-        private static AreaEntryTrigger EnsureAreaEntry(Transform parent, string objectName, string areaId)
+        private static AreaEntryTrigger EnsureAreaEntry(
+            Transform parent,
+            string objectName,
+            string areaId,
+            string placementInstruction)
         {
-            Transform node = EnsureChild(parent, objectName);
+            Transform node = FindOrCreateChild(parent, objectName, out bool created);
+            if (created)
+            {
+                MarkPlacementRequired(node.gameObject, placementInstruction);
+            }
+
             BoxCollider trigger = GetOrAdd<BoxCollider>(node.gameObject);
             trigger.isTrigger = true;
-            trigger.size = new Vector3(6f, 3f, 4f);
-            trigger.center = new Vector3(0f, 1.5f, 0f);
+            if (created)
+            {
+                trigger.size = new Vector3(6f, 3f, 4f);
+                trigger.center = new Vector3(0f, 1.5f, 0f);
+            }
+
             AreaEntryTrigger entry = GetOrAdd<AreaEntryTrigger>(node.gameObject);
             SerializedObject so = new SerializedObject(entry);
             Assign(so, "_areaId", areaId);
             so.ApplyModifiedPropertiesWithoutUndo();
             return entry;
+        }
+
+        private static void MarkPlacementRequired(GameObject host, string instruction)
+        {
+            MissionPlacementRequired marker = GetOrAdd<MissionPlacementRequired>(host);
+            marker.Configure(instruction);
+            Debug.LogWarning("[MissionPrototypeSetupUtility] " + instruction);
         }
 
         private static T ConfigureInteractable<T>(
@@ -723,18 +862,25 @@ namespace NutriMind.Editor
             string name,
             PrimitiveType type,
             Vector3 localPosition,
-            Vector3 localScale)
+            Vector3 localScale,
+            bool assignDefaultTransform)
         {
             Transform child = parent.Find(name);
+            bool created = false;
             if (child == null)
             {
+                created = true;
                 child = GameObject.CreatePrimitive(type).transform;
                 child.name = name;
                 child.SetParent(parent, false);
             }
 
-            child.localPosition = localPosition;
-            child.localScale = localScale;
+            if (created || assignDefaultTransform)
+            {
+                child.localPosition = localPosition;
+                child.localScale = localScale;
+            }
+
             Collider collider = child.GetComponent<Collider>();
             if (collider != null)
             {
@@ -821,13 +967,19 @@ namespace NutriMind.Editor
             return transform != null ? transform.gameObject : null;
         }
 
-        private static void DisableLooseCamera(Scene scene)
+        private static void WarnAboutLooseCameras(Scene scene)
         {
             foreach (GameObject root in scene.GetRootGameObjects())
             {
                 if (root.name == "Camera" && root.GetComponent<Camera>() != null && root.transform.parent == null)
                 {
-                    root.SetActive(false);
+                    AudioListener listener = root.GetComponent<AudioListener>();
+                    if (listener != null && listener.enabled)
+                    {
+                        Debug.LogWarning(
+                            "[MissionPrototypeSetupUtility] Loose scene Camera still has an enabled AudioListener. "
+                            + "Disable it manually to avoid duplicates.");
+                    }
                 }
             }
         }

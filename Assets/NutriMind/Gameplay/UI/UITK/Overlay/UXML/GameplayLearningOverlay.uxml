@@ -18,10 +18,10 @@
                     <ui:Label name="overlay-sequence-hint" text="" class="gameplay-learning-overlay__sequence-hint" />
                 </ui:VisualElement>
                 <ui:VisualElement name="overlay-actions" class="gameplay-learning-overlay__actions">
-                    <ui:Button name="overlay-reset-button" text="Reset" class="ds-button ds-button--secondary gameplay-learning-overlay__reset-button gameplay-learning-overlay__reset-button--hidden" />
-                    <ui:Button name="overlay-secondary-button" text="" class="ds-button ds-button--secondary gameplay-learning-overlay__secondary-button gameplay-learning-overlay__secondary-button--hidden" />
-                    <ui:Button name="overlay-confirm-button" text="Confirm" class="ds-button ds-button--primary gameplay-learning-overlay__confirm-button gameplay-learning-overlay__confirm-button--hidden" />
-                    <ui:Button name="overlay-primary-button" text="Continue" class="ds-button ds-button--primary gameplay-learning-overlay__primary-button" />
+                    <ui:Button name="overlay-reset-button" text="Reset" class="ds-btn ds-btn--secondary gameplay-learning-overlay__reset-button gameplay-learning-overlay__reset-button--hidden" />
+                    <ui:Button name="overlay-secondary-button" text="" class="ds-btn ds-btn--secondary gameplay-learning-overlay__secondary-button gameplay-learning-overlay__secondary-button--hidden" />
+                    <ui:Button name="overlay-confirm-button" text="Confirm" class="ds-btn ds-btn--primary gameplay-learning-overlay__confirm-button gameplay-learning-overlay__confirm-button--hidden" />
+                    <ui:Button name="overlay-primary-button" text="Continue" class="ds-btn ds-btn--primary gameplay-learning-overlay__primary-button" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -95,15 +95,36 @@ namespace NutriMind.Gameplay.Runtime
 
         private void ApplyMovement()
         {
-            Vector3 move = transform.right * _moveInput.x + transform.forward * _moveInput.y;
+            Vector3 horizontal = ComputeHorizontalVelocity(_moveInput, transform, _moveSpeed);
+
             if (_controller.isGrounded && _verticalVelocity < 0f)
             {
                 _verticalVelocity = -2f;
             }
 
             _verticalVelocity += _gravity * Time.deltaTime;
-            move.y = _verticalVelocity;
-            _controller.Move(move * _moveSpeed * Time.deltaTime);
+
+            Vector3 velocity = horizontal;
+            velocity.y = _verticalVelocity;
+            _controller.Move(velocity * Time.deltaTime);
+        }
+
+        /// <summary>
+        /// Separates horizontal locomotion from gravity so vertical speed is never scaled by move speed.
+        /// </summary>
+        public static Vector3 ComputeHorizontalVelocity(Vector2 moveInput, Transform playerTransform, float moveSpeed)
+        {
+            if (playerTransform == null)
+            {
+                return Vector3.zero;
+            }
+
+            Vector3 horizontal =
+                playerTransform.right * moveInput.x
+                + playerTransform.forward * moveInput.y;
+
+            horizontal = Vector3.ClampMagnitude(horizontal, 1f);
+            return horizontal * moveSpeed;
         }
     }
 }

@@ -16,18 +16,36 @@ namespace NutriMind.Gameplay.UI
         private readonly List<string> _sequenceSlotAssignments = new List<string> { string.Empty, string.Empty, string.Empty };
         private string _selectedSequenceCardId = string.Empty;
         private string _sequenceHint = string.Empty;
+        private bool _isOpen;
+        private bool _suppressCloseEvents;
+        private Action _continueCallback;
+        private Action<string> _optionCallback;
+        private Action<bool> _sequenceConfirmCallback;
 
         public event Action OverlayOpened;
         public event Action OverlayClosed;
+        public bool IsOpen => _isOpen;
 
         private void OnEnable()
         {
             Bind();
+            _suppressCloseEvents = true;
             Hide();
+            _suppressCloseEvents = false;
         }
 
         private void OnDisable()
         {
+            ClearCallbacks();
+            if (_isOpen)
+            {
+                _isOpen = false;
+                if (!_suppressCloseEvents)
+                {
+                    OverlayClosed?.Invoke();
+                }
+            }
+
             Unbind();
         }
 
@@ -70,18 +88,32 @@ namespace NutriMind.Gameplay.UI
             _view.SequenceSlotSelected -= OnSequenceSlotSelected;
             _view.ConfirmActionRequested -= OnConfirmActionRequested;
             _view.ResetActionRequested -= OnResetActionRequested;
+            _view.Dispose();
             _view = null;
         }
 
         public void Hide()
         {
+            if (!_isOpen)
+            {
+                _currentModel.State = GameplayLearningOverlayState.Hidden;
+                _view?.SetViewModel(_currentModel);
+                return;
+            }
+
+            _isOpen = false;
+            ClearCallbacks();
             _currentModel.State = GameplayLearningOverlayState.Hidden;
             _view?.SetViewModel(_currentModel);
-            OverlayClosed?.Invoke();
+            if (!_suppressCloseEvents)
+            {
+                OverlayClosed?.Invoke();
+            }
         }
 
         public void ShowDialogue(string speaker, string body, Action onContinue)
         {
+            ClearCallbacks();
             _continueCallback = onContinue;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -95,6 +127,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowEvidence(string title, string body, Action onContinue)
         {
+            ClearCallbacks();
             _continueCallback = onContinue;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -108,6 +141,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowQuestion(MissionQuestionDto question, Action<string> onOptionChosen)
         {
+            ClearCallbacks();
             _optionCallback = onOptionChosen;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -122,6 +156,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowHint(string title, string body, Action onContinue)
         {
+            ClearCallbacks();
             _continueCallback = onContinue;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -135,6 +170,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowExplanation(string title, string body, Action onContinue)
         {
+            ClearCallbacks();
             _continueCallback = onContinue;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -148,6 +184,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowCorrectAcknowledgement(string body, Action onContinue)
         {
+            ClearCallbacks();
             _continueCallback = onContinue;
             _currentModel = new GameplayLearningOverlayViewModel
             {
@@ -161,6 +198,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowCaptionSelection(IReadOnlyList<MissionWorldActionContent.CaptionOption> options, Action<string> onOptionChosen)
         {
+            ClearCallbacks();
             _optionCallback = onOptionChosen;
             var labels = new string[options.Count];
             var ids = new string[options.Count];
@@ -183,6 +221,7 @@ namespace NutriMind.Gameplay.UI
 
         public void ShowEventSequence(IReadOnlyList<MissionWorldActionContent.EventCard> cards, Action<bool> onConfirmed)
         {
+            ClearCallbacks();
             _sequenceConfirmCallback = onConfirmed;
             ResetSequenceState();
             var labels = new string[cards.Count];
@@ -207,15 +246,15 @@ namespace NutriMind.Gameplay.UI
             ApplyAndOpen();
         }
 
-        private Action _continueCallback;
-        private Action<string> _optionCallback;
-        private Action<bool> _sequenceConfirmCallback;
-
         private void ApplyAndOpen()
         {
             Bind();
             _view?.SetViewModel(_currentModel);
-            OverlayOpened?.Invoke();
+            if (!_isOpen)
+            {
+                _isOpen = true;
+                OverlayOpened?.Invoke();
+            }
         }
 
         private void OnPrimaryActionRequested()
@@ -303,6 +342,13 @@ namespace NutriMind.Gameplay.UI
             {
                 _sequenceSlotAssignments[i] = string.Empty;
             }
+        }
+
+        private void ClearCallbacks()
+        {
+            _continueCallback = null;
+            _optionCallback = null;
+            _sequenceConfirmCallback = null;
         }
 
         private void RefreshSequenceModel()

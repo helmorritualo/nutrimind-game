@@ -17,7 +17,10 @@ namespace NutriMind.Gameplay.Runtime
         private MissionPrototypeController _missionController;
 
         public string CollectibleId => _collectibleId;
+        public bool IsRevealed => _revealed;
         public bool IsCollected => _collected;
+        public GameObject VisualRoot => _visualRoot;
+        public Collider TriggerCollider => _triggerCollider;
 
         public event Action<StoryFragmentCollectible> Collected;
 
@@ -25,10 +28,15 @@ namespace NutriMind.Gameplay.Runtime
         {
             if (_visualRoot == null)
             {
-                _visualRoot = gameObject;
+                Transform visual = transform.Find("FragmentVisual");
+                _visualRoot = visual != null ? visual.gameObject : null;
             }
 
-            _baseLocalPosition = _visualRoot.transform.localPosition;
+            if (_visualRoot != null)
+            {
+                _baseLocalPosition = _visualRoot.transform.localPosition;
+            }
+
             SetRevealed(false);
         }
 
@@ -39,7 +47,18 @@ namespace NutriMind.Gameplay.Runtime
 
         public void SetRevealed(bool revealed)
         {
-            _revealed = revealed && !_collected;
+            if (_collected)
+            {
+                revealed = false;
+            }
+
+            if (!gameObject.activeSelf)
+            {
+                gameObject.SetActive(true);
+            }
+
+            _revealed = revealed;
+
             if (_visualRoot != null)
             {
                 _visualRoot.SetActive(_revealed);
@@ -77,11 +96,11 @@ namespace NutriMind.Gameplay.Runtime
             TryCollect();
         }
 
-        public void TryCollect()
+        public bool TryCollect()
         {
             if (_collected || !_revealed)
             {
-                return;
+                return false;
             }
 
             _collected = true;
@@ -98,6 +117,7 @@ namespace NutriMind.Gameplay.Runtime
 
             Collected?.Invoke(this);
             _missionController?.HandleFragmentCollected(_collectibleId);
+            return true;
         }
     }
 }

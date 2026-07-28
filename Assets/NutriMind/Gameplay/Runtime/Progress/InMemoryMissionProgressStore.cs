@@ -78,10 +78,12 @@ namespace NutriMind.Gameplay.Runtime
 
         public void MarkFragmentCollected(string fragmentId)
         {
-            if (!string.IsNullOrEmpty(fragmentId))
+            if (!MissionContentIds.IsAuthoredFragmentId(fragmentId))
             {
-                _collectedFragments.Add(fragmentId);
+                return;
             }
+
+            _collectedFragments.Add(fragmentId);
         }
 
         public bool IsGateUnlocked(string gateId)
