@@ -154,14 +154,13 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
+            await UnityMainThread.SwitchToMainAsync(_cts.Token);
             if (_disposed)
             {
                 return;
             }
 
-            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Authentication, _cts.Token)
-                .ConfigureAwait(false);
+            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Authentication, _cts.Token);
         }
 
         private void OnContinueToApplicationRequested()
@@ -201,14 +200,14 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
+            await UnityMainThread.SwitchToMainAsync(_cts.Token);
             if (_disposed)
             {
                 return;
             }
 
             _lifetime.Router?.EnsureMainRoot();
-            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token).ConfigureAwait(false);
+            await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token);
         }
     }
 }

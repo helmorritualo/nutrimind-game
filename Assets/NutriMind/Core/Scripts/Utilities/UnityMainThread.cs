@@ -1,6 +1,6 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NutriMind.Core.Utilities
@@ -44,6 +44,15 @@ namespace NutriMind.Core.Utilities
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        internal static SynchronizationContext CapturedContext
+        {
+            get
+            {
+                EnsureCaptured();
+                return _context;
+            }
+        }
+
         public static bool IsMainThread
         {
             get
@@ -83,51 +92,88 @@ namespace NutriMind.Core.Utilities
                 catch (Exception exception)
                 {
                     NutriMindLog.RuntimeError(
-                        "Main-thread posted action failed: " + exception.GetType().Name);
+                        "Main-thread posted action failed: "
+                        + exception.GetType().Name
+                        + " — "
+                        + exception.Message);
                 }
             }, null);
         }
 
-        public static Task SwitchToMainAsync(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Await to resume on the Unity main thread. Uses a custom awaiter that posts to the
+        /// captured Unity <see cref="SynchronizationContext"/> — do not replace with a
+        /// <see cref="Task"/>-based switch; after <c>ConfigureAwait(false)</c> a Task
+        /// continuation captures no context and returns to the thread pool.
+        /// </summary>
+        public static MainThreadSwitchAwaitable SwitchToMainAsync(
+            CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            EnsureCaptured();
+            return new MainThreadSwitchAwaitable(cancellationToken);
+        }
+    }
 
-            if (_context == null || IsMainThread)
+    public readonly struct MainThreadSwitchAwaitable
+    {
+        private readonly CancellationToken _cancellationToken;
+
+        public MainThreadSwitchAwaitable(CancellationToken cancellationToken)
+        {
+            _cancellationToken = cancellationToken;
+        }
+
+        public MainThreadSwitchAwaiter GetAwaiter()
+        {
+            return new MainThreadSwitchAwaiter(_cancellationToken);
+        }
+    }
+
+    public readonly struct MainThreadSwitchAwaiter : ICriticalNotifyCompletion
+    {
+        private readonly CancellationToken _cancellationToken;
+
+        public MainThreadSwitchAwaiter(CancellationToken cancellationToken)
+        {
+            _cancellationToken = cancellationToken;
+        }
+
+        public bool IsCompleted => UnityMainThread.IsMainThread;
+
+        public void GetResult()
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+        }
+
+        public void OnCompleted(Action continuation)
+        {
+            UnsafeOnCompleted(continuation);
+        }
+
+        public void UnsafeOnCompleted(Action continuation)
+        {
+            if (continuation == null)
             {
-                return Task.CompletedTask;
+                throw new ArgumentNullException(nameof(continuation));
             }
 
-            var completion = new TaskCompletionSource<bool>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
+            _cancellationToken.ThrowIfCancellationRequested();
 
-            CancellationTokenRegistration registration = default;
-            if (cancellationToken.CanBeCanceled)
+            if (UnityMainThread.IsMainThread)
             {
-                registration = cancellationToken.Register(() =>
-                    completion.TrySetCanceled(cancellationToken));
+                continuation();
+                return;
             }
 
-            _context.Post(_ =>
+            SynchronizationContext context = UnityMainThread.CapturedContext;
+            if (context == null)
             {
-                try
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        completion.TrySetCanceled(cancellationToken);
-                    }
-                    else
-                    {
-                        completion.TrySetResult(true);
-                    }
-                }
-                finally
-                {
-                    registration.Dispose();
-                }
-            }, null);
+                throw new InvalidOperationException(
+                    "Unity main-thread SynchronizationContext was not captured. Cannot marshal to main thread.");
+            }
 
-            return completion.Task;
+            // Always post the async state-machine continuation to Unity's main context.
+            // GetResult() surfaces cancellation once the continuation resumes.
+            context.Post(_ => continuation(), null);
         }
     }
 }

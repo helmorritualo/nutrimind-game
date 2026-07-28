@@ -43,7 +43,7 @@ namespace NutriMind.Core.Utilities
                 }
 
                 NutriMindLog.RuntimeError(
-                    logPrefix + " failed: " + exception.GetType().Name);
+                    logPrefix + " failed: " + exception.GetType().Name + " — " + exception.Message);
             }
         }
     }

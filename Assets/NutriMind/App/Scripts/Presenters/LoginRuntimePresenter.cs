@@ -86,7 +86,8 @@ namespace NutriMind.App.Presentation
                 },
                 _cts.Token).ConfigureAwait(false);
 
-            await UnityMainThread.SwitchToMainAsync(_cts.Token).ConfigureAwait(false);
+            // Stay on the Unity main thread for all UI Toolkit + scene work below.
+            await UnityMainThread.SwitchToMainAsync(_cts.Token);
             if (_disposed)
             {
                 return;
@@ -100,8 +101,7 @@ namespace NutriMind.App.Presentation
             {
                 _view.ClearStatus();
                 _lifetime.Router?.EnsureMainRoot();
-                await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token)
-                    .ConfigureAwait(false);
+                await _lifetime.SceneNavigator.LoadAsync(AppSceneId.Main, _cts.Token);
                 return;
             }
 

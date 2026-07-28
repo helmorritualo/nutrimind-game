@@ -490,10 +490,10 @@ namespace NutriMind.Core.Bootstrap
 
         private async Task LoadBootstrapSceneAsync(CancellationToken cancellationToken)
         {
-            await UnityMainThread.SwitchToMainAsync(cancellationToken).ConfigureAwait(false);
+            await UnityMainThread.SwitchToMainAsync(cancellationToken);
             if (SceneNavigator != null)
             {
-                await SceneNavigator.LoadAsync(AppSceneId.Bootstrap, cancellationToken).ConfigureAwait(false);
+                await SceneNavigator.LoadAsync(AppSceneId.Bootstrap, cancellationToken);
             }
         }
 
