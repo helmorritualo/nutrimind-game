@@ -91,6 +91,9 @@ namespace NutriMind.Gameplay.UI
             if (_pauseButton != null)
             {
                 _pauseButton.SetEnabled(sanitized.PauseAvailable);
+                _pauseButton.EnableInClassList(
+                    "gameplay-student-hud__pause-button--unavailable",
+                    !sanitized.PauseAvailable);
             }
         }
 
@@ -356,7 +359,7 @@ namespace NutriMind.Gameplay.UI
                 return;
             }
 
-            MoveChanged?.Invoke(move);
+            MoveChanged?.Invoke(VirtualJoystickMath.ToGameplayMove(move));
         }
 
         private void OnLookDeltaChanged(Vector2 delta)

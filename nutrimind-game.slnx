@@ -122,6 +122,7 @@
   <Project Path="Unity.AppUI.InternalAPIBridge.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Editor.Shared.csproj" />
   <Project Path="Unity.InferenceEngine.ONNX.Editor.csproj" />
+  <Project Path="NutriMind.Tests.PlayMode.csproj" />
   <Project Path="Unity.VisualScripting.DocCodeExamples.csproj" />
   <Project Path="Unity.InferenceEngine.iOSBLAS.csproj" />
   <Project Path="Unity.PlasticSCM.Editor.Entities.csproj" />
@@ -130,7 +131,6 @@
   <Project Path="Unity.AI.Animate.Motion.Runtime.csproj" />
   <Project Path="Unity.Rendering.LightTransport.Editor.csproj" />
   <Project Path="Unity.Collections.Editor.csproj" />
-  <Project Path="NutriMind.Tests.PlayMode.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Config.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj" />
   <Project Path="Unity.RenderPipelines.Core.ShaderLibrary.csproj" />

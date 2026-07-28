@@ -49,6 +49,14 @@ namespace NutriMind.Tests.EditMode.GameplayUI
         }
 
         [Test]
+        public void ToGameplayMove_FlipsVerticalAxisForForwardInput()
+        {
+            Vector2 gameplayMove = VirtualJoystickMath.ToGameplayMove(new Vector2(0f, -1f));
+            Assert.That(gameplayMove.x, Is.EqualTo(0f).Within(0.001f));
+            Assert.That(gameplayMove.y, Is.EqualTo(1f).Within(0.001f));
+        }
+
+        [Test]
         public void CalculateNormalized_ReturnsZeroWhenRadiusInvalid()
         {
             Assert.That(

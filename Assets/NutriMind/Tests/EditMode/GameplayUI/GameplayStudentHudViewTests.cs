@@ -150,6 +150,23 @@ namespace NutriMind.Tests.EditMode.GameplayUI
         }
 
         [Test]
+        public void SetViewModel_HidesPauseButtonWhenUnavailable()
+        {
+            TemplateContainer root = LoadHudTree();
+            var view = new GameplayStudentHudView(root);
+            Button pauseButton = root.Q<Button>("pause-button");
+
+            var model = GameplayStudentHudViewModel.CreateDefaultPreview();
+            model.PauseAvailable = false;
+            view.SetViewModel(model);
+
+            Assert.That(pauseButton.ClassListContains("gameplay-student-hud__pause-button--unavailable"), Is.True);
+            Assert.That(pauseButton.enabledSelf, Is.False);
+
+            view.Dispose();
+        }
+
+        [Test]
         public void PauseRequested_RaisesPresentationIntent()
         {
             TemplateContainer root = LoadHudTree();

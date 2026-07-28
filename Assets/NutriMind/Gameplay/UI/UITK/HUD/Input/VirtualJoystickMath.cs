@@ -48,5 +48,13 @@ namespace NutriMind.Gameplay.UI
             Vector2 clamped = ClampToRadius(localOffset, radius);
             return clamped / radius;
         }
+
+        /// <summary>
+        /// Converts a UI-normalized joystick vector (Y-down) into gameplay move input (Y-forward).
+        /// </summary>
+        public static Vector2 ToGameplayMove(Vector2 uiNormalized)
+        {
+            return new Vector2(uiNormalized.x, -uiNormalized.y);
+        }
     }
 }

@@ -121,7 +121,7 @@
                     <ui:Button
                         name="interaction-button"
                         text=""
-                        class="ds-btn ds-btn--primary gameplay-student-hud__interaction-button">
+                        class="ds-btn gameplay-student-hud__interaction-button">
                         <ui:VisualElement
                             name="interaction-icon"
                             class="ds-icon ds-icon--search ds-icon--lg gameplay-student-hud__interaction-icon"

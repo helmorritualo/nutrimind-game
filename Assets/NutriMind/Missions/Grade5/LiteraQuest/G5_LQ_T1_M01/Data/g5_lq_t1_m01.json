@@ -1,0 +1,495 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "1.1.0",
+  "mission_id": "g5_lq_t1_m01",
+  "grade_id": "grade_5",
+  "subject_id": "subject_literaquest",
+  "term_id": "term_1",
+  "title": "The Festival Storybook Rescue",
+  "curriculum_block": "Weeks 1–2",
+  "learning_focus": "Identify character, setting, goal, and major events in a short narrative; use one clear noun–pronoun reference in a caption.",
+  "story_premise": "During Bayang Haraya’s Storybook Village Festival, the opening chapter of the town storybook becomes incomplete. Farmer Lira asks the Pathfinder to inspect the illustrated clues, restore the event path, and rebuild the short chapter before the courtyard reading begins.",
+  "mission_objective": "Identify the story’s character, setting, goal, and major events; reconstruct the event sequence; and complete the chapter with a suitable ending.",
+  "collectible_type": "Story Fragment",
+  "collectible_count": 3,
+  "scene_contract": {
+    "scene_model": "single_open_world_mission_scene",
+    "scene_key": "g5_lq_t1_m01",
+    "scene_name": "SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue",
+    "logical_area_count": 3,
+    "load_mode": "single",
+    "area_transition": "in_world_unlock_and_checkpoint_without_scene_load"
+  },
+  "content_ownership": {
+    "source": "local_json_packaged_with_unity",
+    "editable_by_developer": true,
+    "server_can_edit": false,
+    "server_receives_answer_keys": false,
+    "sqlite_persists": [
+      "mission_state",
+      "area_state",
+      "question_attempts_and_outcomes",
+      "review_flags",
+      "world_state",
+      "collectibles",
+      "checkpoints",
+      "sync_outbox"
+    ],
+    "sqlite_does_not_duplicate": [
+      "dialogue",
+      "question_text",
+      "answer_keys",
+      "learning_clues"
+    ]
+  },
+  "areas": [
+    {
+      "area_id": "g5_lq_t1_m01_a01",
+      "area_number": 1,
+      "title": "Story Square",
+      "phase": "discover_and_connect",
+      "story": "Farmer Lira asks the Pathfinder to inspect the damaged opening page in Story Square. The learner identifies the character, setting, and goal, then repairs one caption so its pronoun clearly points to the children. The storybook stand repairs and Story Fragment 1 appears.",
+      "opening_dialogue": [
+        {
+          "speaker": "Farmer Lira",
+          "text": "Pathfinder, the opening page is damaged. Inspect the picture and the surviving lines."
+        },
+        {
+          "speaker": "Farmer Lira",
+          "text": "Find who is here, where the story begins, and what the children want to do. Then repair the missing caption."
+        }
+      ],
+      "learning_clues": [
+        "A story opening introduces the character, setting, and goal.",
+        "A pronoun should clearly refer to a noun already named."
+      ],
+      "required_interactions": [
+        "mission_orientation",
+        "explore_zone",
+        "interact_with_story_source",
+        "observe_story_clues",
+        "repair_opening_caption",
+        "resolve_story_checks",
+        "apply_world_action",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a01_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Who asks the Pathfinder to repair the opening page?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Farmer Lira"
+            },
+            {
+              "id": "b",
+              "text": "The market drummer"
+            },
+            {
+              "id": "c",
+              "text": "The science guide"
+            },
+            {
+              "id": "d",
+              "text": "The gatekeeper"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look at the guide beside the damaged storybook.",
+          "second_wrong_explanation": "Farmer Lira is the guide who asks the Pathfinder for help.",
+          "correct_feedback": "Farmer Lira is the guide who asks the Pathfinder for help."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Where does the story begin?",
+          "options": [
+            {
+              "id": "a",
+              "text": "In Story Square near the large acacia tree"
+            },
+            {
+              "id": "b",
+              "text": "Inside a laboratory"
+            },
+            {
+              "id": "c",
+              "text": "At a river dock"
+            },
+            {
+              "id": "d",
+              "text": "On a mountain trail"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Use the place shown in the opening picture and text.",
+          "second_wrong_explanation": "The opening setting is Story Square near the large acacia tree.",
+          "correct_feedback": "The opening setting is Story Square near the large acacia tree."
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What do the children want to do?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Carry a friendship banner to the Chronicle Courtyard"
+            },
+            {
+              "id": "b",
+              "text": "Hide the town storybook"
+            },
+            {
+              "id": "c",
+              "text": "Cancel the festival"
+            },
+            {
+              "id": "d",
+              "text": "Build a laboratory"
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Find the children’s goal in the surviving sentence.",
+          "second_wrong_explanation": "The children’s goal is to carry the friendship banner to the Chronicle Courtyard.",
+          "correct_feedback": "The children’s goal is to carry the friendship banner to the Chronicle Courtyard."
+        }
+      ],
+      "world_action": "Place the correct opening caption and connect “They” to the children on the storybook stand.",
+      "world_result": "The opening page becomes readable, the storybook stand lights up, Story Fragment 1 appears, and the route to Banner Market Lane opens.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a01_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a01.started",
+        "g5_lq_t1_m01_a01.interaction_state",
+        "g5_lq_t1_m01_a01.question_outcomes",
+        "g5_lq_t1_m01_a01.review_required",
+        "g5_lq_t1_m01_a01.world_action_completed",
+        "g5_lq_t1_m01_a01.collectible_collected",
+        "g5_lq_t1_m01_a01.completed"
+      ],
+      "story_source": "Farmer Lira stands beside the damaged town storybook in Story Square. The opening picture shows children gathering near the large acacia tree. They plan to carry a friendship banner to the Chronicle Courtyard, but the opening caption is missing."
+    },
+    {
+      "area_id": "g5_lq_t1_m01_a02",
+      "area_number": 2,
+      "title": "Banner Market Lane",
+      "phase": "practice_and_apply",
+      "story": "Three illustrated event clues are scattered among the market stalls. The learner finds them, inspects their details, and arranges them in chronological order to restore the banner route. Story Fragment 2 appears when the sequence is correct.",
+      "opening_dialogue": [
+        {
+          "speaker": "Mina",
+          "text": "The middle of the chapter is mixed up. Three event markers are hidden along the market lane."
+        },
+        {
+          "speaker": "Mina",
+          "text": "Find them and place them in the order the events happened."
+        }
+      ],
+      "learning_clues": [
+        "Events in a narrative follow a logical time order.",
+        "Sequence clues such as first, next, and finally show how events connect."
+      ],
+      "required_interactions": [
+        "explore_zone",
+        "find_three_event_clues",
+        "inspect_story_evidence",
+        "arrange_three_event_markers",
+        "resolve_sequence_checks",
+        "review_when_required",
+        "restore_world_state",
+        "collect_story_fragment",
+        "checkpoint_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a02_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event happens first?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children gather at the acacia tree."
+            },
+            {
+              "id": "b",
+              "text": "The restored chapter is presented."
+            },
+            {
+              "id": "c",
+              "text": "The courtyard celebration begins."
+            },
+            {
+              "id": "d",
+              "text": "Story Fragment 3 appears."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the event that begins the story.",
+          "second_wrong_explanation": "The children gathering at the acacia tree is the first event.",
+          "correct_feedback": "The children gathering at the acacia tree is the first event."
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "What happens after the children gather?",
+          "options": [
+            {
+              "id": "a",
+              "text": "Farmer Lira opens the damaged storybook."
+            },
+            {
+              "id": "b",
+              "text": "The final chapter is placed in the Chronicle."
+            },
+            {
+              "id": "c",
+              "text": "The mission is completed."
+            },
+            {
+              "id": "d",
+              "text": "The market stalls close."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Look for the second event in the three-clue sequence.",
+          "second_wrong_explanation": "Farmer Lira opens the damaged storybook after the children gather.",
+          "correct_feedback": "Farmer Lira opens the damaged storybook after the children gather."
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event is last in the market-lane sequence?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The Pathfinder repairs the missing opening caption."
+            },
+            {
+              "id": "b",
+              "text": "The children gather at the acacia tree."
+            },
+            {
+              "id": "c",
+              "text": "Farmer Lira arrives before everyone."
+            },
+            {
+              "id": "d",
+              "text": "The final courtyard reading ends."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the action that follows the damaged storybook being opened.",
+          "second_wrong_explanation": "The Pathfinder repairs the missing opening caption last in this three-event sequence.",
+          "correct_feedback": "The Pathfinder repairs the missing opening caption last in this three-event sequence."
+        }
+      ],
+      "world_action": "Place the three event markers in order on the banner-route board.",
+      "world_result": "The banners rise in the correct order, the market route opens, and Story Fragment 2 appears.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a02_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a02.started",
+        "g5_lq_t1_m01_a02.interaction_state",
+        "g5_lq_t1_m01_a02.question_outcomes",
+        "g5_lq_t1_m01_a02.review_required",
+        "g5_lq_t1_m01_a02.world_action_completed",
+        "g5_lq_t1_m01_a02.collectible_collected",
+        "g5_lq_t1_m01_a02.completed"
+      ],
+      "story_source": "Three event clues remain: the children gather at the acacia tree; Farmer Lira opens the damaged storybook; the Pathfinder repairs the missing opening caption. The banner route activates only when the clues are placed in chronological order."
+    },
+    {
+      "area_id": "g5_lq_t1_m01_a03",
+      "area_number": 3,
+      "title": "Chronicle Courtyard",
+      "phase": "resolve_and_master",
+      "story": "At the courtyard Chronicle display, the learner uses the two recovered fragments and the restored event path to assemble a short beginning, middle, and ending. The learner chooses the ending that fits the goal and presents the completed chapter. Story Fragment 3 appears and the festival reading begins.",
+      "opening_dialogue": [
+        {
+          "speaker": "Farmer Lira",
+          "text": "The opening and event path are restored. Now the Chronicle needs one complete chapter."
+        },
+        {
+          "speaker": "Farmer Lira",
+          "text": "Use the evidence you found, choose the ending that fits, and present the story to the courtyard."
+        }
+      ],
+      "learning_clues": [
+        "A coherent story has a beginning, middle, and ending.",
+        "The ending should resolve the character’s goal and fit the earlier events."
+      ],
+      "required_interactions": [
+        "explore_final_zone",
+        "assemble_short_chapter",
+        "choose_suitable_ending",
+        "resolve_mastery_checks",
+        "review_when_required",
+        "present_restored_chapter",
+        "restore_final_world_state",
+        "collect_story_fragment",
+        "mission_completed"
+      ],
+      "questions": [
+        {
+          "id": "g5_lq_t1_m01_a03_q01",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which sentence belongs in the beginning?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children gather near the acacia tree in Story Square."
+            },
+            {
+              "id": "b",
+              "text": "The Chronicle displays the finished chapter."
+            },
+            {
+              "id": "c",
+              "text": "The final reading ends."
+            },
+            {
+              "id": "d",
+              "text": "Story Fragment 3 is collected."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The beginning introduces the characters and setting.",
+          "second_wrong_explanation": "The children gathering in Story Square belongs in the beginning.",
+          "correct_feedback": "The children gathering in Story Square belongs in the beginning."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q02",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which event belongs in the middle?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The Pathfinder restores the opening caption and event path."
+            },
+            {
+              "id": "b",
+              "text": "The mission badge appears before the problem begins."
+            },
+            {
+              "id": "c",
+              "text": "The courtyard reading happens before the children gather."
+            },
+            {
+              "id": "d",
+              "text": "The storybook disappears after it is repaired."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "The middle contains the actions taken to solve the problem.",
+          "second_wrong_explanation": "Repairing the caption and event path belongs in the middle.",
+          "correct_feedback": "Repairing the caption and event path belongs in the middle."
+        },
+        {
+          "id": "g5_lq_t1_m01_a03_q03",
+          "type": "multiple_choice_single",
+          "is_scored": true,
+          "prompt": "Which ending best fits the story?",
+          "options": [
+            {
+              "id": "a",
+              "text": "The children bring the restored chapter to the courtyard and begin the festival reading together."
+            },
+            {
+              "id": "b",
+              "text": "The children hide the chapter and cancel the festival."
+            },
+            {
+              "id": "c",
+              "text": "A laboratory replaces the village festival."
+            },
+            {
+              "id": "d",
+              "text": "The story ends before the missing page is repaired."
+            }
+          ],
+          "correct_option_ids": [
+            "a"
+          ],
+          "attempt_limit": 2,
+          "first_wrong_hint": "Choose the ending that completes the children’s goal and follows the restored event path.",
+          "second_wrong_explanation": "The fitting ending shows the children reaching the courtyard and beginning the reading together.",
+          "correct_feedback": "The fitting ending shows the children reaching the courtyard and beginning the reading together."
+        }
+      ],
+      "world_action": "Assemble the beginning, middle, and ending, bind the three Story Fragments, and present the restored chapter at the Chronicle display.",
+      "world_result": "The Chronicle opens, the courtyard decorations light up, the restored chapter is read, Story Fragment 3 is collected, and the mission completes.",
+      "collectible": {
+        "id": "g5_lq_t1_m01_a03_collectible",
+        "type": "Story Fragment",
+        "quantity": 1
+      },
+      "completion_rule": "complete_required_interactions_resolve_questions_acknowledge_review_if_required_apply_world_action_collect_item",
+      "sqlite_progress_keys": [
+        "g5_lq_t1_m01_a03.started",
+        "g5_lq_t1_m01_a03.interaction_state",
+        "g5_lq_t1_m01_a03.question_outcomes",
+        "g5_lq_t1_m01_a03.review_required",
+        "g5_lq_t1_m01_a03.world_action_completed",
+        "g5_lq_t1_m01_a03.collectible_collected",
+        "g5_lq_t1_m01_a03.completed"
+      ],
+      "story_source": "Beginning: the children gather in Story Square and Farmer Lira reveals the damaged storybook. Middle: the Pathfinder repairs the opening caption and restores the event path through Banner Market Lane. The ending must show the children reaching the courtyard with the restored chapter and beginning the festival reading together."
+    }
+  ],
+  "release_status": "curriculum_owner_review_required_before_production_release",
+  "authoring_status": "milestone_authored_exact_content",
+  "competency_contract": {
+    "primary_competency_id": "lq_g5_t1_story_elements",
+    "primary_competency_summary": "Identify character, setting, goal, and major events in a short narrative.",
+    "supporting_competency_ids": [
+      "lq_g5_t1_clear_pronoun_reference"
+    ],
+    "prerequisite_competency_ids": [],
+    "review_competency_ids": [],
+    "mastery_evidence": "Learner reconstructs a coherent beginning, event sequence, and suitable ending using observed story evidence.",
+    "mechanic_family": "story_scene_reconstruction"
+  }
+}

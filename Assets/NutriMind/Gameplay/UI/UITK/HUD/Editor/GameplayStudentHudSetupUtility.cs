@@ -91,8 +91,8 @@ namespace NutriMind.Editor
             panelSettings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
             panelSettings.match = 0.5f;
             panelSettings.sortingOrder = GameplayHudSortingOrder;
-            panelSettings.clearColor = true;
-            panelSettings.colorClearValue = new Color(0f, 0f, 0f, 0f);
+            panelSettings.clearColor = false;
+            panelSettings.clearDepthStencil = true;
         }
 
         private static void EnsureFolder(string assetFolderPath)
