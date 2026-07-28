@@ -196,17 +196,17 @@ namespace NutriMind.App.UI
         {
             var areas = new[]
             {
-                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a01", 1, "Parade Meadow", MissionDetailAreaPhase.DiscoverAndConnect, "Farmer Lira asks the Pathfinder to repair the opening section of the festival chapter. The learner observes a short illustrated scene, identifies the character, setting, goal, and first event, then repairs banner captions using clear noun and pronoun references. The repaired banner route opens the path deeper into the festival and reveals Story Fragment 1."),
-                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a02", 2, "Drumbeat Lane", MissionDetailAreaPhase.PracticeAndApply, "The parade has lost its written rhythm and its lantern poster communicates the wrong mood. The learner restores action instructions using appropriate verb forms and complements, compares visual layouts and tone, and chooses evidence that supports the intended meaning. The corrected drum-and-lantern sequence reveals Story Fragment 2."),
-                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a03", 3, "Freedom Stage", MissionDetailAreaPhase.ResolveAndMaster, "At the final stage, the learner arranges seven illustrated events into a coherent narrative, selects the best title and main idea, and completes a short ending. The integrated final challenge reuses the strongest story-grammar, language, and visual-literacy concepts from the mission. The restored festival chapter reveals Story Fragment 3 and completes the mission.")
+                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a01", 1, "Story Square", MissionDetailAreaPhase.DiscoverAndConnect, "Farmer Lira asks the Pathfinder to repair the opening section of the festival chapter. The learner observes a short illustrated scene, identifies the character, setting, goal, and first event, then repairs banner captions using clear noun and pronoun references. The repaired banner route opens the path deeper into the festival and reveals Story Fragment 1."),
+                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a02", 2, "Banner Market Lane", MissionDetailAreaPhase.PracticeAndApply, "The parade has lost its written rhythm and its lantern poster communicates the wrong mood. The learner restores action instructions using appropriate verb forms and complements, compares visual layouts and tone, and chooses evidence that supports the intended meaning. The corrected drum-and-lantern sequence reveals Story Fragment 2."),
+                new MissionDetailAreaAuthoredContent("g5_lq_t1_m01_a03", 3, "Chronicle Courtyard", MissionDetailAreaPhase.ResolveAndMaster, "At the final stage, the learner arranges seven illustrated events into a coherent narrative, selects the best title and main idea, and completes a short ending. The integrated final challenge reuses the strongest story-grammar, language, and visual-literacy concepts from the mission. The restored festival chapter reveals Story Fragment 3 and completes the mission.")
             };
             return Create(
                 "g5_lq_t1_m01", 1, "The Festival Storybook Rescue", "Weeks 1–2",
                 "On the morning of Bayang Haraya’s Freedom and Friendship Festival, the town storybook loses its first chapter. Farmer Lira remembers pieces of the parade story, but the Haze has scattered the events, captions, and illustrations across three connected festival zones. The Pathfinder must restore the chapter in correct order before the opening ceremony.",
                 "Story grammar; sequential plot; main idea; collective/concrete/abstract nouns; demonstrative and relative pronouns; verb-forming suffixes; helping/linking/transitive verbs; noun complements; narrative text; layout, tone, and mood.",
                 "Story Fragment", "Three Story Fragments form the Festival Chapter and unlock Mission 2.", areas,
-                MissionDetailProgressState.MissionCompleted, null, 3, 3,
-                MissionDetailAreaState.Completed, MissionDetailAreaState.Completed, MissionDetailAreaState.Completed);
+                MissionDetailProgressState.Available, null, 0, 0,
+                MissionDetailAreaState.Available, MissionDetailAreaState.Locked, MissionDetailAreaState.Locked);
         }
 
         private static MissionDetailPreviewContent CreateMissionTwo()

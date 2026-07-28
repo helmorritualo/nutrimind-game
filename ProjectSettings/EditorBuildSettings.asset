@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/NutriMind/App/Scenes/SCN_App_QuizPortal.unity
     guid: 69616958cf906d14589745a3b424a35c
+  - enabled: 1
+    path: Assets/NutriMind/Missions/Grade5/LiteraQuest/G5_LQ_T1_M01/Scenes/SCN_G5_LQ_T1_M01_TheFestivalStorybookRescue.unity
+    guid: acfbc318ea8b2d44a80ae766097193ed
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

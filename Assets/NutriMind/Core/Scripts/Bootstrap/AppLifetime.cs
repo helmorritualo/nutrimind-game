@@ -69,7 +69,8 @@ namespace NutriMind.Core.Bootstrap
 
         /// <summary>
         /// Returns the application-mode mission launch service.
-        /// Lazily created after composition. In Mock mode returns <see cref="MockMissionLaunchService"/>.
+        /// Lazily created after composition as <see cref="PlayableMissionLaunchService"/>
+        /// (local progress/outbox recording plus supported gameplay scene load).
         /// </summary>
         public IMissionLaunchService MissionLaunchService
         {
@@ -77,7 +78,7 @@ namespace NutriMind.Core.Bootstrap
             {
                 if (_missionLaunchService == null && IsReady)
                 {
-                    _missionLaunchService = new MockMissionLaunchService(this);
+                    _missionLaunchService = new PlayableMissionLaunchService(this);
                 }
 
                 return _missionLaunchService;

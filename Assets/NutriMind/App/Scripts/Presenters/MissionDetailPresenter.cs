@@ -13,13 +13,15 @@ namespace NutriMind.App.Presentation
 {
     /// <summary>
     /// Runtime presenter for Mission Detail.
-    /// Uses catalog presentation content when available; simulated launch writes local progress/outbox.
+    /// Uses catalog presentation content when available; launch records local
+    /// progress/outbox and opens the playable scene for supported missions.
     /// </summary>
     public sealed class MissionDetailPresenter : RoutePresenterBase
     {
         private readonly MissionDetailPanelView _view;
         private readonly AppRouteContext _ctx;
         private readonly AppShellRuntimeController _shellRuntime;
+        private bool _launchInProgress;
 
         public MissionDetailPresenter(
             AppLifetime lifetime,
@@ -69,6 +71,12 @@ namespace NutriMind.App.Presentation
 
             if (Lifetime.Connectivity != null && !Lifetime.Connectivity.IsOnline)
             {
+                if (TryBindLocalPlayableCatalog())
+                {
+                    _view.SetPreviewState(MissionDetailPreviewState.Content);
+                    return;
+                }
+
                 _view.SetPreviewState(MissionDetailPreviewState.OfflineUnavailable);
                 return;
             }
@@ -104,11 +112,44 @@ namespace NutriMind.App.Presentation
 
             if (IsOffline(result.Error))
             {
+                if (TryBindLocalPlayableCatalog())
+                {
+                    _view.SetPreviewState(MissionDetailPreviewState.Content);
+                    return;
+                }
+
                 _view.SetPreviewState(MissionDetailPreviewState.OfflineUnavailable);
                 return;
             }
 
             _view.SetPreviewState(MissionDetailPreviewState.RecoverableError);
+        }
+
+        private bool TryBindLocalPlayableCatalog()
+        {
+            if (!MissionGameplaySceneCatalog.TryGet(_ctx.MissionId, out _))
+            {
+                return false;
+            }
+
+            var selection = new MissionPreviewSelection(
+                MissionGameplaySceneCatalog.FestivalStorybookMissionId,
+                NutriMindSubject.LiteraQuest,
+                NutriMindTerm.Term1,
+                1,
+                "The Festival Storybook Rescue",
+                false,
+                string.Empty);
+
+            if (!MissionDetailPreviewCatalog.TryGetContent(
+                    selection,
+                    out MissionDetailPreviewContent content))
+            {
+                return false;
+            }
+
+            _view.SetContent(content);
+            return true;
         }
 
         private void BindPresentation(MissionDetail detail)
@@ -143,23 +184,36 @@ namespace NutriMind.App.Presentation
 
         private void OnPrimaryAction(MissionDetailPreviewActionRequest request)
         {
-            if (Disposed)
+            if (Disposed || _launchInProgress)
             {
                 return;
             }
 
             MissionLaunchKind kind = request.Action switch
             {
-                MissionDetailPrimaryAction.Continue => MissionLaunchKind.SimulatedContinue,
-                MissionDetailPrimaryAction.Review => MissionLaunchKind.SimulatedReview,
-                _ => MissionLaunchKind.SimulatedStart
+                MissionDetailPrimaryAction.Continue =>
+                    MissionLaunchKind.SimulatedContinue,
+
+                MissionDetailPrimaryAction.Review =>
+                    MissionLaunchKind.SimulatedReview,
+
+                _ =>
+                    MissionLaunchKind.SimulatedStart
             };
 
-            TaskUtilities.ForgetSafely(LaunchAsync(kind), Cts.Token, "MissionDetail.Launch");
+            TaskUtilities.ForgetSafely(
+                LaunchAsync(request.MissionId, kind),
+                Cts.Token,
+                "MissionDetail.Launch");
         }
 
-        private async Task LaunchAsync(MissionLaunchKind kind)
+        private async Task LaunchAsync(string missionId, MissionLaunchKind kind)
         {
+            if (_launchInProgress)
+            {
+                return;
+            }
+
             IMissionLaunchService launcher = Lifetime.MissionLaunchService;
             if (launcher == null)
             {
@@ -169,30 +223,63 @@ namespace NutriMind.App.Presentation
                 return;
             }
 
-            _shellRuntime?.ShowGlobalLoading("Preparing simulated launch…");
-            MissionLaunchResult result = await launcher.LaunchAsync(
-                _ctx.MissionId,
-                kind,
-                Cts.Token).ConfigureAwait(true);
+            _launchInProgress = true;
+            _shellRuntime?.ShowGlobalLoading("Preparing mission…");
 
-            if (Disposed)
+            try
             {
-                return;
+                MissionLaunchResult result = await launcher.LaunchAsync(
+                    missionId,
+                    kind,
+                    Cts.Token).ConfigureAwait(true);
+
+                if (result.Succeeded && result.GameplaySceneOpened)
+                {
+                    // Main scene / shell may already be destroyed by the single-scene load.
+                    return;
+                }
+
+                if (Disposed)
+                {
+                    return;
+                }
+
+                _shellRuntime?.HideGlobalLoading();
+
+                if (result.Succeeded)
+                {
+                    _shellRuntime?.ShowToast(
+                        result.Message ?? "Mission launch recorded locally.",
+                        AppShellToastTone.Success);
+                }
+                else
+                {
+                    string toast = !string.IsNullOrWhiteSpace(result.Message)
+                        ? result.Message
+                        : LearnerFacingErrorMapper.Map(result.Error);
+                    _shellRuntime?.ShowToast(toast, AppShellToastTone.Danger);
+                }
             }
-
-            _shellRuntime?.HideGlobalLoading();
-
-            if (result.Succeeded)
+            catch (OperationCanceledException)
             {
-                _shellRuntime?.ShowToast(
-                    result.Message ?? "Simulated mission launch recorded locally.",
-                    AppShellToastTone.Success);
+                if (!Disposed)
+                {
+                    _shellRuntime?.HideGlobalLoading();
+                }
             }
-            else
+            catch (Exception)
             {
-                _shellRuntime?.ShowToast(
-                    LearnerFacingErrorMapper.Map(result.Error),
-                    AppShellToastTone.Danger);
+                if (!Disposed)
+                {
+                    _shellRuntime?.HideGlobalLoading();
+                    _shellRuntime?.ShowToast(
+                        "The mission scene could not be opened.",
+                        AppShellToastTone.Danger);
+                }
+            }
+            finally
+            {
+                _launchInProgress = false;
             }
         }
 
