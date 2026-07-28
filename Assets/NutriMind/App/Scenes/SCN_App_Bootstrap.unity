@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingDataAsset: {fileID: 112000004, guid: ef6cc9c5204a8fb48b901595ddae0f24, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -149,15 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f2fca7c193b7141afe717540ee1434, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NutriMind.App.Composition.AppBootstrapSceneRoot
-  _runtimeOptions:
-    _mode: 0
-    _mockScenario: 0
-    _minimumMockLatencyMilliseconds: 180
-    _maximumMockLatencyMilliseconds: 520
-    _resetMockDatabaseOnStart: 0
-    _startOffline: 0
-    _logGatewayOperations: 1
-    _logDatabaseOperations: 0
   _uiDocument: {fileID: 0}
   _lifetimePrefab: {fileID: 0}
 --- !u!114 &681792419
