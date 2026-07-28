@@ -112,6 +112,7 @@
   <Project Path="Unity.AI.Toolkit.Compliance.csproj" />
   <Project Path="NutriMind.Tests.TestData.csproj" />
   <Project Path="NutriMind.Editor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Shaders.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
@@ -129,7 +130,6 @@
   <Project Path="Unity.AI.Animate.Motion.Runtime.csproj" />
   <Project Path="Unity.Rendering.LightTransport.Editor.csproj" />
   <Project Path="Unity.Collections.Editor.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="NutriMind.Tests.PlayMode.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Config.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj" />
