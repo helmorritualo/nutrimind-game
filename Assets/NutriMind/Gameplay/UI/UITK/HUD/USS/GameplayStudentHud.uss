@@ -1,0 +1,338 @@
+/* Student gameplay HUD — screen-space UITK overlay for mobile landscape exploration */
+
+.gameplay-student-hud {
+    --gameplay-hud-surface: rgba(255, 255, 255, 0.92);
+    --gameplay-hud-surface-soft: rgba(255, 255, 255, 0.76);
+    --gameplay-control-base: rgba(26, 26, 26, 0.24);
+    --gameplay-control-knob: rgba(255, 255, 255, 0.90);
+    --gameplay-joystick-region-size: 220px;
+    --gameplay-joystick-base-size: 160px;
+    --gameplay-joystick-knob-size: 70px;
+    --gameplay-interaction-size: 120px;
+    --gameplay-objective-width: 520px;
+
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.gameplay-student-hud Label {
+    margin: 0;
+    padding: 0;
+    white-space: normal;
+}
+
+.gameplay-student-hud__safe-area {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+}
+
+/* ========== LOOK ZONE ========== */
+.gameplay-student-hud__look-zone {
+    position: absolute;
+    left: 34%;
+    right: 0;
+    top: 88px;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.gameplay-student-hud__look-helper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background-color: var(--gameplay-hud-surface-soft);
+    border-width: 1px;
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 17px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.gameplay-student-hud__look-helper--hidden {
+    display: none;
+}
+
+/* ========== TOP LAYER ========== */
+.gameplay-student-hud__top-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 32px 0 28px;
+}
+
+.gameplay-student-hud__objective-card {
+    width: var(--gameplay-objective-width);
+    min-height: 120px;
+    max-width: 56%;
+    flex-shrink: 1;
+    flex-direction: column;
+    padding: 20px 22px;
+    border-radius: 20px;
+    background-color: var(--gameplay-hud-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+}
+
+.gameplay-student-hud__area-phase-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.gameplay-student-hud__area-phase-icon {
+    margin-right: 8px;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.gameplay-student-hud__area-phase-label {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background-color: var(--color-tertiary-soft);
+    color: var(--nm-literaquest);
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.gameplay-student-hud__mission-title-label {
+    margin-bottom: 6px;
+    color: var(--color-text-secondary);
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.gameplay-student-hud__objective-text-label {
+    color: var(--color-text-primary);
+    font-size: 24px;
+    -unity-font-style: bold;
+}
+
+.gameplay-student-hud__top-right-controls {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.gameplay-student-hud__fragment-counter {
+    flex-direction: row;
+    align-items: center;
+    min-height: 48px;
+    margin-right: 10px;
+    padding: 8px 14px;
+    border-radius: 16px;
+    background-color: var(--gameplay-hud-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+}
+
+.gameplay-student-hud__fragment-icon {
+    margin-right: 8px;
+    -unity-background-image-tint-color: var(--nm-literaquest);
+}
+
+.gameplay-student-hud__fragment-count-label {
+    color: var(--color-text-primary);
+    font-size: 22px;
+    -unity-font-style: bold;
+}
+
+.gameplay-student-hud__pause-button {
+    width: 52px;
+    min-width: 52px;
+    height: 52px;
+    min-height: 52px;
+    padding: 0;
+    border-radius: 16px;
+    background-color: var(--gameplay-hud-surface);
+    border-width: 1px;
+    border-color: var(--color-border);
+}
+
+.gameplay-student-hud__pause-icon {
+    -unity-background-image-tint-color: var(--color-text-primary);
+}
+
+/* ========== CONTROL LAYER ========== */
+.gameplay-student-hud__control-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 36px 36px 32px;
+}
+
+.gameplay-student-hud__movement-region {
+    width: var(--gameplay-joystick-region-size);
+    height: var(--gameplay-joystick-region-size);
+    flex-shrink: 0;
+}
+
+.gameplay-student-hud__joystick {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.gameplay-student-hud__joystick-base {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--gameplay-joystick-base-size);
+    height: var(--gameplay-joystick-base-size);
+    translate: -50% -50%;
+    border-radius: 999px;
+    background-color: var(--gameplay-control-base);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.gameplay-student-hud__joystick-knob {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--gameplay-joystick-knob-size);
+    height: var(--gameplay-joystick-knob-size);
+    translate: -50% -50%;
+    border-radius: 999px;
+    background-color: var(--gameplay-control-knob);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.65);
+}
+
+.gameplay-student-hud__action-region {
+    flex-shrink: 0;
+}
+
+.gameplay-student-hud__interaction-button {
+    width: var(--gameplay-interaction-size);
+    min-width: var(--gameplay-interaction-size);
+    height: var(--gameplay-interaction-size);
+    min-height: var(--gameplay-interaction-size);
+    padding: 0;
+    border-radius: 24px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gameplay-student-hud__interaction-icon {
+    margin-bottom: 4px;
+}
+
+.gameplay-student-hud__interaction-label {
+    color: var(--color-text-on-accent);
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.gameplay-student-hud__interaction-button:disabled .gameplay-student-hud__interaction-label {
+    color: var(--color-text-disabled);
+}
+
+.gameplay-student-hud__interaction-button:disabled .gameplay-student-hud__interaction-icon {
+    -unity-background-image-tint-color: var(--color-text-disabled);
+}
+
+.gameplay-student-hud__input-disabled .gameplay-student-hud__look-zone {
+    opacity: 0.55;
+}
+
+.gameplay-student-hud__input-disabled .gameplay-student-hud__joystick {
+    opacity: 0.55;
+}
+
+.gameplay-student-hud__input-disabled .gameplay-student-hud__interaction-button {
+    opacity: 0.55;
+}
+
+/* ========== RESPONSIVE ========== */
+.gameplay-student-hud--compact {
+    --gameplay-objective-width: 440px;
+    --gameplay-joystick-region-size: 200px;
+    --gameplay-joystick-base-size: 148px;
+    --gameplay-joystick-knob-size: 66px;
+    --gameplay-interaction-size: 112px;
+}
+
+.gameplay-student-hud--compact .gameplay-student-hud__objective-card {
+    padding: 16px 18px;
+}
+
+.gameplay-student-hud--compact .gameplay-student-hud__objective-text-label {
+    font-size: 22px;
+}
+
+.gameplay-student-hud--narrow {
+    --gameplay-objective-width: 360px;
+    --gameplay-joystick-region-size: 188px;
+    --gameplay-joystick-base-size: 140px;
+    --gameplay-joystick-knob-size: 64px;
+    --gameplay-interaction-size: 104px;
+}
+
+.gameplay-student-hud--narrow .gameplay-student-hud__top-layer {
+    padding: 20px 20px 0 20px;
+}
+
+.gameplay-student-hud--narrow .gameplay-student-hud__control-layer {
+    padding: 0 24px 24px 20px;
+}
+
+.gameplay-student-hud--narrow .gameplay-student-hud__look-zone {
+    left: 38%;
+    top: 76px;
+}
+
+.gameplay-student-hud--short {
+    --gameplay-joystick-region-size: 188px;
+}
+
+.gameplay-student-hud--short .gameplay-student-hud__top-layer {
+    padding-top: 16px;
+}
+
+.gameplay-student-hud--short .gameplay-student-hud__control-layer {
+    padding-bottom: 20px;
+}
+
+.gameplay-student-hud.mobile .gameplay-student-hud__area-phase-label,
+.gameplay-student-hud.mobile .gameplay-student-hud__mission-title-label {
+    font-size: 18px;
+}
+
+.gameplay-student-hud.mobile .gameplay-student-hud__objective-text-label {
+    font-size: 21px;
+}
+
+.gameplay-student-hud.mobile .gameplay-student-hud__fragment-count-label {
+    font-size: 20px;
+}
+
+.gameplay-student-hud.mobile .gameplay-student-hud__interaction-label {
+    font-size: 18px;
+}

@@ -1,0 +1,139 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.sinanata.designsystem/Resources/UI/Styles/DesignSystem/DesignSystem.uss" />
+    <Style src="project://database/Assets/NutriMind/App/UI/USS/NutriMindTheme.uss" />
+    <Style src="project://database/Assets/NutriMind/Gameplay/UI/UITK/HUD/USS/GameplayStudentHud.uss" />
+
+    <ui:VisualElement
+        name="gameplay-student-hud-root"
+        class="ds-root theme-nutrimind gameplay-student-hud"
+        picking-mode="Ignore">
+
+        <ui:VisualElement
+            name="gameplay-safe-area"
+            class="gameplay-student-hud__safe-area"
+            picking-mode="Ignore">
+
+            <ui:VisualElement
+                name="gameplay-look-zone"
+                class="gameplay-student-hud__look-zone">
+                <ui:Label
+                    name="look-helper"
+                    text="Drag to look"
+                    class="gameplay-student-hud__look-helper"
+                    picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="gameplay-top-layer"
+                class="gameplay-student-hud__top-layer"
+                picking-mode="Ignore">
+
+                <ui:VisualElement
+                    name="objective-card"
+                    class="ds-card gameplay-student-hud__objective-card"
+                    picking-mode="Ignore">
+                    <ui:VisualElement
+                        name="area-phase-row"
+                        class="gameplay-student-hud__area-phase-row"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="area-phase-icon"
+                            class="ds-icon ds-icon--target ds-icon--sm gameplay-student-hud__area-phase-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="area-phase-label"
+                            text="Area 1 • Discover"
+                            class="gameplay-student-hud__area-phase-label"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label
+                        name="mission-title-label"
+                        text="The Festival Storybook Rescue"
+                        class="gameplay-student-hud__mission-title-label"
+                        picking-mode="Ignore" />
+                    <ui:Label
+                        name="objective-text-label"
+                        text="Inspect the damaged storybook beside Farmer Lira."
+                        class="gameplay-student-hud__objective-text-label"
+                        picking-mode="Ignore" />
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="top-right-controls"
+                    class="gameplay-student-hud__top-right-controls"
+                    picking-mode="Ignore">
+
+                    <ui:VisualElement
+                        name="fragment-counter"
+                        class="gameplay-student-hud__fragment-counter"
+                        picking-mode="Ignore">
+                        <ui:VisualElement
+                            name="fragment-icon"
+                            class="ds-icon ds-icon--book ds-icon--md gameplay-student-hud__fragment-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="fragment-count-label"
+                            text="0 / 3"
+                            class="gameplay-student-hud__fragment-count-label"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+
+                    <ui:Button
+                        name="pause-button"
+                        text=""
+                        class="ds-btn ds-btn--ghost ds-btn--icon gameplay-student-hud__pause-button"
+                        tooltip="Pause">
+                        <ui:VisualElement
+                            name="pause-icon"
+                            class="ds-icon ds-icon--pause ds-icon--md gameplay-student-hud__pause-icon"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="gameplay-control-layer"
+                class="gameplay-student-hud__control-layer"
+                picking-mode="Ignore">
+
+                <ui:VisualElement
+                    name="movement-control-region"
+                    class="gameplay-student-hud__movement-region"
+                    picking-mode="Ignore">
+                    <ui:VisualElement
+                        name="movement-joystick"
+                        class="gameplay-student-hud__joystick">
+                        <ui:VisualElement
+                            name="joystick-base"
+                            class="gameplay-student-hud__joystick-base"
+                            picking-mode="Ignore" />
+                        <ui:VisualElement
+                            name="joystick-knob"
+                            class="gameplay-student-hud__joystick-knob"
+                            picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement
+                    name="action-control-region"
+                    class="gameplay-student-hud__action-region"
+                    picking-mode="Ignore">
+                    <ui:Button
+                        name="interaction-button"
+                        text=""
+                        class="ds-btn ds-btn--primary gameplay-student-hud__interaction-button">
+                        <ui:VisualElement
+                            name="interaction-icon"
+                            class="ds-icon ds-icon--search ds-icon--lg gameplay-student-hud__interaction-icon"
+                            picking-mode="Ignore" />
+                        <ui:Label
+                            name="interaction-label"
+                            text="Inspect"
+                            class="gameplay-student-hud__interaction-label"
+                            picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
