@@ -18,6 +18,8 @@ namespace NutriMind.Gameplay.UI
         private string _sequenceHint = string.Empty;
         private bool _isOpen;
         private bool _suppressCloseEvents;
+        private int _showGeneration;
+        private bool _isHandlingOption;
         private Action _continueCallback;
         private Action<string> _optionCallback;
         private Action<bool> _sequenceConfirmCallback;
@@ -249,6 +251,7 @@ namespace NutriMind.Gameplay.UI
         private void ApplyAndOpen()
         {
             Bind();
+            _showGeneration++;
             _view?.SetViewModel(_currentModel);
             if (!_isOpen)
             {
@@ -257,26 +260,60 @@ namespace NutriMind.Gameplay.UI
             }
         }
 
+        private void CompleteBlockingAction(Action continuation)
+        {
+            int generationBefore = _showGeneration;
+            continuation?.Invoke();
+            if (_showGeneration != generationBefore)
+            {
+                // Continuation replaced the overlay; keep the blocking session open.
+                return;
+            }
+
+            Hide();
+        }
+
         private void OnPrimaryActionRequested()
         {
             Action callback = _continueCallback;
             _continueCallback = null;
-            Hide();
-            callback?.Invoke();
+            CompleteBlockingAction(callback);
         }
 
         private void OnOptionSelected(int index)
         {
-            if (_currentModel.OptionIds == null || index < 0 || index >= _currentModel.OptionIds.Length)
+            if (_isHandlingOption)
             {
                 return;
             }
 
-            string optionId = _currentModel.OptionIds[index];
+            if (_currentModel.OptionIds == null || index < 0 || index >= _currentModel.OptionIds.Length)
+            {
+                Debug.LogWarning(
+                    "[GameplayLearningOverlayController] Ignored option index "
+                    + index + " because option ids are missing or out of range.");
+                return;
+            }
+
             Action<string> callback = _optionCallback;
+            if (callback == null)
+            {
+                Debug.LogWarning(
+                    "[GameplayLearningOverlayController] Option selected but no option callback is registered.");
+                return;
+            }
+
+            string optionId = _currentModel.OptionIds[index];
             _optionCallback = null;
-            Hide();
-            callback?.Invoke(optionId);
+            _isHandlingOption = true;
+            try
+            {
+                CompleteBlockingAction(() => callback.Invoke(optionId));
+            }
+            finally
+            {
+                _isHandlingOption = false;
+            }
         }
 
         private void OnSequenceCardSelected(int index)
@@ -331,8 +368,7 @@ namespace NutriMind.Gameplay.UI
 
             Action<bool> callback = _sequenceConfirmCallback;
             _sequenceConfirmCallback = null;
-            Hide();
-            callback?.Invoke(true);
+            CompleteBlockingAction(() => callback?.Invoke(true));
         }
 
         private void ResetSequenceState()
@@ -354,9 +390,46 @@ namespace NutriMind.Gameplay.UI
         private void RefreshSequenceModel()
         {
             _currentModel.Body = _sequenceHint;
-            _currentModel.SlotValues = _sequenceSlotAssignments.ToArray();
+            _currentModel.SlotValues = BuildSequenceSlotDisplayValues();
             _currentModel.ConfirmEnabled = EventSequenceValidator.CanConfirm(_sequenceSlotAssignments);
             _view?.SetViewModel(_currentModel);
+        }
+
+        private string[] BuildSequenceSlotDisplayValues()
+        {
+            var values = new string[_sequenceSlotAssignments.Count];
+            for (int i = 0; i < _sequenceSlotAssignments.Count; i++)
+            {
+                string cardId = _sequenceSlotAssignments[i];
+                values[i] = ResolveSequenceCardLabel(cardId);
+            }
+
+            return values;
+        }
+
+        private string ResolveSequenceCardLabel(string cardId)
+        {
+            if (string.IsNullOrEmpty(cardId)
+                || _currentModel?.OptionLabels == null
+                || MissionContentIds.EventSequenceCardIds == null)
+            {
+                return string.Empty;
+            }
+
+            for (int i = 0; i < MissionContentIds.EventSequenceCardIds.Length; i++)
+            {
+                if (!string.Equals(cardId, MissionContentIds.EventSequenceCardIds[i], System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (i < _currentModel.OptionLabels.Length)
+                {
+                    return _currentModel.OptionLabels[i] ?? string.Empty;
+                }
+            }
+
+            return string.Empty;
         }
 
         private static string[] ExtractOptionLabels(MissionQuestionDto question)

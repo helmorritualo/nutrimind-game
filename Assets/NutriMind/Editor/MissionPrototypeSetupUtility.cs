@@ -101,18 +101,18 @@ namespace NutriMind.Editor
                 "CluePoint01_OpeningIllustration",
                 MissionContentIds.ClueOpeningIllustration,
                 "Opening Illustration",
-                "Children gather near the large acacia tree in Story Square.",
+                "Look at the damaged opening picture. Who is in the scene, and where does the festival story begin?",
                 FindExisting(scene, "CLUE_Opening_illustration"),
-                null,
+                new Vector3(-0.45f, 0.85f, 0.2f),
                 null);
             EvidenceClueInteractable survivingClue = EnsureClue(
                 storybook.transform,
                 "CluePoint02_SurvivingLines",
                 MissionContentIds.ClueSurvivingLines,
                 "Surviving Lines",
-                "They plan to carry a friendship banner to the Chronicle Courtyard.",
+                "Read the surviving sentence. What do the children want to do once the opening page is repaired?",
                 FindExisting(scene, "CLUE_Surviving_Lines"),
-                null,
+                new Vector3(0.45f, 0.85f, 0.2f),
                 null);
             CaptionRepairInteractable captionBoard = EnsureCaptionBoard(storybook.transform);
             WorldStateController area1World = storybook.GetComponent<WorldStateController>();
@@ -146,8 +146,8 @@ namespace NutriMind.Editor
                 area2,
                 "CluePoint01_ChildrenGather",
                 MissionContentIds.ClueChildrenGather,
-                "Children Gather",
-                "The children gather at the acacia tree.",
+                "First Banner Marker",
+                "This near-stall banner shows what happened FIRST: the children gather under the acacia tree in Story Square before the market walk begins.",
                 null,
                 new Vector3(0f, 0f, 2f),
                 "CluePoint01_ChildrenGather requires manual placement near the start of Banner Market Lane.");
@@ -155,8 +155,8 @@ namespace NutriMind.Editor
                 area2,
                 "CluePoint02_StorybookOpened",
                 MissionContentIds.ClueStorybookOpened,
-                "Storybook Opened",
-                "Farmer Lira opens the damaged storybook.",
+                "Next Banner Marker",
+                "This middle-stall painting shows what happened NEXT: after the children gather, Farmer Lira opens the damaged town storybook.",
                 null,
                 new Vector3(0f, 0f, 10f),
                 "CluePoint02_StorybookOpened requires manual placement in the middle section of Banner Market Lane.");
@@ -164,8 +164,8 @@ namespace NutriMind.Editor
                 area2,
                 "CluePoint03_CaptionRepaired",
                 MissionContentIds.ClueCaptionRepaired,
-                "Caption Repaired",
-                "The Pathfinder repairs the missing opening caption.",
+                "Final Banner Marker",
+                "This far-stall marker shows what happened FINALLY on the route: the Pathfinder repairs the missing opening caption so the banner path can continue.",
                 null,
                 new Vector3(0f, 0f, 20f),
                 "CluePoint03_CaptionRepaired requires manual placement later in Banner Market Lane.");
@@ -239,6 +239,8 @@ namespace NutriMind.Editor
             Assign(missionSo, "_bindings", bindings);
             missionSo.ApplyModifiedPropertiesWithoutUndo();
 
+            EnsureWorldSpaceLabels(bindings);
+
             WarnAboutLooseCameras(scene);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -261,6 +263,28 @@ namespace NutriMind.Editor
             Debug.Log(
                 "[MissionPrototypeSetupUtility] Placeholder anchors use MissionPlacementRequired markers. "
                 + "Confirm placements in Scene view before claiming validation success.");
+        }
+
+        [MenuItem("NutriMind/Gameplay/Mission 1/Ensure World-Space Interaction Labels")]
+        public static void EnsureWorldSpaceInteractionLabelsMenu()
+        {
+            Scene scene = OpenMissionScene();
+            if (!scene.IsValid())
+            {
+                return;
+            }
+
+            MissionSceneBindings bindings = UnityEngine.Object.FindFirstObjectByType<MissionSceneBindings>();
+            if (bindings == null)
+            {
+                Debug.LogError("[MissionPrototypeSetupUtility] MissionSceneBindings is missing.");
+                return;
+            }
+
+            int count = EnsureWorldSpaceLabels(bindings);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[MissionPrototypeSetupUtility] Ensured " + count + " world-space interaction labels.");
         }
 
         [MenuItem("NutriMind/Gameplay/Mission 1/Create Fallback Prototype Player")]
@@ -612,11 +636,6 @@ namespace NutriMind.Editor
                 node = FindOrCreateChild(parent, objectName, out created);
                 if (created)
                 {
-                    if (defaultLocalPosition.HasValue)
-                    {
-                        node.localPosition = defaultLocalPosition.Value;
-                    }
-
                     EnsurePrimitiveChild(
                         node,
                         "IllustratedClueVisual",
@@ -633,20 +652,41 @@ namespace NutriMind.Editor
 
             SphereCollider trigger = GetOrAdd<SphereCollider>(node.gameObject);
             trigger.isTrigger = true;
-            trigger.radius = 1.5f;
-            Transform focus = FindOrCreateChild(node, "InteractionPoint", out bool focusCreated);
-            if (focusCreated)
+            bool isArea1BookClue =
+                string.Equals(clueId, MissionContentIds.ClueOpeningIllustration, StringComparison.Ordinal)
+                || string.Equals(clueId, MissionContentIds.ClueSurvivingLines, StringComparison.Ordinal);
+            trigger.radius = isArea1BookClue ? 0.5f : 1.5f;
+
+            if (isArea1BookClue && defaultLocalPosition.HasValue)
             {
-                focus.localPosition = new Vector3(0f, 1.2f, 0f);
+                // Keep book-page clues on the storybook even if an older wire left them far away.
+                if (created || Vector3.Distance(node.localPosition, defaultLocalPosition.Value) > 1.5f)
+                {
+                    node.localPosition = defaultLocalPosition.Value;
+                    node.localScale = Vector3.one;
+                }
+            }
+            else if (created && defaultLocalPosition.HasValue)
+            {
+                node.localPosition = defaultLocalPosition.Value;
             }
 
+            Transform focus = FindOrCreateChild(node, "InteractionPoint", out bool focusCreated);
+            if (focusCreated || isArea1BookClue)
+            {
+                focus.localPosition = isArea1BookClue
+                    ? new Vector3(0f, 0.35f, 0f)
+                    : new Vector3(0f, 1.2f, 0f);
+            }
+
+            int priority = isArea1BookClue ? 2 : 1;
             EvidenceClueInteractable clue = ConfigureInteractable<EvidenceClueInteractable>(
                 node.gameObject,
                 clueId,
                 "Inspect",
                 "ds-icon--search",
                 focus,
-                1);
+                priority);
             SerializedObject so = new SerializedObject(clue);
             Assign(so, "_clueId", clueId);
             Assign(so, "_evidenceTitle", title);
@@ -820,8 +860,9 @@ namespace NutriMind.Editor
             trigger.isTrigger = true;
             if (created)
             {
-                trigger.size = new Vector3(6f, 3f, 4f);
-                trigger.center = new Vector3(0f, 1.5f, 0f);
+                // Tall, wide corridor on the ground so CharacterController cannot miss it.
+                trigger.size = new Vector3(24f, 6f, 16f);
+                trigger.center = new Vector3(0f, 3f, 0f);
             }
 
             AreaEntryTrigger entry = GetOrAdd<AreaEntryTrigger>(node.gameObject);
@@ -982,6 +1023,108 @@ namespace NutriMind.Editor
                     }
                 }
             }
+        }
+
+        private static int EnsureWorldSpaceLabels(MissionSceneBindings bindings)
+        {
+            if (bindings == null)
+            {
+                return 0;
+            }
+
+            const string prefabPath = "Assets/NutriMind/Gameplay/UI/WorldSpace/PF_WorldInteractableLabel.prefab";
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                prefab = CreateWorldLabelPrefabAsset(prefabPath);
+            }
+
+            Transform faceToward = bindings.PlayerSpawn;
+            int count = 0;
+            count += EnsureInteractableLabel(prefab, bindings.FarmerLira, "Talk: Farmer Lira", 0.7f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.DamagedStorybook, "Inspect: Storybook", 0.55f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.OpeningIllustrationClue, "Clue: Opening Illustration", 0.45f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.SurvivingLinesClue, "Clue: Surviving Lines", 0.45f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.CaptionBoard, "Repair: Caption Board", 0.5f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.Mina, "Talk: Mina", 0.7f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.ChildrenGatherClue, "Clue: First Banner Marker", 0.5f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.StorybookOpenedClue, "Clue: Next Banner Marker", 0.5f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.CaptionRepairedClue, "Clue: Final Banner Marker", 0.5f, false, faceToward);
+            count += EnsureInteractableLabel(prefab, bindings.SequenceBoard, "Arrange: Event Sequence", 0.55f, false, faceToward);
+            count += EnsureFragmentLabel(prefab, bindings.Fragment1, "Collect: Story Fragment 1", 0.45f, faceToward);
+            count += EnsureFragmentLabel(prefab, bindings.Fragment2, "Collect: Story Fragment 2", 0.45f, faceToward);
+            return count;
+        }
+
+        private static GameObject CreateWorldLabelPrefabAsset(string prefabPath)
+        {
+            var root = new GameObject("PF_WorldInteractableLabel", typeof(RectTransform));
+            WorldSpaceInteractableLabel label = root.AddComponent<WorldSpaceInteractableLabel>();
+            label.Configure("Label", null, null, 0.55f, false, null);
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            UnityEngine.Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        private static int EnsureInteractableLabel(
+            GameObject prefab,
+            WorldInteractableBase interactable,
+            string text,
+            float topPadding,
+            bool hideWhenUnavailable,
+            Transform faceToward)
+        {
+            if (interactable == null || prefab == null)
+            {
+                return 0;
+            }
+
+            WorldSpaceInteractableLabel existing = interactable.GetComponentInChildren<WorldSpaceInteractableLabel>(true);
+            GameObject instance;
+            if (existing == null)
+            {
+                instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, interactable.transform);
+                instance.name = "WorldLabel";
+                existing = instance.GetComponent<WorldSpaceInteractableLabel>();
+            }
+            else
+            {
+                instance = existing.gameObject;
+            }
+
+            existing.Configure(text, interactable, null, topPadding, hideWhenUnavailable, faceToward);
+            EditorUtility.SetDirty(instance);
+            return 1;
+        }
+
+        private static int EnsureFragmentLabel(
+            GameObject prefab,
+            StoryFragmentCollectible fragment,
+            string text,
+            float topPadding,
+            Transform faceToward)
+        {
+            if (fragment == null || prefab == null)
+            {
+                return 0;
+            }
+
+            WorldSpaceInteractableLabel existing = fragment.GetComponentInChildren<WorldSpaceInteractableLabel>(true);
+            GameObject instance;
+            if (existing == null)
+            {
+                instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, fragment.transform);
+                instance.name = "WorldLabel";
+                existing = instance.GetComponent<WorldSpaceInteractableLabel>();
+            }
+            else
+            {
+                instance = existing.gameObject;
+            }
+
+            existing.Configure(text, null, fragment, topPadding, true, faceToward);
+            EditorUtility.SetDirty(instance);
+            return 1;
         }
     }
 }

@@ -79,7 +79,7 @@ namespace NutriMind.Tests.PlayMode.GameplayRuntime
 
             GameplayStudentHudRuntimeController hud = Object.FindFirstObjectByType<GameplayStudentHudRuntimeController>();
             Assert.That(hud.CurrentModel.CollectedFragments, Is.EqualTo(1));
-            Assert.That(hud.CurrentModel.ObjectiveText, Is.EqualTo("Continue to Banner Market Lane."));
+            Assert.That(hud.CurrentModel.ObjectiveText, Is.EqualTo("Walk toward Banner Market Lane and talk to Mina."));
 
             // Area 2 starts only after entry trigger path.
             controller.HandleAreaEntry(MissionContentIds.Area2Id);
@@ -115,10 +115,11 @@ namespace NutriMind.Tests.PlayMode.GameplayRuntime
         private static IEnumerator LoadMissionScene()
         {
 #if UNITY_EDITOR
-            EditorSceneManager.LoadSceneInPlayMode(
+            AsyncOperation operation = EditorSceneManager.LoadSceneAsyncInPlayMode(
                 ScenePath,
                 new LoadSceneParameters(LoadSceneMode.Single));
-            yield return null;
+            Assert.That(operation, Is.Not.Null, "LoadSceneAsyncInPlayMode should return an AsyncOperation.");
+            yield return operation;
 #else
             Assert.Fail("Mission PlayMode smoke tests require the Unity Editor LoadSceneInPlayMode path.");
             yield break;

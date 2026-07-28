@@ -4,19 +4,31 @@
     <Style src="project://database/Assets/NutriMind/Gameplay/UI/UITK/Overlay/USS/GameplayLearningOverlay.uss" />
 
     <ui:VisualElement name="gameplay-learning-overlay-root" class="ds-root theme-nutrimind gameplay-learning-overlay gameplay-learning-overlay--hidden" picking-mode="Position">
-        <ui:VisualElement name="overlay-backdrop" class="ds-backdrop gameplay-learning-overlay__backdrop">
-            <ui:VisualElement name="overlay-card" class="ds-card gameplay-learning-overlay__card">
+        <ui:VisualElement name="overlay-backdrop" class="ds-backdrop gameplay-learning-overlay__backdrop" picking-mode="Position">
+            <ui:VisualElement name="overlay-card" class="ds-card gameplay-learning-overlay__card" picking-mode="Position">
+                <ui:Label name="overlay-eyebrow" text="" class="gameplay-learning-overlay__eyebrow gameplay-learning-overlay__eyebrow--hidden" />
                 <ui:Label name="overlay-title" text="" class="gameplay-learning-overlay__title" />
                 <ui:Label name="overlay-speaker" text="" class="gameplay-learning-overlay__speaker gameplay-learning-overlay__speaker--hidden" />
                 <ui:Label name="overlay-body" text="" class="gameplay-learning-overlay__body" />
-                <ui:ScrollView name="overlay-options-scroll" class="gameplay-learning-overlay__options-scroll gameplay-learning-overlay__options-scroll--hidden">
-                    <ui:VisualElement name="overlay-options-list" class="gameplay-learning-overlay__options-list" />
-                </ui:ScrollView>
-                <ui:VisualElement name="overlay-sequence-panel" class="gameplay-learning-overlay__sequence-panel gameplay-learning-overlay__sequence-panel--hidden">
-                    <ui:VisualElement name="overlay-sequence-cards" class="gameplay-learning-overlay__sequence-cards" />
-                    <ui:VisualElement name="overlay-sequence-slots" class="gameplay-learning-overlay__sequence-slots" />
-                    <ui:Label name="overlay-sequence-hint" text="" class="gameplay-learning-overlay__sequence-hint" />
+
+                <ui:VisualElement name="overlay-options-host" class="gameplay-learning-overlay__options-host gameplay-learning-overlay__options-host--hidden">
+                    <ui:ScrollView name="overlay-options-scroll" class="gameplay-learning-overlay__options-scroll" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto" touch-scroll-type="Clamped">
+                        <ui:VisualElement name="overlay-options-list" class="gameplay-learning-overlay__options-list" />
+                    </ui:ScrollView>
                 </ui:VisualElement>
+
+                <ui:VisualElement name="overlay-sequence-panel" class="gameplay-learning-overlay__sequence-panel gameplay-learning-overlay__sequence-panel--hidden">
+                    <ui:ScrollView name="overlay-sequence-scroll" class="gameplay-learning-overlay__sequence-scroll" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto" touch-scroll-type="Clamped">
+                        <ui:VisualElement name="overlay-sequence-content" class="gameplay-learning-overlay__sequence-content">
+                            <ui:Label text="1. Tap an event card" class="gameplay-learning-overlay__section-label" />
+                            <ui:VisualElement name="overlay-sequence-cards" class="gameplay-learning-overlay__sequence-cards" />
+                            <ui:Label text="2. Tap a slot to place it in order" class="gameplay-learning-overlay__section-label" />
+                            <ui:VisualElement name="overlay-sequence-slots" class="gameplay-learning-overlay__sequence-slots" />
+                            <ui:Label name="overlay-sequence-hint" text="" class="gameplay-learning-overlay__sequence-hint" />
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+
                 <ui:VisualElement name="overlay-actions" class="gameplay-learning-overlay__actions">
                     <ui:Button name="overlay-reset-button" text="Reset" class="ds-btn ds-btn--secondary gameplay-learning-overlay__reset-button gameplay-learning-overlay__reset-button--hidden" />
                     <ui:Button name="overlay-secondary-button" text="" class="ds-btn ds-btn--secondary gameplay-learning-overlay__secondary-button gameplay-learning-overlay__secondary-button--hidden" />
@@ -27,3 +39,4 @@
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
+

@@ -13,30 +13,52 @@
 .gameplay-learning-overlay__backdrop {
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: 24px 32px;
+    background-color: rgba(24, 18, 36, 0.58);
 }
 
 .gameplay-learning-overlay__card {
-    width: 92%;
-    max-width: 760px;
-    max-height: 88%;
-    padding: 24px;
-    background-color: rgba(255, 252, 247, 0.98);
-    border-radius: 20px;
+    width: 96%;
+    max-width: 1100px;
+    min-width: 480px;
+    max-height: 92%;
+    padding: 40px 44px 32px;
+    background-color: rgb(255, 252, 247);
+    border-radius: 30px;
+    border-width: 2px;
+    border-color: rgba(139, 92, 246, 0.18);
     flex-direction: column;
-    margin-bottom: 12px;
+    flex-shrink: 1;
+    overflow: hidden;
 }
 
-.gameplay-learning-overlay__title {
-    font-size: 28px;
-    -unity-font-style: bold;
-    color: rgb(58, 34, 94);
-}
-
-.gameplay-learning-overlay__speaker {
+.gameplay-learning-overlay__eyebrow {
     font-size: 20px;
     -unity-font-style: bold;
     color: rgb(108, 63, 167);
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.gameplay-learning-overlay__eyebrow--hidden {
+    display: none;
+}
+
+.gameplay-learning-overlay__title {
+    font-size: 40px;
+    -unity-font-style: bold;
+    color: rgb(42, 28, 68);
+    white-space: normal;
+    margin-bottom: 14px;
+}
+
+.gameplay-learning-overlay__speaker {
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(108, 63, 167);
+    margin-bottom: 10px;
 }
 
 .gameplay-learning-overlay__speaker--hidden {
@@ -44,80 +66,213 @@
 }
 
 .gameplay-learning-overlay__body {
-    font-size: 20px;
+    font-size: 26px;
+    -unity-font-style: bold;
     white-space: normal;
     color: rgb(45, 35, 58);
+    margin-bottom: 20px;
+}
+
+.gameplay-learning-overlay__section-label {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(90, 70, 120);
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.gameplay-learning-overlay__options-host {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 240px;
+    max-height: 460px;
+    margin-top: 4px;
+    margin-bottom: 10px;
+}
+
+.gameplay-learning-overlay__options-host--hidden {
+    display: none;
 }
 
 .gameplay-learning-overlay__options-scroll {
-    max-height: 280px;
-    margin-top: 8px;
-}
-
-.gameplay-learning-overlay__options-scroll--hidden {
-    display: none;
+    flex-grow: 1;
+    height: 100%;
 }
 
 .gameplay-learning-overlay__options-list {
     flex-direction: column;
-    margin-bottom: 10px;
+    padding-right: 8px;
+    padding-bottom: 4px;
 }
 
 .gameplay-learning-overlay__option-button {
-    min-height: 52px;
+    min-height: 80px;
+    margin-bottom: 14px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    border-width: 2px;
+    border-color: rgba(139, 92, 246, 0.22);
+    background-color: rgb(255, 255, 255);
+    flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
-    align-items: flex-start;
     white-space: normal;
+}
+
+.gameplay-learning-overlay__option-button:hover {
+    border-color: rgba(139, 92, 246, 0.55);
+    background-color: rgba(139, 92, 246, 0.08);
+}
+
+.gameplay-learning-overlay__option-button:active {
+    background-color: rgba(139, 92, 246, 0.14);
+}
+
+.gameplay-learning-overlay__option-letter {
+    min-width: 48px;
+    min-height: 48px;
+    width: 48px;
+    height: 48px;
+    margin-right: 16px;
+    border-radius: 14px;
+    background-color: rgba(139, 92, 246, 0.14);
+    color: rgb(88, 48, 150);
+    -unity-font-style: bold;
+    font-size: 24px;
+    -unity-text-align: middle-center;
+    flex-shrink: 0;
+}
+
+.gameplay-learning-overlay__option-label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(42, 28, 68);
+    white-space: normal;
+    -unity-text-align: middle-left;
 }
 
 .gameplay-learning-overlay__sequence-panel {
     flex-direction: column;
-    margin-bottom: 12px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 320px;
+    max-height: 560px;
+    margin-bottom: 8px;
+    overflow: hidden;
 }
 
 .gameplay-learning-overlay__sequence-panel--hidden {
     display: none;
 }
 
+.gameplay-learning-overlay__sequence-scroll {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.gameplay-learning-overlay__sequence-content {
+    flex-direction: column;
+    padding-right: 8px;
+    padding-bottom: 8px;
+}
+
 .gameplay-learning-overlay__sequence-cards,
 .gameplay-learning-overlay__sequence-slots {
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-right: -10px;
+    flex-direction: column;
+    margin-bottom: 12px;
 }
 
 .gameplay-learning-overlay__sequence-card,
 .gameplay-learning-overlay__sequence-slot {
-    min-width: 200px;
-    min-height: 72px;
-    padding: 10px;
-    border-radius: 12px;
+    width: 100%;
+    min-height: 84px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    padding: 16px 18px;
+    border-radius: 18px;
     background-color: rgba(108, 63, 167, 0.08);
     border-width: 2px;
     border-color: rgba(108, 63, 167, 0.25);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
     white-space: normal;
+}
+
+.gameplay-learning-overlay__sequence-card:hover,
+.gameplay-learning-overlay__sequence-slot:hover {
+    border-color: rgba(108, 63, 167, 0.55);
+    background-color: rgba(108, 63, 167, 0.14);
 }
 
 .gameplay-learning-overlay__sequence-card--selected {
     border-color: rgb(108, 63, 167);
-    background-color: rgba(108, 63, 167, 0.18);
+    background-color: rgba(108, 63, 167, 0.2);
 }
 
 .gameplay-learning-overlay__sequence-slot--filled {
     background-color: rgba(76, 140, 74, 0.12);
-    border-color: rgba(76, 140, 74, 0.45);
+    border-color: rgba(76, 140, 74, 0.5);
+}
+
+.gameplay-learning-overlay__sequence-card-label,
+.gameplay-learning-overlay__sequence-slot-title,
+.gameplay-learning-overlay__sequence-slot-body {
+    white-space: normal;
+    -unity-font-style: bold;
+    color: rgb(42, 28, 68);
+}
+
+.gameplay-learning-overlay__sequence-card-label {
+    font-size: 22px;
+}
+
+.gameplay-learning-overlay__sequence-slot-title {
+    font-size: 18px;
+    color: rgb(90, 70, 120);
+    margin-bottom: 6px;
+}
+
+.gameplay-learning-overlay__sequence-slot-body {
+    font-size: 22px;
+}
+
+.gameplay-learning-overlay__sequence-slot-body--empty {
+    color: rgb(120, 108, 140);
 }
 
 .gameplay-learning-overlay__sequence-hint {
     color: rgb(150, 58, 58);
-    font-size: 18px;
+    font-size: 22px;
+    -unity-font-style: bold;
     white-space: normal;
+    margin-top: 6px;
+    margin-bottom: 4px;
 }
 
 .gameplay-learning-overlay__actions {
     flex-direction: row;
     justify-content: flex-end;
-    margin-top: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 10px;
+    flex-shrink: 0;
+}
+
+.gameplay-learning-overlay__primary-button,
+.gameplay-learning-overlay__confirm-button,
+.gameplay-learning-overlay__secondary-button,
+.gameplay-learning-overlay__reset-button {
+    min-height: 60px;
+    min-width: 160px;
+    margin-left: 12px;
+    margin-top: 6px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    border-radius: 16px;
 }
 
 .gameplay-learning-overlay__reset-button--hidden,
@@ -125,3 +280,17 @@
 .gameplay-learning-overlay__confirm-button--hidden {
     display: none;
 }
+
+/* State accents */
+.gameplay-learning-overlay__card--hint {
+    border-color: rgba(245, 158, 11, 0.45);
+}
+
+.gameplay-learning-overlay__card--correct {
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.gameplay-learning-overlay__card--review {
+    border-color: rgba(211, 47, 47, 0.4);
+}
+

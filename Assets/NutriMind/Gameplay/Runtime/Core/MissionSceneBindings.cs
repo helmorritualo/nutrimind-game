@@ -172,12 +172,70 @@ namespace NutriMind.Gameplay.Runtime
             ValidateInteractableId(_mina, "Mina", MissionContentIds.MinaNpc, interactionIds, report);
             ValidateInteractableId(_sequenceBoard, "Sequence board", MissionContentIds.EventSequenceBoard, interactionIds, report);
 
+            if (_openingIllustrationClue != null && _survivingLinesClue != null
+                && ReferenceEquals(_openingIllustrationClue, _survivingLinesClue))
+            {
+                report.Errors.Add(
+                    "Opening Illustration Clue and Surviving Lines Clue reference the same component.");
+            }
+
+            if (_childrenGatherClue != null && _storybookOpenedClue != null
+                && ReferenceEquals(_childrenGatherClue, _storybookOpenedClue))
+            {
+                report.Errors.Add(
+                    "Children Gather Clue and Storybook Opened Clue reference the same component.");
+            }
+
+            if (_childrenGatherClue != null && _captionRepairedClue != null
+                && ReferenceEquals(_childrenGatherClue, _captionRepairedClue))
+            {
+                report.Errors.Add(
+                    "Children Gather Clue and Caption Repaired Clue reference the same component.");
+            }
+
+            if (_storybookOpenedClue != null && _captionRepairedClue != null
+                && ReferenceEquals(_storybookOpenedClue, _captionRepairedClue))
+            {
+                report.Errors.Add(
+                    "Storybook Opened Clue and Caption Repaired Clue reference the same component.");
+            }
+
             var clueIds = new Dictionary<string, string>(StringComparer.Ordinal);
-            ValidateClueId(_openingIllustrationClue, "Opening illustration clue", MissionContentIds.ClueOpeningIllustration, clueIds, report);
-            ValidateClueId(_survivingLinesClue, "Surviving lines clue", MissionContentIds.ClueSurvivingLines, clueIds, report);
-            ValidateClueId(_childrenGatherClue, "Children gather clue", MissionContentIds.ClueChildrenGather, clueIds, report);
-            ValidateClueId(_storybookOpenedClue, "Storybook opened clue", MissionContentIds.ClueStorybookOpened, clueIds, report);
-            ValidateClueId(_captionRepairedClue, "Caption repaired clue", MissionContentIds.ClueCaptionRepaired, clueIds, report);
+            ValidateClueId(
+                _openingIllustrationClue,
+                "Opening illustration clue",
+                MissionContentIds.ClueOpeningIllustration,
+                "CluePoint01_OpeningIllustration",
+                clueIds,
+                report);
+            ValidateClueId(
+                _survivingLinesClue,
+                "Surviving lines clue",
+                MissionContentIds.ClueSurvivingLines,
+                "CluePoint02_SurvivingLines",
+                clueIds,
+                report);
+            ValidateClueId(
+                _childrenGatherClue,
+                "Children gather clue",
+                MissionContentIds.ClueChildrenGather,
+                "CluePoint01_ChildrenGather",
+                clueIds,
+                report);
+            ValidateClueId(
+                _storybookOpenedClue,
+                "Storybook opened clue",
+                MissionContentIds.ClueStorybookOpened,
+                "CluePoint02_StorybookOpened",
+                clueIds,
+                report);
+            ValidateClueId(
+                _captionRepairedClue,
+                "Caption repaired clue",
+                MissionContentIds.ClueCaptionRepaired,
+                "CluePoint03_CaptionRepaired",
+                clueIds,
+                report);
 
             if (_fragment1 != null && _fragment1.CollectibleId != MissionContentIds.Fragment1)
             {
@@ -370,12 +428,27 @@ namespace NutriMind.Gameplay.Runtime
             EvidenceClueInteractable clue,
             string label,
             string expectedId,
+            string expectedObjectName,
             Dictionary<string, string> seen,
             MissionValidationReport report)
         {
             if (clue == null)
             {
                 return;
+            }
+
+            EvidenceClueInteractable[] cluesOnObject = clue.GetComponents<EvidenceClueInteractable>();
+            if (cluesOnObject != null && cluesOnObject.Length > 1)
+            {
+                report.Errors.Add(clue.gameObject.name + " has more than one EvidenceClueInteractable.");
+            }
+
+            if (!string.IsNullOrEmpty(expectedObjectName)
+                && !string.Equals(clue.gameObject.name, expectedObjectName, StringComparison.Ordinal))
+            {
+                report.Warnings.Add(
+                    label + " is on '" + clue.gameObject.name
+                    + "' but expected object name '" + expectedObjectName + "'.");
             }
 
             string id = clue.ClueId;
@@ -387,7 +460,25 @@ namespace NutriMind.Gameplay.Runtime
 
             if (!string.Equals(id, expectedId, StringComparison.Ordinal))
             {
-                report.Errors.Add(label + " clue id must be " + expectedId);
+                report.Errors.Add(
+                    clue.gameObject.name + " has clue ID " + id
+                    + " but expected " + expectedId + ".");
+            }
+
+            if (string.IsNullOrWhiteSpace(clue.InteractionId))
+            {
+                report.Errors.Add(label + " has an empty interaction id.");
+            }
+            else if (!string.Equals(clue.InteractionId, expectedId, StringComparison.Ordinal))
+            {
+                report.Errors.Add(
+                    clue.gameObject.name + " has interaction ID " + clue.InteractionId
+                    + " but expected " + expectedId + ".");
+            }
+
+            if (clue.FocusPoint == null)
+            {
+                report.Errors.Add(label + " is missing a focus or interaction point.");
             }
 
             if (seen.TryGetValue(id, out string existing))
@@ -422,6 +513,38 @@ namespace NutriMind.Gameplay.Runtime
             }
 
             ValidateTriggerCollider(trigger, label, report);
+
+            if (interactable is EvidenceClueInteractable clue
+                && (string.Equals(clue.ClueId, MissionContentIds.ClueOpeningIllustration, System.StringComparison.Ordinal)
+                    || string.Equals(clue.ClueId, MissionContentIds.ClueSurvivingLines, System.StringComparison.Ordinal)))
+            {
+                ValidateArea1ClueTriggerSize(interactable, label, report);
+            }
+        }
+
+        private static void ValidateArea1ClueTriggerSize(
+            WorldInteractableBase interactable,
+            string label,
+            MissionValidationReport report)
+        {
+            SphereCollider sphere = interactable.GetComponent<SphereCollider>();
+            if (sphere == null || !sphere.isTrigger)
+            {
+                return;
+            }
+
+            float worldRadius = sphere.radius * MaxAbsAxis(interactable.transform.lossyScale);
+            if (worldRadius < 0.3f || worldRadius > 0.75f)
+            {
+                report.Warnings.Add(
+                    label + " trigger world radius is " + worldRadius.ToString("0.00")
+                    + " m; recommended range is 0.35–0.65 m for book-page clues.");
+            }
+        }
+
+        private static float MaxAbsAxis(Vector3 scale)
+        {
+            return Mathf.Max(Mathf.Abs(scale.x), Mathf.Max(Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
         }
 
         private static void ValidateFragmentTrigger(

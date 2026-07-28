@@ -15,6 +15,8 @@ namespace NutriMind.Gameplay.Runtime
         private string[] _activeQuestionIds = Array.Empty<string>();
         private Transform _lastCheckpointTransform;
         private bool _bootstrapComplete;
+        private bool _area1QuestionSequenceStarted;
+        private bool _area2QuestionSequenceStarted;
 
         public IMissionProgressStore Progress => _progress;
 
@@ -44,9 +46,19 @@ namespace NutriMind.Gameplay.Runtime
                 return;
             }
 
-            if (!_bindings.TryValidate(out string validationError))
+            MissionValidationReport report = _bindings.Validate();
+            if (report.Errors.Count > 0)
             {
-                Debug.LogWarning("[MissionPrototypeController] Scene validation warnings:\n" + validationError);
+                Debug.LogError(
+                    "[MissionPrototypeController] Mission bootstrap stopped "
+                    + "because the scene contains blocking errors:\n"
+                    + report);
+                return;
+            }
+
+            if (report.Warnings.Count > 0 || report.ManualPlacementRequired.Count > 0)
+            {
+                Debug.LogWarning("[MissionPrototypeController] Mission scene warnings:\n" + report);
             }
 
             if (!MissionContentData.TryLoad(_bindings.MissionJson, out _content, out string loadError))
@@ -113,7 +125,7 @@ namespace NutriMind.Gameplay.Runtime
                 return;
             }
 
-            if (_progress.CurrentStep < MissionObjectiveStep.Area1_InspectStorybook)
+            if (_progress.CurrentStep != MissionObjectiveStep.Area1_InspectStorybook)
             {
                 return;
             }
@@ -124,13 +136,7 @@ namespace NutriMind.Gameplay.Runtime
                 () =>
                 {
                     _progress.MarkInteractionCompleted(MissionContentIds.DamagedStorybook);
-                    if (_progress.CurrentStep == MissionObjectiveStep.Area1_InspectStorybook)
-                    {
-                        _progress.CurrentStep = MissionObjectiveStep.Area1_InspectOpeningIllustration;
-                    }
-
-                    EnableClue(_bindings.OpeningIllustrationClue, true);
-                    EnableClue(_bindings.SurvivingLinesClue, true);
+                    _progress.CurrentStep = MissionObjectiveStep.Area1_InspectOpeningIllustration;
                     ApplyInteractionAvailability();
                     RefreshHud();
                 });
@@ -138,14 +144,66 @@ namespace NutriMind.Gameplay.Runtime
 
         public void HandleClueInteraction(EvidenceClueInteractable clue)
         {
-            if (clue == null || _progress.IsClueInspected(clue.ClueId))
+            if (clue == null)
             {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignored null clue at step '"
+                    + _progress.CurrentStep + "'.");
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(clue.ClueId))
+            {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignored clue '" + clue.name
+                    + "' with missing clue ID at step '" + _progress.CurrentStep
+                    + "' in area '" + _progress.CurrentAreaId + "'.");
+                return;
+            }
+
+            if (!IsRecognizedClueId(clue.ClueId))
+            {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignored clue '" + clue.name
+                    + "' with unrecognized ID '" + clue.ClueId
+                    + "' at step '" + _progress.CurrentStep
+                    + "' in area '" + _progress.CurrentAreaId + "'.");
+                return;
+            }
+
+            if (_progress.IsClueInspected(clue.ClueId))
+            {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignored already-inspected clue '" + clue.name
+                    + "' with ID '" + clue.ClueId
+                    + "' at step '" + _progress.CurrentStep
+                    + "' in area '" + _progress.CurrentAreaId
+                    + "'. Check duplicate clue IDs or incorrect MissionSceneBindings.");
+                return;
+            }
+
+            if (!IsClueAllowedForCurrentState(clue))
+            {
+                Debug.LogWarning(
+                    "[MissionPrototypeController] Ignored clue '" + clue.name
+                    + "' with ID '" + clue.ClueId
+                    + "' at step '" + _progress.CurrentStep
+                    + "' in area '" + _progress.CurrentAreaId + "'.");
+                return;
+            }
+
+            string title = clue.EvidenceTitle;
+            string body = clue.EvidenceBody;
+            if (_content != null
+                && _content.TryGetEvidenceClue(clue.ClueId, out string contentTitle, out string contentBody))
+            {
+                title = contentTitle;
+                body = contentBody;
+            }
+
             _bindings.OverlayController.ShowEvidence(
-                clue.EvidenceTitle,
-                clue.EvidenceBody,
+                title,
+                body,
                 () =>
                 {
                     _progress.MarkClueInspected(clue.ClueId);
@@ -192,7 +250,7 @@ namespace NutriMind.Gameplay.Runtime
                     _progress.CurrentStep = MissionObjectiveStep.Area2_ResolveQuestions;
                     ApplyInteractionAvailability();
                     RefreshHud();
-                    BeginQuestionSequence(MissionContentIds.Area2QuestionIds);
+                    BeginArea2QuestionSequence();
                 });
         }
 
@@ -256,7 +314,6 @@ namespace NutriMind.Gameplay.Runtime
             {
                 _progress.MarkInteractionCompleted(MissionContentIds.FarmerLiraNpc);
                 _progress.CurrentStep = MissionObjectiveStep.Area1_InspectStorybook;
-                EnableInteractable(_bindings.DamagedStorybook, true);
                 ApplyInteractionAvailability();
                 RefreshHud();
             });
@@ -264,8 +321,20 @@ namespace NutriMind.Gameplay.Runtime
 
         private void HandleMinaTalk()
         {
+            // Failsafe: if Area 1 is done but the entry trigger was missed, talking to Mina
+            // still advances into Area 2.
+            if (_progress.CurrentStep == MissionObjectiveStep.Area1_Complete)
+            {
+                EnterArea2();
+            }
+
             if (_progress.CurrentStep != MissionObjectiveStep.Area2_TalkToMina
                 || _progress.IsInteractionCompleted(MissionContentIds.MinaNpc))
+            {
+                return;
+            }
+
+            if (_content?.Area2?.Area == null)
             {
                 return;
             }
@@ -274,9 +343,6 @@ namespace NutriMind.Gameplay.Runtime
             {
                 _progress.MarkInteractionCompleted(MissionContentIds.MinaNpc);
                 _progress.CurrentStep = MissionObjectiveStep.Area2_FindClues;
-                EnableClue(_bindings.ChildrenGatherClue, true);
-                EnableClue(_bindings.StorybookOpenedClue, true);
-                EnableClue(_bindings.CaptionRepairedClue, true);
                 ApplyInteractionAvailability();
                 RefreshHud();
             });
@@ -287,38 +353,61 @@ namespace NutriMind.Gameplay.Runtime
             if (IsArea1Clue(clue))
             {
                 HandleArea1ClueProgress();
+                return;
             }
-            else if (IsArea2Clue(clue))
+
+            if (IsArea2Clue(clue))
             {
                 HandleArea2ClueProgress();
             }
-
-            ApplyInteractionAvailability();
-            RefreshHud();
         }
 
         private void HandleArea1ClueProgress()
         {
-            bool openingDone = _progress.IsClueInspected(MissionContentIds.ClueOpeningIllustration);
-            bool linesDone = _progress.IsClueInspected(MissionContentIds.ClueSurvivingLines);
+            if (_progress.CurrentStep >= MissionObjectiveStep.Area1_ResolveQuestions)
+            {
+                return;
+            }
 
-            if (openingDone && !linesDone)
-            {
-                _progress.CurrentStep = MissionObjectiveStep.Area1_InspectSurvivingLines;
-            }
-            else if (!openingDone && linesDone)
-            {
-                _progress.CurrentStep = MissionObjectiveStep.Area1_InspectOpeningIllustration;
-            }
-            else if (openingDone && linesDone && _progress.CurrentStep < MissionObjectiveStep.Area1_ResolveQuestions)
+            bool openingDone =
+                _progress.IsClueInspected(MissionContentIds.ClueOpeningIllustration);
+            bool survivingLinesDone =
+                _progress.IsClueInspected(MissionContentIds.ClueSurvivingLines);
+
+            if (openingDone && survivingLinesDone)
             {
                 _progress.CurrentStep = MissionObjectiveStep.Area1_ResolveQuestions;
-                BeginQuestionSequence(MissionContentIds.Area1QuestionIds);
+                ApplyInteractionAvailability();
+                RefreshHud();
+                BeginArea1QuestionSequence();
+                return;
+            }
+
+            if (openingDone)
+            {
+                _progress.CurrentStep = MissionObjectiveStep.Area1_InspectSurvivingLines;
+                ApplyInteractionAvailability();
+                RefreshHud();
+                return;
+            }
+
+            if (survivingLinesDone)
+            {
+                _progress.CurrentStep = MissionObjectiveStep.Area1_InspectOpeningIllustration;
+                ApplyInteractionAvailability();
+                RefreshHud();
             }
         }
 
         private void HandleArea2ClueProgress()
         {
+            if (_progress.CurrentStep != MissionObjectiveStep.Area2_FindClues)
+            {
+                ApplyInteractionAvailability();
+                RefreshHud();
+                return;
+            }
+
             int count = 0;
             foreach (string clueId in MissionContentIds.Area2ClueIds)
             {
@@ -329,11 +418,36 @@ namespace NutriMind.Gameplay.Runtime
             }
 
             _progress.InspectedArea2ClueCount = count;
-            if (count >= 3 && _progress.CurrentStep < MissionObjectiveStep.Area2_UseSequenceBoard)
+
+            if (count >= 3)
             {
                 _progress.CurrentStep = MissionObjectiveStep.Area2_UseSequenceBoard;
-                EnableInteractable(_bindings.SequenceBoard, true);
             }
+
+            ApplyInteractionAvailability();
+            RefreshHud();
+        }
+
+        private void BeginArea1QuestionSequence()
+        {
+            if (_area1QuestionSequenceStarted)
+            {
+                return;
+            }
+
+            _area1QuestionSequenceStarted = true;
+            BeginQuestionSequence(MissionContentIds.Area1QuestionIds);
+        }
+
+        private void BeginArea2QuestionSequence()
+        {
+            if (_area2QuestionSequenceStarted)
+            {
+                return;
+            }
+
+            _area2QuestionSequenceStarted = true;
+            BeginQuestionSequence(MissionContentIds.Area2QuestionIds);
         }
 
         private void BeginQuestionSequence(string[] questionIds)
@@ -348,6 +462,12 @@ namespace NutriMind.Gameplay.Runtime
             if (_activeQuestionIds == null || _currentQuestionIndex >= _activeQuestionIds.Length)
             {
                 OnQuestionSequenceComplete();
+                return;
+            }
+
+            if (_bindings.OverlayController == null)
+            {
+                Debug.LogWarning("[MissionPrototypeController] Overlay controller is missing.");
                 return;
             }
 
@@ -400,7 +520,13 @@ namespace NutriMind.Gameplay.Runtime
                     outcome.Acknowledged = true;
                     AdvanceQuestionSequence();
                 });
+                return;
             }
+
+            Debug.LogWarning(
+                "[MissionPrototypeController] Question attempt produced no feedback UI for "
+                + question.id + ". Advancing to keep the mission playable.");
+            AdvanceQuestionSequence();
         }
 
         private void AdvanceQuestionSequence()
@@ -414,11 +540,11 @@ namespace NutriMind.Gameplay.Runtime
             if (_progress.CurrentStep == MissionObjectiveStep.Area1_ResolveQuestions)
             {
                 _progress.CurrentStep = MissionObjectiveStep.Area1_RepairCaption;
-                EnableInteractable(_bindings.CaptionBoard, true);
             }
             else if (_progress.CurrentStep == MissionObjectiveStep.Area2_ResolveQuestions)
             {
                 CompleteArea2Questions();
+                return;
             }
 
             ApplyInteractionAvailability();
@@ -441,7 +567,6 @@ namespace NutriMind.Gameplay.Runtime
             _progress.CurrentStep = MissionObjectiveStep.Area1_Complete;
             _bindings.CheckpointA01?.SetActivated(true);
             UnlockGate(_bindings.Gate1, MissionContentIds.Gate1);
-
             ApplyInteractionAvailability();
             RefreshHud();
         }
@@ -460,7 +585,6 @@ namespace NutriMind.Gameplay.Runtime
                 _progress.CurrentStep = MissionObjectiveStep.Area2_TalkToMina;
             }
 
-            EnableInteractable(_bindings.Mina, true);
             ApplyInteractionAvailability();
             RefreshHud();
         }
@@ -511,35 +635,52 @@ namespace NutriMind.Gameplay.Runtime
             EnableInteractable(_bindings.FarmerLira, _progress.CurrentStep == MissionObjectiveStep.Area1_TalkToLira);
             EnableInteractable(
                 _bindings.DamagedStorybook,
-                _progress.CurrentStep >= MissionObjectiveStep.Area1_InspectStorybook
+                _progress.CurrentStep == MissionObjectiveStep.Area1_InspectStorybook
                     && !_progress.IsInteractionCompleted(MissionContentIds.DamagedStorybook));
+
+            bool inArea1Inspection =
+                _progress.CurrentStep == MissionObjectiveStep.Area1_InspectOpeningIllustration
+                || _progress.CurrentStep == MissionObjectiveStep.Area1_InspectSurvivingLines;
+
+            bool storybookInspected = _progress.IsInteractionCompleted(MissionContentIds.DamagedStorybook);
 
             EnableClue(
                 _bindings.OpeningIllustrationClue,
-                _progress.IsInteractionCompleted(MissionContentIds.DamagedStorybook)
+                storybookInspected
+                    && inArea1Inspection
                     && !_progress.IsClueInspected(MissionContentIds.ClueOpeningIllustration));
             EnableClue(
                 _bindings.SurvivingLinesClue,
-                _progress.IsInteractionCompleted(MissionContentIds.DamagedStorybook)
+                storybookInspected
+                    && inArea1Inspection
                     && !_progress.IsClueInspected(MissionContentIds.ClueSurvivingLines));
 
             EnableInteractable(_bindings.CaptionBoard, _progress.CurrentStep == MissionObjectiveStep.Area1_RepairCaption);
-            EnableInteractable(_bindings.Mina, _progress.CurrentStep == MissionObjectiveStep.Area2_TalkToMina);
+            EnableInteractable(
+                _bindings.Mina,
+                _progress.CurrentStep == MissionObjectiveStep.Area2_TalkToMina
+                    || _progress.CurrentStep == MissionObjectiveStep.Area1_Complete);
+
+            bool inArea2FindClues =
+                _progress.CurrentAreaId == MissionContentIds.Area2Id
+                && _progress.CurrentStep == MissionObjectiveStep.Area2_FindClues;
 
             EnableClue(
                 _bindings.ChildrenGatherClue,
-                _progress.CurrentStep >= MissionObjectiveStep.Area2_FindClues
+                inArea2FindClues
                     && !_progress.IsClueInspected(MissionContentIds.ClueChildrenGather));
             EnableClue(
                 _bindings.StorybookOpenedClue,
-                _progress.CurrentStep >= MissionObjectiveStep.Area2_FindClues
+                inArea2FindClues
                     && !_progress.IsClueInspected(MissionContentIds.ClueStorybookOpened));
             EnableClue(
                 _bindings.CaptionRepairedClue,
-                _progress.CurrentStep >= MissionObjectiveStep.Area2_FindClues
+                inArea2FindClues
                     && !_progress.IsClueInspected(MissionContentIds.ClueCaptionRepaired));
 
-            EnableInteractable(_bindings.SequenceBoard, _progress.CurrentStep == MissionObjectiveStep.Area2_UseSequenceBoard);
+            EnableInteractable(
+                _bindings.SequenceBoard,
+                _progress.CurrentStep == MissionObjectiveStep.Area2_UseSequenceBoard);
 
             _bindings.UiCoordinator?.RefreshInteractionPrompt();
         }
@@ -582,7 +723,7 @@ namespace NutriMind.Gameplay.Runtime
                 case MissionObjectiveStep.Area1_CollectFragment:
                     return "Collect Story Fragment 1.";
                 case MissionObjectiveStep.Area1_Complete:
-                    return "Continue to Banner Market Lane.";
+                    return "Walk toward Banner Market Lane and talk to Mina.";
                 case MissionObjectiveStep.Area2_TalkToMina:
                     return "Talk to Mina at the first market stall.";
                 case MissionObjectiveStep.Area2_FindClues:
@@ -608,9 +749,21 @@ namespace NutriMind.Gameplay.Runtime
 
         private MissionQuestionDto FindQuestion(string questionId)
         {
-            MissionAreaContent area = _progress.CurrentAreaId == MissionContentIds.Area2Id
-                ? _content.Area2
-                : _content.Area1;
+            MissionQuestionDto question = FindQuestionInArea(_content?.Area2, questionId);
+            if (question != null)
+            {
+                return question;
+            }
+
+            return FindQuestionInArea(_content?.Area1, questionId);
+        }
+
+        private static MissionQuestionDto FindQuestionInArea(MissionAreaContent area, string questionId)
+        {
+            if (area?.Questions == null)
+            {
+                return null;
+            }
 
             foreach (MissionQuestionDto question in area.Questions)
             {
@@ -649,6 +802,26 @@ namespace NutriMind.Gameplay.Runtime
                 () => ShowDialogueAtIndex(lines, index + 1, onComplete));
         }
 
+        private bool IsClueAllowedForCurrentState(EvidenceClueInteractable clue)
+        {
+            if (IsArea1Clue(clue))
+            {
+                bool inArea1Inspection =
+                    _progress.CurrentStep == MissionObjectiveStep.Area1_InspectOpeningIllustration
+                    || _progress.CurrentStep == MissionObjectiveStep.Area1_InspectSurvivingLines;
+                return _progress.IsInteractionCompleted(MissionContentIds.DamagedStorybook)
+                    && inArea1Inspection;
+            }
+
+            if (IsArea2Clue(clue))
+            {
+                return _progress.CurrentAreaId == MissionContentIds.Area2Id
+                    && _progress.CurrentStep == MissionObjectiveStep.Area2_FindClues;
+            }
+
+            return false;
+        }
+
         private static void EnableInteractable(WorldInteractableBase interactable, bool enabled)
         {
             if (interactable == null)
@@ -673,10 +846,9 @@ namespace NutriMind.Gameplay.Runtime
 
         private static bool IsArea1Clue(EvidenceClueInteractable clue)
         {
-            return clue == null
-                ? false
-                : string.Equals(clue.ClueId, MissionContentIds.ClueOpeningIllustration, StringComparison.Ordinal)
-                    || string.Equals(clue.ClueId, MissionContentIds.ClueSurvivingLines, StringComparison.Ordinal);
+            return clue != null
+                && (string.Equals(clue.ClueId, MissionContentIds.ClueOpeningIllustration, StringComparison.Ordinal)
+                    || string.Equals(clue.ClueId, MissionContentIds.ClueSurvivingLines, StringComparison.Ordinal));
         }
 
         private static bool IsArea2Clue(EvidenceClueInteractable clue)
@@ -689,6 +861,25 @@ namespace NutriMind.Gameplay.Runtime
             foreach (string clueId in MissionContentIds.Area2ClueIds)
             {
                 if (string.Equals(clue.ClueId, clueId, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsRecognizedClueId(string clueId)
+        {
+            if (string.Equals(clueId, MissionContentIds.ClueOpeningIllustration, StringComparison.Ordinal)
+                || string.Equals(clueId, MissionContentIds.ClueSurvivingLines, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            foreach (string area2ClueId in MissionContentIds.Area2ClueIds)
+            {
+                if (string.Equals(clueId, area2ClueId, StringComparison.Ordinal))
                 {
                     return true;
                 }

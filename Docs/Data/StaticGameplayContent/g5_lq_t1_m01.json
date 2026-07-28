@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "content_version": "1.1.0",
+  "content_version": "1.2.0",
   "mission_id": "g5_lq_t1_m01",
   "grade_id": "grade_5",
   "subject_id": "subject_literaquest",
@@ -62,6 +62,18 @@
       "learning_clues": [
         "A story opening introduces the character, setting, and goal.",
         "A pronoun should clearly refer to a noun already named."
+      ],
+      "evidence_clues": [
+        {
+          "id": "g5_lq_t1_m01_a01_clue_opening_illustration",
+          "title": "Opening Illustration",
+          "body": "Look at the damaged opening picture. Who is in the scene, and where does the festival story begin?"
+        },
+        {
+          "id": "g5_lq_t1_m01_a01_clue_surviving_lines",
+          "title": "Surviving Lines",
+          "body": "Read the surviving sentence. What do the children want to do once the opening page is repaired?"
+        }
       ],
       "required_interactions": [
         "mission_orientation",
@@ -197,16 +209,33 @@
       "opening_dialogue": [
         {
           "speaker": "Mina",
-          "text": "The middle of the chapter is mixed up. Three event markers are hidden along the market lane."
+          "text": "Welcome to Banner Market Lane! The middle of the chapter fell off our stall banners."
         },
         {
           "speaker": "Mina",
-          "text": "Find them and place them in the order the events happened."
+          "text": "Find the three event markers along the lane. Then place them in time order: first, next, and finally."
         }
       ],
       "learning_clues": [
         "Events in a narrative follow a logical time order.",
         "Sequence clues such as first, next, and finally show how events connect."
+      ],
+      "evidence_clues": [
+        {
+          "id": "g5_lq_t1_m01_a02_clue_children_gather",
+          "title": "First Banner Marker",
+          "body": "This near-stall banner shows what happened FIRST: the children gather under the acacia tree in Story Square before the market walk begins."
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_clue_storybook_opened",
+          "title": "Next Banner Marker",
+          "body": "This middle-stall painting shows what happened NEXT: after the children gather, Farmer Lira opens the damaged town storybook."
+        },
+        {
+          "id": "g5_lq_t1_m01_a02_clue_caption_repaired",
+          "title": "Final Banner Marker",
+          "body": "This far-stall marker shows what happened FINALLY on the route: the Pathfinder repairs the missing opening caption so the banner path can continue."
+        }
       ],
       "required_interactions": [
         "explore_zone",
@@ -224,7 +253,7 @@
           "id": "g5_lq_t1_m01_a02_q01",
           "type": "multiple_choice_single",
           "is_scored": true,
-          "prompt": "Which event happens first?",
+          "prompt": "Which Banner Market Lane marker shows the FIRST event?",
           "options": [
             {
               "id": "a",
@@ -247,15 +276,15 @@
             "a"
           ],
           "attempt_limit": 2,
-          "first_wrong_hint": "Choose the event that begins the story.",
-          "second_wrong_explanation": "The children gathering at the acacia tree is the first event.",
-          "correct_feedback": "The children gathering at the acacia tree is the first event."
+          "first_wrong_hint": "Choose the marker that begins the story sequence.",
+          "second_wrong_explanation": "The first Banner Market Lane marker is the children gathering at the acacia tree.",
+          "correct_feedback": "Yes — the children gathering at the acacia tree is first in the market-lane sequence."
         },
         {
           "id": "g5_lq_t1_m01_a02_q02",
           "type": "multiple_choice_single",
           "is_scored": true,
-          "prompt": "What happens after the children gather?",
+          "prompt": "According to the stall markers, what happens NEXT after the children gather?",
           "options": [
             {
               "id": "a",
@@ -278,15 +307,15 @@
             "a"
           ],
           "attempt_limit": 2,
-          "first_wrong_hint": "Look for the second event in the three-clue sequence.",
-          "second_wrong_explanation": "Farmer Lira opens the damaged storybook after the children gather.",
-          "correct_feedback": "Farmer Lira opens the damaged storybook after the children gather."
+          "first_wrong_hint": "Look at the middle-stall marker in the three-clue sequence.",
+          "second_wrong_explanation": "Next comes Farmer Lira opening the damaged storybook.",
+          "correct_feedback": "Yes — Farmer Lira opens the damaged storybook next after the children gather."
         },
         {
           "id": "g5_lq_t1_m01_a02_q03",
           "type": "multiple_choice_single",
           "is_scored": true,
-          "prompt": "Which event is last in the market-lane sequence?",
+          "prompt": "Which event belongs LAST on the Banner Market Lane sequence board?",
           "options": [
             {
               "id": "a",
@@ -309,9 +338,9 @@
             "a"
           ],
           "attempt_limit": 2,
-          "first_wrong_hint": "Choose the action that follows the damaged storybook being opened.",
-          "second_wrong_explanation": "The Pathfinder repairs the missing opening caption last in this three-event sequence.",
-          "correct_feedback": "The Pathfinder repairs the missing opening caption last in this three-event sequence."
+          "first_wrong_hint": "Choose the far-stall marker that follows the storybook being opened.",
+          "second_wrong_explanation": "Last in this market-lane sequence is the Pathfinder repairing the missing opening caption.",
+          "correct_feedback": "Yes — repairing the missing opening caption is last on the Banner Market Lane board."
         }
       ],
       "world_action": "Place the three event markers in order on the banner-route board.",
@@ -331,7 +360,7 @@
         "g5_lq_t1_m01_a02.collectible_collected",
         "g5_lq_t1_m01_a02.completed"
       ],
-      "story_source": "Three event clues remain: the children gather at the acacia tree; Farmer Lira opens the damaged storybook; the Pathfinder repairs the missing opening caption. The banner route activates only when the clues are placed in chronological order."
+      "story_source": "Along Banner Market Lane, three stall markers must be ordered: FIRST the children gather at the acacia tree; NEXT Farmer Lira opens the damaged storybook; FINALLY the Pathfinder repairs the missing opening caption. The banner route activates only in that chronological order."
     },
     {
       "area_id": "g5_lq_t1_m01_a03",

@@ -42,6 +42,14 @@ namespace NutriMind.Gameplay.Runtime
     }
 
     [Serializable]
+    public sealed class MissionEvidenceClueDto
+    {
+        public string id;
+        public string title;
+        public string body;
+    }
+
+    [Serializable]
     public sealed class MissionAreaDto
     {
         public string area_id;
@@ -51,6 +59,7 @@ namespace NutriMind.Gameplay.Runtime
         public string story;
         public MissionDialogueLineDto[] opening_dialogue;
         public string[] learning_clues;
+        public MissionEvidenceClueDto[] evidence_clues;
         public string[] required_interactions;
         public MissionQuestionDto[] questions;
         public string world_action;
@@ -81,6 +90,54 @@ namespace NutriMind.Gameplay.Runtime
         public MissionContentDto Raw { get; set; }
         public MissionAreaContent Area1 { get; set; }
         public MissionAreaContent Area2 { get; set; }
+
+        public bool TryGetEvidenceClue(string clueId, out string title, out string body)
+        {
+            title = null;
+            body = null;
+            if (string.IsNullOrWhiteSpace(clueId))
+            {
+                return false;
+            }
+
+            if (TryGetEvidenceClue(Area1, clueId, out title, out body)
+                || TryGetEvidenceClue(Area2, clueId, out title, out body))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryGetEvidenceClue(
+            MissionAreaContent area,
+            string clueId,
+            out string title,
+            out string body)
+        {
+            title = null;
+            body = null;
+            MissionEvidenceClueDto[] clues = area?.Area?.evidence_clues;
+            if (clues == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < clues.Length; i++)
+            {
+                MissionEvidenceClueDto clue = clues[i];
+                if (clue == null || !string.Equals(clue.id, clueId, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                title = clue.title;
+                body = clue.body;
+                return !string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(body);
+            }
+
+            return false;
+        }
 
         public static bool TryLoad(TextAsset jsonAsset, out MissionContentData data, out string error)
         {
@@ -136,6 +193,23 @@ namespace NutriMind.Gameplay.Runtime
             }
 
             if (!ValidateAreaQuestions(area2, MissionContentIds.Area2QuestionIds, out error))
+            {
+                return false;
+            }
+
+            if (!ValidateAreaEvidenceClues(
+                    area1,
+                    new[]
+                    {
+                        MissionContentIds.ClueOpeningIllustration,
+                        MissionContentIds.ClueSurvivingLines
+                    },
+                    out error))
+            {
+                return false;
+            }
+
+            if (!ValidateAreaEvidenceClues(area2, MissionContentIds.Area2ClueIds, out error))
             {
                 return false;
             }
@@ -206,6 +280,34 @@ namespace NutriMind.Gameplay.Runtime
 
             return true;
         }
+
+        private static bool ValidateAreaEvidenceClues(MissionAreaDto area, string[] expectedIds, out string error)
+        {
+            error = string.Empty;
+            if (area.evidence_clues == null || area.evidence_clues.Length != expectedIds.Length)
+            {
+                error = "Area " + area.area_id + " must contain exactly " + expectedIds.Length + " evidence_clues.";
+                return false;
+            }
+
+            for (int i = 0; i < expectedIds.Length; i++)
+            {
+                MissionEvidenceClueDto clue = area.evidence_clues[i];
+                if (clue == null || !string.Equals(clue.id, expectedIds[i], StringComparison.Ordinal))
+                {
+                    error = "Missing or mismatched evidence_clue id at index " + i + " for area " + area.area_id + ".";
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(clue.title) || string.IsNullOrWhiteSpace(clue.body))
+                {
+                    error = "Evidence clue " + clue.id + " requires title and body.";
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     public static class MissionWorldActionContent
@@ -262,19 +364,19 @@ namespace NutriMind.Gameplay.Runtime
                 new EventCard
                 {
                     Id = MissionContentIds.EventSequenceCardIds[0],
-                    Text = "The children gather at the acacia tree.",
+                    Text = "FIRST: The children gather at the acacia tree.",
                     CorrectSlotIndex = 0
                 },
                 new EventCard
                 {
                     Id = MissionContentIds.EventSequenceCardIds[1],
-                    Text = "Farmer Lira opens the damaged storybook.",
+                    Text = "NEXT: Farmer Lira opens the damaged storybook.",
                     CorrectSlotIndex = 1
                 },
                 new EventCard
                 {
                     Id = MissionContentIds.EventSequenceCardIds[2],
-                    Text = "The Pathfinder repairs the missing opening caption.",
+                    Text = "FINALLY: The Pathfinder repairs the missing opening caption.",
                     CorrectSlotIndex = 2
                 }
             };

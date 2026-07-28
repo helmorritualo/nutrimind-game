@@ -105,7 +105,7 @@ namespace NutriMind.Gameplay.Runtime
                     continue;
                 }
 
-                IWorldInteractable interactable = collider.GetComponentInParent<IWorldInteractable>();
+                IWorldInteractable interactable = ResolveInteractable(collider);
                 if (interactable == null || !interactable.CanInteract)
                 {
                     continue;
@@ -131,7 +131,8 @@ namespace NutriMind.Gameplay.Runtime
                 }
 
                 float facing = Vector3.Dot(forward, flat);
-                float score = interactable.Priority * 10f + facing * 5f - distance;
+                // Prefer closer, camera-facing targets; priority still breaks ties.
+                float score = interactable.Priority * 8f + facing * 6f - distance * 2.5f;
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -151,6 +152,24 @@ namespace NutriMind.Gameplay.Runtime
 
             _focusedTarget = target;
             FocusChanged?.Invoke(_focusedTarget);
+        }
+
+        private static IWorldInteractable ResolveInteractable(Collider collider)
+        {
+            if (collider == null)
+            {
+                return null;
+            }
+
+            // Prefer the interactable on the collider's own object so parent
+            // storybook/NPC hosts do not steal child clue targets.
+            IWorldInteractable local = collider.GetComponent<IWorldInteractable>();
+            if (local != null)
+            {
+                return local;
+            }
+
+            return collider.GetComponentInParent<IWorldInteractable>();
         }
     }
 }

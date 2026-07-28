@@ -109,6 +109,23 @@ namespace NutriMind.Tests.EditMode.GameplayRuntime
         }
 
         [Test]
+        public void TalkingToMina_AfterArea1Complete_EntersArea2EvenWithoutEntryTrigger()
+        {
+            NpcGuideInteractable mina = CreateNpc(MissionContentIds.MinaNpc);
+            SetPrivate(_bindings, "_mina", mina);
+
+            _controller.Progress.CurrentStep = MissionObjectiveStep.Area1_Complete;
+            _controller.Progress.CurrentAreaId = MissionContentIds.Area1Id;
+
+            // Without overlay content, HandleMinaTalk should still enter Area 2 before dialogue.
+            // Dialogue may no-op without content; verify area transition from the failsafe path.
+            _controller.HandleNpcInteraction(mina);
+
+            Assert.That(_controller.Progress.CurrentAreaId, Is.EqualTo(MissionContentIds.Area2Id));
+            Assert.That(_controller.Progress.CurrentStep, Is.EqualTo(MissionObjectiveStep.Area2_TalkToMina));
+        }
+
+        [Test]
         public void UnknownFragmentIds_AreRejected()
         {
             _controller.HandleFragmentCollected("extra_fragment");
@@ -136,6 +153,131 @@ namespace NutriMind.Tests.EditMode.GameplayRuntime
             Assert.That(_controller.Progress.IsGateUnlocked(MissionContentIds.Gate2), Is.True);
             Assert.That(_controller.Progress.CurrentStep, Is.EqualTo(MissionObjectiveStep.Area2_Complete));
             Assert.That(_gate2.State, Is.EqualTo(AreaGateState.Unlocked));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Area1ClueProgress_SupportsEitherInspectionOrder_AndDoesNotRegress(bool openingFirst)
+        {
+            _controller.Progress.CurrentStep = MissionObjectiveStep.Area1_InspectOpeningIllustration;
+            _controller.Progress.MarkInteractionCompleted(MissionContentIds.DamagedStorybook);
+
+            if (openingFirst)
+            {
+                _controller.Progress.MarkClueInspected(MissionContentIds.ClueOpeningIllustration);
+                InvokeArea1ClueProgress();
+                Assert.That(
+                    _controller.Progress.CurrentStep,
+                    Is.EqualTo(MissionObjectiveStep.Area1_InspectSurvivingLines));
+
+                _controller.Progress.MarkClueInspected(MissionContentIds.ClueSurvivingLines);
+            }
+            else
+            {
+                _controller.Progress.MarkClueInspected(MissionContentIds.ClueSurvivingLines);
+                InvokeArea1ClueProgress();
+                Assert.That(
+                    _controller.Progress.CurrentStep,
+                    Is.EqualTo(MissionObjectiveStep.Area1_InspectOpeningIllustration));
+
+                _controller.Progress.MarkClueInspected(MissionContentIds.ClueOpeningIllustration);
+            }
+
+            InvokeArea1ClueProgress();
+            Assert.That(
+                _controller.Progress.CurrentStep,
+                Is.EqualTo(MissionObjectiveStep.Area1_ResolveQuestions));
+
+            MissionObjectiveStep[] laterSteps =
+            {
+                MissionObjectiveStep.Area1_ResolveQuestions,
+                MissionObjectiveStep.Area1_RepairCaption,
+                MissionObjectiveStep.Area1_CollectFragment,
+                MissionObjectiveStep.Area1_Complete
+            };
+
+            foreach (MissionObjectiveStep step in laterSteps)
+            {
+                _controller.Progress.CurrentStep = step;
+                InvokeArea1ClueProgress();
+                Assert.That(
+                    _controller.Progress.CurrentStep,
+                    Is.EqualTo(step),
+                    "Area 1 clue progress must not regress from " + step);
+            }
+        }
+
+        [Test]
+        public void Validation_ReportsError_WhenArea1CluesShareComponent()
+        {
+            var sharedHost = new GameObject("SharedClueHost");
+            _created.Add(sharedHost);
+            EvidenceClueInteractable shared = sharedHost.AddComponent<EvidenceClueInteractable>();
+            SetPrivate(shared, "_clueId", MissionContentIds.ClueOpeningIllustration);
+            SetPrivate(shared, "_interactionId", MissionContentIds.ClueOpeningIllustration);
+
+            SetPrivate(_bindings, "_openingIllustrationClue", shared);
+            SetPrivate(_bindings, "_survivingLinesClue", shared);
+
+            MissionValidationReport report = _bindings.Validate();
+            Assert.That(
+                report.Errors,
+                Has.Some.Contain("Opening Illustration Clue and Surviving Lines Clue reference the same component."));
+        }
+
+        [Test]
+        public void Validation_ReportsError_WhenArea1CluesShareClueId()
+        {
+            EvidenceClueInteractable opening = CreateClue(
+                "CluePoint01_OpeningIllustration",
+                MissionContentIds.ClueOpeningIllustration);
+            EvidenceClueInteractable surviving = CreateClue(
+                "CluePoint02_SurvivingLines",
+                MissionContentIds.ClueOpeningIllustration);
+
+            SetPrivate(_bindings, "_openingIllustrationClue", opening);
+            SetPrivate(_bindings, "_survivingLinesClue", surviving);
+
+            MissionValidationReport report = _bindings.Validate();
+            Assert.That(report.Errors, Has.Some.Contain("Duplicate clue id"));
+        }
+
+        private EvidenceClueInteractable CreateClue(string objectName, string clueId)
+        {
+            var host = new GameObject(objectName);
+            _created.Add(host);
+            var focus = new GameObject("InteractionPoint");
+            focus.transform.SetParent(host.transform, false);
+            SphereCollider trigger = host.AddComponent<SphereCollider>();
+            trigger.isTrigger = true;
+            EvidenceClueInteractable clue = host.AddComponent<EvidenceClueInteractable>();
+            SetPrivate(clue, "_clueId", clueId);
+            SetPrivate(clue, "_interactionId", clueId);
+            SetPrivate(clue, "_focusPoint", focus.transform);
+            return clue;
+        }
+
+        private NpcGuideInteractable CreateNpc(string interactionId)
+        {
+            var host = new GameObject(interactionId);
+            _created.Add(host);
+            var focus = new GameObject("InteractionPoint");
+            focus.transform.SetParent(host.transform, false);
+            SphereCollider trigger = host.AddComponent<SphereCollider>();
+            trigger.isTrigger = true;
+            NpcGuideInteractable npc = host.AddComponent<NpcGuideInteractable>();
+            SetPrivate(npc, "_interactionId", interactionId);
+            SetPrivate(npc, "_focusPoint", focus.transform);
+            return npc;
+        }
+
+        private void InvokeArea1ClueProgress()
+        {
+            System.Reflection.MethodInfo method = typeof(MissionPrototypeController).GetMethod(
+                "HandleArea1ClueProgress",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.That(method, Is.Not.Null);
+            method.Invoke(_controller, null);
         }
 
         private StoryFragmentCollectible CreateFragment(string id)
@@ -169,11 +311,24 @@ namespace NutriMind.Tests.EditMode.GameplayRuntime
 
         private static void SetPrivate(object target, string fieldName, object value)
         {
-            System.Reflection.FieldInfo field = target.GetType().GetField(
-                fieldName,
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            Assert.That(field, Is.Not.Null, fieldName);
-            field.SetValue(target, value);
+            System.Type type = target.GetType();
+            while (type != null)
+            {
+                System.Reflection.FieldInfo field = type.GetField(
+                    fieldName,
+                    System.Reflection.BindingFlags.Instance
+                    | System.Reflection.BindingFlags.NonPublic
+                    | System.Reflection.BindingFlags.DeclaredOnly);
+                if (field != null)
+                {
+                    field.SetValue(target, value);
+                    return;
+                }
+
+                type = type.BaseType;
+            }
+
+            Assert.Fail("Missing field: " + fieldName);
         }
     }
 }
